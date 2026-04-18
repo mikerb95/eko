@@ -1,19 +1,19 @@
 {
   "component": "reports_list",
   "metatags": {
-    "title": "Reports | EKO Finance",
-    "description": "Browse our full library of investment research reports and market analysis.",
-    "og_title": "Reports | EKO Finance",
-    "og_description": "Browse our full library of investment research reports.",
+    "title": "Publicaciones | EKO Ambiental",
+    "description": "Guías, análisis normativos y artículos especializados en regulación ambiental colombiana para importadores y productores.",
+    "og_title": "Publicaciones | EKO Ambiental",
+    "og_description": "Guías y análisis de normativa ambiental colombiana para empresas.",
     "og_image": "",
-    "twitter_title": "Reports | EKO Finance",
-    "twitter_description": "Investment research reports and market analysis.",
+    "twitter_title": "Publicaciones | EKO Ambiental",
+    "twitter_description": "Normativa ambiental ANLA para importadores y productores en Colombia.",
     "twitter_image": ""
   },
-  "title": "Research Reports",
-  "lead": "Institutional-grade investment research and market analysis for informed investors.",
+  "title": "Publicaciones y Guías",
+  "lead": "Análisis normativos, guías prácticas y actualizaciones regulatorias para importadores y productores en Colombia.",
   "image": {
-    "filename": "https://picsum.photos/seed/reports-banner/2560/800",
-    "alt": "Research reports library"
+    "filename": "https://picsum.photos/seed/publicaciones-banner/2560/800",
+    "alt": "Publicaciones de normativa ambiental"
   }
 }
