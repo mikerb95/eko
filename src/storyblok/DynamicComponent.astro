@@ -1,0 +1,36 @@
+---
+import Hero from './Hero.astro'
+import Button from './Button.astro'
+import Heading from './Heading.astro'
+import ReportsSection from './ReportsSection.astro'
+import ReportsList from './ReportsList.astro'
+import FeaturesSection from './FeaturesSection.astro'
+import BannerSplit from './BannerSplit.astro'
+import BannerCta from './BannerCta.astro'
+import TeamSection from './TeamSection.astro'
+import PartnersSection from './PartnersSection.astro'
+import StatsSection from './StatsSection.astro'
+import TestimonialsSection from './TestimonialsSection.astro'
+import AdvisersSection from './AdvisersSection.astro'
+import Page from './Page.astro'
+import Report from './Report.astro'
+
+const { blok, ...rest } = Astro.props
+const comp = blok?.component
+---
+
+{comp === 'page' && <Page blok={blok} {...rest} />}
+{comp === 'report' && <Report blok={blok} {...rest} />}
+{comp === 'hero' && <Hero blok={blok} {...rest} />}
+{comp === 'button' && <Button blok={blok} {...rest} />}
+{comp === 'heading' && <Heading blok={blok} {...rest} />}
+{comp === 'reports_section' && <ReportsSection blok={blok} {...rest} />}
+{comp === 'reports_list' && <ReportsList blok={blok} {...rest} />}
+{comp === 'features_section' && <FeaturesSection blok={blok} {...rest} />}
+{comp === 'banner_split' && <BannerSplit blok={blok} {...rest} />}
+{comp === 'banner_cta' && <BannerCta blok={blok} {...rest} />}
+{comp === 'team_section' && <TeamSection blok={blok} {...rest} />}
+{comp === 'partners_section' && <PartnersSection blok={blok} {...rest} />}
+{comp === 'stats_section' && <StatsSection blok={blok} {...rest} />}
+{comp === 'testimonials_section' && <TestimonialsSection blok={blok} {...rest} />}
+{comp === 'advisers_section' && <AdvisersSection blok={blok} {...rest} />}
