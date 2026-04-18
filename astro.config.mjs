@@ -1,69 +1,21 @@
 import { defineConfig } from 'astro/config'
 import tailwindcss from '@tailwindcss/vite'
-import { storyblok } from '@storyblok/astro'
-import { loadEnv } from 'vite'
-import mkcert from 'vite-plugin-mkcert'
-import netlify from '@astrojs/netlify'
-
-const env = loadEnv('', process.cwd(), 'STORYBLOK')
-
-let is_preview = env.STORYBLOK_IS_PREVIEW === 'yes'
-let output
-let adapter
-
-// local dev
-if (import.meta.env.DEV) {
-  output = "server"
-  adapter = undefined
-}
-
-// local build
-else if (env.STORYBLOK_ENVIRONMENT === 'development') {
-  output = "static"
-  adapter = undefined
-  is_preview = false
-}
-
-// cloud
-else {
-  adapter = is_preview ? netlify() : undefined
-  output = is_preview ? "server" : "static"
-}
+import vercel from '@astrojs/vercel'
 
 export default defineConfig({
-  output: output,
-  adapter: adapter,
-
-  integrations: [
-    storyblok({
-      accessToken: env.STORYBLOK_TOKEN,
-      bridge: {
-        resolveRelations: ['reports_section.reports'],
-      },
-      enableFallbackComponent: true,
-      livePreview: is_preview,
-      apiOptions: {
-        region: 'eu',
-      },
-    }),
-  ],
+  output: 'static',
+  adapter: vercel(),
 
   image: {
     remotePatterns: [
       {
         protocol: 'https',
-        hostname: '**.storyblok.com',
+        hostname: 'picsum.photos',
       },
     ],
   },
 
   vite: {
-    plugins: [
-      mkcert(),
-      tailwindcss()
-    ],
-    server: {
-      https: true,
-    },
-  }
+    plugins: [tailwindcss()],
+  },
 })
