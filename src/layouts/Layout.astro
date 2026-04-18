@@ -4,8 +4,8 @@ import Header from '../components/Header.astro'
 import Footer from '../components/Footer.astro'
 import { getDatasource } from '../utils/api'
 
-const { siteSettings, language, langSwitch, translate, blok } = Astro.props
-const seo = blok.metatags
+const { siteSettings, language, translate, blok } = Astro.props
+const seo = blok?.metatags ?? siteSettings?.metatags ?? {}
 
 const colors = await getDatasource('colors')
 const primaryColor = colors.primary
@@ -25,13 +25,12 @@ const primaryColor = colors.primary
     <meta name="twitter:description" content={seo?.twitter_description} />
     <meta property="og:locale" content={language} />
     <meta property="og:type" content="website" />
-    <meta property="og:site_name" content="" />
     <meta name="twitter:card" content={seo?.twitter_image ? "summary_large_image" : "summary"} />
-    <meta property="og:image" content={seo?.og_image} />
-    <meta name="twitter:image" content={seo?.twitter_image} />
+    {seo?.og_image && <meta property="og:image" content={seo.og_image} />}
+    {seo?.twitter_image && <meta name="twitter:image" content={seo.twitter_image} />}
   </head>
   <body class="font-inter antialiased bg-background text-foreground" style={`--color-primary: ${primaryColor};`}>
-    <Header siteSettings={siteSettings} langSwitch={langSwitch} language={language} translate={translate} />
+    <Header siteSettings={siteSettings} language={language} translate={translate} />
     <slot />
     <Footer siteSettings={siteSettings} language={language} translate={translate} />
   </body>
