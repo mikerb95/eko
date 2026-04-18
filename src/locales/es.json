@@ -1,11 +1,11 @@
 {
   "author": "Autor",
   "readMore": "Leer más",
-  "report": "Informar",
-  "returnReports": "Volver a todos los informes",
-  "becomeMember": "Hazte miembro",
-  "companyDetails": "Detalles de la empresa",
+  "report": "Publicación",
+  "returnReports": "Ver todas las publicaciones",
+  "becomeMember": "Solicitar Consulta",
+  "companyDetails": "Información de contacto",
   "allRightsReserved": "Todos los derechos reservados",
-  "termsAndConditions": "Términos y condiciones",
-  "privacyPolicy": "Política de privacidad"
+  "termsAndConditions": "Términos y Condiciones",
+  "privacyPolicy": "Política de Privacidad"
 }
