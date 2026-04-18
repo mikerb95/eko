@@ -1,28 +1,16 @@
 ---
-import { storyblokEditable } from '@storyblok/astro'
-import StoryblokComponent from '@storyblok/astro/StoryblokComponent.astro'
+import DynamicComponent from './DynamicComponent.astro'
 const { blok } = Astro.props
 ---
 
-<section {...storyblokEditable(blok)} class="group" data-posthog>
-
+<section class="group" data-posthog>
   <div class="relative min-h-[82vh] flex items-end pt-40 before:absolute before:inset-0 before:bg-black/55 before:mix-blend-multiply before:z-10">
 
     <picture class="absolute z-0 w-full h-full object-cover object-top">
-      <source
-        srcset={`${blok.image.filename}/m/640x685/`}
-        media="(max-width: 640px)"
-      />
-      <source
-        srcset={`${blok.image.filename}/m/1024x685/`}
-        media="(max-width: 1024px)"
-      />
-      <source
-        srcset={`${blok.image.filename}/m/1440x685/`}
-        media="(max-width: 1440px)"
-      />
+      <source srcset={blok.image.filename} media="(max-width: 640px)" />
+      <source srcset={blok.image.filename} media="(max-width: 1024px)" />
       <img
-        src={`${blok.image.filename}/m/1440x685/`}
+        src={blok.image.filename}
         alt={blok.image.alt}
         class="absolute z-0 w-full h-full object-cover object-top"
       />
@@ -34,26 +22,20 @@ const { blok } = Astro.props
           <h2 class="text-white text-3xl md:text-5xl leading-[110%] -tracking-[1.92px] font-adamina mb-4">
             {blok.headline}
           </h2>
-
           {blok.lead && (
-            <p class="text-white leading-[150%] -tracking-[0.32px]">
-              {blok.lead}
-            </p>
+            <p class="text-white leading-[150%] -tracking-[0.32px]">{blok.lead}</p>
           )}
         </div>
-
         {blok.button && blok.button.length > 0 && (
-          <StoryblokComponent blok={blok.button[0]} classes="cta-button" />
+          <DynamicComponent blok={blok.button[0]} classes="cta-button" />
         )}
       </div>
 
       <div class="max-w-[1016px] mx-auto px-6">
         {blok.partners && blok.partners.length > 0 && (
-          <StoryblokComponent blok={blok.partners[0]} />
+          <DynamicComponent blok={blok.partners[0]} />
         )}
       </div>
-
     </div>
   </div>
-
 </section>
