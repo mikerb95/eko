@@ -1,0 +1,136 @@
+@import "tailwindcss";
+@plugin "@tailwindcss/typography";
+
+@view-transition {
+  navigation: auto;
+}
+
+@font-face {
+  font-display: swap;
+  font-family: 'Inter';
+  font-style: normal;
+  font-weight: 400;
+  src: url('../fonts/inter-v19-latin-regular.woff2') format('woff2');
+}
+
+@font-face {
+  font-display: swap;
+  font-family: 'Inter';
+  font-style: normal;
+  font-weight: 500;
+  src: url('../fonts/inter-v19-latin-500.woff2') format('woff2');
+}
+
+@font-face {
+  font-display: swap;
+  font-family: 'Adamina';
+  font-style: normal;
+  font-weight: 400;
+  src: url('/fonts/adamina-v21-latin-regular.woff2') format('woff2');
+}
+
+@media (min-width: 1024px) {
+  .container {
+    max-width: 1146px;
+  }
+}
+
+@theme {
+  --font-inter: "Inter", sans-serif;
+  --font-adamina: "Adamina", sans-serif;
+
+  --color-background: #F4F5F5;
+  --color-foreground: #000;
+
+  --color-primary: #193EAF;
+  --color-primary-foreground: #fff;
+
+  --color-card: #FFF;
+  --color-card-foreground: var(--color-foreground);
+
+  --color-muted: #595959;
+
+  --color-border: #e3e3e333;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+@media screen and (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+}
+
+@utility sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border-width: 0;
+}
+
+body:has(#header.is-open){
+  overflow: hidden;
+}
+
+header {
+  isolation: isolate;
+}
+
+.button--glass {
+  --glass-border-width: 1px;
+  --glass-radius: 4px;
+
+  position: relative;
+  border-radius: var(--glass-radius);
+  border: var(--glass-border-width) solid transparent;
+}
+
+.button--glass::before {
+  content: " ";
+  position: absolute;
+  inset: calc(var(--glass-border-width) * -1);
+  z-index: -1;
+  border: inherit;
+  border-radius: inherit;
+  background-image: conic-gradient(from var(--angle), #ffffff44 5%, transparent 10%, #ffffff44);
+  background-origin: border-box;
+  -webkit-mask:
+    linear-gradient(black, black) content-box,
+    linear-gradient(black, black);
+  mask: linear-gradient(black, black),
+        linear-gradient(black, black);
+  -webkit-mask-clip: content-box, border-box;
+  mask-clip: content-box, border-box;
+  -webkit-mask-composite: xor;
+  mask-composite: exclude;
+  animation: border-spin 3s linear infinite;
+}
+
+@supports not (background: paint(something)) {
+  .button--glass::before {
+    background-image: conic-gradient(#FFFFFF7A 5%, transparent 10%, #FFFFFF77);
+  }
+}
+
+.button--glass:hover::before {
+  animation-play-state: paused;
+}
+
+@property --angle {
+  syntax: "<angle>";
+  inherits: true;
+  initial-value: 0turn;
+}
+
+@keyframes border-spin {
+  to {
+    --angle: 1turn;
+  }
+}

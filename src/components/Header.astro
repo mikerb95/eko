@@ -1,0 +1,65 @@
+---
+import { getTransLink } from '../utils/i18n'
+import { getHref } from '../utils/getHref'
+import LanguageSwitcher from './LanguageSwitcher.astro'
+const { language, translate, langSwitch, siteSettings } = Astro.props
+---
+
+<header class="group absolute top-0 right-0 left-0 border-b border-border z-50" id="header">
+  <nav class="max-w-[1016px] mx-auto px-6 flex justify-between items-center md:grid md:grid-cols-3 py-6">
+    <!-- Logo -->
+    <div class="flex items-center gap-1 z-50">
+      <a href={getTransLink(language, `/`)}>
+        <img src={siteSettings.logo.filename} alt={siteSettings.logo.alt} />
+      </a>
+    </div>
+
+    <!-- Navigation -->
+    <ul class="fixed inset-0 flex flex-col items-center justify-center gap-8 bg-primary text-white text-2xl transform transition-transform duration-300 md:static md:flex-row md:bg-transparent md:text-[0.81rem] md:gap-0 md:translate-x-0 translate-x-full group-[.is-open]:translate-x-0">
+      {siteSettings.navigation.length &&
+        siteSettings.navigation.map((navItem) => (
+          <li>
+            <a
+              href={getHref(navItem.url)}
+              class="block px-4 py-2 md:px-4 md:py-2 capitalize hover:opacity-80"
+            >
+              {navItem.label}
+            </a>
+          </li>
+        ))
+      }
+
+      <!-- Mobile CTA at bottom -->
+      <li>
+        <a
+          href={getTransLink(language, ``)}
+          class="mt-8 button--glass text-white px-6 py-3 text-lg bg-black/20 backdrop-blur-sm md:hidden"
+        >
+          {translate.becomeMember}
+        </a>
+      </li>
+    </ul>
+
+    <!-- Desktop right side -->
+    <div class="flex items-center gap-4 md:justify-self-end">
+      <LanguageSwitcher langSwitch={langSwitch} language={language} />
+      <a
+        href={getTransLink(language, ``)}
+        class="button--glass hidden md:block text-white px-3 py-1.5 text-sm bg-black/20 backdrop-blur-sm"
+      >
+        {translate.becomeMember}
+      </a>
+
+      <!-- Hamburger Button -->
+      <button
+        class="md:hidden flex flex-col justify-between w-6 h-5 z-50 relative"
+        onclick="document.getElementById('header').classList.toggle('is-open')"
+        aria-label="Toggle Navigation"
+      >
+        <span class="block h-0.5 w-full bg-white transition-transform duration-300 group-[.is-open]:translate-y-[9px] group-[.is-open]:rotate-45"></span>
+        <span class="block h-0.5 w-full bg-white transition-opacity duration-300 group-[.is-open]:opacity-0"></span>
+        <span class="block h-0.5 w-full bg-white transition-transform duration-300 group-[.is-open]:-translate-y-[9px] group-[.is-open]:-rotate-45"></span>
+      </button>
+    </div>
+  </nav>
+</header>

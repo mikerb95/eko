@@ -1,0 +1,219 @@
+{
+  "component": "page",
+  "metatags": {
+    "title": "EKO Finance | Investment Intelligence",
+    "description": "Expert investment analysis and financial intelligence for discerning investors.",
+    "og_title": "EKO Finance | Investment Intelligence",
+    "og_description": "Expert investment analysis and financial intelligence for discerning investors.",
+    "og_image": "",
+    "twitter_title": "EKO Finance",
+    "twitter_description": "Expert investment analysis.",
+    "twitter_image": ""
+  },
+  "body": [
+    {
+      "component": "hero",
+      "headline": "Investment Intelligence for the Modern Era",
+      "lead": "Expert analysis and curated insights to navigate today's complex financial landscape with confidence.",
+      "image": {
+        "filename": "https://picsum.photos/seed/finance-hero/1440/685",
+        "alt": "Financial markets background"
+      },
+      "button": [
+        {
+          "component": "button",
+          "label": "Become a Member",
+          "style": "primary",
+          "url": { "linktype": "url", "url": "#" }
+        }
+      ],
+      "partners": [
+        {
+          "component": "partners_section",
+          "title": "Trusted by leading institutions",
+          "partners": [
+            { "name": "BlackRock", "logo": { "filename": "", "alt": "BlackRock" }, "link": { "cached_url": "#" } },
+            { "name": "Vanguard", "logo": { "filename": "", "alt": "Vanguard" }, "link": { "cached_url": "#" } },
+            { "name": "Fidelity", "logo": { "filename": "", "alt": "Fidelity" }, "link": { "cached_url": "#" } },
+            { "name": "Goldman Sachs", "logo": { "filename": "", "alt": "Goldman Sachs" }, "link": { "cached_url": "#" } },
+            { "name": "Morgan Stanley", "logo": { "filename": "", "alt": "Morgan Stanley" }, "link": { "cached_url": "#" } }
+          ]
+        }
+      ]
+    },
+    {
+      "component": "reports_section",
+      "title": "Featured Reports",
+      "reports": [
+        {
+          "slug": "report/annual-market-outlook-2024",
+          "content": {
+            "component": "report",
+            "title": "Annual Market Outlook 2024",
+            "author": "Dr. Sarah Chen",
+            "published_date": "January 15, 2024",
+            "image": {
+              "filename": "https://picsum.photos/seed/report-1/700/700",
+              "alt": "Market outlook 2024"
+            }
+          }
+        },
+        {
+          "slug": "report/sustainable-investing-guide",
+          "content": {
+            "component": "report",
+            "title": "The Complete Guide to Sustainable Investing",
+            "author": "Marcus Williams",
+            "published_date": "February 3, 2024",
+            "image": {
+              "filename": "https://picsum.photos/seed/report-2/700/700",
+              "alt": "Sustainable investing"
+            }
+          }
+        },
+        {
+          "slug": "report/global-portfolio-diversification",
+          "content": {
+            "component": "report",
+            "title": "Global Portfolio Diversification Strategies",
+            "author": "Elena Vasquez",
+            "published_date": "March 12, 2024",
+            "image": {
+              "filename": "https://picsum.photos/seed/report-3/700/700",
+              "alt": "Portfolio diversification"
+            }
+          }
+        }
+      ],
+      "button": [
+        {
+          "component": "button",
+          "label": "View All Reports",
+          "style": "secondary",
+          "url": { "linktype": "url", "url": "/report" }
+        }
+      ]
+    },
+    {
+      "component": "features_section",
+      "title": "Why EKO Finance",
+      "features": [
+        {
+          "title": "In-depth Analysis",
+          "image": {
+            "filename": "https://picsum.photos/seed/feature-analysis/700/480",
+            "alt": "Financial analysis"
+          },
+          "description": "Our team of seasoned analysts delivers comprehensive research grounded in data, giving you the edge to make better investment decisions."
+        },
+        {
+          "title": "Market Intelligence",
+          "image": {
+            "filename": "https://picsum.photos/seed/feature-market/700/480",
+            "alt": "Market intelligence"
+          },
+          "description": "Stay ahead of market trends with real-time intelligence curated from thousands of sources and distilled into actionable insights."
+        },
+        {
+          "title": "Portfolio Strategy",
+          "image": {
+            "filename": "https://picsum.photos/seed/feature-portfolio/700/480",
+            "alt": "Portfolio strategy"
+          },
+          "description": "From asset allocation to risk management, our strategic frameworks help you build resilient portfolios that perform across market cycles."
+        }
+      ]
+    },
+    {
+      "component": "banner_split",
+      "headline": "Data-driven decisions for long-term wealth",
+      "lead": "Join thousands of investors who rely on EKO Finance for their most critical investment decisions. Access institutional-grade research at an accessible price.",
+      "image": {
+        "filename": "https://picsum.photos/seed/banner-split/906/543",
+        "alt": "Investment professional"
+      },
+      "heading": [
+        {
+          "component": "heading",
+          "title": "Membership",
+          "icon": null,
+          "style": "default"
+        }
+      ],
+      "button": [
+        {
+          "component": "button",
+          "label": "Become a Member",
+          "style": "primary",
+          "url": { "linktype": "url", "url": "#" }
+        }
+      ]
+    },
+    {
+      "component": "stats_section",
+      "title": "Trusted by investors worldwide",
+      "lead": "Our track record speaks for itself. EKO Finance has helped thousands of investors navigate volatile markets since 2015.",
+      "stats": [
+        { "number": "$2.4B+", "label": "Assets under advisory", "primary": true },
+        { "number": "15,000+", "label": "Active members", "primary": false },
+        { "number": "98%", "label": "Member retention rate", "primary": false },
+        { "number": "200+", "label": "Research reports annually", "primary": false }
+      ]
+    },
+    {
+      "component": "testimonials_section",
+      "headline": "What our members say",
+      "image": {
+        "filename": "https://picsum.photos/seed/testimonials/858/494",
+        "alt": "Member testimonial"
+      },
+      "heading": [
+        {
+          "component": "heading",
+          "title": "Testimonials",
+          "icon": null,
+          "style": "glass"
+        }
+      ],
+      "testimonials": [
+        {
+          "quote": "EKO Finance transformed how I approach investing. The depth of analysis is unmatched — it's like having a Goldman Sachs research team in your pocket.",
+          "author_name": "James Thornton",
+          "author_title": "Family Office CIO"
+        }
+      ],
+      "button": [
+        {
+          "component": "button",
+          "label": "Join Now",
+          "style": "primary",
+          "url": { "linktype": "url", "url": "#" }
+        }
+      ]
+    },
+    {
+      "component": "banner_cta",
+      "headline": "Start making smarter investment decisions today",
+      "image": {
+        "filename": "https://picsum.photos/seed/banner-cta/1440/720",
+        "alt": "Investment background"
+      },
+      "heading": [
+        {
+          "component": "heading",
+          "title": "Get Started",
+          "icon": null,
+          "style": "glass"
+        }
+      ],
+      "button": [
+        {
+          "component": "button",
+          "label": "Become a Member",
+          "style": "primary",
+          "url": { "linktype": "url", "url": "#" }
+        }
+      ]
+    }
+  ]
+}

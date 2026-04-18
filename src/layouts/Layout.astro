@@ -1,0 +1,38 @@
+---
+import "../styles/global.css"
+import Header from '../components/Header.astro'
+import Footer from '../components/Footer.astro'
+import { getDatasource } from '../utils/api'
+
+const { siteSettings, language, langSwitch, translate, blok } = Astro.props
+const seo = blok.metatags
+
+const colors = await getDatasource('colors')
+const primaryColor = colors.primary
+---
+
+<!DOCTYPE html>
+<html lang={language}>
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <title>{seo?.title}</title>
+    <meta property="og:title" content={seo?.og_title} />
+    <meta name="twitter:title" content={seo?.twitter_title} />
+    <meta name="description" content={seo?.description} />
+    <meta property="og:description" content={seo?.og_description} />
+    <meta name="twitter:description" content={seo?.twitter_description} />
+    <meta property="og:locale" content={language} />
+    <meta property="og:type" content="website" />
+    <meta property="og:site_name" content="" />
+    <meta name="twitter:card" content={seo?.twitter_image ? "summary_large_image" : "summary"} />
+    <meta property="og:image" content={seo?.og_image} />
+    <meta name="twitter:image" content={seo?.twitter_image} />
+  </head>
+  <body class="font-inter antialiased bg-background text-foreground" style={`--color-primary: ${primaryColor};`}>
+    <Header siteSettings={siteSettings} langSwitch={langSwitch} language={language} translate={translate} />
+    <slot />
+    <Footer siteSettings={siteSettings} language={language} translate={translate} />
+  </body>
+</html>

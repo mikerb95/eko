@@ -1,0 +1,49 @@
+---
+import { getLanguages, getLanguageLabel, getLanguageFlag } from '../utils/i18n'
+const languages = await getLanguages()
+const { language, langSwitch } = Astro.props
+---
+
+<div class="relative inline-block">
+  <button id="dropdowntoggle" type="button" class="inline-flex items-center p-1.5 gap-0.5 rounded-sm select-none cursor-pointer" aria-expanded="false" aria-haspopup="true" aria-label="Select language">
+    <svg class="rounded-full" width="16" height="16" viewBox="0 0 16 16" xmlns="http://www.w3.org/2000/svg" set:html={getLanguageFlag(language)} />
+    <svg class="-scale-100" width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <path d="M4 10L8 6L12 10" stroke="white" stroke-width="1.33333" stroke-linecap="round" stroke-linejoin="round"/>
+    </svg>
+  </button>
+  <div id="dropdown" class="hidden absolute left-0 w-[160px] -translate-x-1/2 ml-[50%] mt-2 rounded-lg bg-white" aria-labelledby="dropdowntoggle">
+    <ul class="flex flex-col p-2 gap-y-1.5" role="none">
+      {languages.map((lang) => (
+          <li>
+            <a
+              href={langSwitch[lang]}
+              class="flex items-center gap-1 rounded-sm p-1 text-xs capitalize"
+            >
+              <svg aria-hidden="true" class="rounded-full" width="16" height="16" viewBox="0 0 16 16" xmlns="http://www.w3.org/2000/svg" set:html={getLanguageFlag(lang)} />
+              {getLanguageLabel(lang)}
+            </a>
+          </li>
+        ))}
+    </ul>
+  </div>
+</div>
+
+<script is:inline>
+  document.addEventListener('DOMContentLoaded', () => {
+    const toggleBtn = document.getElementById('dropdowntoggle')
+    const dropdown = document.getElementById('dropdown')
+
+    toggleBtn.addEventListener('click', () => {
+      dropdown.classList.toggle('hidden')
+      const expanded = toggleBtn.getAttribute('aria-expanded') === 'true'
+      toggleBtn.setAttribute('aria-expanded', !expanded)
+    })
+
+    document.addEventListener('click', (e) => {
+      if (!toggleBtn.contains(e.target) && !dropdown.contains(e.target)) {
+        dropdown.classList.add('hidden')
+        toggleBtn.setAttribute('aria-expanded', false)
+      }
+    })
+  })
+</script>

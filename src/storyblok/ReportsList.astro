@@ -1,0 +1,44 @@
+---
+import { storyblokEditable } from '@storyblok/astro'
+import { getReportList } from '../utils/api'
+import ReportCard from '../components/ReportCard.astro'
+
+const { blok, language } = Astro.props
+const reports = await getReportList(language)
+---
+
+<section {...storyblokEditable(blok)} class="bg-black">
+
+  <div
+    class="min-h-[44vh] flex flex-col justify-center items-center bg-no-repeat bg-cover bg-center"
+    style={`background-image: ${blok.image.filename ? `url(${blok.image.filename}/m/2560x0)` : ''}`}
+    >
+    <div class="max-w-[624px] mx-auto px-6 flex flex-col justify-center items-center pt-14">
+      <h1 class="text-white text-3xl md:text-5xl leading-[120%] text-center font-adamina mb-4">
+        {blok.title}
+      </h1>
+
+      {blok.lead && (
+        <p class="text-center text-white opacity-65 leading-[24px]">
+          {blok.lead}
+        </p>
+      )}
+    </div>
+  </div>
+
+  <div class="container mx-auto px-6 py-24">
+    <ul class="grid gap-7 grid-cols-1 md:grid-cols-3">
+      {
+        reports.length &&
+          reports.map((report) => {
+            report.content.slug = report.slug
+            return (
+              <li>
+                <ReportCard language={language} report={report.content} />
+              </li>
+            )
+          })
+      }
+    </ul>
+  </div>
+</section>

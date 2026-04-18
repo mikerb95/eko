@@ -1,0 +1,40 @@
+---
+import { storyblokEditable, renderRichText } from '@storyblok/astro'
+import Button from '../components/Button.astro'
+import { getTransLink } from '../utils/i18n'
+
+const { blok, translate, language  } = Astro.props
+const renderedRichText = renderRichText(blok.content)
+---
+
+<article {...storyblokEditable(blok)}>
+  <div
+    class="min-h-[44vh] flex flex-col justify-center items-center text-white"
+    style={`background: linear-gradient(0deg, rgba(0, 0, 0, 0.70) 0%, rgba(0, 0, 0, 0.70) 100%) ${blok.image.filename ? `, url(${blok.image.filename}) center/cover no-repeat lightgray` : ''}`}
+  >
+    <div class="container mx-auto px-6">
+      <div class="max-w-[624px] mx-auto flex flex-col justify-center items-center pt-28 pb-14">
+        <span class="block text-center opacity-65 leading-[24px] mb-3">
+          {translate.report}
+        </span>
+        <h1 class="text-3xl md:text-5xl leading-[120%] text-center font-adamina">
+          {blok.title}
+        </h1>
+
+        <div class="flex flex-col sm:flex-row justify-center items-center gap-4 my-8">
+          <div class="font-medium">{translate.author}: {blok.author}</div>
+          <span class="w-[5px] h-[5px] bg-white opacity-50 rounded-[0.5px]"></span>
+          <div class="font-medium">{blok.published_date}</div>
+        </div>
+
+        <Button label={translate.returnReports} href={getTransLink(language, `/report`)} />
+      </div>
+    </div>
+  </div>
+
+  <div class="container mx-auto px-6">
+    <div class="mx-auto py-24 px-4 prose prose-headings:text-primary prose-headings:mt-8 prose-a:text-primary prose-a:hover:underline"
+      set:html={renderedRichText}>
+    </div>
+  </div>
+</article>

@@ -1,0 +1,19 @@
+{
+  "component": "reports_list",
+  "metatags": {
+    "title": "Reports | EKO Finance",
+    "description": "Browse our full library of investment research reports and market analysis.",
+    "og_title": "Reports | EKO Finance",
+    "og_description": "Browse our full library of investment research reports.",
+    "og_image": "",
+    "twitter_title": "Reports | EKO Finance",
+    "twitter_description": "Investment research reports and market analysis.",
+    "twitter_image": ""
+  },
+  "title": "Research Reports",
+  "lead": "Institutional-grade investment research and market analysis for informed investors.",
+  "image": {
+    "filename": "https://picsum.photos/seed/reports-banner/2560/800",
+    "alt": "Research reports library"
+  }
+}

@@ -1,0 +1,38 @@
+---
+import {getLiveStory } from '@storyblok/astro'
+import { getStory, getSiteSettings } from '../utils/api'
+import StoryblokComponent from '@storyblok/astro/StoryblokComponent.astro'
+import Layout from '../layouts/Layout.astro'
+import parseUrl from '../utils/parseUrl'
+import isPreview from '../utils/isPreview'
+import generateStaticPaths from '../utils/generateStaticPaths'
+import * as locales from '../locales'
+
+export async function getStaticPaths() {
+  return await generateStaticPaths()
+}
+
+const params = Astro.params
+
+let props = isPreview() ? parseUrl(params.slug) : Astro.props
+
+const { slug, language, langSwitch } = props
+
+const siteSettings = await getSiteSettings(language)
+
+const translate = locales[language] || locales.en
+
+let story
+
+const liveStory = await getLiveStory(Astro);
+
+if (liveStory) {
+  story = liveStory;
+} else {
+  story = await getStory(slug, language)
+}
+---
+
+<Layout blok={story.content} siteSettings={siteSettings.content} langSwitch={langSwitch} language={language} translate={translate}>
+  <StoryblokComponent blok={story.content} language={language} translate={translate}  />
+</Layout>
