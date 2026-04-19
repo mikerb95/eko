@@ -1,0 +1,126 @@
+[
+  {
+    "slug": "anla-vital-2026",
+    "category": "Normativa",
+    "date": "14 abr 2026",
+    "readtime": "6 min",
+    "title": "VITAL 3.0: qué cambia en el cargue de expedientes para el sector tech",
+    "lede": "La plataforma VITAL publicó su actualización mayor de abril. Cambios en la estructura del expediente, nuevos campos obligatorios para importadores y un flujo renovado de respuesta a requerimientos.",
+    "accent": "deep",
+    "featured": true,
+    "sections": [
+      { "type": "p", "text": "La plataforma VITAL de la ANLA publicó el pasado 10 de abril su actualización 3.0. Para importadores y productores del sector tecnológico, tres cambios son especialmente relevantes." },
+      { "type": "h2", "text": "1. Estructura del expediente" },
+      { "type": "p", "text": "El nuevo esquema exige una segmentación explícita entre documento técnico, anexos cartográficos y respaldo financiero. Los expedientes abiertos antes de abril se migran automáticamente, pero conviene auditar el resultado — en los primeros casos hemos visto cargas incompletas." },
+      { "type": "pull", "text": "Los expedientes migrados automáticamente no siempre conservan los anexos cartográficos. Revisar manualmente." },
+      { "type": "h2", "text": "2. Nuevos campos obligatorios" },
+      { "type": "p", "text": "Se incorporan campos de NIT del gestor posconsumo, código CIIU específico y coordenadas WGS84 de los puntos de operación. Para multinacionales con operaciones distribuidas, esto implica coordinación previa con la matriz." },
+      { "type": "list", "items": ["NIT del gestor posconsumo autorizado", "Código CIIU a 6 dígitos", "Coordenadas WGS84 de los puntos de operación", "Responsable ambiental certificado"] },
+      { "type": "h2", "text": "3. Flujo de respuesta a requerimientos" },
+      { "type": "p", "text": "Antes, el expediente quedaba en estado 'en requerimiento' y el reloj se pausaba. Ahora el sistema cuenta los días hábiles de forma continua, lo que reduce el margen operativo." },
+      { "type": "p", "text": "Nuestro equipo está acompañando la migración de los primeros 14 expedientes bajo esta nueva versión. Compartiremos los aprendizajes en una nota de seguimiento a fin de mayo." }
+    ]
+  },
+  {
+    "slug": "raee-metas-2026",
+    "category": "Posconsumo",
+    "date": "02 abr 2026",
+    "readtime": "4 min",
+    "title": "Metas RAEE 2026: el salto del 12% que preocupa a las importadoras",
+    "lede": "El nuevo ajuste de la Resolución 1297 obliga a gestionar 12% más de residuos respecto a lo puesto en el mercado el año anterior. Analizamos cómo prepararse sin romper la operación logística.",
+    "accent": "forest",
+    "featured": false,
+    "sections": [
+      { "type": "p", "text": "La Resolución 1297 de 2010 opera bajo un sistema de metas crecientes. Cada año, los productores e importadores de aparatos eléctricos y electrónicos deben gestionar un porcentaje mayor de lo puesto en el mercado el año anterior." },
+      { "type": "h2", "text": "El salto del 12%" },
+      { "type": "p", "text": "Para 2026, la meta mínima nacional pasa del 33% al 45% — un incremento absoluto de 12 puntos que, en volumen, se traduce en aproximadamente 28.000 toneladas adicionales a gestionar formalmente." },
+      { "type": "pull", "text": "45% de lo puesto en el mercado en 2025. Sin prórrogas anunciadas." },
+      { "type": "h2", "text": "Cómo prepararse" },
+      { "type": "list", "items": ["Auditar la red actual de puntos de recolección", "Renegociar cupos con gestores autorizados antes de Q3", "Activar canales B2B (los equipos corporativos representan el 40% del volumen)", "Reforzar la trazabilidad documental de cada movimiento"] }
+    ]
+  },
+  {
+    "slug": "auditoria-tecnologica",
+    "category": "Buenas prácticas",
+    "date": "24 mar 2026",
+    "readtime": "7 min",
+    "title": "Auditoría ambiental para tech: las 11 brechas que siempre encontramos",
+    "lede": "Siete años auditando compañías de hardware, software y data centers nos han enseñado que las mismas once brechas aparecen en el 90% de los casos. Las listamos, ordenadas por impacto sancionatorio.",
+    "accent": "clay",
+    "featured": false,
+    "sections": [
+      { "type": "p", "text": "Después de 142 auditorías, podemos predecir con alta precisión qué vamos a encontrar. Las brechas son sorprendentemente consistentes entre compañías muy distintas." },
+      { "type": "h2", "text": "Las 11 brechas recurrentes" },
+      { "type": "list", "items": ["Plan posconsumo radicado pero sin reporte anual de metas", "Empaques comercializados sin plan REP asociado", "Vertimientos industriales sin caracterización vigente", "Permiso de emisiones para generadores sobredimensionados", "RCD de obras menores sin plan de gestión", "Inventario de sustancias químicas desactualizado", "RUA manufacturero con vencimiento superado", "Responsable ambiental sin certificación vigente", "Contratos con gestores sin anexos técnicos", "Matriz de obligaciones no reconciliada con expedientes", "Evidencia operativa no archivada en formato auditable"] },
+      { "type": "p", "text": "Ocho de las once se cierran en menos de 60 días con un plan estructurado. Las otras tres — vertimientos, emisiones y empaques — requieren un ciclo regulatorio completo." }
+    ]
+  },
+  {
+    "slug": "data-centers-vertimientos",
+    "category": "Caso técnico",
+    "date": "12 mar 2026",
+    "readtime": "5 min",
+    "title": "Data centers en Colombia: el cuello de botella del permiso de vertimientos",
+    "lede": "El 70% de las demoras en licenciamiento de data centers viene del permiso de vertimientos. Una guía paso a paso con el orden correcto de radicación.",
+    "accent": "deep",
+    "featured": false,
+    "sections": [
+      { "type": "p", "text": "Los data centers modernos generan vertimientos por tres vías: torres de enfriamiento, agua de procesos sanitarios y purgas del sistema de climatización. Cualquiera de las tres activa la obligación del permiso." },
+      { "type": "h2", "text": "El orden correcto" },
+      { "type": "list", "items": ["Caracterización físico-química (4–6 semanas)", "Diseño de sistema de tratamiento", "Radicación ante la autoridad ambiental competente", "Visita técnica y auto de inicio", "Resolución de permiso"] },
+      { "type": "pull", "text": "Radicar el permiso de emisiones antes del de vertimientos es la causa #1 de demoras." }
+    ]
+  },
+  {
+    "slug": "raee-colombia-cifras",
+    "category": "Industria",
+    "date": "28 feb 2026",
+    "readtime": "8 min",
+    "title": "El estado del RAEE en Colombia 2026: cifras, brechas y oportunidades",
+    "lede": "Colombia genera 300 mil toneladas de RAEE al año. Gestiona formalmente menos del 15%. Lo que dice el dato y lo que se viene en regulación.",
+    "accent": "forest",
+    "featured": false,
+    "sections": [
+      { "type": "p", "text": "Colombia es el quinto generador de RAEE en Latinoamérica. Las cifras oficiales y las de la industria no siempre coinciden, pero todas apuntan en la misma dirección: el sistema no está capturando la mayoría del flujo." },
+      { "type": "h2", "text": "La foto 2025" },
+      { "type": "list", "items": ["300.000 toneladas generadas anualmente (estimado PNUMA)", "Solo 42.000 toneladas gestionadas formalmente en 2025", "85% del flujo va a gestores informales o disposición común", "7 kg per cápita — por encima del promedio regional"] },
+      { "type": "h2", "text": "Lo que viene" },
+      { "type": "p", "text": "El ajuste de metas 2026–2030 y la entrada del país a acuerdos de Basilea actualizados presionan a las importadoras a formalizar trazabilidad aguas abajo. Veremos más auditorías de segunda parte (del importador al gestor) en los próximos 24 meses." }
+    ]
+  },
+  {
+    "slug": "empaques-rep",
+    "category": "REP",
+    "date": "14 feb 2026",
+    "readtime": "6 min",
+    "title": "Envases y empaques: lo que deben saber los e-commerce de tecnología",
+    "lede": "La Resolución 1407 aplica a cualquier marca que ponga empaques en el mercado. Aclaramos las dudas más frecuentes de los retailers electrónicos.",
+    "accent": "clay",
+    "featured": false,
+    "sections": [
+      { "type": "p", "text": "La Resolución 1407 de 2018 aplica a cualquier persona natural o jurídica que ponga empaques en el mercado colombiano. Para un e-commerce de tecnología, esto incluye: cajas maestras, separadores, bolsas, flejes y cualquier material de relleno." },
+      { "type": "h2", "text": "Las preguntas que más recibimos" },
+      { "type": "list", "items": ["¿Aplica si importo el producto ya empacado? — Sí.", "¿Aplica si solo hago dropshipping? — Depende de quién figura como importador.", "¿Cuenta el empaque secundario de transporte? — Sí, si llega al consumidor final.", "¿Hay umbral mínimo? — No para el registro, sí para las metas."] }
+    ]
+  },
+  {
+    "slug": "visita-anla-playbook",
+    "category": "Playbook",
+    "date": "30 ene 2026",
+    "readtime": "5 min",
+    "title": "Visita sorpresa de la ANLA: el playbook de las primeras 4 horas",
+    "lede": "Qué hacer en el primer cuarto de hora, quién habla, qué documentos mostrar y qué nunca debe firmarse. El protocolo que damos a nuestros clientes.",
+    "accent": "deep",
+    "featured": false,
+    "sections": [
+      { "type": "p", "text": "Las visitas no programadas de la autoridad ambiental son cada vez más frecuentes en el sector tecnológico. El protocolo de las primeras cuatro horas define el resultado del proceso." },
+      { "type": "h2", "text": "Minuto 0 — 15" },
+      { "type": "p", "text": "Identificar al funcionario, verificar el acta de visita y notificar inmediatamente al responsable ambiental. Nunca firmar documentos sin revisión jurídica." },
+      { "type": "h2", "text": "Hora 1 — 2" },
+      { "type": "p", "text": "Acompañar al funcionario en el recorrido. No volunteer información no solicitada. Documentar todo con foto y bitácora paralela." },
+      { "type": "h2", "text": "Hora 3 — 4" },
+      { "type": "p", "text": "Revisar el acta antes de firmar. Anotar observaciones específicas si hay discrepancia con lo observado. El acta es el insumo #1 si hay proceso posterior." },
+      { "type": "pull", "text": "La firma del acta no es obligatoria si hay discrepancia sustancial. Sí lo es dejar constancia escrita." }
+    ]
+  }
+]
