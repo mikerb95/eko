@@ -1,0 +1,130 @@
+---
+import Layout from '../layouts/Layout.astro'
+---
+
+<Layout title="Contacto — Eko" activePath="/contacto">
+  <section class="page-head wrap">
+    <div class="page-strip">
+      <div class="l">Contacto</div>
+      <div class="l">Respondemos en &lt; 24 h hábiles</div>
+    </div>
+    <h1 class="display reveal" style="margin-top:40px">
+      Un <em>diagnóstico</em><br>para empezar.
+    </h1>
+    <p class="lede reveal" style="margin-top:32px; max-width:56ch">
+      Cuéntanos brevemente qué obligación necesitas resolver. Te llamamos en 24 horas hábiles para una sesión sin costo de 45 minutos.
+    </p>
+  </section>
+
+  <section class="section wrap">
+    <div class="contact-grid reveal">
+      <div class="contact-info">
+        <div class="row"><div class="k">Email</div><div class="v ulink">hola@eko.co</div></div>
+        <div class="row"><div class="k">Teléfono</div><div class="v">+57 601 000 0000</div></div>
+        <div class="row"><div class="k">Oficina</div><div class="v">Cra. 11 #93-50, piso 6<br>Chicó, Bogotá D.C.</div></div>
+        <div class="row"><div class="k">Horario</div><div class="v">Lun – Vie · 8:00 – 17:30 COT</div></div>
+        <div class="row">
+          <div class="k">Emergencias</div>
+          <div class="v">
+            Visitas no programadas de la autoridad ambiental:<br>
+            <span style="color:var(--deep); font-weight:500">+57 300 000 0000</span> · 24/7
+          </div>
+        </div>
+        <div class="row"><div class="k">Prensa</div><div class="v">prensa@eko.co</div></div>
+      </div>
+
+      <form class="form" id="contact-form">
+        <div class="form-row">
+          <div class="field">
+            <label>Nombre</label>
+            <input type="text" placeholder="Tu nombre" />
+          </div>
+          <div class="field">
+            <label>Empresa</label>
+            <input type="text" placeholder="Nombre de la compañía" />
+          </div>
+        </div>
+        <div class="form-row">
+          <div class="field">
+            <label>Email corporativo</label>
+            <input type="email" placeholder="tu@empresa.co" />
+          </div>
+          <div class="field">
+            <label>Teléfono</label>
+            <input type="tel" placeholder="+57" />
+          </div>
+        </div>
+        <div class="field">
+          <label>Sector</label>
+          <select>
+            <option>Importadora de tecnología</option>
+            <option>Ensambladora / productora</option>
+            <option>Telecomunicaciones</option>
+            <option>Data center / infraestructura</option>
+            <option>Retail electrónico</option>
+            <option>Otro</option>
+          </select>
+        </div>
+        <div class="field">
+          <label>¿En qué podemos ayudar? (selecciona las que apliquen)</label>
+          <div class="chips">
+            <button type="button" class="chip">Licenciamiento</button>
+            <button type="button" class="chip on">Posconsumo RAEE</button>
+            <button type="button" class="chip">Auditoría</button>
+            <button type="button" class="chip">Reportes ANLA</button>
+            <button type="button" class="chip">Proceso sancionatorio</button>
+            <button type="button" class="chip">Capacitación</button>
+          </div>
+        </div>
+        <div class="field">
+          <label>Cuéntanos más</label>
+          <textarea placeholder="Contexto de la obligación, vencimientos próximos, tamaño del proyecto…"></textarea>
+        </div>
+        <button type="submit" class="submit">
+          <span class="submit-text">Enviar solicitud</span>
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6">
+            <path d="M5 12h14M13 6l6 6-6 6"/>
+          </svg>
+        </button>
+      </form>
+    </div>
+  </section>
+
+  <footer class="foot">
+    <div class="wrap">
+      <div class="foot-head reveal">
+        <div class="display">¿Un nuevo <em>expediente</em><br>en el radar?</div>
+        <a href="/contacto" class="foot-cta">
+          Escríbenos
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6">
+            <path d="M5 12h14M13 6l6 6-6 6"/>
+          </svg>
+        </a>
+      </div>
+      <div class="foot-cols">
+        <div>
+          <div class="brand" style="color:var(--paper)"><span class="mark"></span><span>Ek<em>o</em></span></div>
+          <p style="opacity:.6; font-size:14px; margin-top:12px; max-width:36ch">Consultoría ambiental especializada en cumplimiento ANLA para el sector tecnológico.</p>
+        </div>
+        <div><h5>Sitio</h5><ul><li><a href="/">Inicio</a></li><li><a href="/servicios">Servicios</a></li><li><a href="/normativas">Normativas</a></li><li><a href="/casos">Casos</a></li><li><a href="/blog">Diario</a></li></ul></div>
+        <div><h5>Contacto</h5><ul><li>hola@eko.co</li><li>+57 601 000 0000</li><li>Cra. 11 #93-50<br>Bogotá D.C.</li></ul></div>
+        <div><h5>Legal</h5><ul><li>Política de tratamiento</li><li>Términos de servicio</li><li>Código de ética</li></ul></div>
+      </div>
+      <div class="foot-bottom">
+        <div>© 2026 Eko S.A.S · NIT 901.xxx.xxx-x</div>
+        <div>Built with care in Bogotá</div>
+      </div>
+    </div>
+  </footer>
+
+  <script>
+    const form = document.getElementById("contact-form");
+    form?.addEventListener("submit", (e) => {
+      e.preventDefault();
+      const btn = form.querySelector(".submit") as HTMLButtonElement;
+      const text = form.querySelector(".submit-text") as HTMLElement;
+      if (text) text.textContent = "Enviado ✓";
+      if (btn) btn.style.background = "var(--forest)";
+    });
+  </script>
+</Layout>
