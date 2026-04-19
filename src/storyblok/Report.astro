@@ -13,7 +13,7 @@ const { blok, translate, language } = Astro.props
     <div class="container mx-auto px-6">
       <div class="max-w-[624px] mx-auto flex flex-col justify-center items-center pt-28 pb-14">
         <span class="block text-center opacity-65 leading-[24px] mb-3">{translate.report}</span>
-        <h1 class="text-3xl md:text-5xl leading-[120%] text-center font-adamina">{blok.title}</h1>
+        <h1 transition:animate="fade" class="text-3xl md:text-5xl leading-[120%] text-center font-adamina">{blok.title}</h1>
         <div class="flex flex-col sm:flex-row justify-center items-center gap-4 my-8">
           <div class="font-medium">{translate.author}: {blok.author}</div>
           <span class="w-[5px] h-[5px] bg-white opacity-50 rounded-[0.5px]"></span>
