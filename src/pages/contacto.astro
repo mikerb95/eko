@@ -2,7 +2,7 @@
 import Layout from '../layouts/Layout.astro'
 ---
 
-<Layout title="Contacto — Eko" activePath="/contacto">
+<Layout title="Contacto — Ekosolv" activePath="/contacto">
   <section class="page-head wrap">
     <div class="page-strip">
       <div class="l">Contacto</div>
@@ -12,15 +12,41 @@ import Layout from '../layouts/Layout.astro'
       Un <em>diagnóstico</em><br>para empezar.
     </h1>
     <p class="lede reveal" style="margin-top:32px; max-width:56ch">
-      Cuéntanos brevemente qué obligación necesitas resolver. Te llamamos en 24 horas hábiles para una sesión sin costo de 45 minutos.
+      Cuéntanos brevemente qué obligación necesitas resolver. Te contactamos en 24 horas hábiles para una sesión sin costo de 45 minutos.
     </p>
   </section>
 
   <section class="section wrap">
+    <div class="band reveal" style="margin-bottom: clamp(32px, 4vw, 56px)">
+      <div class="band-grid" style="grid-template-columns: 1fr 1fr">
+        <div>
+          <div class="eyebrow" style="color: color-mix(in oklab, #fff 55%, transparent)">EKORAEE · Recolección</div>
+          <h2 style="margin-top:14px; max-width:20ch">¿Necesitas retirar equipos <em>obsoletos</em>?</h2>
+          <p style="color: color-mix(in oklab, #fff 75%, transparent); margin-top:16px; max-width:44ch; font-size:15px; line-height:1.55">
+            Agenda una recolección de residuos electrónicos (RAEE) para tu empresa. Incluye transporte certificado y certificado de disposición final.
+          </p>
+        </div>
+        <div style="display:flex; flex-direction:column; justify-content:center; gap:20px">
+          <a href="https://wa.me/573212712773" target="_blank" rel="noopener" class="foot-cta" style="background: color-mix(in oklab, #fff 15%, transparent); border: 1px solid color-mix(in oklab, #fff 25%, transparent);">
+            Agendar por WhatsApp
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
+              <path d="M5 12h14M13 6l6 6-6 6"/>
+            </svg>
+          </a>
+          <div style="font-family: var(--font-mono); font-size:11.5px; color: color-mix(in oklab, #fff 55%, transparent); letter-spacing:0.06em; text-transform:uppercase;">
+            +57 321 271 2773 · info@ekosolv.com
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="section wrap" style="padding-top:0">
     <div class="contact-grid reveal">
       <div class="contact-info">
         <div class="row"><div class="k">Email</div><div class="v ulink">info@ekosolv.com</div></div>
         <div class="row"><div class="k">Teléfono</div><div class="v">+57 321 271 2773</div></div>
+        <div class="row"><div class="k">WhatsApp</div><div class="v">+57 321 271 2773</div></div>
         <div class="row"><div class="k">Oficina</div><div class="v">Edificio RPTV<br>Carrera 15 #31B-33, Bogotá D.C.</div></div>
         <div class="row"><div class="k">Horario</div><div class="v">Lun – Vie · 8:00 – 17:30 COT</div></div>
         <div class="row">
@@ -30,7 +56,6 @@ import Layout from '../layouts/Layout.astro'
             <span style="color:var(--deep); font-weight:500">+57 322 226 6729</span> · 24/7
           </div>
         </div>
-        <div class="row"><div class="k">Prensa</div><div class="v">info@ekosolv.com</div></div>
       </div>
 
       <form class="form" id="contact-form">
@@ -66,19 +91,18 @@ import Layout from '../layouts/Layout.astro'
           </select>
         </div>
         <div class="field">
-          <label>¿En qué podemos ayudar? (selecciona las que apliquen)</label>
+          <label>Línea de servicio (selecciona las que apliquen)</label>
           <div class="chips">
-            <button type="button" class="chip">Licenciamiento</button>
-            <button type="button" class="chip on">Posconsumo RAEE</button>
-            <button type="button" class="chip">Auditoría</button>
-            <button type="button" class="chip">Reportes ANLA</button>
-            <button type="button" class="chip">Proceso sancionatorio</button>
-            <button type="button" class="chip">Capacitación</button>
+            <button type="button" class="chip">EKONSULTING · Asesoría ANLA</button>
+            <button type="button" class="chip on">EKORAEE · Residuos electrónicos</button>
+            <button type="button" class="chip">EKOPARTNER · Operación residuos</button>
+            <button type="button" class="chip">EKOTRADING · Activos IT</button>
+            <button type="button" class="chip">Estrategia ESG</button>
           </div>
         </div>
         <div class="field">
           <label>Cuéntanos más</label>
-          <textarea placeholder="Contexto de la obligación, vencimientos próximos, tamaño del proyecto…"></textarea>
+          <textarea placeholder="Contexto de la obligación, tipo de residuos, volúmenes estimados, vencimientos próximos…"></textarea>
         </div>
         <button type="submit" class="submit">
           <span class="submit-text">Enviar solicitud</span>
@@ -104,7 +128,7 @@ import Layout from '../layouts/Layout.astro'
       <div class="foot-cols">
         <div>
           <div class="brand" style="color:var(--paper)"><span class="mark"></span><span>Ek<em>o</em></span></div>
-          <p style="opacity:.6; font-size:14px; margin-top:12px; max-width:36ch">Consultoría ambiental especializada en cumplimiento ANLA para el sector tecnológico.</p>
+          <p style="opacity:.6; font-size:14px; margin-top:12px; max-width:36ch">Consultoría ambiental especializada en cumplimiento ANLA, ESG y economía circular.</p>
         </div>
         <div><h5>Sitio</h5><ul><li><a href="/">Inicio</a></li><li><a href="/servicios">Servicios</a></li><li><a href="/normativas">Normativas</a></li><li><a href="/casos">Casos</a></li><li><a href="/blog">Diario</a></li></ul></div>
         <div><h5>Contacto</h5><ul><li>info@ekosolv.com</li><li>+57 321 271 2773</li><li>Edif. RPTV · Carrera 15 #31B-33<br>Bogotá D.C.</li></ul></div>
