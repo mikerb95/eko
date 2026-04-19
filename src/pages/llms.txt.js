@@ -1,72 +1,35 @@
-import { storyblokApi } from '@storyblok/astro/client'
-import { extractStoryMeta } from '../utils/extractStoryMeta'
-import isPreview from '../utils/isPreview'
+import { getLinks } from '../utils/api'
 
 export const GET = async () => {
-	try {
-		const stories = await storyblokApi.getAll('cdn/stories', {
-			sort_by: 'position:desc',
-			version: isPreview() ? 'draft' : 'published',
-      excluding_slugs: 'settings/*',
-		})
+  try {
+    const links = await getLinks()
+    const baseUrl = 'https://ekoambiental.co'
 
-		// Filters all stories not in folders, such as Home and About
-		const mainStories = stories.filter((story) => !story.parent_id)
+    const pages = links
+      .filter((l) => !l.is_folder)
+      .map((l) => `- [${l.slug === 'home' ? 'Inicio' : l.slug}](${baseUrl}/${l.slug === 'home' ? '' : l.slug})`)
+      .join('\n')
 
-		// Group stories by folder
-		const childStories = stories.filter((story) => story.parent_id)
-		const storiesByFolder = childStories.reduce((acc, story) => {
-			const folder = story.full_slug.split('/')[0]
-			if (!acc[folder]) acc[folder] = []
-			acc[folder].push(story)
-			return acc
-		}, {})
+    const body = `# EKO Ambiental
 
-		const mainExtract = mainStories.map((story) => extractStoryMeta(story))
+> Consultoría en normativa ambiental para importadores y productores en Colombia
 
-		// Build sections by folder
-		const folderSections = Object.entries(storiesByFolder)
-			.map(([folder, folderStories]) => {
-				const folderName = folder.replace(/^./, (firstLetter) =>
-					firstLetter.toUpperCase()
-				)
-				const stories = folderStories
-					.map((story) => {
-						const meta = extractStoryMeta(story)
-						return `- [${meta.headline}](https://astro-storyblok-finance-starter.netlify.app/${meta.slug})${meta.summary ? `: ${meta.summary}` : ''}`
-					})
-					.join('\n')
-				return `\n## ${folderName}\n\n${stories}`
-			})
-			.join('\n')
-
-    const body = `# Global Finance Starter
-
-> Financial clarity tools for modern businesses
-
-This file contains a list of all pages and resources on this website.
+Este archivo contiene un listado de todas las páginas y recursos del sitio.
 
 ***
 
-## Main Pages
+## Páginas
 
-${mainExtract
-	.map(
-		(story) =>
-			`- [${story.headline}](https://astro-storyblok-finance-starter.netlify.app/${story.slug})${story.summary ? `: ${story.summary}` : ''}`,
-	)
-	.join('\n')}
-${folderSections}
+${pages}
+
+---
+
+Para más información visita [${baseUrl}](${baseUrl})
 `
-		return new Response(body, {
-			headers: {
-				'Content-Type': 'text/plain charset=utf-8',
-			},
-		})
-	} catch (error) {
-		console.error('Error generating llms.txt:', error)
-		return new Response(`Failed to generate llms.txt \n\n${error}`, {
-			status: 500,
-		})
-	}
+    return new Response(body, {
+      headers: { 'Content-Type': 'text/plain; charset=utf-8' },
+    })
+  } catch (error) {
+    return new Response(`Error generando llms.txt\n\n${error}`, { status: 500 })
+  }
 }
