@@ -1,65 +1,46 @@
-import { storyblokApi } from '@storyblok/astro/client'
-import { extractStoryMeta } from '../utils/extractStoryMeta'
+import { getReportList } from '../utils/api'
 import { convertedMarkdown } from '../utils/html2md'
-import isPreview from '../utils/isPreview'
 
 export const GET = async () => {
-	try {
-		const stories = await storyblokApi.getAll('cdn/stories', {
-			sort_by: 'position:desc',
-			version: isPreview() ? 'draft' : 'published',
-      excluding_slugs: 'settings/*',
-		})
+  try {
+    const reports = await getReportList()
+    const baseUrl = 'https://ekoambiental.co'
 
-		const storyExtract = stories
-			.map((story) => {
-				const richTextContent = story.content?.content
-				const markdownContent = richTextContent
-					? convertedMarkdown(richTextContent)
-					: ''
+    const sections = reports
+      .map((r) => {
+        const slug = r.slug.replace('report/', '')
+        const content = convertedMarkdown(r.content.content)
+        return `## ${r.content.title}
 
-				return extractStoryMeta(story, {
-					content: markdownContent,
-				})
-			})
-			// Filter out stories with no content
-			.filter((story) => story.content && story.content !== 'No content available')
+**Autor**: ${r.content.author} | **Fecha**: ${r.content.published_date}
 
-      const body = `# Global Finance Starter
+${content}
 
-> Financial clarity tools for modern businesses
+**URL**: [${r.content.title}](${baseUrl}/report/${slug})
 
-This file contains the full text content of all pages on this website, optimized for AI language models and search systems.
+***
+`
+      })
+      .join('\n')
+
+    const body = `# EKO Ambiental — Publicaciones Completas
+
+> Consultoría en normativa ambiental para importadores y productores en Colombia
+
+Este archivo contiene el texto completo de todas las publicaciones del sitio, optimizado para modelos de lenguaje e IA.
 
 ***
 
-${storyExtract
-	.map(
-		(story) =>
-			`## ${story.headline}
-
-${story.content}
-
-**URL**: [${story.headline}](https://astro-storyblok-finance-starter.netlify.app/${story.slug})
-
-***
-`,
-	)
-	.join('\n')}
+${sections}
 
 ---
 
-For more information, visit [https://astro-storyblok-finance-starter.netlify.app](https://astro-storyblok-finance-starter.netlify.app)
+Para más información visita [${baseUrl}](${baseUrl})
 `
-		return new Response(body, {
-			headers: {
-				'Content-Type': 'text/plain charset=utf-8',
-			},
-		})
-	} catch (error) {
-		console.error('Error generating llms-full.txt:', error)
-		return new Response(`Failed to generate llms-full.txt \n\n${error.message}`, {
-			status: 500,
-		})
-	}
+    return new Response(body, {
+      headers: { 'Content-Type': 'text/plain; charset=utf-8' },
+    })
+  } catch (error) {
+    return new Response(`Error generando llms-full.txt\n\n${error.message}`, { status: 500 })
+  }
 }
