@@ -1,0 +1,293 @@
+---
+import Layout from '../layouts/Layout.astro'
+
+const team = [
+  {
+    name: "Mario Castilla Sánchez",
+    role: "Gerente General · CEO",
+    initial: "MC",
+    accent: "var(--deep)",
+    bio: "Lidera la visión estratégica de Ekosolv. Su enfoque en la economía de la confianza define la relación con cada cliente.",
+  },
+  {
+    name: "Paula Andrea González",
+    role: "Directora de Operaciones",
+    initial: "PG",
+    accent: "var(--forest)",
+    bio: "Garantiza la ejecución impecable de cada mandato. Coordina las líneas EKORAEE y EKOPARTNER en campo.",
+  },
+  {
+    name: "Maira Arévalo",
+    role: "Directora Comercial · Marketing · Servicio al Cliente",
+    initial: "MA",
+    accent: "var(--clay)",
+    bio: "Construye la relación con clientes nuevos y activos. Responsable de la experiencia de marca Ekosolv.",
+  },
+  {
+    name: "Rafael Poveda",
+    role: "Estratega de Comunicaciones",
+    initial: "RP",
+    accent: "var(--aqua)",
+    bio: "Diseña la narrativa de sostenibilidad y ESG. Ha participado en inmersiones de innovación en Silicon Valley.",
+  },
+]
+
+const hitos = [
+  {
+    year: "2013",
+    title: "Fundación",
+    desc: "Ekosolv nace en Bogotá con la misión de acompañar a empresas colombianas en su transformación ambiental. Desde el primer día, con foco en cumplimiento normativo y gestión de RAEE.",
+  },
+  {
+    year: "2014",
+    title: "REP+ · ANLA",
+    desc: "Participación en el lanzamiento de la estrategia REP+ de la ANLA (14 de junio), para las tres primeras corrientes de residuos posconsumo: baterías plomo-ácido, llantas usadas y residuos electrónicos.",
+  },
+  {
+    year: "2022",
+    title: "Silicon Valley",
+    desc: "Inmersión en las tendencias de tecnología sostenible más avanzadas del mundo. Exploración de innovaciones en gestión de residuos e integración de sostenibilidad corporativa.",
+  },
+  {
+    year: "2024",
+    title: "COP16 · Colombia",
+    desc: "Participación en la zona verde de la COP16 en Colombia. Intercambio de soluciones innovadoras con líderes ambientales nacionales e internacionales.",
+  },
+  {
+    year: "2024",
+    title: "Campaña Quibdó · Istmina",
+    desc: "Iniciativa conjunta con el Ministerio de Ambiente, el Ejército Nacional, la Armada, Codechocó y la Universidad Antonio Nariño. Recolección de residuos, sensibilización y cultura de reciclaje en el Pacífico colombiano.",
+  },
+]
+
+const aliados = [
+  { name: "ANLA", desc: "Autoridad Nacional de Licencias Ambientales" },
+  { name: "Carnaval de Barranquilla", desc: "Aliado estratégico en gestión de residuos sólidos y electrónicos" },
+  { name: "COP16", desc: "Participación en zona verde · Colombia 2024" },
+  { name: "Ministerio de Ambiente", desc: "Campañas posconsumo en territorio" },
+  { name: "Codechocó", desc: "Cooperación técnica regional" },
+  { name: "Univ. Antonio Nariño", desc: "Educación ambiental y reciclaje" },
+]
+---
+
+<Layout title="Quiénes somos — Ekosolv" activePath="/quienes-somos">
+
+  <!-- Hero -->
+  <section class="page-head wrap">
+    <div class="page-strip">
+      <div class="l">Quiénes somos</div>
+      <div class="l">Desde 2013 · Bogotá · Colombia</div>
+    </div>
+    <h1 class="display reveal" style="margin-top:40px">
+      Agentes de <em>cambio</em><br>ambiental positivo.
+    </h1>
+    <p class="lede reveal" style="margin-top:32px; max-width:58ch">
+      En Ekosolv creemos en un futuro donde las empresas se convierten en agentes de cambio positivo. Llevamos 12 años acompañando organizaciones en Colombia y Latinoamérica a crecer de manera competitiva mientras cuidan el planeta.
+    </p>
+  </section>
+
+  <!-- Stats -->
+  <section class="section wrap" style="padding-top:0">
+    <div class="band reveal">
+      <div class="band-grid">
+        <div>
+          <div class="eyebrow" style="color: color-mix(in oklab, #fff 55%, transparent)">Ekosolv en números</div>
+          <h2 style="margin-top:14px; max-width:16ch">12 años construyendo la <em>economía de la confianza</em>.</h2>
+        </div>
+        <div class="stat">
+          <div class="n">2013</div>
+          <div class="lbl">Año de fundación</div>
+        </div>
+        <div class="stat">
+          <div class="n">4</div>
+          <div class="lbl">Líneas de servicio integradas</div>
+        </div>
+        <div class="stat">
+          <div class="n">12<small>años</small></div>
+          <div class="lbl">En mercados colombiano y latinoamericano</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Misión y filosofía -->
+  <section class="section wrap">
+    <div class="section-head reveal">
+      <div>
+        <div class="eyebrow">Filosofía · 01</div>
+        <h2>Sostenibilidad construida<br>sobre <em>confianza</em>.</h2>
+      </div>
+      <div class="meta">
+        Nuestra economía de la confianza parte de soluciones personalizadas con relación costo-beneficio real. No vendemos paquetes — acompañamos transformaciones.
+      </div>
+    </div>
+
+    <div class="process reveal">
+      <div class="process-row">
+        <div class="n">Misión</div>
+        <h3>Transformar con <em>propósito</em></h3>
+        <div class="desc">Somos una empresa de consultoría en sostenibilidad ambiental que entrega soluciones a medida, garantizando el cumplimiento regulatorio y la correcta gestión de residuos, guiando a las organizaciones hacia la sostenibilidad.</div>
+        <div class="when">Desde 2013</div>
+      </div>
+      <div class="process-row">
+        <div class="n">Visión</div>
+        <h3>Futuro sin <em>fronteras</em> verdes</h3>
+        <div class="desc">Creemos en un futuro donde las empresas se convierten en agentes de cambio positivo: transforman sus prácticas, crecen de manera competitiva y contribuyen al cuidado ambiental del planeta.</div>
+        <div class="when">Horizonte 2030</div>
+      </div>
+      <div class="process-row">
+        <div class="n">Enfoque</div>
+        <h3>Minimizar <em>riesgo</em>, maximizar valor</h3>
+        <div class="desc">Reducimos el riesgo legal, económico y ambiental mediante capital humano especializado. Nuestro equipo multidisciplinario habla el idioma de la autoridad y el del directivo.</div>
+        <div class="when">ANLA · ESG · ODS</div>
+      </div>
+      <div class="process-row">
+        <div class="n">Cultura</div>
+        <h3>El cambio nace del <em>equipo</em></h3>
+        <div class="desc">Fomentamos una cultura de sostenibilidad y confianza que genera valor compartido para clientes, colaboradores y el medioambiente. El verdadero cambio nace del trabajo en equipo.</div>
+        <div class="when">Interno · externo</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Equipo -->
+  <section class="section wrap">
+    <div class="section-head reveal">
+      <div>
+        <div class="eyebrow">Equipo · 02</div>
+        <h2>Las personas detrás de<br>cada <em>expediente</em>.</h2>
+      </div>
+      <div class="meta">
+        "Me enorgullece presentarles a quienes trabajan incansablemente para ofrecerles la mejor experiencia." — Mario Castilla Sánchez, CEO
+      </div>
+    </div>
+
+    <div class="reveal" style="display:grid; grid-template-columns: repeat(4,1fr); gap:1px; background:var(--line); border-radius:var(--r-lg); overflow:hidden; border:1px solid var(--line)">
+      {team.map(m => (
+        <div style="background:var(--paper-warm); padding:clamp(28px,3vw,44px); display:flex; flex-direction:column; gap:20px; transition: background .3s ease;"
+             class="team-card">
+          <div style={`width:56px; height:56px; border-radius:50%; background:${m.accent}; display:grid; place-items:center; font-family:var(--font-mono); font-size:13px; font-weight:600; color:#fff; letter-spacing:0.04em; flex-shrink:0;`}>
+            {m.initial}
+          </div>
+          <div>
+            <div style="font-family:var(--font-display); font-size:clamp(18px,1.6vw,22px); letter-spacing:-0.015em; line-height:1.1; color:var(--ink)">
+              {m.name}
+            </div>
+            <div style="font-family:var(--font-mono); font-size:10.5px; letter-spacing:0.08em; text-transform:uppercase; color:var(--mute); margin-top:6px">
+              {m.role}
+            </div>
+          </div>
+          <p style="font-size:14px; line-height:1.6; color:var(--ink-2); flex:1">
+            {m.bio}
+          </p>
+        </div>
+      ))}
+    </div>
+  </section>
+
+  <!-- Hitos -->
+  <section class="section wrap">
+    <div class="section-head reveal">
+      <div>
+        <div class="eyebrow">Historia · 03</div>
+        <h2>Una década de <em>hitos</em><br>en terreno.</h2>
+      </div>
+      <div class="meta">Los momentos que definen quiénes somos — de la radicación de los primeros expedientes a la COP16.</div>
+    </div>
+
+    <div class="process reveal">
+      {hitos.map(h => (
+        <div class="process-row">
+          <div class="n">{h.year}</div>
+          <h3>{h.title.split(' ')[0]} <em>{h.title.split(' ').slice(1).join(' ')}</em></h3>
+          <div class="desc">{h.desc}</div>
+          <div class="when">&nbsp;</div>
+        </div>
+      ))}
+    </div>
+  </section>
+
+  <!-- Aliados -->
+  <section class="section wrap">
+    <div class="section-head reveal">
+      <div>
+        <div class="eyebrow">Aliados · 04</div>
+        <h2>Instituciones que <em>confían</em><br>en nuestra práctica.</h2>
+      </div>
+      <div class="meta">Trabajamos codo a codo con autoridades ambientales, universidades y organizaciones de impacto para llevar la gestión ambiental a donde más se necesita.</div>
+    </div>
+
+    <div class="reveal" style="display:grid; grid-template-columns:repeat(3,1fr); gap:1px; background:var(--line); border:1px solid var(--line); border-radius:var(--r-lg); overflow:hidden">
+      {aliados.map(a => (
+        <div style="background:var(--paper-warm); padding:clamp(24px,2.5vw,36px);">
+          <div style="font-family:var(--font-display); font-size:clamp(18px,1.8vw,24px); letter-spacing:-0.015em; color:var(--ink)">
+            {a.name}
+          </div>
+          <div style="font-size:13px; color:var(--mute); margin-top:8px; line-height:1.5">
+            {a.desc}
+          </div>
+        </div>
+      ))}
+    </div>
+  </section>
+
+  <!-- CTA Band -->
+  <section class="section wrap">
+    <div class="band reveal">
+      <div class="band-grid" style="grid-template-columns: 1.4fr 1fr">
+        <div>
+          <div class="eyebrow" style="color: color-mix(in oklab, #fff 55%, transparent)">EKORUTA</div>
+          <h2 style="margin-top:14px; max-width:20ch">Tu hoja de ruta de sostenibilidad <em>empieza aquí</em>.</h2>
+          <p style="color: color-mix(in oklab, #fff 75%, transparent); margin-top:20px; max-width:44ch; font-size:15px; line-height:1.55">
+            Un diagnóstico de 45 minutos para mapear tus obligaciones ANLA, brechas ESG y oportunidades de economía circular. Sin costo. Sin compromiso.
+          </p>
+        </div>
+        <div style="display:flex; align-items:center; justify-content:flex-end;">
+          <a href="/contacto" class="foot-cta">
+            Agenda un diagnóstico
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6">
+              <path d="M5 12h14M13 6l6 6-6 6"/>
+            </svg>
+          </a>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <footer class="foot">
+    <div class="wrap">
+      <div class="foot-head reveal">
+        <div class="display">¿Un nuevo <em>expediente</em><br>en el radar?</div>
+        <a href="/contacto" class="foot-cta">
+          Escríbenos
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6">
+            <path d="M5 12h14M13 6l6 6-6 6"/>
+          </svg>
+        </a>
+      </div>
+      <div class="foot-cols">
+        <div>
+          <div class="brand" style="color:var(--paper)"><span class="mark"></span><span>Ek<em>o</em></span></div>
+          <p style="opacity:.6; font-size:14px; margin-top:12px; max-width:36ch">Consultoría ambiental especializada en cumplimiento ANLA, ESG y economía circular.</p>
+        </div>
+        <div><h5>Sitio</h5><ul><li><a href="/">Inicio</a></li><li><a href="/servicios">Servicios</a></li><li><a href="/quienes-somos">Nosotros</a></li><li><a href="/normativas">Normativas</a></li><li><a href="/casos">Casos</a></li><li><a href="/blog">Diario</a></li></ul></div>
+        <div><h5>Contacto</h5><ul><li>info@ekosolv.com</li><li>+57 321 271 2773</li><li>Edif. RPTV · Carrera 15 #31B-33<br>Bogotá D.C.</li></ul></div>
+        <div><h5>Legal</h5><ul><li>Política de tratamiento</li><li>Términos de servicio</li><li>Código de ética</li></ul></div>
+      </div>
+      <div class="foot-bottom">
+        <div>© 2026 Ekosolv S.A.S. · NIT 900.659.506-9</div>
+        <div>Built with care in Bogotá</div>
+      </div>
+    </div>
+  </footer>
+
+  <style>
+    .team-card:hover { background: #fff !important; }
+    @media (max-width: 900px) {
+      .team-card { grid-column: span 2; }
+    }
+    @media (max-width: 600px) {
+      .team-card { grid-column: span 4; }
+    }
+  </style>
+</Layout>
