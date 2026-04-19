@@ -19,11 +19,11 @@ const { blok } = Astro.props
     <div class="relative z-20 w-full pt-10">
       <div class="max-w-[624px] mx-auto mb-28 px-6 flex flex-col gap-y-8 justify-center items-center">
         <div class="max-w-[624px] text-center">
-          <h2 class="text-white text-3xl md:text-5xl leading-[110%] -tracking-[1.92px] font-adamina mb-4">
+          <h2 transition:animate="fade" class="text-white text-3xl md:text-5xl leading-[110%] -tracking-[1.92px] font-adamina mb-4">
             {blok.headline}
           </h2>
           {blok.lead && (
-            <p class="text-white leading-[150%] -tracking-[0.32px]">{blok.lead}</p>
+            <p transition:animate="fade" class="text-white leading-[150%] -tracking-[0.32px]">{blok.lead}</p>
           )}
         </div>
         {blok.button && blok.button.length > 0 && (

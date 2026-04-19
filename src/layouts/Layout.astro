@@ -29,6 +29,7 @@ const primaryColor = colors.primary
     <meta name="twitter:card" content={seo?.twitter_image ? "summary_large_image" : "summary"} />
     {seo?.og_image && <meta property="og:image" content={seo.og_image} />}
     {seo?.twitter_image && <meta name="twitter:image" content={seo.twitter_image} />}
+    <ClientRouter />
   </head>
   <body class="font-inter antialiased bg-background text-foreground" style={`--color-primary: ${primaryColor};`}>
     <Header siteSettings={siteSettings} language={language} translate={translate} />
