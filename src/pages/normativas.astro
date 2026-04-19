@@ -1,0 +1,127 @@
+---
+import Layout from '../layouts/Layout.astro'
+
+const col1 = [
+  { code: "DEC 1076 · 2015", title: "Decreto Único Reglamentario del Sector Ambiental", body: "Consolida la mayoría de normas ambientales en Colombia. Define licencias, permisos, planes y autoridades competentes.", tags: ["MinAmbiente", "Licencias", "ANLA", "CAR"] },
+  { code: "RES 2184 · 2019", title: "Códigos de colores para residuos aprovechables", body: "Estándar nacional para separación en la fuente: blanco (aprovechables), negro (no aprovechables), verde (orgánicos).", tags: ["Separación", "RSU", "Hogares", "Empresas"] },
+  { code: "RES 1297 · 2010", title: "Plan posconsumo de Residuos de Aparatos Eléctricos y Electrónicos", body: "Obliga a productores e importadores a presentar planes de gestión, operación, cobertura y metas.", tags: ["RAEE", "Posconsumo", "Productor", "Importador"] },
+  { code: "LEY 1672 · 2013", title: "Ley de RAEE", body: "Marco de responsabilidad extendida del productor. Define principios, actores, recolección selectiva y aprovechamiento.", tags: ["REP", "Marco legal"] },
+  { code: "RES 0472 · 2017", title: "Gestión integral de residuos de construcción y demolición (RCD)", body: "Aplica a empresas que adecúan oficinas, centros de datos o bodegas: plan de gestión, registro y reporte.", tags: ["RCD", "Obras"] },
+]
+
+const col2 = [
+  { code: "RES 1407 · 2018", title: "Plan de gestión ambiental de residuos de envases y empaques", body: "Obligación de productores y comercializadores de empaques y envases puestos en el mercado colombiano.", tags: ["Empaques", "REP", "Comercializador"] },
+  { code: "DEC 1076 · Título 5", title: "Uso y aprovechamiento del recurso hídrico", body: "Concesiones, permisos de vertimiento, tasas retributivas y tasas por uso del agua.", tags: ["Agua", "Vertimientos", "Concesión"] },
+  { code: "RES 909 · 2008", title: "Estándares de emisión admisibles", body: "Aplica a fuentes fijas. Relevante para ensambladoras, data centers con generadores, procesos con hornos.", tags: ["Aire", "Emisiones", "Fuentes fijas"] },
+  { code: "RES 0631 · 2015", title: "Parámetros y valores límites máximos de vertimientos puntuales", body: "Define qué se puede verter a un cuerpo de agua o al alcantarillado. Plantas de tratamiento, laboratorios, datacenters.", tags: ["Vertimientos", "DBO", "DQO"] },
+  { code: "RES 1407 · 2022", title: "Régimen sancionatorio ambiental (Ley 1333)", body: "Establece el procedimiento sancionatorio y los criterios para dosificar la multa.", tags: ["Sanciones", "Procedimiento"] },
+]
+---
+
+<Layout title="Normativas — Eko" activePath="/normativas">
+  <section class="page-head wrap">
+    <div class="page-strip">
+      <div class="l">Normativas</div>
+      <div class="l">Actualizado · abril 2026</div>
+    </div>
+    <h1 class="display reveal" style="margin-top:40px">
+      El <em>marco</em> que<br>le aplica a su empresa.
+    </h1>
+    <p class="lede reveal" style="margin-top:32px; max-width:56ch">
+      Un mapa vivo de las obligaciones ambientales más frecuentes para compañías que importan, producen o distribuyen tecnología en Colombia. Haz clic para expandir.
+    </p>
+  </section>
+
+  <section class="section wrap">
+    <div class="norms reveal">
+      <div class="norms-col">
+        {col1.map((n, i) => (
+          <div class="norm" data-open={i === 0 ? 'true' : 'false'}>
+            <div>
+              <div class="code">{n.code}</div>
+              <h4>{n.title}</h4>
+            </div>
+            <button class="plus" aria-label="expand">
+              <svg width="12" height="12" viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="1.5">
+                <path d="M6 1v10M1 6h10"/>
+              </svg>
+            </button>
+            <div class="body">
+              <p>{n.body}</p>
+              <ul>{n.tags.map(t => <li>{t}</li>)}</ul>
+            </div>
+          </div>
+        ))}
+      </div>
+      <div class="norms-col">
+        {col2.map((n, i) => (
+          <div class="norm" data-open="false">
+            <div>
+              <div class="code">{n.code}</div>
+              <h4>{n.title}</h4>
+            </div>
+            <button class="plus" aria-label="expand">
+              <svg width="12" height="12" viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="1.5">
+                <path d="M6 1v10M1 6h10"/>
+              </svg>
+            </button>
+            <div class="body">
+              <p>{n.body}</p>
+              <ul>{n.tags.map(t => <li>{t}</li>)}</ul>
+            </div>
+          </div>
+        ))}
+      </div>
+    </div>
+  </section>
+
+  <section class="section wrap">
+    <div class="band reveal">
+      <div class="band-grid">
+        <div>
+          <div class="eyebrow" style="color: color-mix(in oklab, #fff 55%, transparent)">Seguimiento regulatorio</div>
+          <h2 style="margin-top:14px; max-width:16ch">Nuevas normas, <em>revisadas</em> cada semana.</h2>
+        </div>
+        <div class="stat">
+          <div class="n">47</div>
+          <div class="lbl">Resoluciones vigentes monitoreadas</div>
+        </div>
+        <div class="stat">
+          <div class="n">12</div>
+          <div class="lbl">Cambios regulatorios en 2025</div>
+        </div>
+        <div class="stat">
+          <div class="n">24<small>h</small></div>
+          <div class="lbl">Alerta a clientes tras publicación</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <footer class="foot">
+    <div class="wrap">
+      <div class="foot-head reveal">
+        <div class="display">¿Un nuevo <em>expediente</em><br>en el radar?</div>
+        <a href="/contacto" class="foot-cta">
+          Escríbenos
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6">
+            <path d="M5 12h14M13 6l6 6-6 6"/>
+          </svg>
+        </a>
+      </div>
+      <div class="foot-cols">
+        <div>
+          <div class="brand" style="color:var(--paper)"><span class="mark"></span><span>Ek<em>o</em></span></div>
+          <p style="opacity:.6; font-size:14px; margin-top:12px; max-width:36ch">Consultoría ambiental especializada en cumplimiento ANLA para el sector tecnológico.</p>
+        </div>
+        <div><h5>Sitio</h5><ul><li><a href="/">Inicio</a></li><li><a href="/servicios">Servicios</a></li><li><a href="/normativas">Normativas</a></li><li><a href="/casos">Casos</a></li><li><a href="/blog">Diario</a></li></ul></div>
+        <div><h5>Contacto</h5><ul><li>hola@eko.co</li><li>+57 601 000 0000</li><li>Cra. 11 #93-50<br>Bogotá D.C.</li></ul></div>
+        <div><h5>Legal</h5><ul><li>Política de tratamiento</li><li>Términos de servicio</li><li>Código de ética</li></ul></div>
+      </div>
+      <div class="foot-bottom">
+        <div>© 2026 Eko S.A.S · NIT 901.xxx.xxx-x</div>
+        <div>Built with care in Bogotá</div>
+      </div>
+    </div>
+  </footer>
+</Layout>
