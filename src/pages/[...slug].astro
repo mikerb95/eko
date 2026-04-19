@@ -1,5 +1,5 @@
 ---
-import { getStory, getSiteSettings } from '../utils/api'
+import { getStory } from '../utils/api'
 import DynamicComponent from '../storyblok/DynamicComponent.astro'
 import Layout from '../layouts/Layout.astro'
 import generateStaticPaths from '../utils/generateStaticPaths'
@@ -10,12 +10,11 @@ export async function getStaticPaths() {
 }
 
 const { slug } = Astro.props
-
-const siteSettings = await getSiteSettings()
 const story = await getStory(slug)
 const translate = locales.es
+const title = story?.content?.title ? `${story.content.title} — Eko` : "Eko"
 ---
 
-<Layout blok={story.content} siteSettings={siteSettings.content} language="es" translate={translate}>
+<Layout title={title}>
   <DynamicComponent blok={story.content} language="es" translate={translate} />
 </Layout>

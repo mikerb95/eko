@@ -35,8 +35,8 @@ const col2 = [
   <section class="section wrap">
     <div class="norms reveal">
       <div class="norms-col">
-        {col1.map((n, i) => (
-          <div class="norm" data-open={i === 0 ? 'true' : 'false'}>
+        {col1.map((n, idx) => (
+          <div class="norm" data-open={idx === 0 ? 'true' : 'false'}>
             <div>
               <div class="code">{n.code}</div>
               <h4>{n.title}</h4>
