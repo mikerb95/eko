@@ -1,0 +1,138 @@
+---
+import Layout from '../layouts/Layout.astro'
+
+const cases = [
+  {
+    cls: "",
+    label: "Importadora · hardware",
+    kicker: ["Caso 01 · 2024", "Licenciamiento"],
+    title: "De cero al plan posconsumo aprobado en 73 días.",
+    titleEm: "cero",
+    metrics: [["73", "Días hasta aprobación"], ["1.2M", "Unidades cubiertas"]],
+  },
+  {
+    cls: "green",
+    label: "Ensambladora · PC",
+    kicker: ["Caso 02 · 2024", "Auditoría"],
+    title: "Auditoría 360° y cierre de 11 brechas regulatorias.",
+    titleEm: "360°",
+    metrics: [["11", "Brechas cerradas"], ["$480M", "Riesgo sancionatorio evitado"]],
+  },
+  {
+    cls: "clay",
+    label: "Operador · Data center",
+    kicker: ["Caso 03 · 2025", "Permisos"],
+    title: "Permiso de emisiones y vertimientos para nuevo DC.",
+    titleEm: "emisiones",
+    metrics: [["2", "Permisos radicados"], ["0", "Requerimientos pendientes"]],
+  },
+  {
+    cls: "green",
+    label: "Retail · electrónicos",
+    kicker: ["Caso 04 · 2025", "Posconsumo"],
+    title: "Red de puntos RAEE con 218 tiendas a nivel nacional.",
+    titleEm: "RAEE",
+    metrics: [["218", "Puntos de recolección"], ["340k", "Kg gestionados año 1"]],
+  },
+  {
+    cls: "",
+    label: "Telco · infraestructura",
+    kicker: ["Caso 05 · 2025", "Defensa"],
+    title: "Archivo del proceso sancionatorio por antenas.",
+    titleEm: "sancionatorio",
+    metrics: [["6", "Meses de proceso"], ["Archivo", "Resolución final"]],
+  },
+  {
+    cls: "clay",
+    label: "Distribuidora · componentes",
+    kicker: ["Caso 06 · 2026", "Reporte"],
+    title: "Tablero de trazabilidad para reporte anual ANLA.",
+    titleEm: "trazabilidad",
+    metrics: [["1", "Panel unificado"], ["7", "Obligaciones automatizadas"]],
+  },
+]
+---
+
+<Layout title="Casos — Eko" activePath="/casos">
+  <section class="page-head wrap">
+    <div class="page-strip">
+      <div class="l">Casos</div>
+      <div class="l">Selección · 2024 – 2026</div>
+    </div>
+    <h1 class="display reveal" style="margin-top:40px">
+      Expedientes<br><em>reales</em>, resultados medibles.
+    </h1>
+    <p class="lede reveal" style="margin-top:32px; max-width:56ch">
+      Una muestra de los mandatos ejecutados en los últimos 24 meses. Los nombres de los clientes se mantienen bajo acuerdo de confidencialidad.
+    </p>
+  </section>
+
+  <section class="section wrap">
+    <div class="cases reveal">
+      {cases.map(c => (
+        <article class={`case ${c.cls}`}>
+          <div class="cover" data-label={c.label}></div>
+          <div class="kicker">
+            <span>{c.kicker[0]}</span>
+            <span>{c.kicker[1]}</span>
+          </div>
+          <h3 set:html={c.title.replace(c.titleEm, `<em>${c.titleEm}</em>`)}></h3>
+          <div class="metric">
+            {c.metrics.map(m => (
+              <div>
+                <div class="v">{m[0]}</div>
+                <div class="l">{m[1]}</div>
+              </div>
+            ))}
+          </div>
+        </article>
+      ))}
+    </div>
+  </section>
+
+  <section class="section wrap">
+    <div class="band reveal">
+      <div class="band-grid" style="grid-template-columns: 1.3fr 1fr 1fr">
+        <div>
+          <div class="eyebrow" style="color: color-mix(in oklab, #fff 55%, transparent)">Resultados agregados</div>
+          <h2 style="margin-top:14px; max-width:18ch">El impacto, <em>sumando</em> todos los mandatos.</h2>
+        </div>
+        <div class="stat">
+          <div class="n">$2.1<small>B</small></div>
+          <div class="lbl">Riesgo sancionatorio mitigado</div>
+        </div>
+        <div class="stat">
+          <div class="n">0</div>
+          <div class="lbl">Sanciones en firme · 2024–2026</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <footer class="foot">
+    <div class="wrap">
+      <div class="foot-head reveal">
+        <div class="display">¿Un nuevo <em>expediente</em><br>en el radar?</div>
+        <a href="/contacto" class="foot-cta">
+          Escríbenos
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6">
+            <path d="M5 12h14M13 6l6 6-6 6"/>
+          </svg>
+        </a>
+      </div>
+      <div class="foot-cols">
+        <div>
+          <div class="brand" style="color:var(--paper)"><span class="mark"></span><span>Ek<em>o</em></span></div>
+          <p style="opacity:.6; font-size:14px; margin-top:12px; max-width:36ch">Consultoría ambiental especializada en cumplimiento ANLA para el sector tecnológico.</p>
+        </div>
+        <div><h5>Sitio</h5><ul><li><a href="/">Inicio</a></li><li><a href="/servicios">Servicios</a></li><li><a href="/normativas">Normativas</a></li><li><a href="/casos">Casos</a></li><li><a href="/blog">Diario</a></li></ul></div>
+        <div><h5>Contacto</h5><ul><li>hola@eko.co</li><li>+57 601 000 0000</li><li>Cra. 11 #93-50<br>Bogotá D.C.</li></ul></div>
+        <div><h5>Legal</h5><ul><li>Política de tratamiento</li><li>Términos de servicio</li><li>Código de ética</li></ul></div>
+      </div>
+      <div class="foot-bottom">
+        <div>© 2026 Eko S.A.S · NIT 901.xxx.xxx-x</div>
+        <div>Built with care in Bogotá</div>
+      </div>
+    </div>
+  </footer>
+</Layout>
