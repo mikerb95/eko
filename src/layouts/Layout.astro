@@ -69,7 +69,7 @@ const { title = "Eko — Consultoría ambiental ANLA", description = "Acompañam
         window.addEventListener("pointermove", (e) => { tx = e.clientX; ty = e.clientY; });
         document.addEventListener("pointerover", (e) => {
           const hover = (e.target as Element).closest("a, button, .svc, .case, .norm, [data-link]");
-          dot.classList.toggle("big", !!hover);
+          if (dot) dot.classList.toggle("big", !!hover);
         });
         function tick() {
           x += (tx - x) * 0.18;
