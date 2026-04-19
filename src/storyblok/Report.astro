@@ -7,6 +7,7 @@ const { blok, translate, language } = Astro.props
 
 <article>
   <div
+    transition:name={`report-image-${blok.slug}`}
     class="min-h-[44vh] flex flex-col justify-center items-center text-white"
     style={`background: linear-gradient(0deg, rgba(0, 0, 0, 0.70) 0%, rgba(0, 0, 0, 0.70) 100%) ${blok.image?.filename ? `, url(${blok.image.filename}) center/cover no-repeat lightgray` : ''}`}
   >
