@@ -1,73 +1,89 @@
 ---
 import Layout from '../layouts/Layout.astro'
 
-const services = [
+const lines = [
   {
-    n: "01", code: "LIC",
-    title: "Licenciamiento ambiental",
-    lede: "Estructuramos y radicamos expedientes ante la ANLA y las CAR. Desde el estudio de impacto hasta el último requerimiento del evaluador.",
-    deliverables: ["Estudio de Impacto Ambiental (EIA)", "Diagnóstico Ambiental de Alternativas (DAA)", "Plan de Manejo Ambiental (PMA)", "Cargue en VITAL y seguimiento", "Atención a requerimientos"],
-    plazo: "3–9 meses",
+    n: "01", code: "EKONSULTING",
+    title: "Asesoría y cumplimiento ANLA",
+    lede: "El núcleo de nuestra práctica. Estructuramos y ejecutamos todos los trámites regulatorios ante la ANLA y las CAR — desde el licenciamiento hasta la defensa en procesos sancionatorios.",
+    deliverables: [
+      "Licenciamiento ambiental (EIA, DAA, PMA)",
+      "Planes posconsumo RAEE y pilas",
+      "Auditoría de cumplimiento 360°",
+      "Reportes ante autoridad (RUA, ICA, ANLA)",
+      "Acompañamiento en procesos sancionatorios",
+      "Capacitación in-house del equipo HSE",
+      "Estrategia ESG y alineación ODS",
+    ],
+    plazo: "Continuo",
+    accent: "accent-deep",
   },
   {
-    n: "02", code: "POS",
-    title: "Posconsumo RAEE & pilas",
-    lede: "Planes posconsumo bajo la Resolución 1297 de 2010 y 2184 de 2019. Diseño, radicación y operación del plan.",
-    deliverables: ["Diseño del Plan Posconsumo", "Convenios con gestores autorizados", "Operación logística inversa", "Reporte de metas anual", "Comunicación al consumidor"],
-    plazo: "2–4 meses",
+    n: "02", code: "EKORAEE",
+    title: "Gestión certificada de residuos electrónicos",
+    lede: "Recolección, transporte, almacenamiento y certificación de aparatos eléctricos y electrónicos bajo la Resolución 1297 de 2010 y la Ley 1672 de 2013.",
+    deliverables: [
+      "Recolección en punto o a domicilio",
+      "Transporte certificado a gestor autorizado",
+      "Certificados de disposición final",
+      "Integración con plan posconsumo EKONSULTING",
+      "Reporte de metas para la autoridad",
+    ],
+    plazo: "Por campaña o continuo",
+    accent: "accent-forest",
   },
   {
-    n: "03", code: "AUD",
-    title: "Auditoría de cumplimiento",
-    lede: "Radiografía completa de las obligaciones ambientales de la compañía. Cuantificamos la exposición sancionatoria.",
-    deliverables: ["Matriz de obligaciones", "Gap analysis técnico-legal", "Valoración del riesgo", "Plan de remediación priorizado", "Informe ejecutivo"],
-    plazo: "4–6 semanas",
+    n: "03", code: "EKOPARTNER",
+    title: "Operación de sistemas de gestión de residuos",
+    lede: "Integramos y operamos el sistema completo de recolección y disposición de residuos de la organización. No solo asesoramos — lo hacemos. Aplica únicamente en Colombia.",
+    deliverables: [
+      "Diseño del sistema de gestión integral",
+      "Operación de puntos de recolección",
+      "Gestión de gestores y transportistas",
+      "Trazabilidad end-to-end de residuos",
+      "Reportes operativos y regulatorios",
+    ],
+    plazo: "Retainer mensual",
+    accent: "",
   },
   {
-    n: "04", code: "REP",
-    title: "Reportes ante autoridad",
-    lede: "Informes de gestión, cumplimiento de metas, vertimientos, emisiones y toda la información que exige la autoridad ambiental de forma periódica.",
-    deliverables: ["Informe Anual de Gestión", "Reporte de metas posconsumo", "RUA manufacturero", "Informes ICA", "Reportes a la SFC cuando aplica"],
-    plazo: "Anual / Semestral",
-  },
-  {
-    n: "05", code: "DEF",
-    title: "Procesos sancionatorios",
-    lede: "Acompañamiento integral ante investigaciones, requerimientos y procesos iniciados por la autoridad ambiental.",
-    deliverables: ["Análisis del pliego", "Descargos técnicos y legales", "Recursos de reposición", "Plan de trabajo correctivo", "Negociación con la autoridad"],
-    plazo: "Según caso",
-  },
-  {
-    n: "06", code: "EDU",
-    title: "Capacitación in-house",
-    lede: "Formación del equipo HSE de la compañía para que pueda operar con independencia y responder a visitas de la autoridad.",
-    deliverables: ["Workshop de normativa sectorial", "Simulacro de visita ANLA", "Documentación de procesos", "Playbooks internos", "Certificación del equipo"],
-    plazo: "2–6 semanas",
+    n: "04", code: "EKOTRADING",
+    title: "Economía circular · compra y venta de activos IT",
+    lede: "Cerramos el ciclo de vida de los equipos tecnológicos dentro de un marco de economía circular. Compramos y vendemos tecnología usada u obsoleta al por mayor, con la trazabilidad que exigen los ODS.",
+    deliverables: [
+      "Valoración y retiro de activos IT obsoletos",
+      "Reacondicionamiento y certificación",
+      "Recolocación en mercados secundarios",
+      "Documentación para reporte ESG",
+      "Integración con EKORAEE para lo no reacondicionable",
+    ],
+    plazo: "Por lote o continuo",
+    accent: "accent-clay",
   },
 ]
 ---
 
-<Layout title="Servicios — Eko" activePath="/servicios">
+<Layout title="Servicios — Ekosolv" activePath="/servicios">
   <section class="page-head wrap">
     <div class="page-strip">
-      <div class="l">Servicios</div>
-      <div class="l">06 líneas · una sola práctica</div>
+      <div class="l">Líneas de servicio</div>
+      <div class="l">04 líneas · un solo ecosistema</div>
     </div>
     <h1 class="display reveal" style="margin-top:40px">
-      De la radicación<br>al <em>cierre</em> del ciclo.
+      Del cumplimiento<br>a la <em>ventaja competitiva</em>.
     </h1>
-    <p class="lede reveal" style="margin-top:32px; max-width:52ch">
-      Operamos como un área ambiental externa. Cada mandato se estructura alrededor de una obligación regulatoria concreta, con entregables y plazos medibles.
+    <p class="lede reveal" style="margin-top:32px; max-width:54ch">
+      Cuatro líneas integradas que cubren todo el ciclo ambiental de una compañía tech: la obligación regulatoria, la operación de residuos, la economía circular y la estrategia ESG.
     </p>
   </section>
 
   <section class="section wrap">
     <div class="process reveal">
-      {services.map(s => (
-        <div class="process-row" style="grid-template-columns: 80px 260px 1fr 140px">
+      {lines.map(s => (
+        <div class={`process-row ${s.accent ? s.accent + '-row' : ''}`} style="grid-template-columns: 100px 240px 1fr 160px">
           <div class="n">{s.n} · {s.code}</div>
           <div>
-            <h3 style="font-size:clamp(22px,2.2vw,32px)">{s.title}</h3>
+            <h3 style="font-size:clamp(20px,2vw,30px)">{s.title}</h3>
           </div>
           <div class="desc">
             {s.lede}
@@ -80,6 +96,39 @@ const services = [
           <div class="when">{s.plazo}</div>
         </div>
       ))}
+    </div>
+  </section>
+
+  <section class="section wrap">
+    <div class="section-head reveal">
+      <div>
+        <div class="eyebrow">Metodología · EKORUTA</div>
+        <h2>Un framework propio para ir<br>más allá del <em>mínimo regulatorio</em>.</h2>
+      </div>
+      <div class="meta">
+        La EKORUTA es nuestra hoja de ruta de sostenibilidad empresarial. Guía a cada organización paso a paso — desde el primer diagnóstico ANLA hasta la estrategia ESG alineada con los ODS de la ONU.
+      </div>
+    </div>
+
+    <div class="band reveal">
+      <div class="band-grid" style="grid-template-columns: 1fr 1fr 1fr 1fr">
+        <div class="stat">
+          <div class="n" style="font-size:clamp(20px,2.5vw,32px)">Diagnóstico</div>
+          <div class="lbl">Obligaciones ANLA + brechas ESG</div>
+        </div>
+        <div class="stat">
+          <div class="n" style="font-size:clamp(20px,2.5vw,32px)">Hoja de ruta</div>
+          <div class="lbl">Plan regulatorio + ODS aplicables</div>
+        </div>
+        <div class="stat">
+          <div class="n" style="font-size:clamp(20px,2.5vw,32px)">Ejecución</div>
+          <div class="lbl">Trámites + operación + trading</div>
+        </div>
+        <div class="stat">
+          <div class="n" style="font-size:clamp(20px,2.5vw,32px)">Mejora</div>
+          <div class="lbl">Reporte ESG + nuevo ciclo</div>
+        </div>
+      </div>
     </div>
   </section>
 
@@ -98,8 +147,8 @@ const services = [
           <div class="lbl">Diagnóstico inicial sin costo</div>
         </div>
         <div class="stat">
-          <div class="n">11<small>d</small></div>
-          <div class="lbl">Expediente más rápido radicado</div>
+          <div class="n">4</div>
+          <div class="lbl">Líneas integradas disponibles</div>
         </div>
       </div>
     </div>
@@ -119,7 +168,7 @@ const services = [
       <div class="foot-cols">
         <div>
           <div class="brand" style="color:var(--paper)"><span class="mark"></span><span>Ek<em>o</em></span></div>
-          <p style="opacity:.6; font-size:14px; margin-top:12px; max-width:36ch">Consultoría ambiental especializada en cumplimiento ANLA para el sector tecnológico.</p>
+          <p style="opacity:.6; font-size:14px; margin-top:12px; max-width:36ch">Consultoría ambiental especializada en cumplimiento ANLA, ESG y economía circular.</p>
         </div>
         <div><h5>Sitio</h5><ul><li><a href="/">Inicio</a></li><li><a href="/servicios">Servicios</a></li><li><a href="/normativas">Normativas</a></li><li><a href="/casos">Casos</a></li><li><a href="/blog">Diario</a></li></ul></div>
         <div><h5>Contacto</h5><ul><li>info@ekosolv.com</li><li>+57 321 271 2773</li><li>Edif. RPTV · Carrera 15 #31B-33<br>Bogotá D.C.</li></ul></div>
