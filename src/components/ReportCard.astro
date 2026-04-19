@@ -5,6 +5,7 @@ const { language, report } = Astro.props
 
 <article class="relative group">
   <img
+    transition:name={`report-image-${report.slug}`}
     class="object-cover object-center w-full"
     src={report.image.filename}
     alt={report.image.alt}

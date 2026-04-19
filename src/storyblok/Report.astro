@@ -26,6 +26,7 @@ const { blok, translate, language } = Astro.props
 
   <div class="container mx-auto px-6">
     <div
+      transition:animate="fade"
       class="mx-auto py-24 px-4 prose prose-headings:text-primary prose-headings:mt-8 prose-a:text-primary prose-a:hover:underline"
       set:html={blok.content}
     >
