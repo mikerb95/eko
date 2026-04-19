@@ -1,0 +1,134 @@
+---
+import Layout from '../layouts/Layout.astro'
+
+const services = [
+  {
+    n: "01", code: "LIC",
+    title: "Licenciamiento ambiental",
+    lede: "Estructuramos y radicamos expedientes ante la ANLA y las CAR. Desde el estudio de impacto hasta el último requerimiento del evaluador.",
+    deliverables: ["Estudio de Impacto Ambiental (EIA)", "Diagnóstico Ambiental de Alternativas (DAA)", "Plan de Manejo Ambiental (PMA)", "Cargue en VITAL y seguimiento", "Atención a requerimientos"],
+    plazo: "3–9 meses",
+  },
+  {
+    n: "02", code: "POS",
+    title: "Posconsumo RAEE & pilas",
+    lede: "Planes posconsumo bajo la Resolución 1297 de 2010 y 2184 de 2019. Diseño, radicación y operación del plan.",
+    deliverables: ["Diseño del Plan Posconsumo", "Convenios con gestores autorizados", "Operación logística inversa", "Reporte de metas anual", "Comunicación al consumidor"],
+    plazo: "2–4 meses",
+  },
+  {
+    n: "03", code: "AUD",
+    title: "Auditoría de cumplimiento",
+    lede: "Radiografía completa de las obligaciones ambientales de la compañía. Cuantificamos la exposición sancionatoria.",
+    deliverables: ["Matriz de obligaciones", "Gap analysis técnico-legal", "Valoración del riesgo", "Plan de remediación priorizado", "Informe ejecutivo"],
+    plazo: "4–6 semanas",
+  },
+  {
+    n: "04", code: "REP",
+    title: "Reportes ante autoridad",
+    lede: "Informes de gestión, cumplimiento de metas, vertimientos, emisiones y toda la información que exige la autoridad ambiental de forma periódica.",
+    deliverables: ["Informe Anual de Gestión", "Reporte de metas posconsumo", "RUA manufacturero", "Informes ICA", "Reportes a la SFC cuando aplica"],
+    plazo: "Anual / Semestral",
+  },
+  {
+    n: "05", code: "DEF",
+    title: "Procesos sancionatorios",
+    lede: "Acompañamiento integral ante investigaciones, requerimientos y procesos iniciados por la autoridad ambiental.",
+    deliverables: ["Análisis del pliego", "Descargos técnicos y legales", "Recursos de reposición", "Plan de trabajo correctivo", "Negociación con la autoridad"],
+    plazo: "Según caso",
+  },
+  {
+    n: "06", code: "EDU",
+    title: "Capacitación in-house",
+    lede: "Formación del equipo HSE de la compañía para que pueda operar con independencia y responder a visitas de la autoridad.",
+    deliverables: ["Workshop de normativa sectorial", "Simulacro de visita ANLA", "Documentación de procesos", "Playbooks internos", "Certificación del equipo"],
+    plazo: "2–6 semanas",
+  },
+]
+---
+
+<Layout title="Servicios — Eko" activePath="/servicios">
+  <section class="page-head wrap">
+    <div class="page-strip">
+      <div class="l">Servicios</div>
+      <div class="l">06 líneas · una sola práctica</div>
+    </div>
+    <h1 class="display reveal" style="margin-top:40px">
+      De la radicación<br>al <em>cierre</em> del ciclo.
+    </h1>
+    <p class="lede reveal" style="margin-top:32px; max-width:52ch">
+      Operamos como un área ambiental externa. Cada mandato se estructura alrededor de una obligación regulatoria concreta, con entregables y plazos medibles.
+    </p>
+  </section>
+
+  <section class="section wrap">
+    <div class="process reveal">
+      {services.map(s => (
+        <div class="process-row" style="grid-template-columns: 80px 260px 1fr 140px">
+          <div class="n">{s.n} · {s.code}</div>
+          <div>
+            <h3 style="font-size:clamp(22px,2.2vw,32px)">{s.title}</h3>
+          </div>
+          <div class="desc">
+            {s.lede}
+            <div style="display:flex; flex-wrap:wrap; gap:6px; margin-top:14px">
+              {s.deliverables.map(d => (
+                <span style="font-family: var(--font-mono); font-size:11px; color:var(--ink-2); padding:5px 10px; background:var(--paper); border:1px solid var(--line); border-radius:999px;">{d}</span>
+              ))}
+            </div>
+          </div>
+          <div class="when">{s.plazo}</div>
+        </div>
+      ))}
+    </div>
+  </section>
+
+  <section class="section wrap">
+    <div class="band reveal">
+      <div class="band-grid" style="grid-template-columns: 1.4fr 1fr 1fr">
+        <div>
+          <div class="eyebrow" style="color: color-mix(in oklab, #fff 55%, transparent)">Forma de trabajo</div>
+          <h2 style="margin-top:14px; max-width:18ch">Tres modalidades, un <em>solo estándar</em>.</h2>
+          <p style="color: color-mix(in oklab, #fff 75%, transparent); margin-top:20px; max-width:44ch; font-size:15px; line-height:1.55">
+            Trabajamos por proyecto cerrado, como retainer mensual o en esquema híbrido. Sin letra pequeña.
+          </p>
+        </div>
+        <div class="stat">
+          <div class="n">45<small>min</small></div>
+          <div class="lbl">Diagnóstico inicial sin costo</div>
+        </div>
+        <div class="stat">
+          <div class="n">11<small>d</small></div>
+          <div class="lbl">Expediente más rápido radicado</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <footer class="foot">
+    <div class="wrap">
+      <div class="foot-head reveal">
+        <div class="display">¿Un nuevo <em>expediente</em><br>en el radar?</div>
+        <a href="/contacto" class="foot-cta">
+          Escríbenos
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6">
+            <path d="M5 12h14M13 6l6 6-6 6"/>
+          </svg>
+        </a>
+      </div>
+      <div class="foot-cols">
+        <div>
+          <div class="brand" style="color:var(--paper)"><span class="mark"></span><span>Ek<em>o</em></span></div>
+          <p style="opacity:.6; font-size:14px; margin-top:12px; max-width:36ch">Consultoría ambiental especializada en cumplimiento ANLA para el sector tecnológico.</p>
+        </div>
+        <div><h5>Sitio</h5><ul><li><a href="/">Inicio</a></li><li><a href="/servicios">Servicios</a></li><li><a href="/normativas">Normativas</a></li><li><a href="/casos">Casos</a></li><li><a href="/blog">Diario</a></li></ul></div>
+        <div><h5>Contacto</h5><ul><li>hola@eko.co</li><li>+57 601 000 0000</li><li>Cra. 11 #93-50<br>Bogotá D.C.</li></ul></div>
+        <div><h5>Legal</h5><ul><li>Política de tratamiento</li><li>Términos de servicio</li><li>Código de ética</li></ul></div>
+      </div>
+      <div class="foot-bottom">
+        <div>© 2026 Eko S.A.S · NIT 901.xxx.xxx-x</div>
+        <div>Built with care in Bogotá</div>
+      </div>
+    </div>
+  </footer>
+</Layout>
