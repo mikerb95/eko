@@ -81,6 +81,9 @@ img, svg { display: block; max-width: 100%; }
   view-transition-name: brand;
 }
 .brand em { font-style: normal; color: var(--forest); }
+.brand-logo { height: 34px; width: auto; display: block; }
+.foot-logo { height: 32px; width: auto; display: block; }
+@media (max-width: 480px) { .brand-logo { height: 28px; } }
 .brand .mark {
   width: 28px; height: 28px; border-radius: 50%;
   background: radial-gradient(circle at 30% 30%, var(--aqua) 0%, var(--forest) 40%, var(--deep) 90%);
