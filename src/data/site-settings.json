@@ -11,8 +11,12 @@
     "twitter_image": ""
   },
   "logo": {
-    "filename": "/favicon.svg",
-    "alt": "EKO Ambiental"
+    "filename": "/brand/ekosolv-horizontal.svg",
+    "alt": "EKOSOLV — Consultores en Sostenibilidad"
+  },
+  "logo_white": {
+    "filename": "/brand/ekosolv-horizontal-white.svg",
+    "alt": "EKOSOLV — Consultores en Sostenibilidad"
   },
   "navigation": [
     { "label": "Inicio", "url": { "linktype": "url", "url": "/" } },
