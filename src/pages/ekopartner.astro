@@ -1,0 +1,116 @@
+---
+import Layout from '../layouts/Layout.astro'
+
+const sistemas = [
+  {
+    n: "01", title: "Envases y empaques",
+    desc: "Nuestro Sistema Colectivo de Recolección de Envases y Empaques, avalado por la Resolución 1407 de 2018 (modificada por la 1342 de 2020), opera desde 2021. En su primer año gestionó 52 toneladas de residuos de empaques.",
+    when: "Desde 2021",
+  },
+  {
+    n: "02", title: "Sistema de recolección RAEE",
+    desc: "Sistema colectivo e individual de recolección y gestión posconsumo de residuos de aparatos eléctricos y electrónicos, autorizado por la ANLA. Aplica únicamente en Colombia.",
+    when: "Colectivo / individual",
+  },
+]
+
+const incluye = [
+  "Sistema de gestión autorizado por la ANLA",
+  "Logística inversa colectiva o individual",
+  "Certificados de disposición final para todos los clientes",
+  "Campañas de sensibilización internas y externas",
+  "Programas de formación ambiental",
+  "Equipo especializado de promoción de marca con enfoque ecológico",
+]
+---
+
+<Layout title="EKOPARTNER — Gestión de sistemas posconsumo · Ekosolv" description="Operamos sistemas colectivos e individuales de recolección y gestión posconsumo de envases, empaques y RAEE, autorizados por la ANLA. Aplica solo en Colombia." activePath="/servicios">
+  <section class="page-head wrap">
+    <div class="page-strip">
+      <div class="l">EKOPARTNER · 03</div>
+      <div class="l">Gestión de RAEE · Ekosolv</div>
+    </div>
+    <h1 class="display reveal" style="margin-top:40px">
+      Operamos tu <em>sistema</em><br>posconsumo completo.
+    </h1>
+    <p class="lede reveal" style="margin-top:32px; max-width:58ch">
+      Integramos y operamos sistemas colectivos e individuales de recolección y gestión posconsumo de residuos de interés prioritario, mediante sistemas diferenciados. No solo asesoramos — lo hacemos. Aplica únicamente en Colombia.
+    </p>
+  </section>
+
+  <section class="section wrap">
+    <div class="section-head reveal">
+      <div>
+        <div class="eyebrow">Programas posconsumo</div>
+        <h2>Dos sistemas de<br>recolección <em>diferenciados</em>.</h2>
+      </div>
+      <div class="meta">Iniciativa del Ministerio de Ambiente y Desarrollo Sostenible para promover la gestión ambientalmente responsable de los residuos de interés prioritario.</div>
+    </div>
+    <div class="process reveal">
+      {sistemas.map(s => (
+        <div class="process-row">
+          <div class="n">{s.n}</div>
+          <h3>{s.title}</h3>
+          <div class="desc">{s.desc}</div>
+          <div class="when">{s.when}</div>
+        </div>
+      ))}
+    </div>
+  </section>
+
+  <section class="section wrap" style="padding-top:0">
+    <div class="band reveal">
+      <div class="band-grid">
+        <div>
+          <div class="eyebrow" style="color: color-mix(in oklab, #fff 55%, transparent)">Resultados 2021</div>
+          <h2 style="margin-top:14px; max-width:16ch">Operación con <em>respaldo</em> normativo.</h2>
+        </div>
+        <div class="stat">
+          <div class="n">52<small>ton</small></div>
+          <div class="lbl">Residuos de empaques gestionados en 2021</div>
+        </div>
+        <div class="stat">
+          <div class="n">1407<small>/18</small></div>
+          <div class="lbl">Resolución que avala el sistema colectivo</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="section wrap">
+    <div class="section-head reveal">
+      <div>
+        <div class="eyebrow">Qué incluye</div>
+        <h2>Un socio que <em>opera</em>,<br>no solo asesora.</h2>
+      </div>
+      <div class="meta">Asumimos la operación del sistema de gestión de residuos de tu organización, de principio a fin.</div>
+    </div>
+    <div class="reveal" style="display:flex; flex-wrap:wrap; gap:8px;">
+      {incluye.map(d => (
+        <span style="font-family: var(--font-mono); font-size:12px; color:var(--ink-2); padding:8px 14px; background:var(--paper); border:1px solid var(--line); border-radius:999px;">{d}</span>
+      ))}
+    </div>
+  </section>
+
+  <footer class="foot">
+    <div class="wrap">
+      <div class="foot-head reveal">
+        <div class="display">¿Un nuevo <em>expediente</em><br>en el radar?</div>
+        <a href="/contacto" class="foot-cta">Escríbenos <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M5 12h14M13 6l6 6-6 6"/></svg></a>
+      </div>
+      <div class="foot-cols">
+        <div>
+          <img class="foot-logo" src="/brand/ekosolv-horizontal-white.svg" alt="EKOSOLV — Consultores en Sostenibilidad" />
+          <p style="opacity:.6; font-size:14px; margin-top:12px; max-width:36ch">Consultoría ambiental especializada en cumplimiento ANLA, ESG y economía circular.</p>
+        </div>
+        <div><h5>Servicios</h5><ul><li><a href="/ekonsulting">EKONSULTING</a></li><li><a href="/ekoraee">EKORAEE</a></li><li><a href="/ekopartner">EKOPARTNER</a></li><li><a href="/ekotrading">EKOTRADING</a></li></ul></div>
+        <div><h5>Sitio</h5><ul><li><a href="/">Inicio</a></li><li><a href="/quienes-somos">Nosotros</a></li><li><a href="/agenda-una-recoleccion">Agenda</a></li><li><a href="/blog">Diario</a></li></ul></div>
+        <div><h5>Contacto</h5><ul><li>info@ekosolv.com</li><li>+57 321 271 2773</li><li>Edif. RPTV · Carrera 15 #31B-33<br>Bogotá D.C.</li></ul></div>
+      </div>
+      <div class="foot-bottom">
+        <div>© 2026 Ekosolv S.A.S. · NIT 900.659.506-9</div>
+        <div>Built with care in Bogotá</div>
+      </div>
+    </div>
+  </footer>
+</Layout>
