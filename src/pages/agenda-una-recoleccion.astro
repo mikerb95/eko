@@ -1,0 +1,129 @@
+---
+import Layout from '../layouts/Layout.astro'
+---
+
+<Layout title="Agenda una recolección — Ekosolv" description="Formulario de recolección de residuos electrónicos (RAEE). Programa el retiro de tus equipos obsoletos con transporte certificado y certificado de disposición final." activePath="/agenda-una-recoleccion">
+  <section class="page-head wrap">
+    <div class="page-strip">
+      <div class="l">EKORAEE · Recolección</div>
+      <div class="l">Cuidando el planeta, paso a paso</div>
+    </div>
+    <h1 class="display reveal" style="margin-top:40px">
+      Agenda una <em>recolección</em>.
+    </h1>
+    <p class="lede reveal" style="margin-top:32px; max-width:56ch">
+      Formulario de recolección de residuos electrónicos (RAEE). Por favor completa todos los campos requeridos (<span style="color:var(--deep)">*</span>). Incluye transporte certificado y certificado de disposición final.
+    </p>
+  </section>
+
+  <section class="section wrap" style="padding-top:0">
+    <div class="contact-grid reveal">
+      <div class="contact-info">
+        <div class="row"><div class="k">Email</div><div class="v ulink">info@ekosolv.com</div></div>
+        <div class="row"><div class="k">Teléfono</div><div class="v">+57 321 271 2773</div></div>
+        <div class="row"><div class="k">WhatsApp</div><div class="v">+57 322 226 6729</div></div>
+        <div class="row"><div class="k">Oficina</div><div class="v">Edificio RPTV<br>Carrera 15 #31B-33, Bogotá D.C.</div></div>
+        <div class="row"><div class="k">Horario</div><div class="v">Lun – Vie · 8:00 – 17:30 COT</div></div>
+        <div class="row">
+          <div class="k">Atajo</div>
+          <div class="v">
+            ¿Prefieres WhatsApp?<br>
+            <a href="https://wa.me/573212712773" target="_blank" rel="noopener" style="color:var(--deep); font-weight:500">Agenda por WhatsApp →</a>
+          </div>
+        </div>
+      </div>
+
+      <form class="form" id="recoleccion-form">
+        <div class="form-row">
+          <div class="field">
+            <label>Nombre *</label>
+            <input type="text" placeholder="Tu nombre" required />
+          </div>
+          <div class="field">
+            <label>Apellido *</label>
+            <input type="text" placeholder="Tu apellido" required />
+          </div>
+        </div>
+        <div class="form-row">
+          <div class="field">
+            <label>Email *</label>
+            <input type="email" placeholder="tu@correo.co" required />
+          </div>
+          <div class="field">
+            <label>Teléfono *</label>
+            <input type="tel" placeholder="+57" required />
+          </div>
+        </div>
+        <div class="form-row">
+          <div class="field">
+            <label>Empresa</label>
+            <input type="text" placeholder="Nombre de la compañía" />
+          </div>
+          <div class="field">
+            <label>País / región *</label>
+            <input type="text" placeholder="Colombia" value="Colombia" required />
+          </div>
+        </div>
+        <div class="field">
+          <label>Dirección *</label>
+          <input type="text" placeholder="Calle / carrera y número" required />
+        </div>
+        <div class="field">
+          <label>Dirección — línea 2</label>
+          <input type="text" placeholder="Apartamento, oficina, piso (opcional)" />
+        </div>
+        <div class="form-row">
+          <div class="field">
+            <label>Ciudad *</label>
+            <input type="text" placeholder="Bogotá D.C." required />
+          </div>
+          <div class="field">
+            <label>Código postal</label>
+            <input type="text" placeholder="110111" />
+          </div>
+        </div>
+        <div class="field">
+          <label>Mensaje</label>
+          <textarea placeholder="Tipo de equipos, cantidad aproximada y fecha tentativa de recolección…"></textarea>
+        </div>
+        <button type="submit" class="submit">
+          <span class="submit-text">Enviar</span>
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
+        </button>
+      </form>
+    </div>
+  </section>
+
+  <footer class="foot">
+    <div class="wrap">
+      <div class="foot-head reveal">
+        <div class="display">¿Un nuevo <em>expediente</em><br>en el radar?</div>
+        <a href="/contacto" class="foot-cta">Escríbenos <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M5 12h14M13 6l6 6-6 6"/></svg></a>
+      </div>
+      <div class="foot-cols">
+        <div>
+          <img class="foot-logo" src="/brand/ekosolv-horizontal-white.svg" alt="EKOSOLV — Consultores en Sostenibilidad" />
+          <p style="opacity:.6; font-size:14px; margin-top:12px; max-width:36ch">Consultoría ambiental especializada en cumplimiento ANLA, ESG y economía circular.</p>
+        </div>
+        <div><h5>Servicios</h5><ul><li><a href="/ekonsulting">EKONSULTING</a></li><li><a href="/ekoraee">EKORAEE</a></li><li><a href="/ekopartner">EKOPARTNER</a></li><li><a href="/ekotrading">EKOTRADING</a></li></ul></div>
+        <div><h5>Sitio</h5><ul><li><a href="/">Inicio</a></li><li><a href="/quienes-somos">Nosotros</a></li><li><a href="/agenda-una-recoleccion">Agenda</a></li><li><a href="/blog">Diario</a></li></ul></div>
+        <div><h5>Contacto</h5><ul><li>info@ekosolv.com</li><li>+57 321 271 2773</li><li>Edif. RPTV · Carrera 15 #31B-33<br>Bogotá D.C.</li></ul></div>
+      </div>
+      <div class="foot-bottom">
+        <div>© 2026 Ekosolv S.A.S. · NIT 900.659.506-9</div>
+        <div>Built with care in Bogotá</div>
+      </div>
+    </div>
+  </footer>
+
+  <script>
+    const form = document.getElementById("recoleccion-form");
+    form?.addEventListener("submit", (e) => {
+      e.preventDefault();
+      const btn = form.querySelector(".submit") as HTMLButtonElement;
+      const text = form.querySelector(".submit-text") as HTMLElement;
+      if (text) text.textContent = "¡Gracias por tu mensaje! ✓";
+      if (btn) btn.style.background = "var(--forest)";
+    });
+  </script>
+</Layout>
