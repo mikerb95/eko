@@ -9,7 +9,7 @@ const { translate, siteSettings } = Astro.props
       <div class="lg:col-span-2">
         <div class="flex items-center gap-3">
           <a href="/">
-            <img src={siteSettings.logo.filename} alt={siteSettings.logo.alt} class="h-8" />
+            <img src={(siteSettings.logo_white ?? siteSettings.logo).filename} alt={(siteSettings.logo_white ?? siteSettings.logo).alt} class="h-8" />
           </a>
         </div>
       </div>
