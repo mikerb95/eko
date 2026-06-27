@@ -1,0 +1,91 @@
+---
+import Layout from '../layouts/Layout.astro'
+
+const features = [
+  {
+    n: "01", title: "Compra y venta de hardware",
+    desc: "Comercializamos electrónica de consumo nueva, seminueva y renovada. Adquirimos los equipos directamente a productores, operadores, grandes distribuidores y a pequeñas, medianas y grandes compañías.",
+    when: "Por lote",
+  },
+  {
+    n: "02", title: "Economía circular",
+    desc: "Prolongamos la vida útil de los dispositivos y reducimos el impacto del residuo electrónico, recolocando los equipos en mercados secundarios con la trazabilidad que exigen los ODS.",
+    when: "Continuo",
+  },
+  {
+    n: "03", title: "Proceso seguro y transparente",
+    desc: "Verificación de calidad y pruebas de funcionalidad, plataforma de transacción segura y transparente, y gestión profesional de activos para clientes corporativos.",
+    when: "Por transacción",
+  },
+]
+---
+
+<Layout title="EKOTRADING — Economía circular y activos IT · Ekosolv" description="Gestión de lotes masivos de hardware tecnológico: compra y venta de electrónica nueva, seminueva y renovada dentro de un marco de economía circular." activePath="/servicios">
+  <section class="page-head wrap">
+    <div class="page-strip">
+      <div class="l">EKOTRADING · 04</div>
+      <div class="l">Economía circular y sostenibilidad</div>
+    </div>
+    <h1 class="display reveal" style="margin-top:40px">
+      Convierte tus equipos<br>usados en <em>ingresos</em>.
+    </h1>
+    <p class="lede reveal" style="margin-top:32px; max-width:58ch">
+      Servicio especializado en la gestión de lotes masivos de hardware tecnológico. Combinamos la gestión responsable del residuo electrónico con la generación de valor económico mediante procesos de compra y venta transparentes y eficientes.
+    </p>
+  </section>
+
+  <section class="section wrap">
+    <div class="process reveal">
+      {features.map(f => (
+        <div class="process-row">
+          <div class="n">{f.n}</div>
+          <h3>{f.title}</h3>
+          <div class="desc">{f.desc}</div>
+          <div class="when">{f.when}</div>
+        </div>
+      ))}
+    </div>
+  </section>
+
+  <section class="section wrap">
+    <div class="band reveal">
+      <div class="band-grid" style="grid-template-columns: 1.4fr 1fr">
+        <div>
+          <div class="eyebrow" style="color: color-mix(in oklab, #fff 55%, transparent)">Economía circular</div>
+          <h2 style="margin-top:14px; max-width:22ch">¡Únete y haz una diferencia por el <em>planeta</em>!</h2>
+          <p style="color: color-mix(in oklab, #fff 75%, transparent); margin-top:20px; max-width:44ch; font-size:15px; line-height:1.55">
+            Valoramos y retiramos tus activos IT obsoletos, y nos integramos con EKORAEE para lo que no es reacondicionable.
+          </p>
+        </div>
+        <div style="display:flex; align-items:center; justify-content:flex-end;">
+          <a href="/contacto" class="foot-cta">
+            Contáctanos
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
+          </a>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <footer class="foot">
+    <div class="wrap">
+      <div class="foot-head reveal">
+        <div class="display">¿Un nuevo <em>expediente</em><br>en el radar?</div>
+        <a href="/contacto" class="foot-cta">Escríbenos <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M5 12h14M13 6l6 6-6 6"/></svg></a>
+      </div>
+      <div class="foot-cols">
+        <div>
+          <img class="foot-logo" src="/brand/ekosolv-horizontal-white.svg" alt="EKOSOLV — Consultores en Sostenibilidad" />
+          <p style="opacity:.6; font-size:14px; margin-top:12px; max-width:36ch">Consultoría ambiental especializada en cumplimiento ANLA, ESG y economía circular.</p>
+        </div>
+        <div><h5>Servicios</h5><ul><li><a href="/ekonsulting">EKONSULTING</a></li><li><a href="/ekoraee">EKORAEE</a></li><li><a href="/ekopartner">EKOPARTNER</a></li><li><a href="/ekotrading">EKOTRADING</a></li></ul></div>
+        <div><h5>Sitio</h5><ul><li><a href="/">Inicio</a></li><li><a href="/quienes-somos">Nosotros</a></li><li><a href="/agenda-una-recoleccion">Agenda</a></li><li><a href="/blog">Diario</a></li></ul></div>
+        <div><h5>Contacto</h5><ul><li>info@ekosolv.com</li><li>+57 321 271 2773</li><li>Edif. RPTV · Carrera 15 #31B-33<br>Bogotá D.C.</li></ul></div>
+      </div>
+      <div class="foot-bottom">
+        <div>© 2026 Ekosolv S.A.S. · NIT 900.659.506-9</div>
+        <div>Built with care in Bogotá</div>
+      </div>
+    </div>
+  </footer>
+</Layout>
