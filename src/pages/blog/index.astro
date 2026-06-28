@@ -1,7 +1,9 @@
 ---
+export const prerender = false
 import Layout from '../../layouts/Layout.astro'
-import posts from '../../data/blog-posts.json'
+import { getPosts } from '../../lib/cms'
 
+const posts = await getPosts()
 const featured = posts.find(p => p.featured) || posts[0]
 const rest = posts.filter(p => p !== featured)
 ---
