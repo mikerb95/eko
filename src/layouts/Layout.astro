@@ -10,6 +10,23 @@ interface Props {
 }
 
 const { title = "Eko — Consultoría ambiental ANLA", description = "Acompañamos a importadores, productores y operadores de tecnología en Colombia a construir sus planes de gestión ambiental, licencias y reportes.", activePath = "/" } = Astro.props
+
+const esToEn: Record<string, string> = {
+  '/': '/en',
+  '/servicios': '/en/services',
+  '/quienes-somos': '/en/about',
+  '/normativas': '/en/regulations',
+  '/casos': '/en/cases',
+  '/blog': '/en/blog',
+  '/agenda-una-recoleccion': '/en/schedule-a-collection',
+  '/contacto': '/en/contact',
+  '/ekonsulting': '/en/ekonsulting',
+  '/ekoraee': '/en/ekoraee',
+  '/ekopartner': '/en/ekopartner',
+  '/ekotrading': '/en/ekotrading',
+}
+const currentPath = Astro.url.pathname.replace(/\/$/, '') || '/'
+const enUrl = esToEn[currentPath] ?? '/en'
 ---
 
 <!DOCTYPE html>
@@ -46,7 +63,7 @@ const { title = "Eko — Consultoría ambiental ANLA", description = "Acompañam
           <a href="/agenda-una-recoleccion" class={activePath === '/agenda-una-recoleccion' ? 'active' : ''}>Agenda</a>
         </nav>
         <div class="nav-right" style="display:flex; align-items:center; gap:12px;">
-          <a href="/en" class="lang-switch" style="font-family:var(--font-mono); font-size:11px; letter-spacing:0.06em; text-transform:uppercase; opacity:0.55; transition:opacity .2s;" title="View in English">EN</a>
+          <a href={enUrl} class="lang-switch" style="font-family:var(--font-mono); font-size:11px; letter-spacing:0.06em; text-transform:uppercase; opacity:0.55; transition:opacity .2s;" title="View in English">EN</a>
           <a href="/contacto" class="nav-cta">
             Hablemos
             <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">

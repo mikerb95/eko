@@ -10,6 +10,23 @@ interface Props {
 }
 
 const { title = "Ekosolv — Environmental Consulting ANLA", description = "We help importers, producers, and tech operators in Colombia build their environmental management plans, licenses, and reports.", activePath = "/en" } = Astro.props
+
+const enToEs: Record<string, string> = {
+  '/en': '/',
+  '/en/services': '/servicios',
+  '/en/about': '/quienes-somos',
+  '/en/regulations': '/normativas',
+  '/en/cases': '/casos',
+  '/en/blog': '/blog',
+  '/en/schedule-a-collection': '/agenda-una-recoleccion',
+  '/en/contact': '/contacto',
+  '/en/ekonsulting': '/ekonsulting',
+  '/en/ekoraee': '/ekoraee',
+  '/en/ekopartner': '/ekopartner',
+  '/en/ekotrading': '/ekotrading',
+}
+const currentPath = Astro.url.pathname.replace(/\/$/, '') || '/en'
+const esUrl = enToEs[currentPath] ?? '/'
 ---
 
 <!DOCTYPE html>
