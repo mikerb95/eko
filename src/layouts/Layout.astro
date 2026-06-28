@@ -70,9 +70,29 @@ const enUrl = esToEn[currentPath] ?? '/en'
               <path d="M5 12h14M13 6l6 6-6 6"/>
             </svg>
           </a>
+          <button class="nav-burger" id="nav-burger" aria-label="Abrir menú" aria-expanded="false">
+            <span></span><span></span><span></span>
+          </button>
         </div>
       </div>
     </header>
+
+    <div class="nav-mobile-overlay" id="nav-mobile-overlay" aria-hidden="true">
+      <nav class="nav-mobile-links">
+        <a href="/servicios">Servicios</a>
+        <a href="/quienes-somos">Nosotros</a>
+        <a href="/normativas">Normativas</a>
+        <a href="/casos">Casos</a>
+        <a href="/blog">Blog</a>
+        <a href="/agenda-una-recoleccion">Agenda</a>
+        <a href="/contacto" class="nav-mobile-cta">
+          Hablemos
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M5 12h14M13 6l6 6-6 6"/>
+          </svg>
+        </a>
+      </nav>
+    </div>
 
     <main>
       <slot />
@@ -113,6 +133,28 @@ const enUrl = esToEn[currentPath] ?? '/en'
         tick();
       })();
 
+      // Mobile nav toggle
+      function initMobileNav() {
+        const burger = document.getElementById('nav-burger');
+        const overlay = document.getElementById('nav-mobile-overlay');
+        if (!burger || !overlay) return;
+        function close() {
+          burger.classList.remove('open');
+          overlay.classList.remove('open');
+          burger.setAttribute('aria-expanded', 'false');
+          overlay.setAttribute('aria-hidden', 'true');
+          document.body.style.overflow = '';
+        }
+        burger.addEventListener('click', () => {
+          const isOpen = burger.classList.toggle('open');
+          overlay.classList.toggle('open', isOpen);
+          burger.setAttribute('aria-expanded', String(isOpen));
+          overlay.setAttribute('aria-hidden', String(!isOpen));
+          document.body.style.overflow = isOpen ? 'hidden' : '';
+        });
+        overlay.querySelectorAll('a').forEach(a => a.addEventListener('click', close));
+      }
+
       // Reveal on scroll
       function initRevealers() {
         const io = new IntersectionObserver((entries) => {
@@ -148,6 +190,7 @@ const enUrl = esToEn[currentPath] ?? '/en'
 
       // Run on load and after each Astro view transition
       function init() {
+        initMobileNav();
         initRevealers();
         initAccordion();
         initChips();
