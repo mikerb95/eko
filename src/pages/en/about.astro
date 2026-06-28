@@ -1,0 +1,366 @@
+---
+import LayoutEn from '../../layouts/LayoutEn.astro'
+
+const team = [
+  {
+    name: "Mario Castilla Sánchez",
+    role: "General Manager · CEO",
+    initial: "MC",
+    accent: "var(--deep)",
+    photo: "/images/quienes-somos/mario-castilla.jpg",
+    bio: "Leads Ekosolv's strategic vision. His focus on the trust economy defines the relationship with every client.",
+  },
+  {
+    name: "Paula Andrea González",
+    role: "Director of Operations",
+    initial: "PG",
+    accent: "var(--forest)",
+    photo: "/images/quienes-somos/paula-gonzalez.jpg",
+    bio: "Ensures flawless execution of every mandate. Coordinates the EKORAEE and EKOPARTNER lines in the field.",
+  },
+  {
+    name: "Maira Arévalo",
+    role: "Commercial Director · Marketing · Client Services",
+    initial: "MA",
+    accent: "var(--clay)",
+    photo: "/images/quienes-somos/maira-arevalo.jpg",
+    bio: "Builds relationships with new and existing clients. Responsible for the Ekosolv brand experience.",
+  },
+  {
+    name: "Rafael Poveda",
+    role: "Communications Strategist",
+    initial: "RP",
+    accent: "var(--aqua)",
+    photo: "/images/quienes-somos/rafael-poveda.jpg",
+    bio: "Designs the sustainability and ESG narrative. Has participated in innovation immersions in Silicon Valley.",
+  },
+]
+
+const milestones = [
+  {
+    year: "2013",
+    title: "Foundation",
+    img: "/images/quienes-somos/equipo-consultores.jpg",
+    desc: "Ekosolv is born in Bogotá with the mission to support Colombian companies in their environmental transformation. From day one, focused on regulatory compliance and WEEE management.",
+  },
+  {
+    year: "2014",
+    title: "REP+ · ANLA",
+    img: "/images/quienes-somos/hito-anla-repmas.jpg",
+    desc: "Participation in the launch of ANLA's REP+ strategy (June 14) for the first three post-consumer waste streams: lead-acid batteries, used tires, and electronic waste.",
+  },
+  {
+    year: "2022",
+    title: "Silicon Valley",
+    img: "/images/quienes-somos/hito-silicon-valley.jpg",
+    desc: "Immersion in the world's most advanced sustainable technology trends. Exploration of innovations in waste management and corporate sustainability integration.",
+  },
+  {
+    year: "2024",
+    title: "COP16 · Colombia",
+    img: "/images/quienes-somos/hito-cop16.jpg",
+    desc: "Participation in the green zone of COP16 in Colombia. Exchange of innovative solutions with national and international environmental leaders.",
+  },
+  {
+    year: "2024",
+    title: "Quibdó · Istmina Campaign",
+    img: "/images/quienes-somos/campana-posconsumo.jpg",
+    desc: "Joint initiative with the Ministry of Environment, the National Army, Navy, Codechocó, and Universidad Antonio Nariño. Waste collection, awareness, and recycling culture in Colombia's Pacific coast.",
+  },
+  {
+    year: "Today",
+    title: "Circular economy",
+    img: "/images/quienes-somos/economia-circular.jpg",
+    desc: "We lead the transition to a circular economy with our clients, installing custom containers for WEEE collection and closing the lifecycle of electronic equipment.",
+  },
+]
+
+const allies = [
+  { name: "ANLA", desc: "National Environmental Licensing Authority" },
+  { name: "Carnaval de Barranquilla", desc: "Strategic partner in solid and electronic waste management" },
+  { name: "COP16", desc: "Green zone participation · Colombia 2024" },
+  { name: "Ministry of Environment", desc: "Post-consumer campaigns in the field" },
+  { name: "Codechocó", desc: "Regional technical cooperation" },
+  { name: "Univ. Antonio Nariño", desc: "Environmental education and recycling" },
+]
+---
+
+<LayoutEn title="About us — Ekosolv" activePath="/en/about">
+
+  <!-- Hero -->
+  <section class="page-head wrap">
+    <div class="page-strip">
+      <div class="l">About us</div>
+      <div class="l">Since 2013 · Bogotá · Colombia</div>
+    </div>
+    <h1 class="display reveal" style="margin-top:40px">
+      Agents of positive <em>environmental</em><br>change.
+    </h1>
+    <p class="lede reveal" style="margin-top:32px; max-width:58ch">
+      At Ekosolv we believe in a future where companies become agents of positive change. For 12 years we have been supporting organizations in Colombia and Latin America to grow competitively while caring for the planet.
+    </p>
+    <figure class="qs-hero reveal" style="margin-top:48px">
+      <img src="/images/quienes-somos/banner-solar.jpg" alt="Solar energy infrastructure surrounded by nature" loading="eager" />
+    </figure>
+  </section>
+
+  <!-- Stats -->
+  <section class="section wrap" style="padding-top:0">
+    <div class="band reveal">
+      <div class="band-grid">
+        <div>
+          <div class="eyebrow" style="color: color-mix(in oklab, #fff 55%, transparent)">Ekosolv in numbers</div>
+          <h2 style="margin-top:14px; max-width:16ch">12 years building the <em>trust economy</em>.</h2>
+        </div>
+        <div class="stat">
+          <div class="n">2013</div>
+          <div class="lbl">Year of foundation</div>
+        </div>
+        <div class="stat">
+          <div class="n">4</div>
+          <div class="lbl">Integrated service lines</div>
+        </div>
+        <div class="stat">
+          <div class="n">12<small>yrs</small></div>
+          <div class="lbl">In Colombian and Latin American markets</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Mission & philosophy -->
+  <section class="section wrap">
+    <div class="section-head reveal">
+      <div>
+        <div class="eyebrow">Philosophy · 01</div>
+        <h2>Sustainability built<br>on <em>trust</em>.</h2>
+      </div>
+      <div class="meta">
+        Our trust economy starts with tailored solutions with real cost-benefit value. We don't sell packages — we accompany transformations.
+      </div>
+    </div>
+
+    <figure class="qs-wide reveal" style="margin-bottom: clamp(28px, 4vw, 52px)">
+      <img src="/images/quienes-somos/equipo-estrategas.jpg" alt="Ekosolv team working on sustainability strategies" loading="lazy" />
+    </figure>
+
+    <div class="process reveal">
+      <div class="process-row">
+        <div class="n">Mission</div>
+        <h3>Transform with <em>purpose</em></h3>
+        <div class="desc">We are an environmental sustainability consulting firm that delivers tailored solutions, ensuring regulatory compliance and proper waste management, guiding organizations toward sustainability.</div>
+        <div class="when">Since 2013</div>
+      </div>
+      <div class="process-row">
+        <div class="n">Vision</div>
+        <h3>A future without <em>green</em> borders</h3>
+        <div class="desc">We believe in a future where companies become agents of positive change: transforming their practices, growing competitively, and contributing to the environmental care of the planet.</div>
+        <div class="when">Horizon 2030</div>
+      </div>
+      <div class="process-row">
+        <div class="n">Approach</div>
+        <h3>Minimize <em>risk</em>, maximize value</h3>
+        <div class="desc">We reduce legal, economic, and environmental risk through specialized human capital. Our multidisciplinary team speaks the language of both the authority and the executive.</div>
+        <div class="when">ANLA · ESG · SDGs</div>
+      </div>
+      <div class="process-row">
+        <div class="n">Culture</div>
+        <h3>Change starts from the <em>team</em></h3>
+        <div class="desc">We foster a culture of sustainability and trust that generates shared value for clients, collaborators, and the environment. Real change starts from teamwork.</div>
+        <div class="when">Internal · external</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Team -->
+  <section class="section wrap">
+    <div class="section-head reveal">
+      <div>
+        <div class="eyebrow">Team · 02</div>
+        <h2>The people behind<br>every <em>case</em>.</h2>
+      </div>
+      <div class="meta">
+        "I am proud to introduce those who work tirelessly to deliver the best possible experience." — Mario Castilla Sánchez, CEO
+      </div>
+    </div>
+
+    <div class="reveal" style="display:grid; grid-template-columns: repeat(4,1fr); gap:1px; background:var(--line); border-radius:var(--r-lg); overflow:hidden; border:1px solid var(--line)">
+      {team.map(m => (
+        <div style="background:var(--paper-warm); padding:clamp(28px,3vw,44px); display:flex; flex-direction:column; gap:20px; transition: background .3s ease;"
+             class="team-card">
+          <div class="team-photo" style={`--ring:${m.accent}`}>
+            <img src={m.photo} alt={m.name} loading="lazy" />
+            <span class="team-badge" style={`background:${m.accent}`}>{m.initial}</span>
+          </div>
+          <div>
+            <div style="font-family:var(--font-display); font-size:clamp(18px,1.6vw,22px); letter-spacing:-0.015em; line-height:1.1; color:var(--ink)">
+              {m.name}
+            </div>
+            <div style="font-family:var(--font-mono); font-size:10.5px; letter-spacing:0.08em; text-transform:uppercase; color:var(--mute); margin-top:6px">
+              {m.role}
+            </div>
+          </div>
+          <p style="font-size:14px; line-height:1.6; color:var(--ink-2); flex:1">
+            {m.bio}
+          </p>
+        </div>
+      ))}
+    </div>
+  </section>
+
+  <!-- Milestones -->
+  <section class="section wrap">
+    <div class="section-head reveal">
+      <div>
+        <div class="eyebrow">History · 03</div>
+        <h2>A decade of <em>milestones</em><br>in the field.</h2>
+      </div>
+      <div class="meta">The moments that define who we are — from filing our first cases to COP16.</div>
+    </div>
+
+    <div class="hito-grid reveal">
+      {milestones.map(h => (
+        <article class="hito-card">
+          <div class="hito-img">
+            <img src={h.img} alt={h.title} loading="lazy" />
+            <span class="hito-year">{h.year}</span>
+          </div>
+          <div class="hito-body">
+            <h3>{h.title.split(' ')[0]} <em>{h.title.split(' ').slice(1).join(' ')}</em></h3>
+            <p>{h.desc}</p>
+          </div>
+        </article>
+      ))}
+    </div>
+  </section>
+
+  <!-- Allies -->
+  <section class="section wrap">
+    <div class="section-head reveal">
+      <div>
+        <div class="eyebrow">Partners · 04</div>
+        <h2>Institutions that <em>trust</em><br>our practice.</h2>
+      </div>
+      <div class="meta">We work side by side with environmental authorities, universities, and impact organizations to bring environmental management where it's needed most.</div>
+    </div>
+
+    <div class="reveal" style="display:grid; grid-template-columns:repeat(3,1fr); gap:1px; background:var(--line); border:1px solid var(--line); border-radius:var(--r-lg); overflow:hidden">
+      {allies.map(a => (
+        <div style="background:var(--paper-warm); padding:clamp(24px,2.5vw,36px);">
+          <div style="font-family:var(--font-display); font-size:clamp(18px,1.8vw,24px); letter-spacing:-0.015em; color:var(--ink)">
+            {a.name}
+          </div>
+          <div style="font-size:13px; color:var(--mute); margin-top:8px; line-height:1.5">
+            {a.desc}
+          </div>
+        </div>
+      ))}
+    </div>
+  </section>
+
+  <!-- CTA Band -->
+  <section class="section wrap">
+    <div class="band reveal">
+      <div class="band-grid" style="grid-template-columns: 1.4fr 1fr">
+        <div>
+          <div class="eyebrow" style="color: color-mix(in oklab, #fff 55%, transparent)">EKORUTA</div>
+          <h2 style="margin-top:14px; max-width:20ch">Your sustainability roadmap <em>starts here</em>.</h2>
+          <p style="color: color-mix(in oklab, #fff 75%, transparent); margin-top:20px; max-width:44ch; font-size:15px; line-height:1.55">
+            A 45-minute diagnostic to map your ANLA obligations, ESG gaps, and circular economy opportunities. No cost. No commitment.
+          </p>
+        </div>
+        <div style="display:flex; align-items:center; justify-content:flex-end;">
+          <a href="/en/contact" class="foot-cta">
+            Schedule a diagnostic
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6">
+              <path d="M5 12h14M13 6l6 6-6 6"/>
+            </svg>
+          </a>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <footer class="foot">
+    <div class="wrap">
+      <div class="foot-head reveal">
+        <div class="display">A new <em>case</em><br>on the radar?</div>
+        <a href="/en/contact" class="foot-cta">
+          Write to us
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6">
+            <path d="M5 12h14M13 6l6 6-6 6"/>
+          </svg>
+        </a>
+      </div>
+      <div class="foot-cols">
+        <div>
+          <img class="foot-logo" src="/brand/ekosolv-horizontal-white.svg" alt="EKOSOLV — Sustainability Consultants" />
+          <p style="opacity:.6; font-size:14px; margin-top:12px; max-width:36ch">Environmental consulting specialized in ANLA compliance, ESG, and circular economy.</p>
+        </div>
+        <div><h5>Site</h5><ul><li><a href="/en">Home</a></li><li><a href="/en/services">Services</a></li><li><a href="/en/about">About</a></li><li><a href="/en/regulations">Regulations</a></li><li><a href="/en/cases">Cases</a></li><li><a href="/en/blog">Journal</a></li></ul></div>
+        <div><h5>Contact</h5><ul><li>info@ekosolv.com</li><li>+57 321 271 2773</li><li>Edif. RPTV · Carrera 15 #31B-33<br>Bogotá D.C.</li></ul></div>
+        <div><h5>Legal</h5><ul><li>Data policy</li><li>Terms of service</li><li>Code of ethics</li></ul></div>
+      </div>
+      <div class="foot-bottom">
+        <div>© 2026 Ekosolv S.A.S. · NIT 900.659.506-9</div>
+        <div>Built with care in Bogotá</div>
+      </div>
+    </div>
+  </footer>
+
+  <style>
+    .qs-hero, .qs-wide { margin: 0; overflow: hidden; border-radius: var(--r-lg); border: 1px solid var(--line); }
+    .qs-hero img { display: block; width: 100%; height: clamp(240px, 40vw, 520px); object-fit: cover; }
+    .qs-wide img { display: block; width: 100%; height: clamp(220px, 34vw, 440px); object-fit: cover; }
+
+    .team-card { gap: 18px !important; }
+    .team-card:hover { background: #fff !important; }
+    .team-photo {
+      position: relative; width: 100%; aspect-ratio: 4 / 5;
+      border-radius: 14px; overflow: hidden;
+      box-shadow: inset 0 0 0 1px color-mix(in oklab, var(--ink) 8%, transparent);
+    }
+    .team-photo img {
+      width: 100%; height: 100%; object-fit: cover; display: block;
+      filter: saturate(1.02); transition: transform .5s cubic-bezier(.2,.7,.2,1);
+    }
+    .team-card:hover .team-photo img { transform: scale(1.04); }
+    .team-badge {
+      position: absolute; left: 12px; bottom: 12px;
+      display: inline-grid; place-items: center;
+      min-width: 30px; height: 30px; padding: 0 9px; border-radius: 999px;
+      font-family: var(--font-mono); font-size: 11px; font-weight: 600; color: #fff;
+      letter-spacing: 0.04em; box-shadow: 0 4px 14px rgba(0,0,0,.22);
+    }
+
+    .hito-grid {
+      display: grid; grid-template-columns: repeat(3, 1fr); gap: 1px;
+      background: var(--line); border: 1px solid var(--line);
+      border-radius: var(--r-lg); overflow: hidden;
+    }
+    .hito-card { background: var(--paper-warm); display: flex; flex-direction: column; transition: background .3s ease; }
+    .hito-card:hover { background: #fff; }
+    .hito-img { position: relative; aspect-ratio: 16 / 11; overflow: hidden; }
+    .hito-img img { width: 100%; height: 100%; object-fit: cover; display: block; transition: transform .5s cubic-bezier(.2,.7,.2,1); }
+    .hito-card:hover .hito-img img { transform: scale(1.05); }
+    .hito-year {
+      position: absolute; left: 14px; top: 14px;
+      font-family: var(--font-mono); font-size: 11.5px; letter-spacing: 0.06em;
+      color: #fff; background: color-mix(in oklab, var(--ink) 62%, transparent);
+      backdrop-filter: blur(4px); padding: 5px 11px; border-radius: 999px;
+    }
+    .hito-body { padding: clamp(20px, 2vw, 28px); display: flex; flex-direction: column; gap: 10px; }
+    .hito-body h3 { font-family: var(--font-display); font-weight: 400; font-size: clamp(20px, 1.9vw, 26px); letter-spacing: -0.02em; }
+    .hito-body h3 em { font-style: italic; color: var(--forest); }
+    .hito-body p { font-size: 14px; line-height: 1.6; color: var(--ink-2); }
+
+    @media (max-width: 900px) {
+      .team-card { grid-column: span 2; }
+      .hito-grid { grid-template-columns: repeat(2, 1fr); }
+    }
+    @media (max-width: 600px) {
+      .team-card { grid-column: span 4; }
+      .hito-grid { grid-template-columns: 1fr; }
+    }
+  </style>
+</LayoutEn>
