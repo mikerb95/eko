@@ -1,31 +1,14 @@
 ---
+export const prerender = false
 import Layout from '../../layouts/Layout.astro'
-import posts from '../../data/blog-posts.json'
+import { getPosts, getPostBySlug } from '../../lib/cms'
 
-export function getStaticPaths() {
-  return posts.map(p => ({ params: { slug: p.slug }, props: { post: p } }))
-}
+const { slug } = Astro.params
+const post = slug ? await getPostBySlug(slug) : null
+if (!post) return Astro.redirect('/blog')
 
-interface Section {
-  type: string
-  text?: string
-  items?: string[]
-}
-
-interface Post {
-  slug: string
-  category: string
-  date: string
-  readtime: string
-  title: string
-  lede: string
-  accent: string
-  featured: boolean
-  sections: Section[]
-}
-
-const { post } = Astro.props as { post: Post }
-const related = posts.filter(p => p.slug !== post.slug).slice(0, 3)
+const allPosts = await getPosts()
+const related = allPosts.filter(p => p.slug !== post.slug).slice(0, 3)
 ---
 
 <Layout title={`${post.title} — Eko`} activePath="/blog">
