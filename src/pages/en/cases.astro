@@ -1,0 +1,138 @@
+---
+import LayoutEn from '../../layouts/LayoutEn.astro'
+
+const cases = [
+  {
+    cls: "",
+    label: "Importer · hardware",
+    kicker: ["Case 01 · 2024", "Licensing"],
+    title: "From zero to approved post-consumer plan in 73 days.",
+    titleEm: "zero",
+    metrics: [["73", "Days to approval"], ["1.2M", "Units covered"]],
+  },
+  {
+    cls: "green",
+    label: "Assembler · PC",
+    kicker: ["Case 02 · 2024", "Audit"],
+    title: "360° audit and closure of 11 regulatory gaps.",
+    titleEm: "360°",
+    metrics: [["11", "Gaps closed"], ["$480M", "Penalty risk avoided"]],
+  },
+  {
+    cls: "clay",
+    label: "Operator · Data center",
+    kicker: ["Case 03 · 2025", "Permits"],
+    title: "Emission and discharge permit for new DC.",
+    titleEm: "emission",
+    metrics: [["2", "Permits filed"], ["0", "Pending requirements"]],
+  },
+  {
+    cls: "green",
+    label: "Retail · electronics",
+    kicker: ["Case 04 · 2025", "Post-consumer"],
+    title: "WEEE collection network with 218 stores nationwide.",
+    titleEm: "WEEE",
+    metrics: [["218", "Collection points"], ["340k", "Kg managed year 1"]],
+  },
+  {
+    cls: "",
+    label: "Telco · infrastructure",
+    kicker: ["Case 05 · 2025", "Defense"],
+    title: "Closure of penalty proceeding for antennas.",
+    titleEm: "penalty",
+    metrics: [["6", "Months of process"], ["Closed", "Final resolution"]],
+  },
+  {
+    cls: "clay",
+    label: "Distributor · components",
+    kicker: ["Case 06 · 2026", "Reporting"],
+    title: "Traceability dashboard for annual ANLA report.",
+    titleEm: "Traceability",
+    metrics: [["1", "Unified panel"], ["7", "Automated obligations"]],
+  },
+]
+---
+
+<LayoutEn title="Cases — Ekosolv" activePath="/en/cases">
+  <section class="page-head wrap">
+    <div class="page-strip">
+      <div class="l">Cases</div>
+      <div class="l">Selection · 2024 – 2026</div>
+    </div>
+    <h1 class="display reveal" style="margin-top:40px">
+      Real<br><em>mandates</em>, measurable results.
+    </h1>
+    <p class="lede reveal" style="margin-top:32px; max-width:56ch">
+      A sample of mandates executed in the last 24 months. Client names are kept confidential under NDA.
+    </p>
+  </section>
+
+  <section class="section wrap">
+    <div class="cases reveal">
+      {cases.map(c => (
+        <article class={`case ${c.cls}`}>
+          <div class="cover" data-label={c.label}></div>
+          <div class="kicker">
+            <span>{c.kicker[0]}</span>
+            <span>{c.kicker[1]}</span>
+          </div>
+          <h3 set:html={c.title.replace(c.titleEm, `<em>${c.titleEm}</em>`)}></h3>
+          <div class="metric">
+            {c.metrics.map(m => (
+              <div>
+                <div class="v">{m[0]}</div>
+                <div class="l">{m[1]}</div>
+              </div>
+            ))}
+          </div>
+        </article>
+      ))}
+    </div>
+  </section>
+
+  <section class="section wrap">
+    <div class="band reveal">
+      <div class="band-grid" style="grid-template-columns: 1.3fr 1fr 1fr">
+        <div>
+          <div class="eyebrow" style="color: color-mix(in oklab, #fff 55%, transparent)">Aggregate results</div>
+          <h2 style="margin-top:14px; max-width:18ch">The impact, <em>summing</em> all mandates.</h2>
+        </div>
+        <div class="stat">
+          <div class="n">$2.1<small>B</small></div>
+          <div class="lbl">Penalty risk mitigated</div>
+        </div>
+        <div class="stat">
+          <div class="n">0</div>
+          <div class="lbl">Final penalties · 2024–2026</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <footer class="foot">
+    <div class="wrap">
+      <div class="foot-head reveal">
+        <div class="display">A new <em>case</em><br>on the radar?</div>
+        <a href="/en/contact" class="foot-cta">
+          Write to us
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6">
+            <path d="M5 12h14M13 6l6 6-6 6"/>
+          </svg>
+        </a>
+      </div>
+      <div class="foot-cols">
+        <div>
+          <img class="foot-logo" src="/brand/ekosolv-horizontal-white.svg" alt="EKOSOLV — Sustainability Consultants" />
+          <p style="opacity:.6; font-size:14px; margin-top:12px; max-width:36ch">Environmental consulting specialized in ANLA compliance for the tech sector.</p>
+        </div>
+        <div><h5>Site</h5><ul><li><a href="/en">Home</a></li><li><a href="/en/services">Services</a></li><li><a href="/en/regulations">Regulations</a></li><li><a href="/en/cases">Cases</a></li><li><a href="/en/blog">Journal</a></li></ul></div>
+        <div><h5>Contact</h5><ul><li>info@ekosolv.com</li><li>+57 321 271 2773</li><li>Edif. RPTV · Carrera 15 #31B-33<br>Bogotá D.C.</li></ul></div>
+        <div><h5>Legal</h5><ul><li>Data policy</li><li>Terms of service</li><li>Code of ethics</li></ul></div>
+      </div>
+      <div class="foot-bottom">
+        <div>© 2026 Ekosolv S.A.S. · NIT 900.659.506-9</div>
+        <div>Built with care in Bogotá</div>
+      </div>
+    </div>
+  </footer>
+</LayoutEn>
