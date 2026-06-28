@@ -145,6 +145,7 @@ export async function seedIfEmpty(): Promise<{ posts: number; normativas: number
 
 // ---------- Public reads (with JSON fallback) ----------
 export async function getPosts(): Promise<Post[]> {
+  if (!getDbUrl()) return (seedPosts as Post[])
   try {
     await ensureSchema()
     const res = await client().execute('SELECT * FROM posts ORDER BY featured DESC, id ASC')
@@ -156,6 +157,7 @@ export async function getPosts(): Promise<Post[]> {
 }
 
 export async function getPostBySlug(slug: string): Promise<Post | null> {
+  if (!getDbUrl()) return (seedPosts as Post[]).find((p) => p.slug === slug) ?? null
   try {
     await ensureSchema()
     const res = await client().execute({ sql: 'SELECT * FROM posts WHERE slug = ? LIMIT 1', args: [slug] })
@@ -167,6 +169,7 @@ export async function getPostBySlug(slug: string): Promise<Post | null> {
 }
 
 export async function getNormativas(): Promise<Normativa[]> {
+  if (!getDbUrl()) return (seedNormativas as any[]).map((n, i) => ({ id: i + 1, position: i, col: n.col ?? 1, code: n.code, title: n.title, body: n.body, tags: n.tags ?? [] }))
   try {
     await ensureSchema()
     const res = await client().execute('SELECT * FROM normativas ORDER BY col ASC, position ASC, id ASC')
