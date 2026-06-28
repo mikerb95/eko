@@ -1,0 +1,130 @@
+---
+import "../styles/global.css"
+import "../styles/blog.css"
+import { ClientRouter } from 'astro:transitions'
+
+interface Props {
+  title?: string
+  description?: string
+  activePath?: string
+}
+
+const { title = "Ekosolv — Environmental Consulting ANLA", description = "We help importers, producers, and tech operators in Colombia build their environmental management plans, licenses, and reports.", activePath = "/en" } = Astro.props
+---
+
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <title>{title}</title>
+    <meta name="description" content={description} />
+    <meta property="og:title" content={title} />
+    <meta property="og:description" content={description} />
+    <meta property="og:type" content="website" />
+    <meta property="og:locale" content="en_US" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Geist:wght@300..700&family=Geist+Mono:wght@300..500&display=swap" rel="stylesheet" />
+    <ClientRouter />
+  </head>
+  <body>
+    <div id="cursor"></div>
+
+    <header class="nav">
+      <div class="wrap nav-inner">
+        <a href="/en" class="brand" aria-label="EKOSOLV — Sustainability Consultants">
+          <img src="/brand/ekosolv-horizontal.svg" alt="EKOSOLV — Sustainability Consultants" class="brand-logo" />
+        </a>
+        <nav class="nav-links">
+          <a href="/en/services" class={activePath === '/en/services' ? 'active' : ''}>Services</a>
+          <a href="/en/about" class={activePath === '/en/about' ? 'active' : ''}>About</a>
+          <a href="/en/regulations" class={activePath === '/en/regulations' ? 'active' : ''}>Regulations</a>
+          <a href="/en/cases" class={activePath === '/en/cases' ? 'active' : ''}>Cases</a>
+          <a href="/en/blog" class={activePath.startsWith('/en/blog') ? 'active' : ''}>Journal</a>
+          <a href="/en/schedule-a-collection" class={activePath === '/en/schedule-a-collection' ? 'active' : ''}>Schedule</a>
+        </nav>
+        <div class="nav-right" style="display:flex; align-items:center; gap:12px;">
+          <a href="/" class="lang-switch" style="font-family:var(--font-mono); font-size:11px; letter-spacing:0.06em; text-transform:uppercase; opacity:0.55; transition:opacity .2s;" title="Ver en español">ES</a>
+          <a href="/en/contact" class="nav-cta">
+            Let's talk
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M5 12h14M13 6l6 6-6 6"/>
+            </svg>
+          </a>
+        </div>
+      </div>
+    </header>
+
+    <main>
+      <slot />
+    </main>
+
+    <script>
+      // Cursor trailing dot
+      (() => {
+        const dot = document.getElementById("cursor");
+        if (!dot || window.matchMedia("(pointer: coarse)").matches) {
+          if (dot) dot.style.display = "none";
+          return;
+        }
+        let x = 0, y = 0, tx = 0, ty = 0;
+        window.addEventListener("pointermove", (e) => { tx = e.clientX; ty = e.clientY; });
+        document.addEventListener("pointerover", (e) => {
+          const hover = (e.target as Element).closest("a, button, .svc, .case, .norm, [data-link]");
+          if (dot) dot.classList.toggle("big", !!hover);
+        });
+        function tick() {
+          x += (tx - x) * 0.18;
+          y += (ty - y) * 0.18;
+          dot.style.transform = `translate(${x}px, ${y}px) translate(-50%, -50%)`;
+          requestAnimationFrame(tick);
+        }
+        tick();
+      })();
+
+      // Reveal on scroll
+      function initRevealers() {
+        const io = new IntersectionObserver((entries) => {
+          entries.forEach(en => {
+            if (en.isIntersecting) {
+              en.target.classList.add("in");
+              io.unobserve(en.target);
+            }
+          });
+        }, { threshold: 0.12 });
+        document.querySelectorAll(".reveal").forEach(el => io.observe(el));
+      }
+
+      // Accordion for regulations
+      function initAccordion() {
+        document.querySelectorAll(".norm").forEach(n => {
+          n.addEventListener("click", () => {
+            const open = n.getAttribute("data-open") === "true";
+            n.setAttribute("data-open", open ? "false" : "true");
+          });
+        });
+      }
+
+      // Chip toggles for contact form
+      function initChips() {
+        document.querySelectorAll(".chip").forEach(c => {
+          c.addEventListener("click", (e) => {
+            e.preventDefault();
+            c.classList.toggle("on");
+          });
+        });
+      }
+
+      function init() {
+        initRevealers();
+        initAccordion();
+        initChips();
+      }
+
+      document.addEventListener("astro:page-load", init);
+      init();
+    </script>
+  </body>
+</html>
