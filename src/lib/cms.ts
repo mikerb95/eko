@@ -183,6 +183,7 @@ export async function upsertPost(p: Post): Promise<number> {
   await ensureSchema()
   const db = client()
   const args = [p.slug, p.category, p.date, p.readtime, p.accent, p.featured ? 1 : 0, p.title, p.lede, JSON.stringify(p.sections ?? []), now()]
+  console.error('[upsertPost] id=', p.id, 'args=', JSON.stringify(args.map(a => a === undefined ? '__UNDEF__' : a)))
   if (p.id) {
     await db.execute({
       sql: `UPDATE posts SET slug=?,category=?,date=?,readtime=?,accent=?,featured=?,title=?,lede=?,sections=?,updated_at=? WHERE id=?`,
