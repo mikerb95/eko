@@ -36,6 +36,11 @@ export interface Normativa {
 let _db: Client | null = null
 let _ready: Promise<void> | null = null
 
+function getDbUrl(): string | null {
+  const url = import.meta.env.DATABASE_URL || process.env.DATABASE_URL
+  return url && !url.startsWith('file:') ? url : null
+}
+
 function client(): Client {
   if (_db) return _db
   const url = import.meta.env.DATABASE_URL || process.env.DATABASE_URL || 'file:./data/cms.db'
