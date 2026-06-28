@@ -1,0 +1,141 @@
+---
+import LayoutEn from '../../../layouts/LayoutEn.astro'
+import posts from '../../../data/blog-posts.json'
+
+const featured = posts.find(p => p.featured) || posts[0]
+const rest = posts.filter(p => p !== featured)
+---
+
+<LayoutEn title="Journal — Ekosolv" activePath="/en/blog">
+  <section class="page-head wrap">
+    <div class="page-strip">
+      <div class="l">Journal</div>
+      <div class="l">{posts.length} articles · updated weekly</div>
+    </div>
+    <h1 class="display reveal" style="margin-top:40px">
+      Field notes on <em>regulation</em>.
+    </h1>
+    <p class="lede reveal" style="margin-top:32px; max-width:56ch">
+      Analysis, guides, and alerts on environmental compliance in Colombia's tech sector. Written by the team, with no content editor behind it.
+    </p>
+  </section>
+
+  <section class="section wrap">
+    <a class="blog-featured reveal" href={`/blog/${featured.slug}`} style="view-transition-name: featured-post">
+      <div class={`blog-featured-media accent-${featured.accent}`}>
+        <div class="bfm-coords">
+          <span>ES · {featured.date}</span>
+          <span>{featured.readtime} read</span>
+        </div>
+        <div class="bfm-badge">Featured</div>
+      </div>
+      <div class="blog-featured-body">
+        <div class="blog-kicker">
+          <span class="dot"></span>{featured.category}
+        </div>
+        <h2 class="blog-featured-title">{featured.title}</h2>
+        <p class="lede" style="margin-top:20px">{featured.lede}</p>
+        <div class="blog-read">
+          Read article
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6">
+            <path d="M5 12h14M13 6l6 6-6 6"/>
+          </svg>
+        </div>
+      </div>
+    </a>
+  </section>
+
+  <section class="section wrap" style="padding-top:0">
+    <div class="section-head reveal">
+      <div>
+        <div class="eyebrow">Archive · 2026</div>
+        <h2><em>Recent</em> reads.</h2>
+      </div>
+      <div class="meta">We publish when there's something that truly adds value — not by editorial calendar. Average: two pieces per month.</div>
+    </div>
+
+    <div class="blog-list reveal">
+      {rest.map((p, i) => (
+        <a class="blog-row" href={`/blog/${p.slug}`}>
+          <div class="br-num">{String(i + 2).padStart(2, "0")}</div>
+          <div class="br-cat"><span class={`d accent-${p.accent}`}></span>{p.category}</div>
+          <div class="br-title">{p.title}</div>
+          <div class="br-date">{p.date}</div>
+          <div class="br-time">{p.readtime}</div>
+          <div class="br-arrow">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6">
+              <path d="M7 17L17 7M9 7h8v8"/>
+            </svg>
+          </div>
+        </a>
+      ))}
+    </div>
+  </section>
+
+  <section class="section wrap">
+    <div class="band reveal">
+      <div class="band-grid" style="grid-template-columns: 1.3fr 1fr">
+        <div>
+          <div class="eyebrow" style="color: color-mix(in oklab, #fff 55%, transparent)">Newsletter</div>
+          <h2 style="margin-top:14px; max-width:18ch">A monthly <em>brief</em> for HSE teams.</h2>
+          <p style="color: color-mix(in oklab, #fff 75%, transparent); margin-top:20px; max-width:52ch; font-size:15px; line-height:1.55">
+            Monthly regulatory changes, upcoming deadlines, authority interpretations, and a short case. No noise.
+          </p>
+        </div>
+        <form class="news-form" id="news-form">
+          <div class="news-field">
+            <label>Corporate email</label>
+            <div class="news-input-row">
+              <input type="email" placeholder="you@company.com" required />
+              <button type="submit">
+                Subscribe
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <path d="M5 12h14M13 6l6 6-6 6"/>
+                </svg>
+              </button>
+            </div>
+            <div class="news-ok" id="news-ok">Done — you'll receive the next brief at month's end.</div>
+          </div>
+        </form>
+      </div>
+    </div>
+  </section>
+
+  <footer class="foot">
+    <div class="wrap">
+      <div class="foot-head reveal">
+        <div class="display">A new <em>case</em><br>on the radar?</div>
+        <a href="/en/contact" class="foot-cta">
+          Write to us
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6">
+            <path d="M5 12h14M13 6l6 6-6 6"/>
+          </svg>
+        </a>
+      </div>
+      <div class="foot-cols">
+        <div>
+          <img class="foot-logo" src="/brand/ekosolv-horizontal-white.svg" alt="EKOSOLV — Sustainability Consultants" />
+          <p style="opacity:.6; font-size:14px; margin-top:12px; max-width:36ch">Environmental consulting specialized in ANLA compliance for the tech sector.</p>
+        </div>
+        <div><h5>Site</h5><ul><li><a href="/en">Home</a></li><li><a href="/en/services">Services</a></li><li><a href="/en/regulations">Regulations</a></li><li><a href="/en/cases">Cases</a></li><li><a href="/en/blog">Journal</a></li></ul></div>
+        <div><h5>Contact</h5><ul><li>info@ekosolv.com</li><li>+57 321 271 2773</li><li>Edif. RPTV · Carrera 15 #31B-33<br>Bogotá D.C.</li></ul></div>
+        <div><h5>Legal</h5><ul><li>Data policy</li><li>Terms of service</li><li>Code of ethics</li></ul></div>
+      </div>
+      <div class="foot-bottom">
+        <div>© 2026 Ekosolv S.A.S. · NIT 900.659.506-9</div>
+        <div>Built with care in Bogotá</div>
+      </div>
+    </div>
+  </footer>
+
+  <script>
+    const form = document.getElementById("news-form");
+    form?.addEventListener("submit", (e) => {
+      e.preventDefault();
+      const input = form.querySelector("input") as HTMLInputElement;
+      const ok = document.getElementById("news-ok") as HTMLElement;
+      if (input) input.value = "";
+      if (ok) ok.style.opacity = "1";
+    });
+  </script>
+</LayoutEn>
