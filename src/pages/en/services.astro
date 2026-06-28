@@ -1,0 +1,187 @@
+---
+import LayoutEn from '../../layouts/LayoutEn.astro'
+
+const lines = [
+  {
+    n: "01", code: "EKONSULTING", slug: "/en/ekonsulting",
+    title: "ANLA advisory and compliance",
+    lede: "The core of our practice. We structure and execute all regulatory processes before ANLA and the regional environmental authorities (CAR) — from licensing to defense in penalty proceedings.",
+    deliverables: [
+      "Environmental licensing (EIA, DAA, PMA)",
+      "WEEE and battery post-consumer plans",
+      "360° compliance audit",
+      "Authority reports (RUA, ICA, ANLA)",
+      "Support in penalty proceedings",
+      "In-house HSE team training",
+      "ESG strategy and SDG alignment",
+    ],
+    plazo: "Ongoing",
+    accent: "accent-deep",
+  },
+  {
+    n: "02", code: "EKORAEE", slug: "/en/ekoraee",
+    title: "Certified electronic waste management",
+    lede: "Collection, transport, storage, and certification of electrical and electronic equipment under Resolution 1297 of 2010 and Law 1672 of 2013.",
+    deliverables: [
+      "On-site or door-to-door collection",
+      "Certified transport to authorized processor",
+      "Final disposal certificates",
+      "Integration with EKONSULTING post-consumer plan",
+      "Target reporting to the authority",
+    ],
+    plazo: "Per campaign or ongoing",
+    accent: "accent-forest",
+  },
+  {
+    n: "03", code: "EKOPARTNER", slug: "/en/ekopartner",
+    title: "Operation of waste management systems",
+    lede: "We integrate and operate the organization's complete waste collection and disposal system. We don't just advise — we do it. Colombia only.",
+    deliverables: [
+      "Integral management system design",
+      "Collection point operations",
+      "Processor and carrier management",
+      "End-to-end waste traceability",
+      "Operational and regulatory reports",
+    ],
+    plazo: "Monthly retainer",
+    accent: "",
+  },
+  {
+    n: "04", code: "EKOTRADING", slug: "/en/ekotrading",
+    title: "Circular economy · buying and selling IT assets",
+    lede: "We close the lifecycle of tech equipment within a circular economy framework. We buy and sell used or obsolete technology wholesale, with the traceability SDGs demand.",
+    deliverables: [
+      "Valuation and retrieval of obsolete IT assets",
+      "Refurbishment and certification",
+      "Remarketing in secondary markets",
+      "Documentation for ESG reporting",
+      "Integration with EKORAEE for non-refurbishable items",
+    ],
+    plazo: "Per batch or ongoing",
+    accent: "accent-clay",
+  },
+]
+---
+
+<LayoutEn title="Services — Ekosolv" activePath="/en/services">
+  <section class="page-head wrap">
+    <div class="page-strip">
+      <div class="l">Service lines</div>
+      <div class="l">04 lines · one ecosystem</div>
+    </div>
+    <h1 class="display reveal" style="margin-top:40px">
+      From compliance<br>to <em>competitive advantage</em>.
+    </h1>
+    <p class="lede reveal" style="margin-top:32px; max-width:54ch">
+      Four integrated lines covering the full environmental lifecycle of a tech company: regulatory obligation, waste operations, circular economy, and ESG strategy.
+    </p>
+  </section>
+
+  <section class="section wrap">
+    <div class="process reveal">
+      {lines.map(s => (
+        <div class={`process-row ${s.accent ? s.accent + '-row' : ''}`} style="grid-template-columns: 100px 240px 1fr 160px">
+          <div class="n">{s.n} · {s.code}</div>
+          <div>
+            <h3 style="font-size:clamp(20px,2vw,30px)">{s.title}</h3>
+          </div>
+          <div class="desc">
+            {s.lede}
+            <div style="display:flex; flex-wrap:wrap; gap:6px; margin-top:14px">
+              {s.deliverables.map(d => (
+                <span style="font-family: var(--font-mono); font-size:11px; color:var(--ink-2); padding:5px 10px; background:var(--paper); border:1px solid var(--line); border-radius:999px;">{d}</span>
+              ))}
+            </div>
+            <a href={s.slug} style="display:inline-flex; align-items:center; gap:6px; margin-top:16px; font-family:var(--font-mono); font-size:11.5px; letter-spacing:0.04em; text-transform:uppercase; color:var(--deep);">
+              View {s.code} line
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
+            </a>
+          </div>
+          <div class="when">{s.plazo}</div>
+        </div>
+      ))}
+    </div>
+  </section>
+
+  <section class="section wrap">
+    <div class="section-head reveal">
+      <div>
+        <div class="eyebrow">Methodology · EKORUTA</div>
+        <h2>A proprietary framework to go<br>beyond the <em>regulatory minimum</em>.</h2>
+      </div>
+      <div class="meta">
+        The EKORUTA is our business sustainability roadmap. It guides each organization step by step — from the first ANLA diagnostic to an ESG strategy aligned with UN SDGs.
+      </div>
+    </div>
+
+    <div class="band reveal">
+      <div class="band-grid" style="grid-template-columns: 1fr 1fr 1fr 1fr">
+        <div class="stat">
+          <div class="n" style="font-size:clamp(20px,2.5vw,32px)">Diagnostic</div>
+          <div class="lbl">ANLA obligations + ESG gaps</div>
+        </div>
+        <div class="stat">
+          <div class="n" style="font-size:clamp(20px,2.5vw,32px)">Roadmap</div>
+          <div class="lbl">Regulatory plan + applicable SDGs</div>
+        </div>
+        <div class="stat">
+          <div class="n" style="font-size:clamp(20px,2.5vw,32px)">Execution</div>
+          <div class="lbl">Filings + operations + trading</div>
+        </div>
+        <div class="stat">
+          <div class="n" style="font-size:clamp(20px,2.5vw,32px)">Improvement</div>
+          <div class="lbl">ESG report + new cycle</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="section wrap">
+    <div class="band reveal">
+      <div class="band-grid" style="grid-template-columns: 1.4fr 1fr 1fr">
+        <div>
+          <div class="eyebrow" style="color: color-mix(in oklab, #fff 55%, transparent)">How we work</div>
+          <h2 style="margin-top:14px; max-width:18ch">Three modalities, one <em>standard</em>.</h2>
+          <p style="color: color-mix(in oklab, #fff 75%, transparent); margin-top:20px; max-width:44ch; font-size:15px; line-height:1.55">
+            We work per fixed project, as a monthly retainer, or in a hybrid scheme. No fine print.
+          </p>
+        </div>
+        <div class="stat">
+          <div class="n">45<small>min</small></div>
+          <div class="lbl">Initial diagnostic at no cost</div>
+        </div>
+        <div class="stat">
+          <div class="n">4</div>
+          <div class="lbl">Integrated lines available</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <footer class="foot">
+    <div class="wrap">
+      <div class="foot-head reveal">
+        <div class="display">A new <em>case</em><br>on the radar?</div>
+        <a href="/en/contact" class="foot-cta">
+          Write to us
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6">
+            <path d="M5 12h14M13 6l6 6-6 6"/>
+          </svg>
+        </a>
+      </div>
+      <div class="foot-cols">
+        <div>
+          <img class="foot-logo" src="/brand/ekosolv-horizontal-white.svg" alt="EKOSOLV — Sustainability Consultants" />
+          <p style="opacity:.6; font-size:14px; margin-top:12px; max-width:36ch">Environmental consulting specialized in ANLA compliance, ESG, and circular economy.</p>
+        </div>
+        <div><h5>Site</h5><ul><li><a href="/en">Home</a></li><li><a href="/en/services">Services</a></li><li><a href="/en/regulations">Regulations</a></li><li><a href="/en/cases">Cases</a></li><li><a href="/en/blog">Journal</a></li></ul></div>
+        <div><h5>Contact</h5><ul><li>info@ekosolv.com</li><li>+57 321 271 2773</li><li>Edif. RPTV · Carrera 15 #31B-33<br>Bogotá D.C.</li></ul></div>
+        <div><h5>Legal</h5><ul><li>Data policy</li><li>Terms of service</li><li>Code of ethics</li></ul></div>
+      </div>
+      <div class="foot-bottom">
+        <div>© 2026 Ekosolv S.A.S. · NIT 900.659.506-9</div>
+        <div>Built with care in Bogotá</div>
+      </div>
+    </div>
+  </footer>
+</LayoutEn>
