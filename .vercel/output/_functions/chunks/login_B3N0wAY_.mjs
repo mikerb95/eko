@@ -3,7 +3,7 @@ import 'piccolore';
 import { b4 as renderHead, L as renderTemplate } from './sequence_liNBEFg9.mjs';
 import 'clsx';
 import { r as renderScript } from './script_CVkmP5jU.mjs';
-import { S as SESSION_COOKIE, v as verifySession } from './auth_BBNtY4Gb.mjs';
+import { S as SESSION_COOKIE, v as verifySession } from './auth_DIhOE80G.mjs';
 
 const prerender = false;
 const $$Login = createComponent(async ($$result, $$props, $$slots) => {

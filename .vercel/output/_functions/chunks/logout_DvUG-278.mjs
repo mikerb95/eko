@@ -1,4 +1,4 @@
-import { S as SESSION_COOKIE } from './auth_BBNtY4Gb.mjs';
+import { S as SESSION_COOKIE } from './auth_DIhOE80G.mjs';
 
 const prerender = false;
 const POST = async ({ cookies }) => {

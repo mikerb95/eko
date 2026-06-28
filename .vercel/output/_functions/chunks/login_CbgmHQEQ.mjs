@@ -1,4 +1,4 @@
-import { a as verifyCredentials, c as createSession, S as SESSION_COOKIE } from './auth_BBNtY4Gb.mjs';
+import { a as verifyCredentials, c as createSession, S as SESSION_COOKIE } from './auth_DIhOE80G.mjs';
 
 const prerender = false;
 const POST = async ({ request, cookies }) => {

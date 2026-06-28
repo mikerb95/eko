@@ -2,7 +2,7 @@ const __vite_import_meta_env__ = {"ASSETS_PREFIX": undefined, "BASE_URL": "/", "
 const SESSION_COOKIE = "eko_admin";
 const SESSION_TTL_SECONDS = 60 * 60 * 8;
 function env(key, fallback = "") {
-  return Object.assign(__vite_import_meta_env__, { USER: "mike", _: "/home/mike/.nvm/versions/node/v22.22.3/bin/npx", USERNAME: "mike" })[key] || process.env[key] || fallback;
+  return Object.assign(__vite_import_meta_env__, { USER: "mike", _: "/home/mike/.nvm/versions/node/v22.22.3/bin/npm", USERNAME: "mike" })[key] || process.env[key] || fallback;
 }
 function getSecret() {
   return env("AUTH_SECRET", "dev-insecure-secret-change-me");

@@ -2,7 +2,7 @@ import { c as createComponent } from './astro-component_Dtkjvv3X.mjs';
 import 'piccolore';
 import { L as renderTemplate, b5 as defineScriptVars, b4 as renderHead } from './sequence_liNBEFg9.mjs';
 import 'clsx';
-import { s as seedIfEmpty, g as getPosts, a as getNormativas } from './cms_Cop3Dqhp.mjs';
+import { s as seedIfEmpty, g as getPosts, a as getNormativas } from './cms_BaF-xoCC.mjs';
 
 var __freeze = Object.freeze;
 var __defProp = Object.defineProperty;

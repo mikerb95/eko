@@ -1,7 +1,7 @@
 import { a6 as defineMiddleware, af as sequence } from './chunks/sequence_liNBEFg9.mjs';
 import 'piccolore';
 import 'clsx';
-import { S as SESSION_COOKIE, v as verifySession } from './chunks/auth_BBNtY4Gb.mjs';
+import { S as SESSION_COOKIE, v as verifySession } from './chunks/auth_DIhOE80G.mjs';
 
 const PUBLIC_ADMIN_PATHS = /* @__PURE__ */ new Set(["/admin/login"]);
 const PUBLIC_API_PATHS = /* @__PURE__ */ new Set(["/api/admin/login"]);

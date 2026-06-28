@@ -1,4 +1,4 @@
-import { b as deletePost, c as upsertPost } from './cms_Cop3Dqhp.mjs';
+import { b as deletePost, c as upsertPost } from './cms_BaF-xoCC.mjs';
 
 const prerender = false;
 const ACCENTS = ["deep", "forest", "clay"];

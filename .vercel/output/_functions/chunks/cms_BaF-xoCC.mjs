@@ -219,7 +219,7 @@ async function seedIfEmpty() {
 async function getPosts() {
   try {
     await ensureSchema();
-    const res = await client().execute("SELECT * FROM posts ORDER BY featured DESC, id DESC");
+    const res = await client().execute("SELECT * FROM posts ORDER BY featured DESC, id ASC");
     if (res.rows.length) return res.rows.map(rowToPost);
   } catch (e) {
     console.error("[cms] getPosts fell back to JSON:", e.message);

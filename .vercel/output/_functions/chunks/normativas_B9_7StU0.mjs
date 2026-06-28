@@ -1,4 +1,4 @@
-import { d as deleteNormativa, u as upsertNormativa } from './cms_Cop3Dqhp.mjs';
+import { d as deleteNormativa, u as upsertNormativa } from './cms_BaF-xoCC.mjs';
 
 const prerender = false;
 const POST = async ({ request }) => {
