@@ -63,7 +63,7 @@ const esUrl = enToEs[currentPath] ?? '/'
           <a href="/en/schedule-a-collection" class={activePath === '/en/schedule-a-collection' ? 'active' : ''}>Schedule</a>
         </nav>
         <div class="nav-right" style="display:flex; align-items:center; gap:12px;">
-          <a href="/" class="lang-switch" style="font-family:var(--font-mono); font-size:11px; letter-spacing:0.06em; text-transform:uppercase; opacity:0.55; transition:opacity .2s;" title="Ver en español">ES</a>
+          <a href={esUrl} class="lang-switch" style="font-family:var(--font-mono); font-size:11px; letter-spacing:0.06em; text-transform:uppercase; opacity:0.55; transition:opacity .2s;" title="Ver en español">ES</a>
           <a href="/en/contact" class="nav-cta">
             Let's talk
             <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
