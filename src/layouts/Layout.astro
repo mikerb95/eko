@@ -45,12 +45,15 @@ const { title = "Eko — Consultoría ambiental ANLA", description = "Acompañam
           <a href="/blog" class={activePath.startsWith('/blog') ? 'active' : ''}>Diario</a>
           <a href="/agenda-una-recoleccion" class={activePath === '/agenda-una-recoleccion' ? 'active' : ''}>Agenda</a>
         </nav>
-        <a href="/contacto" class="nav-cta">
-          Hablemos
-          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-            <path d="M5 12h14M13 6l6 6-6 6"/>
-          </svg>
-        </a>
+        <div class="nav-right" style="display:flex; align-items:center; gap:12px;">
+          <a href="/en" class="lang-switch" style="font-family:var(--font-mono); font-size:11px; letter-spacing:0.06em; text-transform:uppercase; opacity:0.55; transition:opacity .2s;" title="View in English">EN</a>
+          <a href="/contacto" class="nav-cta">
+            Hablemos
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M5 12h14M13 6l6 6-6 6"/>
+            </svg>
+          </a>
+        </div>
       </div>
     </header>
 

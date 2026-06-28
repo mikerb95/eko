@@ -1,5 +1,9 @@
 # build output
 dist/
+
+# local CMS database (libSQL/SQLite)
+data/*.db
+data/*.db-*
 # generated types
 .astro/
 
