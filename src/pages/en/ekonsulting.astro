@@ -1,0 +1,116 @@
+---
+import LayoutEn from '../../layouts/LayoutEn.astro'
+
+const deliverables = [
+  "Environmental licensing (EIA, DAA, PMA)",
+  "WEEE and battery post-consumer plans",
+  "360° compliance audit",
+  "Authority reports (RUA, ICA, ANLA)",
+  "Support in penalty proceedings",
+  "In-house HSE team training",
+  "ESG strategy and SDG alignment",
+]
+
+const pillars = [
+  {
+    n: "01", title: "Compliance consulting",
+    desc: "We guide you step by step through regulatory adherence, process optimization, and building a sustainable brand. Compliance stops being a burden and becomes a competitive advantage.",
+    when: "Ongoing",
+  },
+  {
+    n: "02", title: "Environmental development programs",
+    desc: "We design and implement comprehensive environmental development solutions tailored to each organization's sustainability objectives.",
+    when: "Per project",
+  },
+  {
+    n: "03", title: "Technology + experience",
+    desc: "We combine extensive environmental management experience with cutting-edge technology to keep your company aligned with regulation and its ecological commitments.",
+    when: "Cross-cutting",
+  },
+]
+---
+
+<LayoutEn title="EKONSULTING — ANLA Advisory & Compliance · Ekosolv" description="Advisory and application of strategies for regulatory environmental compliance. Licensing, post-consumer plans, and ESG strategy before ANLA." activePath="/en/services">
+  <section class="page-head wrap">
+    <div class="page-strip">
+      <div class="l">EKONSULTING · 01</div>
+      <div class="l">With Ekosolv every action counts</div>
+    </div>
+    <h1 class="display reveal" style="margin-top:40px">
+      Regulatory environmental<br><em>advisory &amp; compliance</em>.
+    </h1>
+    <p class="lede reveal" style="margin-top:32px; max-width:56ch">
+      The core of our practice. We structure and execute regulatory processes before ANLA and the regional authorities (CAR) — from licensing to defense in penalty proceedings — delivering tailored solutions that generate long-term value.
+    </p>
+  </section>
+
+  <section class="section wrap">
+    <div class="process reveal">
+      {pillars.map(p => (
+        <div class="process-row">
+          <div class="n">{p.n}</div>
+          <h3>{p.title}</h3>
+          <div class="desc">{p.desc}</div>
+          <div class="when">{p.when}</div>
+        </div>
+      ))}
+    </div>
+  </section>
+
+  <section class="section wrap">
+    <div class="section-head reveal">
+      <div>
+        <div class="eyebrow">Deliverables</div>
+        <h2>Everything covered by<br>the <em>EKONSULTING</em> line.</h2>
+      </div>
+      <div class="meta">Beyond the regulatory minimum: we identify improvement opportunities and position sustainability as a competitive advantage.</div>
+    </div>
+    <div class="reveal" style="display:flex; flex-wrap:wrap; gap:8px;">
+      {deliverables.map(d => (
+        <span style="font-family: var(--font-mono); font-size:12px; color:var(--ink-2); padding:8px 14px; background:var(--paper); border:1px solid var(--line); border-radius:999px;">{d}</span>
+      ))}
+    </div>
+  </section>
+
+  <section class="section wrap">
+    <div class="band reveal">
+      <div class="band-grid" style="grid-template-columns: 1.4fr 1fr">
+        <div>
+          <div class="eyebrow" style="color: color-mix(in oklab, #fff 55%, transparent)">EKORUTA</div>
+          <h2 style="margin-top:14px; max-width:20ch">Start with a compliance <em>diagnostic</em>.</h2>
+          <p style="color: color-mix(in oklab, #fff 75%, transparent); margin-top:20px; max-width:44ch; font-size:15px; line-height:1.55">
+            45 minutes to map your ANLA obligations, ESG gaps, and circular economy opportunities. No cost.
+          </p>
+        </div>
+        <div style="display:flex; align-items:center; justify-content:flex-end;">
+          <a href="/en/contact" class="foot-cta">
+            Schedule a diagnostic
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
+          </a>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <footer class="foot">
+    <div class="wrap">
+      <div class="foot-head reveal">
+        <div class="display">A new <em>case</em><br>on the radar?</div>
+        <a href="/en/contact" class="foot-cta">Write to us <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M5 12h14M13 6l6 6-6 6"/></svg></a>
+      </div>
+      <div class="foot-cols">
+        <div>
+          <img class="foot-logo" src="/brand/ekosolv-horizontal-white.svg" alt="EKOSOLV — Sustainability Consultants" />
+          <p style="opacity:.6; font-size:14px; margin-top:12px; max-width:36ch">Environmental consulting specialized in ANLA compliance, ESG, and circular economy.</p>
+        </div>
+        <div><h5>Services</h5><ul><li><a href="/en/ekonsulting">EKONSULTING</a></li><li><a href="/en/ekoraee">EKORAEE</a></li><li><a href="/en/ekopartner">EKOPARTNER</a></li><li><a href="/en/ekotrading">EKOTRADING</a></li></ul></div>
+        <div><h5>Site</h5><ul><li><a href="/en">Home</a></li><li><a href="/en/about">About</a></li><li><a href="/en/schedule-a-collection">Schedule</a></li><li><a href="/en/blog">Journal</a></li></ul></div>
+        <div><h5>Contact</h5><ul><li>info@ekosolv.com</li><li>+57 321 271 2773</li><li>Edif. RPTV · Carrera 15 #31B-33<br>Bogotá D.C.</li></ul></div>
+      </div>
+      <div class="foot-bottom">
+        <div>© 2026 Ekosolv S.A.S. · NIT 900.659.506-9</div>
+        <div>Built with care in Bogotá</div>
+      </div>
+    </div>
+  </footer>
+</LayoutEn>
