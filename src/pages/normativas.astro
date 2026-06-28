@@ -1,21 +1,11 @@
 ---
+export const prerender = false
 import Layout from '../layouts/Layout.astro'
+import { getNormativas } from '../lib/cms'
 
-const col1 = [
-  { code: "DEC 1076 · 2015", title: "Decreto Único Reglamentario del Sector Ambiental", body: "Consolida la mayoría de normas ambientales en Colombia. Define licencias, permisos, planes y autoridades competentes.", tags: ["MinAmbiente", "Licencias", "ANLA", "CAR"] },
-  { code: "RES 2184 · 2019", title: "Códigos de colores para residuos aprovechables", body: "Estándar nacional para separación en la fuente: blanco (aprovechables), negro (no aprovechables), verde (orgánicos).", tags: ["Separación", "RSU", "Hogares", "Empresas"] },
-  { code: "RES 1297 · 2010", title: "Plan posconsumo de Residuos de Aparatos Eléctricos y Electrónicos", body: "Obliga a productores e importadores a presentar planes de gestión, operación, cobertura y metas.", tags: ["RAEE", "Posconsumo", "Productor", "Importador"] },
-  { code: "LEY 1672 · 2013", title: "Ley de RAEE", body: "Marco de responsabilidad extendida del productor. Define principios, actores, recolección selectiva y aprovechamiento.", tags: ["REP", "Marco legal"] },
-  { code: "RES 0472 · 2017", title: "Gestión integral de residuos de construcción y demolición (RCD)", body: "Aplica a empresas que adecúan oficinas, centros de datos o bodegas: plan de gestión, registro y reporte.", tags: ["RCD", "Obras"] },
-]
-
-const col2 = [
-  { code: "RES 1407 · 2018", title: "Plan de gestión ambiental de residuos de envases y empaques", body: "Obligación de productores y comercializadores de empaques y envases puestos en el mercado colombiano.", tags: ["Empaques", "REP", "Comercializador"] },
-  { code: "DEC 1076 · Título 5", title: "Uso y aprovechamiento del recurso hídrico", body: "Concesiones, permisos de vertimiento, tasas retributivas y tasas por uso del agua.", tags: ["Agua", "Vertimientos", "Concesión"] },
-  { code: "RES 909 · 2008", title: "Estándares de emisión admisibles", body: "Aplica a fuentes fijas. Relevante para ensambladoras, data centers con generadores, procesos con hornos.", tags: ["Aire", "Emisiones", "Fuentes fijas"] },
-  { code: "RES 0631 · 2015", title: "Parámetros y valores límites máximos de vertimientos puntuales", body: "Define qué se puede verter a un cuerpo de agua o al alcantarillado. Plantas de tratamiento, laboratorios, datacenters.", tags: ["Vertimientos", "DBO", "DQO"] },
-  { code: "RES 1407 · 2022", title: "Régimen sancionatorio ambiental (Ley 1333)", body: "Establece el procedimiento sancionatorio y los criterios para dosificar la multa.", tags: ["Sanciones", "Procedimiento"] },
-]
+const all = await getNormativas()
+const col1 = all.filter(n => n.col === 1)
+const col2 = all.filter(n => n.col === 2)
 ---
 
 <Layout title="Normativas — Eko" activePath="/normativas">
