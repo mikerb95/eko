@@ -3,11 +3,11 @@ export function getTransLink(_language, slug) {
 }
 
 export function getLanguages() {
-  return ['es']
+  return ['es', 'en']
 }
 
-export function getLanguageLabel(_locale) {
-  return 'Español'
+export function getLanguageLabel(locale) {
+  return locale === 'en' ? 'English' : 'Español'
 }
 
 export function getLanguageFlag(_locale) {
