@@ -38,6 +38,7 @@ const POST = async ({ request }) => {
     readtime: String(b.readtime ?? "").trim() || "3 min",
     accent: ACCENTS.includes(b.accent) ? b.accent : "deep",
     featured: !!b.featured,
+    title,
     lede: String(b.lede ?? "").trim(),
     sections: cleanSections(b.sections)
   };

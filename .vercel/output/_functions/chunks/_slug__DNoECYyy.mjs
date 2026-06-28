@@ -1,9 +1,9 @@
 import { c as createComponent } from './astro-component_Dtkjvv3X.mjs';
 import 'piccolore';
 import { L as renderTemplate, x as maybeRenderHead, a2 as addAttribute } from './sequence_liNBEFg9.mjs';
-import { r as renderComponent } from './entrypoint_CQVRoxdA.mjs';
+import { r as renderComponent } from './entrypoint_CpqPsXbs.mjs';
 import { r as renderScript } from './script_CVkmP5jU.mjs';
-import { $ as $$Layout } from './Layout_CUCrnuYn.mjs';
+import { $ as $$Layout } from './Layout_BNIuGJJk.mjs';
 import { e as getPostBySlug, g as getPosts } from './cms_BaF-xoCC.mjs';
 
 const prerender = false;

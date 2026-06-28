@@ -1,8 +1,8 @@
 import { c as createComponent } from './astro-component_Dtkjvv3X.mjs';
 import 'piccolore';
 import { L as renderTemplate, x as maybeRenderHead, a2 as addAttribute } from './sequence_liNBEFg9.mjs';
-import { r as renderComponent } from './entrypoint_CQVRoxdA.mjs';
-import { $ as $$Layout } from './Layout_CUCrnuYn.mjs';
+import { r as renderComponent } from './entrypoint_CpqPsXbs.mjs';
+import { $ as $$Layout } from './Layout_BNIuGJJk.mjs';
 import { a as getNormativas } from './cms_BaF-xoCC.mjs';
 
 const prerender = false;
