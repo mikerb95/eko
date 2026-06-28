@@ -134,6 +134,10 @@ const aliados = [
       </div>
     </div>
 
+    <figure class="qs-wide reveal" style="margin-bottom: clamp(28px, 4vw, 52px)">
+      <img src="/images/quienes-somos/equipo-estrategas.jpg" alt="Equipo de Ekosolv trabajando en estrategias de sostenibilidad" loading="lazy" />
+    </figure>
+
     <div class="process reveal">
       <div class="process-row">
         <div class="n">Misión</div>
@@ -178,8 +182,9 @@ const aliados = [
       {team.map(m => (
         <div style="background:var(--paper-warm); padding:clamp(28px,3vw,44px); display:flex; flex-direction:column; gap:20px; transition: background .3s ease;"
              class="team-card">
-          <div style={`width:56px; height:56px; border-radius:50%; background:${m.accent}; display:grid; place-items:center; font-family:var(--font-mono); font-size:13px; font-weight:600; color:#fff; letter-spacing:0.04em; flex-shrink:0;`}>
-            {m.initial}
+          <div class="team-photo" style={`--ring:${m.accent}`}>
+            <img src={m.photo} alt={m.name} loading="lazy" />
+            <span class="team-badge" style={`background:${m.accent}`}>{m.initial}</span>
           </div>
           <div>
             <div style="font-family:var(--font-display); font-size:clamp(18px,1.6vw,22px); letter-spacing:-0.015em; line-height:1.1; color:var(--ink)">
@@ -207,14 +212,18 @@ const aliados = [
       <div class="meta">Los momentos que definen quiénes somos — de la radicación de los primeros expedientes a la COP16.</div>
     </div>
 
-    <div class="process reveal">
+    <div class="hito-grid reveal">
       {hitos.map(h => (
-        <div class="process-row">
-          <div class="n">{h.year}</div>
-          <h3>{h.title.split(' ')[0]} <em>{h.title.split(' ').slice(1).join(' ')}</em></h3>
-          <div class="desc">{h.desc}</div>
-          <div class="when">&nbsp;</div>
-        </div>
+        <article class="hito-card">
+          <div class="hito-img">
+            <img src={h.img} alt={h.title} loading="lazy" />
+            <span class="hito-year">{h.year}</span>
+          </div>
+          <div class="hito-body">
+            <h3>{h.title.split(' ')[0]} <em>{h.title.split(' ').slice(1).join(' ')}</em></h3>
+            <p>{h.desc}</p>
+          </div>
+        </article>
       ))}
     </div>
   </section>
