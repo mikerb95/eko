@@ -20,12 +20,6 @@ function requireEnv(key: string, devFallback: string): string {
 function getSecret(): string {
   return requireEnv('AUTH_SECRET', 'dev-insecure-secret-change-me')
 }
-function adminUser(): string {
-  return requireEnv('ADMIN_USERNAME', 'admin')
-}
-function adminPass(): string {
-  return requireEnv('ADMIN_PASSWORD', 'ekosolv2026')
-}
 
 // ---- base64url helpers ----
 function b64url(bytes: Uint8Array): string {
