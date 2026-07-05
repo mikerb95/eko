@@ -1,0 +1,324 @@
+---
+import Layout from '../layouts/Layout.astro'
+
+const ejes = [
+  {
+    code: "ECONOMÍA",
+    title: "Economía libertaria y emergencia económica",
+    body: "Declaratoria de emergencia económica para eliminar trabas y meta de crecimiento del PIB entre 6% y 7% anual. Más actividad empresarial significa más residuos y más obligaciones ambientales corporativas.",
+    tags: ["PIB 6–7%", "Desregulación", "Más volumen de residuos"],
+    col: 1,
+  },
+  {
+    code: "ESTADO",
+    title: "Reducción del Estado en 40%",
+    body: "Menos fiscalización estatal implica que la presión de cumplimiento migra al sector privado: inversionistas, banca y cadenas de suministro internacionales pasan a ser quienes exigen evidencia ambiental.",
+    tags: ["Menos fiscalización", "Cumplimiento privado", "ESG de mercado"],
+    col: 1,
+  },
+  {
+    code: "MINERÍA · ENERGÍA",
+    title: "Reactivación minero-energética y licenciamientos exprés",
+    body: "Reactivación petrolera, fracking, minería organizada, renovables y energía nuclear con trámites acelerados. Una ola de proyectos nuevos que requieren licencias, estudios, planes de manejo e informes de cumplimiento.",
+    tags: ["Licenciamiento exprés", "EIA · PMA · ICA", "Más trámites ANLA"],
+    col: 2,
+  },
+  {
+    code: "TRIBUTARIO · AMBIENTE",
+    title: "Zonas económicas especiales y plan ABC",
+    body: "Zonas con exenciones tributarias que atraen operación industrial y tecnológica — más rotación de parque tecnológico y por tanto más RAEE. El plan ambiental ABC (Agua, Biodiversidad, Comunidades) se enfoca en deforestación y minería ilegal: el posconsumo queda en manos del marco vigente y del mercado.",
+    tags: ["Zonas especiales", "Más RAEE", "Posconsumo sin cambios"],
+    col: 2,
+  },
+]
+
+const oportunidades = [
+  {
+    n: "01", code: "LICENCIAMIENTO",
+    title: "Boom de licenciamiento ambiental",
+    lede: "La reactivación minero-energética con licenciamientos exprés implica una ola de proyectos que necesitan estudios de impacto, licencias, planes de manejo e Informes de Cumplimiento Ambiental (ICA). Más velocidad estatal = más volumen de trámites = más demanda para EKONSULTING.",
+    tags: ["EIA · DAA · PMA", "ICA", "Procesos sancionatorios"],
+    when: "2026–2027",
+    accent: "accent-deep",
+  },
+  {
+    n: "02", code: "ESG PRIVADO",
+    title: "El cumplimiento se privatiza",
+    lede: "Con un Estado 40% más pequeño, la exigencia ambiental migra a inversionistas, banca y compradores internacionales (CSRD y CBAM europeos, casas matrices). Las empresas exportadoras necesitarán evidencia verificable de gestión ambiental aunque el gobierno no la exija. El diferenciador de Ekosolv pasa a ser el cumplimiento demostrable con datos.",
+    tags: ["CSRD · CBAM", "Banca e inversionistas", "Trazabilidad verificable"],
+    when: "Todo el periodo",
+    accent: "accent-forest",
+  },
+  {
+    n: "03", code: "VOLUMEN RAEE",
+    title: "Crecimiento del volumen de RAEE",
+    lede: "Las metas de recolección de la Resolución 0851 de 2022 suben año a año con sanciones para productores incumplidos. Digitalización, zonas económicas especiales y la meta de crecimiento del 6–7% aceleran la rotación del parque tecnológico empresarial. Colombia recicla solo ~20% de sus RAEE: el espacio para gestores formales certificados es enorme.",
+    tags: ["Res. 0851/2022", "Basura Cero · D.670/2025", "~20% de reciclaje actual"],
+    when: "Estructural",
+    accent: "accent-clay",
+  },
+]
+
+const modulos = [
+  {
+    n: "01", code: "CUSTODIA",
+    title: "Cadena de custodia digital de punta a punta",
+    lede: "Desde la solicitud de recolección hasta el certificado de disposición final con QR verificable públicamente: manifiesto de transporte, pesaje y tratamiento registrados como datos, no como PDFs y Excel — que es como opera hoy casi todo el sector.",
+    when: "Fase 1 · MVP",
+  },
+  {
+    n: "02", code: "REPORTERÍA",
+    title: "Reportería regulatoria automática",
+    lede: "Motor que genera los informes anuales de los sistemas de recolección (Res. 0851) y los ICA a partir de los datos operativos. Es el painkiller directo: la parte que todos los obligados odian hacer a mano.",
+    when: "Fase 3",
+  },
+  {
+    n: "03", code: "PORTAL ESG",
+    title: "Portal ESG para clientes corporativos",
+    lede: "Dashboard con kilogramos gestionados, tasa de valorización, CO₂ evitado y certificados descargables — cifras que el cliente pega directamente en su reporte de sostenibilidad. Aquí nace la demanda inmediata: el cliente del cliente (auditor, inversionista, casa matriz) exige esos números.",
+    when: "Fase 2",
+  },
+  {
+    n: "04", code: "ITAD",
+    title: "Módulo ITAD para EKOTRADING",
+    lede: "Inventario de activos, certificado de borrado seguro de datos y valorización de reventa. El borrado certificado es lo que desbloquea que grandes empresas entreguen sus equipos.",
+    when: "Fase 2–3",
+  },
+]
+
+const fuentes = [
+  { t: "El Tiempo — Resultados segunda vuelta presidencial 2026", u: "https://www.eltiempo.com/politica/elecciones-colombia-2026/resultados-segunda-vuelta-presidencial-2026-siga-el-minuto-a-minuto-del-preconteo-de-la-registraduria-nacional-3565893" },
+  { t: "El Tiempo — Los 10 pilares del plan de gobierno de De la Espriella", u: "https://www.eltiempo.com/politica/elecciones-colombia-2026/abelardo-de-la-espriella-anuncio-los-10-pilares-de-su-gobierno-plan-colombia-ii-reduccion-del-estado-en-40-7-megacarceles-y-otras-medidas-3561778" },
+  { t: "Semana — Propuestas de De la Espriella en 13 puntos", u: "https://www.semana.com/politica/articulo/las-propuestas-de-abelardo-de-la-espriella-en-13-puntos-clave/202654/" },
+  { t: "La Silla Vacía — Plan ABC de medio ambiente", u: "https://www.lasillavacia.com/en-vivo/este-es-el-plan-abc-para-medio-ambiente-y-comunidades-de-de-la-espriella/" },
+  { t: "El Tiempo — Sector minero-energético y el nuevo gobierno", u: "https://www.eltiempo.com/economia/sectores/sector-minero-energetico-traza-la-hoja-de-ruta-de-la-reactivacion-para-trabajar-con-el-gobierno-de-abelardo-de-la-espriella-3565965" },
+  { t: "ANLA — Marco normativo RAEE", u: "https://www.anla.gov.co/tramites-y-servicios/permisos-tramites-ambientales/raee-electricos-y-electronicos/raee-marco-normativo" },
+  { t: "ANLA — Decreto 670 de 2025 · Programa Basura Cero", u: "https://www.anla.gov.co/wanla/eureka/normativa/decretos/decreto-reglamentario-670-de-2025-programa-basura-cero-servicio-publico-de-aseo-y-tema-ambiental-residuos-solidos-gestion-integral-de-residuos-solidos" },
+  { t: "MinAmbiente — RAEE", u: "https://www.minambiente.gov.co/asuntos-ambientales-sectorial-y-urbana/residuos-de-aparato-electricos-y-electronicos-raee/" },
+  { t: "El Colombiano — Manejo de RAEE en Colombia (~20% de reciclaje)", u: "https://www.elcolombiano.com/medio-ambiente/colombia-avanza-en-manejo-de-residuos-electricos-y-electronicos-raee-MD15165797" },
+]
+---
+
+<Layout
+  title="Oportunidades 2026–2030 — Ekosolv"
+  description="Análisis estratégico: oportunidades para el sector de gestión ambiental y RAEE ante el nuevo gobierno de Colombia 2026–2030, y la plataforma de trazabilidad que las captura."
+  activePath="/oportunidades2630"
+>
+  <section class="page-head wrap">
+    <div class="page-strip">
+      <div class="l">Análisis estratégico</div>
+      <div class="l">Gobierno 2026–2030 · julio 2026</div>
+    </div>
+    <h1 class="display reveal" style="margin-top:40px">
+      El nuevo gobierno<br>como <em>oportunidad</em>.
+    </h1>
+    <p class="lede reveal" style="margin-top:32px; max-width:58ch">
+      Abelardo de la Espriella asume la presidencia el 7 de agosto de 2026 con un programa de desregulación, reactivación minero-energética y reducción del Estado. Para el sector de gestión ambiental y RAEE, eso no es una amenaza — es un reacomodo de dónde nace la demanda.
+    </p>
+  </section>
+
+  <section class="section wrap">
+    <div class="band reveal">
+      <div class="band-grid">
+        <div>
+          <div class="eyebrow" style="color: color-mix(in oklab, #fff 55%, transparent)">Contexto político</div>
+          <h2 style="margin-top:14px; max-width:18ch">Segunda vuelta, <em>21 de junio</em> de 2026.</h2>
+          <p style="color: color-mix(in oklab, #fff 75%, transparent); margin-top:20px; max-width:44ch; font-size:15px; line-height:1.55">
+            De la Espriella (Defensores de la Patria) venció a Iván Cepeda (Pacto Histórico) en un resultado estrecho. Su programa: "La Patria Milagro".
+          </p>
+        </div>
+        <div class="stat">
+          <div class="n">49.7<small>%</small></div>
+          <div class="lbl">12.9M de votos en segunda vuelta</div>
+        </div>
+        <div class="stat">
+          <div class="n">−40<small>%</small></div>
+          <div class="lbl">Reducción propuesta del tamaño del Estado</div>
+        </div>
+        <div class="stat">
+          <div class="n">6–7<small>%</small></div>
+          <div class="lbl">Meta de crecimiento anual del PIB</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="section wrap">
+    <div class="section-head reveal">
+      <div>
+        <div class="eyebrow">Programa de gobierno</div>
+        <h2>Cuatro ejes que <em>mueven</em><br>el tablero del sector.</h2>
+      </div>
+      <div class="meta">
+        Lo relevante no es la orientación política sino dónde queda la exigencia ambiental: el foco estatal se va a seguridad y reactivación, y el posconsumo queda gobernado por el marco vigente y por el mercado. Haz clic para expandir.
+      </div>
+    </div>
+    <div class="norms reveal">
+      <div class="norms-col">
+        {ejes.filter(e => e.col === 1).map((e, idx) => (
+          <div class="norm" data-open={idx === 0 ? 'true' : 'false'}>
+            <div>
+              <div class="code">{e.code}</div>
+              <h4>{e.title}</h4>
+            </div>
+            <button class="plus" aria-label="expand">
+              <svg width="12" height="12" viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="1.5">
+                <path d="M6 1v10M1 6h10"/>
+              </svg>
+            </button>
+            <div class="body">
+              <p>{e.body}</p>
+              <ul>{e.tags.map(t => <li>{t}</li>)}</ul>
+            </div>
+          </div>
+        ))}
+      </div>
+      <div class="norms-col">
+        {ejes.filter(e => e.col === 2).map(e => (
+          <div class="norm" data-open="false">
+            <div>
+              <div class="code">{e.code}</div>
+              <h4>{e.title}</h4>
+            </div>
+            <button class="plus" aria-label="expand">
+              <svg width="12" height="12" viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="1.5">
+                <path d="M6 1v10M1 6h10"/>
+              </svg>
+            </button>
+            <div class="body">
+              <p>{e.body}</p>
+              <ul>{e.tags.map(t => <li>{t}</li>)}</ul>
+            </div>
+          </div>
+        ))}
+      </div>
+    </div>
+  </section>
+
+  <section class="section wrap">
+    <div class="section-head reveal">
+      <div>
+        <div class="eyebrow">Oportunidades del sector</div>
+        <h2>Tres frentes donde la demanda<br>crece <em>sin importar</em> el gobierno.</h2>
+      </div>
+      <div class="meta">
+        El marco regulatorio del posconsumo — Ley 1672/2013, Decreto 284/2018, Resolución 0851/2022 y el Decreto 670/2025 (Basura Cero) — ya está en firme y genera obligaciones que no dependen del gobierno de turno.
+      </div>
+    </div>
+    <div class="process reveal">
+      {oportunidades.map(o => (
+        <div class={`process-row ${o.accent ? o.accent + '-row' : ''}`} style="grid-template-columns: 100px 240px 1fr 160px">
+          <div class="n">{o.n} · {o.code}</div>
+          <div>
+            <h3 style="font-size:clamp(20px,2vw,30px)">{o.title}</h3>
+          </div>
+          <div class="desc">
+            {o.lede}
+            <div style="display:flex; flex-wrap:wrap; gap:6px; margin-top:14px">
+              {o.tags.map(t => (
+                <span style="font-family: var(--font-mono); font-size:11px; color:var(--ink-2); padding:5px 10px; background:var(--paper); border:1px solid var(--line); border-radius:999px;">{t}</span>
+              ))}
+            </div>
+          </div>
+          <div class="when">{o.when}</div>
+        </div>
+      ))}
+    </div>
+  </section>
+
+  <section class="section wrap">
+    <div class="section-head reveal">
+      <div>
+        <div class="eyebrow">La respuesta desde el software</div>
+        <h2>Plataforma de <em>trazabilidad</em> y<br>cumplimiento posconsumo.</h2>
+      </div>
+      <div class="meta">
+        La palanca no es una app nueva de recolección: es convertir la operación actual en datos que los clientes necesitan por obligación — regulatoria o contractual. Eso es lo que genera demanda inmediata.
+      </div>
+    </div>
+    <div class="process reveal">
+      {modulos.map(m => (
+        <div class="process-row" style="grid-template-columns: 100px 240px 1fr 160px">
+          <div class="n">{m.n} · {m.code}</div>
+          <div>
+            <h3 style="font-size:clamp(20px,2vw,30px)">{m.title}</h3>
+          </div>
+          <div class="desc">{m.lede}</div>
+          <div class="when">{m.when}</div>
+        </div>
+      ))}
+    </div>
+  </section>
+
+  <section class="section wrap">
+    <div class="band reveal">
+      <div class="band-grid" style="grid-template-columns: 1fr 1fr 1fr 1fr">
+        <div class="stat">
+          <div class="n" style="font-size:clamp(20px,2.5vw,32px)">Fase 1</div>
+          <div class="lbl">Cadena de custodia + certificados QR sobre la operación propia</div>
+        </div>
+        <div class="stat">
+          <div class="n" style="font-size:clamp(20px,2.5vw,32px)">Fase 2</div>
+          <div class="lbl">Portal ESG de clientes + módulo ITAD</div>
+        </div>
+        <div class="stat">
+          <div class="n" style="font-size:clamp(20px,2.5vw,32px)">Fase 3</div>
+          <div class="lbl">Reportería automática Res. 0851 e ICA</div>
+        </div>
+        <div class="stat">
+          <div class="n" style="font-size:clamp(20px,2.5vw,32px)">Fase 4</div>
+          <div class="lbl">SaaS multi-tenant para otros gestores y SRS</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="section wrap">
+    <div class="section-head reveal">
+      <div>
+        <div class="eyebrow">¿Por qué la demanda es inmediata?</div>
+        <h2>La necesidad ya <em>existe</em>,<br>no hay que crearla.</h2>
+      </div>
+      <div class="meta">
+        Las metas de la Res. 0851 suben cada año con sanciones para productores incumplidos. Los certificados y la trazabilidad ya son requisito contractual de los clientes B2B. Y ante un gobierno que desregula, la trazabilidad verificable es el argumento de venta frente a la competencia informal.
+      </div>
+    </div>
+    <div class="reveal" style="margin-top:8px">
+      <div class="eyebrow" style="margin-bottom:16px">Fuentes</div>
+      <ul style="display:grid; gap:10px; list-style:none; padding:0">
+        {fuentes.map(f => (
+          <li>
+            <a href={f.u} target="_blank" rel="noopener" class="ulink" style="font-size:14.5px">{f.t}</a>
+          </li>
+        ))}
+      </ul>
+    </div>
+  </section>
+
+  <footer class="foot">
+    <div class="wrap">
+      <div class="foot-head reveal">
+        <div class="display">¿Hablamos de<br>la <em>fase 1</em>?</div>
+        <a href="/contacto" class="foot-cta">
+          Escríbenos
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6">
+            <path d="M5 12h14M13 6l6 6-6 6"/>
+          </svg>
+        </a>
+      </div>
+      <div class="foot-cols">
+        <div>
+          <img class="foot-logo" src="/brand/ekosolv-horizontal-white.svg" alt="EKOSOLV — Consultores en Sostenibilidad" />
+          <p style="opacity:.6; font-size:14px; margin-top:12px; max-width:36ch">Consultoría ambiental especializada en cumplimiento ANLA para el sector tecnológico.</p>
+        </div>
+        <div><h5>Sitio</h5><ul><li><a href="/">Inicio</a></li><li><a href="/servicios">Servicios</a></li><li><a href="/normativas">Normativas</a></li><li><a href="/casos">Casos</a></li><li><a href="/blog">Blog</a></li></ul></div>
+        <div><h5>Contacto</h5><ul><li>info@ekosolv.com</li><li>+57 321 271 2773</li><li>Edif. RPTV · Carrera 15 #31B-33<br>Bogotá D.C.</li></ul></div>
+        <div><h5>Legal</h5><ul><li>Política de tratamiento</li><li>Términos de servicio</li><li>Código de ética</li></ul></div>
+      </div>
+      <div class="foot-bottom">
+        <div>© 2026 Ekosolv S.A.S. · NIT 900.659.506-9</div>
+        <div>Built with care in Bogotá</div>
+      </div>
+    </div>
+  </footer>
+</Layout>
