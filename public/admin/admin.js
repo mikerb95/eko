@@ -4,6 +4,7 @@ const $$ = (s, r = document) => [...r.querySelectorAll(s)]
 
 let posts = window.__POSTS__ || []
 let norms = window.__NORMS__ || []
+let orders = window.__ORDERS__ || []
 
 const esc = (s) => String(s ?? '').replace(/[&<>"]/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]))
 
