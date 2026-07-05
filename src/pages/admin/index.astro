@@ -92,6 +92,45 @@ const user = Astro.locals.user || 'admin'
       </section>
     </main>
 
+    <!-- ORDEN DE RECOLECCIÓN -->
+    <div class="drawer" id="order-drawer" hidden>
+      <div class="drawer-bg" data-close></div>
+      <div class="drawer-panel">
+        <div class="drawer-head"><h3 id="order-drawer-title">Orden</h3><button class="x" data-close>×</button></div>
+        <form id="order-form" class="drawer-body">
+          <input type="hidden" name="id" />
+          <div id="order-client" class="list" style="margin-bottom:14px"></div>
+          <div class="grid3">
+            <label>Estado
+              <select name="status">
+                <option value="solicitada">Solicitada</option>
+                <option value="confirmada">Confirmada</option>
+                <option value="programada">Programada</option>
+                <option value="en_ruta">En ruta</option>
+                <option value="recolectada">Recolectada</option>
+                <option value="certificada">Certificada</option>
+                <option value="cerrada">Cerrada</option>
+                <option value="cancelada">Cancelada</option>
+              </select>
+            </label>
+            <label>Responsable<input name="assigned_to" placeholder="Nombre del responsable" /></label>
+            <label>Fecha programada<input name="scheduled_at" type="date" /></label>
+          </div>
+          <label>Notas internas<textarea name="internal_notes" rows="3" placeholder="Vehículo, transportador, observaciones…"></textarea></label>
+          <label>Comentario para la bitácora (opcional)<input name="note" placeholder="Se registra en el historial con este cambio" /></label>
+
+          <div class="sections-head"><h4>Historial</h4></div>
+          <div id="order-events" class="list"></div>
+
+          <div class="drawer-actions">
+            <button type="button" class="btn-ghost" data-close>Cancelar</button>
+            <button type="submit" class="btn-primary"><span class="t">Guardar</span></button>
+            <p class="form-error" id="order-err"></p>
+          </div>
+        </form>
+      </div>
+    </div>
+
     <!-- POST EDITOR -->
     <div class="drawer" id="post-drawer" hidden>
       <div class="drawer-bg" data-close></div>
@@ -166,9 +205,10 @@ const user = Astro.locals.user || 'admin'
       </div>
     </div>
 
-    <script is:inline define:vars={{ posts, normativas }}>
+    <script is:inline define:vars={{ posts, normativas, orders }}>
       window.__POSTS__ = posts
       window.__NORMS__ = normativas
+      window.__ORDERS__ = orders
     </script>
     <script src="/admin/admin.js" type="module"></script>
   </body>
