@@ -48,11 +48,31 @@ const user = Astro.locals.user || 'admin'
     {seedError && <div class="banner-error">No se pudo inicializar la base de datos: {seedError}</div>}
 
     <nav class="tabs">
-      <button class="tab is-active" data-tab="blog">Blog <span class="count">{posts.length}</span></button>
+      <button class="tab is-active" data-tab="recolecciones">Recolecciones <span class="count">{pendingOrders ? `${pendingOrders} nuevas` : orders.length}</span></button>
+      <button class="tab" data-tab="blog">Blog <span class="count">{posts.length}</span></button>
       <button class="tab" data-tab="normativas">Normativas <span class="count">{normativas.length}</span></button>
     </nav>
 
     <main class="admin-main">
+      <!-- RECOLECCIONES -->
+      <section id="panel-recolecciones" class="panel is-active">
+        <div class="panel-head">
+          <h2>Órdenes de recolección</h2>
+          <select id="order-filter" class="icon-btn" title="Filtrar por estado">
+            <option value="">Todas</option>
+            <option value="solicitada">Solicitadas</option>
+            <option value="confirmada">Confirmadas</option>
+            <option value="programada">Programadas</option>
+            <option value="en_ruta">En ruta</option>
+            <option value="recolectada">Recolectadas</option>
+            <option value="certificada">Certificadas</option>
+            <option value="cerrada">Cerradas</option>
+            <option value="cancelada">Canceladas</option>
+          </select>
+        </div>
+        <div id="order-list" class="list"></div>
+      </section>
+
       <!-- BLOG -->
       <section id="panel-blog" class="panel is-active">
         <div class="panel-head">
