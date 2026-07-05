@@ -1,6 +1,7 @@
 ---
 export const prerender = false
 import { seedIfEmpty, getPosts, getNormativas } from '../../lib/cms'
+import { listOrders } from '../../lib/ops'
 
 // Populate DB from JSON on first run, then load everything
 let seedError = ''
@@ -11,6 +12,13 @@ try {
 }
 const posts = await getPosts()
 const normativas = await getNormativas()
+let orders: Awaited<ReturnType<typeof listOrders>> = []
+try {
+  orders = await listOrders()
+} catch (e: any) {
+  if (!seedError) seedError = String(e?.message || e)
+}
+const pendingOrders = orders.filter((o) => o.status === 'solicitada').length
 const user = Astro.locals.user || 'admin'
 ---
 
