@@ -56,20 +56,24 @@ function timingSafeEqual(a: string, b: string): boolean {
   return diff === 0
 }
 
-export function verifyCredentials(username: string, password: string): boolean {
-  // constant-time-ish comparison on both fields
-  const u = timingSafeEqual(username || '', adminUser())
-  const p = timingSafeEqual(password || '', adminPass())
-  return u && p
+export interface Session {
+  u: string // username
+  n: string // display name
+  r: string // role
 }
 
-export async function createSession(username: string): Promise<string> {
-  const payload = b64url(enc.encode(JSON.stringify({ u: username, exp: Math.floor(Date.now() / 1000) + SESSION_TTL_SECONDS })))
+export async function createSession(user: { username: string; name: string; role: string }): Promise<string> {
+  const payload = b64url(enc.encode(JSON.stringify({
+    u: user.username,
+    n: user.name,
+    r: user.role,
+    exp: Math.floor(Date.now() / 1000) + SESSION_TTL_SECONDS,
+  })))
   const sig = b64url(await hmac(payload))
   return `${payload}.${sig}`
 }
 
-export async function verifySession(token: string | undefined | null): Promise<{ u: string } | null> {
+export async function verifySession(token: string | undefined | null): Promise<Session | null> {
   if (!token || !token.includes('.')) return null
   const [payload, sig] = token.split('.')
   const expected = b64url(await hmac(payload))
@@ -77,7 +81,8 @@ export async function verifySession(token: string | undefined | null): Promise<{
   try {
     const data = JSON.parse(new TextDecoder().decode(b64urlToBytes(payload)))
     if (typeof data.exp !== 'number' || data.exp < Math.floor(Date.now() / 1000)) return null
-    return { u: data.u }
+    if (typeof data.u !== 'string' || typeof data.r !== 'string') return null // sesiones antiguas sin rol: re-login
+    return { u: data.u, n: String(data.n || data.u), r: data.r }
   } catch {
     return null
   }
