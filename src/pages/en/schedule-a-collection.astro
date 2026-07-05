@@ -119,13 +119,33 @@ import LayoutEn from '../../layouts/LayoutEn.astro'
   </footer>
 
   <script>
-    const form = document.getElementById("recoleccion-form");
-    form?.addEventListener("submit", (e) => {
+    const form = document.getElementById("recoleccion-form") as HTMLFormElement | null;
+    form?.addEventListener("submit", async (e) => {
       e.preventDefault();
       const btn = form.querySelector(".submit") as HTMLButtonElement;
       const text = form.querySelector(".submit-text") as HTMLElement;
-      if (text) text.textContent = "Thank you! ✓";
-      if (btn) btn.style.background = "var(--forest)";
+      const err = document.getElementById("recoleccion-error") as HTMLElement;
+      btn.disabled = true;
+      text.textContent = "Sending…";
+      err.style.display = "none";
+      const payload = Object.fromEntries(new FormData(form).entries());
+      try {
+        const res = await fetch("/api/recolecciones", {
+          method: "POST",
+          headers: { "content-type": "application/json" },
+          body: JSON.stringify(payload),
+        });
+        const j = await res.json();
+        if (!res.ok) throw new Error(j.error || "Could not send the request.");
+        text.textContent = `Request ${j.consecutive} received! ✓`;
+        btn.style.background = "var(--forest)";
+        form.querySelectorAll("input, textarea").forEach((el) => ((el as HTMLInputElement).disabled = true));
+      } catch (ex) {
+        err.textContent = ex instanceof Error ? ex.message : "Network error. Try again or reach us on WhatsApp.";
+        err.style.display = "block";
+        btn.disabled = false;
+        text.textContent = "Send";
+      }
     });
   </script>
 </LayoutEn>
