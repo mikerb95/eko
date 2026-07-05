@@ -1,5 +1,6 @@
 # build output
 dist/
+.vercel/
 
 # local CMS database (libSQL/SQLite)
 data/*.db
