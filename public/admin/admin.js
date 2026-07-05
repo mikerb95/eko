@@ -22,6 +22,106 @@ $('#logout').addEventListener('click', async () => {
   location.href = '/admin/login'
 })
 
+/* ---------- Recolecciones ---------- */
+const STATUS_LABELS = {
+  solicitada: 'Solicitada', confirmada: 'Confirmada', programada: 'Programada',
+  en_ruta: 'En ruta', recolectada: 'Recolectada', certificada: 'Certificada',
+  cerrada: 'Cerrada', cancelada: 'Cancelada',
+}
+const STATUS_PILL = {
+  solicitada: 'feat', confirmada: 'deep', programada: 'deep', en_ruta: 'clay',
+  recolectada: 'forest', certificada: 'forest', cerrada: '', cancelada: '',
+}
+const fmtDate = (iso) => {
+  if (!iso) return ''
+  const d = new Date(iso)
+  return isNaN(d) ? iso : d.toLocaleDateString('es-CO', { day: 'numeric', month: 'short', year: 'numeric' })
+}
+
+function renderOrders() {
+  const el = $('#order-list')
+  const filter = $('#order-filter').value
+  const rows = filter ? orders.filter((o) => o.status === filter) : orders
+  if (!rows.length) { el.innerHTML = '<div class="empty">Sin órdenes de recolección todavía. Las solicitudes del formulario público aparecen aquí.</div>'; return }
+  el.innerHTML = rows.map((o) => `
+    <div class="row-card">
+      <div class="main">
+        <div class="title">${esc(o.consecutive)} — ${esc(o.first_name)} ${esc(o.last_name)}${o.company ? ' · ' + esc(o.company) : ''}</div>
+        <div class="meta">
+          <span class="pill ${STATUS_PILL[o.status] || ''}">${STATUS_LABELS[o.status] || esc(o.status)}</span>
+          <span>${esc(o.city)}</span>
+          <span>·</span><span>Solicitada ${fmtDate(o.created_at)}</span>
+          ${o.scheduled_at ? `<span>·</span><span>Programada ${fmtDate(o.scheduled_at)}</span>` : ''}
+          ${o.assigned_to ? `<span>·</span><span>Resp: ${esc(o.assigned_to)}</span>` : ''}
+        </div>
+      </div>
+      <div class="row-actions">
+        <button class="icon-btn" data-open-order="${o.id}">Gestionar</button>
+      </div>
+    </div>`).join('')
+  $$('[data-open-order]', el).forEach((b) => b.addEventListener('click', () => openOrder(Number(b.dataset.openOrder))))
+}
+$('#order-filter').addEventListener('change', renderOrders)
+
+const of = $('#order-form')
+async function openOrder(id) {
+  const o = orders.find((x) => x.id === id)
+  if (!o) return
+  of.reset()
+  $('#order-err').textContent = ''
+  $('#order-drawer-title').textContent = `${o.consecutive} · ${STATUS_LABELS[o.status] || o.status}`
+  of.id.value = o.id
+  of.status.value = o.status
+  of.assigned_to.value = o.assigned_to || ''
+  of.scheduled_at.value = (o.scheduled_at || '').slice(0, 10)
+  of.internal_notes.value = o.internal_notes || ''
+  of.note.value = ''
+  $('#order-client').innerHTML = `
+    <div class="row-card"><div class="main">
+      <div class="title">${esc(o.first_name)} ${esc(o.last_name)}${o.company ? ' · ' + esc(o.company) : ''}</div>
+      <div class="meta">
+        <span>${esc(o.email)}</span><span>·</span><span>${esc(o.phone)}</span><span>·</span>
+        <span>${esc(o.address)}${o.address2 ? ', ' + esc(o.address2) : ''}, ${esc(o.city)}${o.postal_code ? ' (' + esc(o.postal_code) + ')' : ''}, ${esc(o.country)}</span>
+      </div>
+      ${o.message ? `<div class="meta" style="margin-top:6px">“${esc(o.message)}”</div>` : ''}
+    </div></div>`
+  $('#order-events').innerHTML = '<div class="empty">Cargando historial…</div>'
+  openDrawer('#order-drawer')
+  try {
+    const res = await fetch('/api/admin/recolecciones?id=' + id)
+    const j = await res.json()
+    const evs = j.events || []
+    $('#order-events').innerHTML = evs.length ? evs.map((ev) => `
+      <div class="row-card"><div class="main">
+        <div class="meta">
+          <span class="pill">${STATUS_LABELS[ev.to_status] || esc(ev.to_status)}</span>
+          <span>${fmtDate(ev.at)}</span><span>·</span><span>${esc(ev.user)}</span>
+          ${ev.note ? `<span>·</span><span>${esc(ev.note)}</span>` : ''}
+        </div>
+      </div></div>`).join('') : '<div class="empty">Sin eventos.</div>'
+  } catch {
+    $('#order-events').innerHTML = '<div class="empty">No se pudo cargar el historial.</div>'
+  }
+}
+of.addEventListener('submit', async (e) => {
+  e.preventDefault()
+  const btn = of.querySelector('button[type=submit]'), t = btn.querySelector('.t')
+  btn.disabled = true; t.textContent = 'Guardando…'; $('#order-err').textContent = ''
+  const payload = {
+    status: of.status.value,
+    assigned_to: of.assigned_to.value,
+    scheduled_at: of.scheduled_at.value,
+    internal_notes: of.internal_notes.value,
+    note: of.note.value,
+  }
+  const res = await fetch('/api/admin/recolecciones?id=' + of.id.value, {
+    method: 'PATCH', headers: { 'content-type': 'application/json' }, body: JSON.stringify(payload),
+  })
+  const j = await res.json()
+  if (res.ok) location.reload()
+  else { $('#order-err').textContent = j.error || 'Error al guardar'; btn.disabled = false; t.textContent = 'Guardar' }
+})
+
 /* ---------- Render: posts ---------- */
 function renderPosts() {
   const el = $('#post-list')
@@ -183,5 +283,6 @@ async function delNorm(id, code) {
 $('#new-norm').addEventListener('click', () => openNorm(null))
 
 /* ---------- Init ---------- */
+renderOrders()
 renderPosts()
 renderNorms()
