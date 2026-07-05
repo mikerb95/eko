@@ -8,14 +8,23 @@ function env(key: string, fallback = ''): string {
   return (import.meta.env as any)[key] || (process.env as any)[key] || fallback
 }
 
+function requireEnv(key: string, devFallback: string): string {
+  const value = env(key)
+  if (value) return value
+  if (import.meta.env.PROD) {
+    throw new Error(`Missing required environment variable: ${key}`)
+  }
+  return devFallback
+}
+
 function getSecret(): string {
-  return env('AUTH_SECRET', 'dev-insecure-secret-change-me')
+  return requireEnv('AUTH_SECRET', 'dev-insecure-secret-change-me')
 }
 function adminUser(): string {
-  return env('ADMIN_USERNAME', 'admin')
+  return requireEnv('ADMIN_USERNAME', 'admin')
 }
 function adminPass(): string {
-  return env('ADMIN_PASSWORD', 'ekosolv2026')
+  return requireEnv('ADMIN_PASSWORD', 'ekosolv2026')
 }
 
 // ---- base64url helpers ----
