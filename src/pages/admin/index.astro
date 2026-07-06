@@ -104,6 +104,49 @@ if (isAdmin) {
       </section>
     </main>
 
+    {isAdmin && (
+      <section id="panel-usuarios" class="panel">
+        <div class="panel-head">
+          <h2>Usuarios del panel</h2>
+          <button class="btn-primary" id="new-user">+ Nuevo usuario</button>
+        </div>
+        <div id="user-list" class="list"></div>
+      </section>
+    )}
+
+    <!-- USUARIO EDITOR -->
+    <div class="drawer" id="user-drawer" hidden>
+      <div class="drawer-bg" data-close></div>
+      <div class="drawer-panel">
+        <div class="drawer-head"><h3 id="user-drawer-title">Usuario</h3><button class="x" data-close>×</button></div>
+        <form id="user-form" class="drawer-body">
+          <input type="hidden" name="id" />
+          <div class="grid2">
+            <label>Usuario (login)<input name="username" placeholder="nombre.apellido o email" required /></label>
+            <label>Nombre<input name="name" placeholder="Nombre completo" required /></label>
+          </div>
+          <div class="grid2">
+            <label>Rol
+              <select name="role">
+                <option value="admin">Administrador</option>
+                <option value="operaciones">Operaciones</option>
+                <option value="logistica">Logística</option>
+                <option value="consultor">Consultor</option>
+                <option value="lectura">Solo lectura</option>
+              </select>
+            </label>
+            <label>Contraseña<input name="password" type="password" placeholder="Mín. 8 caracteres" autocomplete="new-password" /></label>
+          </div>
+          <label class="check"><input type="checkbox" name="active" checked /> Cuenta activa</label>
+          <div class="drawer-actions">
+            <button type="button" class="btn-ghost" data-close>Cancelar</button>
+            <button type="submit" class="btn-primary"><span class="t">Guardar</span></button>
+            <p class="form-error" id="user-err"></p>
+          </div>
+        </form>
+      </div>
+    </div>
+
     <!-- ORDEN DE RECOLECCIÓN -->
     <div class="drawer" id="order-drawer" hidden>
       <div class="drawer-bg" data-close></div>
@@ -217,10 +260,12 @@ if (isAdmin) {
       </div>
     </div>
 
-    <script is:inline define:vars={{ posts, normativas, orders }}>
+    <script is:inline define:vars={{ posts, normativas, orders, users, role }}>
       window.__POSTS__ = posts
       window.__NORMS__ = normativas
       window.__ORDERS__ = orders
+      window.__USERS__ = users
+      window.__ROLE__ = role
     </script>
     <script src="/admin/admin.js" type="module"></script>
   </body>
