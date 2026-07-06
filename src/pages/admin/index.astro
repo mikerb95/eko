@@ -50,7 +50,7 @@ if (isAdmin) {
         <span class="tag">CMS</span>
       </div>
       <div class="top-right">
-        <span class="muted">Sesión: {user}</span>
+        <span class="muted">Sesión: {user}{role ? ` · ${role}` : ''}</span>
         <a href="/" class="btn-ghost" target="_blank">Ver sitio ↗</a>
         <button id="logout" class="btn-ghost">Salir</button>
       </div>
