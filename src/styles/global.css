@@ -406,9 +406,20 @@ h3 { font-size: 22px; }
 .foot-cols ul { list-style: none; display: flex; flex-direction: column; gap: 8px; font-size: 14.5px; color: color-mix(in oklab, #fff 85%, transparent); }
 .foot-cols a:hover { color: var(--aqua); }
 .foot-bottom {
-  display: flex; justify-content: space-between; font-family: var(--font-mono); font-size: 11px; letter-spacing: 0.05em;
+  display: flex; justify-content: space-between; align-items: center; font-family: var(--font-mono); font-size: 11px; letter-spacing: 0.05em;
   color: color-mix(in oklab, #fff 50%, transparent); margin-top: 56px;
   text-transform: uppercase;
+}
+.gh-badge {
+  display: inline-flex; align-items: center; gap: 6px;
+  padding: 6px 12px; border-radius: 999px;
+  border: 1px solid color-mix(in oklab, #fff 18%, transparent);
+  color: color-mix(in oklab, #fff 70%, transparent);
+  text-transform: none; letter-spacing: 0.02em;
+  transition: color .2s ease, border-color .2s ease, background .2s ease;
+}
+.gh-badge:hover {
+  color: var(--ink); background: var(--aqua); border-color: transparent;
 }
 
 /* ===== Contact form ===== */
