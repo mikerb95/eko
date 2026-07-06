@@ -1,5 +1,5 @@
 // Lightweight session auth: HMAC-signed cookie, no external deps.
-// Credentials and secret come from environment variables.
+// El secreto viene de AUTH_SECRET; las credenciales viven en la tabla users (src/lib/users.ts).
 
 export const SESSION_COOKIE = 'eko_admin'
 const SESSION_TTL_SECONDS = 60 * 60 * 8 // 8h
