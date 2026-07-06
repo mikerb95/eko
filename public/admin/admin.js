@@ -124,6 +124,77 @@ of.addEventListener('submit', async (e) => {
   else { $('#order-err').textContent = j.error || 'Error al guardar'; btn.disabled = false; t.textContent = 'Guardar' }
 })
 
+/* ---------- Usuarios (solo admin) ---------- */
+const ROLE_LABELS = {
+  admin: 'Administrador', operaciones: 'Operaciones', logistica: 'Logística',
+  consultor: 'Consultor', lectura: 'Solo lectura',
+}
+const uf = $('#user-form')
+
+function renderUsers() {
+  const el = $('#user-list')
+  if (!el) return
+  if (!users.length) { el.innerHTML = '<div class="empty">Sin usuarios.</div>'; return }
+  el.innerHTML = users.map((u) => `
+    <div class="row-card">
+      <div class="main">
+        <div class="title">${esc(u.name)} <span class="muted" style="font-weight:400">· ${esc(u.username)}</span></div>
+        <div class="meta">
+          <span class="pill ${u.role === 'admin' ? 'deep' : ''}">${ROLE_LABELS[u.role] || esc(u.role)}</span>
+          ${u.active ? '<span class="pill forest">Activa</span>' : '<span class="pill">Inactiva</span>'}
+        </div>
+      </div>
+      <div class="row-actions">
+        <button class="icon-btn" data-edit-user="${u.id}">Editar</button>
+        <button class="icon-btn danger" data-del-user="${u.id}" data-name="${esc(u.username)}">Eliminar</button>
+      </div>
+    </div>`).join('')
+  $$('[data-edit-user]', el).forEach((b) => b.addEventListener('click', () => openUser(users.find((u) => u.id == b.dataset.editUser))))
+  $$('[data-del-user]', el).forEach((b) => b.addEventListener('click', () => delUser(b.dataset.delUser, b.dataset.name)))
+}
+
+function openUser(u) {
+  uf.reset()
+  $('#user-err').textContent = ''
+  $('#user-drawer-title').textContent = u ? 'Editar usuario' : 'Nuevo usuario'
+  uf.id.value = u?.id || ''
+  uf.username.value = u?.username || ''
+  uf.name.value = u?.name || ''
+  uf.role.value = u?.role || 'lectura'
+  uf.password.value = ''
+  uf.password.placeholder = u ? 'Dejar vacío para no cambiarla' : 'Mín. 8 caracteres'
+  uf.password.required = !u
+  uf.active.checked = u ? !!u.active : true
+  openDrawer('#user-drawer')
+}
+
+if (uf) {
+  uf.addEventListener('submit', async (e) => {
+    e.preventDefault()
+    const btn = uf.querySelector('button[type=submit]'), t = btn.querySelector('.t')
+    btn.disabled = true; t.textContent = 'Guardando…'; $('#user-err').textContent = ''
+    const payload = {
+      id: uf.id.value || undefined,
+      username: uf.username.value,
+      name: uf.name.value,
+      role: uf.role.value,
+      active: uf.active.checked,
+      password: uf.password.value || undefined,
+    }
+    const res = await fetch('/api/admin/users', { method: 'POST', headers: { 'content-type': 'application/json' }, body: JSON.stringify(payload) })
+    const j = await res.json()
+    if (res.ok) location.reload()
+    else { $('#user-err').textContent = j.error || 'Error al guardar'; btn.disabled = false; t.textContent = 'Guardar' }
+  })
+}
+async function delUser(id, username) {
+  if (!confirm(`¿Eliminar el usuario "${username}"? Perderá el acceso al panel.`)) return
+  const res = await fetch('/api/admin/users?id=' + id, { method: 'DELETE' })
+  const j = await res.json().catch(() => ({}))
+  if (res.ok) location.reload(); else alert(j.error || 'No se pudo eliminar')
+}
+$('#new-user')?.addEventListener('click', () => openUser(null))
+
 /* ---------- Render: posts ---------- */
 function renderPosts() {
   const el = $('#post-list')
@@ -288,3 +359,4 @@ $('#new-norm').addEventListener('click', () => openNorm(null))
 renderOrders()
 renderPosts()
 renderNorms()
+renderUsers()
