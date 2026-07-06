@@ -21,6 +21,16 @@ try {
 }
 const pendingOrders = orders.filter((o) => o.status === 'solicitada').length
 const user = Astro.locals.user || 'admin'
+const role = Astro.locals.role || ''
+const isAdmin = role === 'admin'
+let users: User[] = []
+if (isAdmin) {
+  try {
+    users = await listUsers()
+  } catch (e: any) {
+    if (!seedError) seedError = String(e?.message || e)
+  }
+}
 ---
 
 <!DOCTYPE html>
