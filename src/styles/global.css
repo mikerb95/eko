@@ -110,6 +110,12 @@ img, svg { display: block; max-width: 100%; }
 .nav-cta:hover { background: var(--deep-2); transform: translateY(-1px); }
 .nav-cta svg { transition: transform .2s ease; }
 .nav-cta:hover svg { transform: translateX(3px); }
+.nav-login {
+  font-size: 13px; color: var(--ink-2); padding: 8px 12px;
+  border-radius: 999px; border: 1px solid color-mix(in oklab, var(--ink) 15%, transparent);
+  transition: background .2s ease, color .2s ease;
+}
+.nav-login:hover { background: color-mix(in oklab, var(--ink) 5%, transparent); color: var(--ink); }
 
 /* ===== Page ===== */
 main { position: relative; z-index: 2; }
