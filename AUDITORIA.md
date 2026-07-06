@@ -68,9 +68,9 @@ El endpoint de login no limita intentos, permitiendo fuerza bruta contra la cont
 
 - [x] Fail-hard en producción si faltan `AUTH_SECRET` / `ADMIN_USERNAME` / `ADMIN_PASSWORD` (`src/lib/auth.ts`, función `requireEnv`)
 - [x] Sacar `.vercel/output` del repo y añadir `.vercel/` a `.gitignore`
-- [ ] `npm audit fix` (vite, tar) y evaluar upgrade de `@astrojs/vercel` a v11 (path-to-regexp)
+- [x] `npm audit fix` — resueltas vite (NTLMv2/fs.deny) y tar (file smuggling). Quedan 5 vulnerabilidades (1 low, 4 high) que requieren `--force` (upgrade breaking de `astro` y `@astrojs/vercel` a v11 por `esbuild`/`path-to-regexp`); no aplicado, pendiente de decisión.
 - [ ] Actualizar Node local a ≥22.12
-- [ ] Eliminar lockfile no utilizado (`bun.lock` o `package-lock.json`)
+- [x] Eliminar lockfile no utilizado (`bun.lock`, se mantiene `package-lock.json`)
 - [ ] Rate limiting en `/api/admin/login`
 
 **Importante:** antes de desplegar, confirma que `AUTH_SECRET`, `ADMIN_USERNAME` y `ADMIN_PASSWORD` estén configuradas en las variables de entorno del proyecto en Vercel (producción) — de lo contrario el login de `/admin` fallará con "Missing required environment variable".
