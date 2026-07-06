@@ -7,8 +7,7 @@
 | Fecha | Avance |
 |---|---|
 | 2026-07-05 | **Fase 1 (Recolecciones) implementada en su núcleo**: `src/lib/ops.ts` (tablas `orders` + `order_events`, consecutivo `REC-AAAA-0001`, ciclo de estados con bitácora), endpoint público `POST /api/recolecciones` con honeypot, formularios ES/EN conectados de verdad, pestaña "Recolecciones" en el admin con filtro por estado y drawer de gestión (estado, responsable, fecha, notas, historial), API `GET/PATCH /api/admin/recolecciones` protegida por sesión. Verificado end-to-end. **Pendiente de Fase 1:** notificación por email al equipo (requiere proveedor, p. ej. Resend). |
-
-**Pendiente Fase 0 (login multiusuario):** hoy el login de `/admin/login` es una sola credencial compartida en variables de entorno (`ADMIN_USERNAME`/`ADMIN_PASSWORD`, con fallback inseguro hardcodeado en `src/lib/auth.ts`). El M7 la reemplaza por tabla `users` con hash y roles — ver §3 M7 y §5. Se decidió arrancar por Fase 1 porque el impacto operacional era inmediato; M7 es el siguiente paso antes de sumar más empleados al panel.
+| 2026-07-06 | **Fase 0 / M7 (usuarios, roles y autorización) implementada**: `src/lib/users.ts` (tabla `users`, PBKDF2-SHA256 vía WebCrypto, sin dependencias), login contra DB con bootstrap del primer admin desde `ADMIN_USERNAME`/`ADMIN_PASSWORD` si la tabla está vacía, sesión firmada con nombre + rol, autorización por rol en el middleware (lectura para cualquier sesión; escrituras: recolecciones → admin/operaciones/logística, contenido → admin/consultor, usuarios → solo admin), pestaña "Usuarios" en el panel (crear/editar/desactivar/eliminar, reset de contraseña), salvaguardas (no auto-degradarse, no borrar el último admin activo), y la bitácora de órdenes registra el nombre real del empleado. Verificado end-to-end con los tres roles. |
 
 ---
 
@@ -102,7 +101,7 @@ audit_log(id, user_id, entity, entity_id, action, diff_json, at)
 
 | Fase | Duración est. | Entrega | Impacto operacional | Estado |
 |---|---|---|---|---|
-| **0. Fundaciones** | 1–2 sem | M7 (usuarios/roles/auditoría), migraciones, layout del panel con navegación por módulos | Habilita todo lo demás; elimina la credencial única insegura | **Pendiente — siguiente** |
+| **0. Fundaciones** | 1–2 sem | M7 (usuarios/roles/auditoría), migraciones, layout del panel con navegación por módulos | Habilita todo lo demás; elimina la credencial única insegura | **Hecho (2026-07-06)** |
 | **1. Recolecciones** | 2–3 sem | M1 completo + persistencia del form público + notificaciones email | Cero solicitudes perdidas; visibilidad diaria inmediata | **Núcleo hecho (2026-07-05)**; falta email |
 | **2. Certificados** | 2 sem | M2 (PDF + QR verificable + cadena de custodia) | El entregable de mayor valor al cliente sale del sistema |
 | **3. Cerebro v1** | 1–2 sem | M6 tablero "hoy" + kilos/órdenes + exporte regulatorio CSV | Gerencia ve el resultado operacional diario |
