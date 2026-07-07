@@ -69,7 +69,7 @@ El endpoint de login no limita intentos, permitiendo fuerza bruta contra la cont
 - [x] Fail-hard en producción si faltan `AUTH_SECRET` / `ADMIN_USERNAME` / `ADMIN_PASSWORD` (`src/lib/auth.ts`, función `requireEnv`)
 - [x] Sacar `.vercel/output` del repo y añadir `.vercel/` a `.gitignore`
 - [x] `npm audit fix` — resueltas vite (NTLMv2/fs.deny) y tar (file smuggling). Quedan 5 vulnerabilidades (1 low, 4 high) que requieren `--force` (upgrade breaking de `astro` y `@astrojs/vercel` a v11 por `esbuild`/`path-to-regexp`); no aplicado, pendiente de decisión.
-- [ ] Actualizar Node local a ≥22.12
+- [x] Actualizar Node local a ≥22.12 (instalado Node 24.18.0 LTS vía `nvm`; añadido `.nvmrc` al repo fijando `24`). `astro check` (0 errores) y `astro build` corren correctamente.
 - [x] Eliminar lockfile no utilizado (`bun.lock`, se mantiene `package-lock.json`)
 - [ ] Rate limiting en `/api/admin/login`
 
