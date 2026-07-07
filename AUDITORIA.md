@@ -71,6 +71,6 @@ El endpoint de login no limita intentos, permitiendo fuerza bruta contra la cont
 - [x] `npm audit fix` — resueltas vite (NTLMv2/fs.deny) y tar (file smuggling). Quedan 5 vulnerabilidades (1 low, 4 high) que requieren `--force` (upgrade breaking de `astro` y `@astrojs/vercel` a v11 por `esbuild`/`path-to-regexp`); no aplicado, pendiente de decisión.
 - [x] Actualizar Node local a ≥22.12 (instalado Node 24.18.0 LTS vía `nvm`; añadido `.nvmrc` al repo fijando `24`). `astro check` (0 errores) y `astro build` corren correctamente.
 - [x] Eliminar lockfile no utilizado (`bun.lock`, se mantiene `package-lock.json`)
-- [ ] Rate limiting en `/api/admin/login`
+- [x] Rate limiting en `/api/admin/login` (`src/lib/rateLimit.ts`, aplicado en `src/pages/api/admin/login.ts`): máximo 5 intentos por IP cada 10 minutos, responde `429` con `Retry-After`. Limitador en memoria por instancia de función (no requiere infraestructura externa); con Fluid Compute la reutilización de instancias lo hace efectivo contra fuerza bruta desde un mismo origen, aunque no es una defensa distribuida perfecta entre instancias concurrentes. Probado manualmente: 6º intento devuelve 429.
 
 **Importante:** antes de desplegar, confirma que `AUTH_SECRET`, `ADMIN_USERNAME` y `ADMIN_PASSWORD` estén configuradas en las variables de entorno del proyecto en Vercel (producción) — de lo contrario el login de `/admin` fallará con "Missing required environment variable".
