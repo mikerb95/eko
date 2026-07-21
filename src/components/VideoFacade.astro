@@ -1,0 +1,80 @@
+---
+/**
+ * Reproductor con fachada.
+ *
+ * Un <iframe> de YouTube incrustado directo trae ~1 MB de JS y varias
+ * conexiones a terceros en CADA carga de la home, la vea o no el visitante.
+ * Aquí solo se pinta el póster; el iframe se inyecta al hacer clic.
+ *
+ * Bonus de privacidad: youtube-nocookie, sin cookies hasta que el usuario
+ * decide reproducir.
+ */
+import type { Video } from '../lib/credenciales'
+
+interface Props {
+  video: Video
+  lang?: 'es' | 'en'
+}
+
+const { video, lang = 'es' }: Props = Astro.props
+const es = lang === 'es'
+
+const src =
+  video.proveedor === 'youtube'
+    ? `https://www.youtube-nocookie.com/embed/${video.id}?autoplay=1&rel=0`
+    : video.proveedor === 'vimeo'
+      ? `https://player.vimeo.com/video/${video.id}?autoplay=1`
+      : ''
+
+const t = es
+  ? { play: 'Reproducir vídeo', transcript: 'Leer la transcripción' }
+  : { play: 'Play video', transcript: 'Read the transcript' }
+---
+
+<div class="vid">
+  {video.proveedor === 'file' ? (
+    <video class="vid-frame" controls preload="none" poster={video.poster} title={video.titulo}>
+      <source src={video.id} type="video/mp4" />
+    </video>
+  ) : (
+    <button
+      class="vid-facade"
+      type="button"
+      data-src={src}
+      aria-label={`${t.play}: ${video.titulo}`}
+      style={video.poster ? `background-image:url('${video.poster}')` : undefined}
+    >
+      <span class="vid-play" aria-hidden="true">
+        <svg width="26" height="26" viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg>
+      </span>
+      <span class="vid-meta">
+        <span class="vid-title">{video.titulo}</span>
+        <span class="vid-dur">{video.duracion}</span>
+      </span>
+    </button>
+  )}
+
+  {video.transcripcion && (
+    <details class="vid-transcript">
+      <summary>{t.transcript}</summary>
+      <p>{video.transcripcion}</p>
+    </details>
+  )}
+</div>
+
+<script>
+  // Sustituye la fachada por el iframe real solo cuando el usuario lo pide.
+  document.querySelectorAll<HTMLButtonElement>('.vid-facade').forEach((btn) => {
+    btn.addEventListener('click', () => {
+      const src = btn.dataset.src
+      if (!src) return
+      const frame = document.createElement('iframe')
+      frame.className = 'vid-frame'
+      frame.src = src
+      frame.title = btn.getAttribute('aria-label') ?? ''
+      frame.allow = 'accelerometer; autoplay; encrypted-media; picture-in-picture'
+      frame.allowFullscreen = true
+      btn.replaceWith(frame)
+    })
+  })
+</script>
