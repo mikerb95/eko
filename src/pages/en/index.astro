@@ -40,6 +40,27 @@ const radar = [
       </a>
     </div>
 
+    {/*
+      Phase 2 of docs/plan-competitivo-lito.md. Scale and track-record figures.
+      PENDING-DATA 2.b: once the number of companies served exists, it is a better
+      third figure than "regulations tracked" — it is the one the competition uses.
+      PENDING-DATA 2.a: confirm whether tonnage is still 1,000+ in 2026.
+    */}
+    <div class="hero-stats reveal">
+      <div>
+        <div class="n">{yearsActive}</div>
+        <div class="lbl">Years in operation · since {FOUNDED_YEAR}</div>
+      </div>
+      <div>
+        <div class="n">{tonnesManaged('en')}</div>
+        <div class="lbl">Tonnes of WEEE managed</div>
+      </div>
+      <div>
+        <div class="n">{normativas.length}</div>
+        <div class="lbl">Regulations under active tracking</div>
+      </div>
+    </div>
+
     <div class="hero-visual reveal">
       <div class="hv-head">
         <div class="label"><span class="pulse"></span>Regulatory radar · framework in force in Colombia</div>
