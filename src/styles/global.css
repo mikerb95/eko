@@ -192,6 +192,30 @@ h3 { font-size: 22px; }
 }
 .hero-card:hover .arrow { transform: rotate(-45deg) scale(1.05); }
 
+/* Cifras del hero: escala y trayectoria por encima del pliegue.
+   El bloque .band más abajo cubre desempeño — no repetir cifras entre ambos. */
+.hero-stats {
+  margin-top: clamp(28px, 4vw, 48px);
+  padding-top: clamp(20px, 2.5vw, 28px);
+  border-top: 1px solid var(--line);
+  display: grid; grid-template-columns: repeat(3, 1fr);
+  gap: clamp(20px, 3vw, 40px);
+}
+.hero-stats .n {
+  font-family: var(--font-display); font-size: clamp(38px, 4.2vw, 58px);
+  letter-spacing: -0.03em; line-height: 1;
+  font-variant-numeric: tabular-nums;
+}
+.hero-stats .n em { font-style: italic; color: var(--forest); }
+.hero-stats .n small { font-size: .42em; color: var(--clay); margin-left: 3px; vertical-align: top; font-style: italic; }
+.hero-stats .lbl {
+  font-family: var(--font-mono); font-size: 12px; letter-spacing: 0.08em;
+  text-transform: uppercase; color: var(--mute); margin-top: 10px; line-height: 1.45;
+}
+@media (max-width: 700px) {
+  .hero-stats { grid-template-columns: 1fr 1fr; row-gap: 28px; }
+}
+
 /* Ticker / marquee */
 .marquee {
   border-block: 1px solid var(--line);
