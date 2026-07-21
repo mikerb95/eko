@@ -111,6 +111,7 @@ const PAIRS: Array<[string, string]> = [
   ['/blog', '/en/blog'],
   ['/agenda-una-recoleccion', '/en/schedule-a-collection'],
   ['/contacto', '/en/contact'],
+  ['/licencias', '/en/licenses'],
   ['/ekonsulting', '/en/ekonsulting'],
   ['/ekoraee', '/en/ekoraee'],
   ['/ekopartner', '/en/ekopartner'],

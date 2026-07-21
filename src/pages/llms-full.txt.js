@@ -1,46 +1,58 @@
-import { getReportList } from '../utils/api'
-import { convertedMarkdown } from '../utils/html2md'
+import { SITE_NAME, SITE_TAGLINE, url } from '../lib/site'
+import posts from '../data/blog-posts.json'
+
+/**
+ * Texto completo de las publicaciones editoriales del sitio.
+ *
+ * Antes volcaba tres "reportes" de la plantilla de Storyblok firmados por
+ * autores que no existen. Ahora vuelca el blog real, que sí está escrito
+ * para Ekosolv y no atribuye autoría a nadie inventado.
+ */
+function render(section) {
+  switch (section.type) {
+    case 'h2':
+      return `### ${section.text}`
+    case 'pull':
+      return `> ${section.text}`
+    case 'list':
+      return (section.items ?? []).map((i) => `- ${i}`).join('\n')
+    default:
+      return section.text ?? ''
+  }
+}
 
 export const GET = async () => {
-  try {
-    const reports = await getReportList()
-    const baseUrl = 'https://ekoambiental.co'
+  const sections = posts
+    .map((p) => {
+      const cuerpo = (p.sections ?? []).map(render).filter(Boolean).join('\n\n')
+      return `## ${p.title}
 
-    const sections = reports
-      .map((r) => {
-        const slug = r.slug.replace('report/', '')
-        const content = convertedMarkdown(r.content.content)
-        return `## ${r.content.title}
+**Categoría**: ${p.category} | **Fecha**: ${p.date} | **Lectura**: ${p.readtime}
 
-**Autor**: ${r.content.author} | **Fecha**: ${r.content.published_date}
+${p.lede}
 
-${content}
+${cuerpo}
 
-**URL**: [${r.content.title}](${baseUrl}/report/${slug})
+**URL**: ${url(`/blog/${p.slug}`)}
 
 ***
 `
-      })
-      .join('\n')
+    })
+    .join('\n')
 
-    const body = `# EKO Ambiental — Publicaciones Completas
+  const body = `# ${SITE_NAME} — Publicaciones completas
 
-> Consultoría en normativa ambiental para importadores y productores en Colombia
+> ${SITE_TAGLINE.es}
 
-Este archivo contiene el texto completo de todas las publicaciones del sitio, optimizado para modelos de lenguaje e IA.
+Texto completo de las ${posts.length} publicaciones del Diario, para consumo
+por modelos de lenguaje. El índice del sitio está en ${url('/llms.txt')}.
 
 ***
 
 ${sections}
-
----
-
-Para más información visita [${baseUrl}](${baseUrl})
 `
-    return new Response(body, {
-      headers: { 'Content-Type': 'text/plain; charset=utf-8' },
-    })
-  } catch (error) {
-    return new Response(`Error generando llms-full.txt\n\n${error.message}`, { status: 500 })
-  }
+
+  return new Response(body, {
+    headers: { 'Content-Type': 'text/plain; charset=utf-8' },
+  })
 }
