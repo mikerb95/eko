@@ -182,7 +182,7 @@ export interface Video {
 
 export const videoEs: Video = {
   proveedor: 'youtube',
-  id: '',
+  id: 'auhrVUGaGYA',
   poster: '',
   titulo: 'PENDIENTE — título del vídeo corporativo',
   duracion: '—',
@@ -192,7 +192,7 @@ export const videoEs: Video = {
 
 export const videoEn: Video = {
   proveedor: 'youtube',
-  id: '',
+  id: 'auhrVUGaGYA',
   poster: '',
   titulo: 'PENDING — corporate video title',
   duracion: '—',
