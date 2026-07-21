@@ -206,6 +206,32 @@ export const videoVisible = (lang: 'es' | 'en' = 'es'): Video | null => {
   return mostrarPlaceholders ? v : null
 }
 
+export const videoServiciosEs: Video = {
+  proveedor: 'youtube',
+  id: 'bsL2kR9Q0RQ',
+  poster: 'https://img.youtube.com/vi/bsL2kR9Q0RQ/maxresdefault.jpg',
+  titulo: 'Servicios Ekosolv',
+  duracion: '',
+  transcripcion: '',
+  publicado: true,
+}
+
+export const videoServiciosEn: Video = {
+  proveedor: 'youtube',
+  id: 'bsL2kR9Q0RQ',
+  poster: 'https://img.youtube.com/vi/bsL2kR9Q0RQ/maxresdefault.jpg',
+  titulo: 'Ekosolv services',
+  duracion: '',
+  transcripcion: '',
+  publicado: true,
+}
+
+export const videoServiciosVisible = (lang: 'es' | 'en' = 'es'): Video | null => {
+  const v = lang === 'en' ? videoServiciosEn : videoServiciosEs
+  if (v.publicado) return v
+  return mostrarPlaceholders ? v : null
+}
+
 // ── SELECTORES ──────────────────────────────────────────────────────────
 // Las páginas SIEMPRE deben consumir estas funciones, nunca los arrays
 // crudos: son las que garantizan que un placeholder no llegue a producción.
