@@ -796,6 +796,22 @@ h3 { font-size: 22px; }
 /* Selection */
 ::selection { background: var(--aqua); color: var(--ink); }
 
+/* Skip link: oculto hasta recibir foco por teclado. */
+.skip-link {
+  position: fixed; top: 8px; left: 8px; z-index: 100;
+  padding: 12px 20px; border-radius: 999px;
+  background: var(--ink); color: var(--paper);
+  font-size: 15px;
+  transform: translateY(-160%);
+  transition: transform .2s cubic-bezier(.2,.7,.2,1);
+}
+.skip-link:focus-visible { transform: translateY(0); outline: 2px solid var(--aqua); outline-offset: 2px; }
+main:focus { outline: none; }
+
+/* Con el panel móvil abierto, el FAB de WhatsApp (z-index 999) taparía el CTA
+   del pie del panel. */
+body.nav-open .whatsapp-fab { opacity: 0; pointer-events: none; }
+
 /* ===== Responsive nav ===== */
 /* Punto de corte a 1000px: por debajo, 6 links + panel + CTA se aprietan. */
 @media (max-width: 999px) {
