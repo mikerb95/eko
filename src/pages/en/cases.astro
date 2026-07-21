@@ -1,57 +1,10 @@
 ---
 import LayoutEn from '../../layouts/LayoutEn.astro'
 import SiteFooter from '../../components/SiteFooter.astro'
+import { agregadoCasos, casosVisibles, hayAgregado, mostrarPlaceholders } from '../../lib/credenciales'
 
-const cases = [
-  {
-    cls: "",
-    label: "Importer · hardware",
-    kicker: ["Case 01 · 2024", "Licensing"],
-    title: "From zero to approved post-consumer plan in 73 days.",
-    titleEm: "zero",
-    metrics: [["73", "Days to approval"], ["1.2M", "Units covered"]],
-  },
-  {
-    cls: "green",
-    label: "Assembler · PC",
-    kicker: ["Case 02 · 2024", "Audit"],
-    title: "360° audit and closure of 11 regulatory gaps.",
-    titleEm: "360°",
-    metrics: [["11", "Gaps closed"], ["$480M", "Penalty risk avoided"]],
-  },
-  {
-    cls: "clay",
-    label: "Operator · Data center",
-    kicker: ["Case 03 · 2025", "Permits"],
-    title: "Emission and discharge permit for new DC.",
-    titleEm: "emission",
-    metrics: [["2", "Permits filed"], ["0", "Pending requirements"]],
-  },
-  {
-    cls: "green",
-    label: "Retail · electronics",
-    kicker: ["Case 04 · 2025", "Post-consumer"],
-    title: "WEEE collection network with 218 stores nationwide.",
-    titleEm: "WEEE",
-    metrics: [["218", "Collection points"], ["340k", "Kg managed year 1"]],
-  },
-  {
-    cls: "",
-    label: "Telco · infrastructure",
-    kicker: ["Case 05 · 2025", "Defense"],
-    title: "Closure of penalty proceeding for antennas.",
-    titleEm: "penalty",
-    metrics: [["6", "Months of process"], ["Closed", "Final resolution"]],
-  },
-  {
-    cls: "clay",
-    label: "Distributor · components",
-    kicker: ["Case 06 · 2026", "Reporting"],
-    title: "Traceability dashboard for annual ANLA report.",
-    titleEm: "Traceability",
-    metrics: [["1", "Unified panel"], ["7", "Automated obligations"]],
-  },
-]
+const cases = casosVisibles()
+
 ---
 
 <LayoutEn title="Cases — Ekosolv" activePath="/en/cases">

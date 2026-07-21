@@ -1,57 +1,10 @@
 ---
 import Layout from '../layouts/Layout.astro'
 import SiteFooter from '../components/SiteFooter.astro'
+import { agregadoCasos, casosVisibles, hayAgregado, mostrarPlaceholders } from '../lib/credenciales'
 
-const cases = [
-  {
-    cls: "",
-    label: "Importadora · hardware",
-    kicker: ["Caso 01 · 2024", "Licenciamiento"],
-    title: "De cero al plan posconsumo aprobado en 73 días.",
-    titleEm: "cero",
-    metrics: [["73", "Días hasta aprobación"], ["1.2M", "Unidades cubiertas"]],
-  },
-  {
-    cls: "green",
-    label: "Ensambladora · PC",
-    kicker: ["Caso 02 · 2024", "Auditoría"],
-    title: "Auditoría 360° y cierre de 11 brechas regulatorias.",
-    titleEm: "360°",
-    metrics: [["11", "Brechas cerradas"], ["$480M", "Riesgo sancionatorio evitado"]],
-  },
-  {
-    cls: "clay",
-    label: "Operador · Data center",
-    kicker: ["Caso 03 · 2025", "Permisos"],
-    title: "Permiso de emisiones y vertimientos para nuevo DC.",
-    titleEm: "emisiones",
-    metrics: [["2", "Permisos radicados"], ["0", "Requerimientos pendientes"]],
-  },
-  {
-    cls: "green",
-    label: "Retail · electrónicos",
-    kicker: ["Caso 04 · 2025", "Posconsumo"],
-    title: "Red de puntos RAEE con 218 tiendas a nivel nacional.",
-    titleEm: "RAEE",
-    metrics: [["218", "Puntos de recolección"], ["340k", "Kg gestionados año 1"]],
-  },
-  {
-    cls: "",
-    label: "Telco · infraestructura",
-    kicker: ["Caso 05 · 2025", "Defensa"],
-    title: "Archivo del proceso sancionatorio por antenas.",
-    titleEm: "sancionatorio",
-    metrics: [["6", "Meses de proceso"], ["Archivo", "Resolución final"]],
-  },
-  {
-    cls: "clay",
-    label: "Distribuidora · componentes",
-    kicker: ["Caso 06 · 2026", "Reporte"],
-    title: "Tablero de trazabilidad para reporte anual ANLA.",
-    titleEm: "trazabilidad",
-    metrics: [["1", "Panel unificado"], ["7", "Obligaciones automatizadas"]],
-  },
-]
+const cases = casosVisibles()
+
 ---
 
 <Layout title="Casos — Eko" activePath="/casos">
