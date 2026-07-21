@@ -178,6 +178,8 @@ export interface NewOrderInput {
   address2?: string
   city: string
   postal_code?: string
+  waste_type?: string
+  estimated_quantity?: string
   message?: string
   source?: string
 }
