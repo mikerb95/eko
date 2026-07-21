@@ -82,9 +82,26 @@ import LayoutEn from '../../layouts/LayoutEn.astro'
             <input type="text" name="postal_code" placeholder="110111" />
           </div>
         </div>
+        <div class="form-row">
+          <div class="field">
+            <label>Waste type</label>
+            <select name="waste_type">
+              <option value="">Select…</option>
+              <option value="raee_computo">WEEE · Computing & peripherals</option>
+              <option value="raee_telco">WEEE · Telecommunications</option>
+              <option value="raee_datacenter">WEEE · Data center infrastructure</option>
+              <option value="baterias">Batteries</option>
+              <option value="otro">Other</option>
+            </select>
+          </div>
+          <div class="field">
+            <label>Estimated quantity</label>
+            <input type="text" name="estimated_quantity" placeholder="E.g. 40 devices / 300 kg" />
+          </div>
+        </div>
         <div class="field">
           <label>Message</label>
-          <textarea name="message" placeholder="Type of equipment, approximate quantity, and tentative collection date…"></textarea>
+          <textarea name="message" placeholder="Additional details and tentative collection date…"></textarea>
         </div>
         <input type="text" name="website" tabindex="-1" autocomplete="off" aria-hidden="true" style="position:absolute; left:-9999px; height:0; width:0; opacity:0" />
         <p id="recoleccion-error" style="display:none; color:#b04a2e; margin:0"></p>
