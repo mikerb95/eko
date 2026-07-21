@@ -927,7 +927,11 @@ body.nav-open .whatsapp-fab { opacity: 0; pointer-events: none; }
   font-family: var(--font-mono); font-size: 11.5px;
   letter-spacing: 0.08em; text-transform: uppercase; color: var(--mute);
 }
-.nav-sheet-utils a { padding: 8px 4px; transition: color .2s ease; }
+.nav-sheet-utils a {
+  display: inline-flex; align-items: center;
+  min-height: 44px; padding: 8px 12px;
+  transition: color .2s ease;
+}
 .nav-sheet-utils a:hover { color: var(--ink); }
 
 @media (min-width: 1000px) { .nav-sheet { display: none; } }
