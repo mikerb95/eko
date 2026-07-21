@@ -1,0 +1,120 @@
+---
+import LayoutEn from '../../layouts/LayoutEn.astro'
+import { hayLicencias, licenciasVisibles, mostrarPlaceholders } from '../../lib/credenciales'
+
+const licencias = licenciasVisibles()
+
+function fecha(iso: string): string {
+  if (!iso) return '—'
+  return new Date(`${iso}T00:00:00`).toLocaleDateString('en-US', {
+    year: 'numeric', month: 'long', day: 'numeric',
+  })
+}
+---
+
+<LayoutEn
+  title="Licences and authorisations — Ekosolv"
+  description="Environmental licences, registrations, and authorisations held by Ekosolv S.A.S., with resolution number, issuing authority, and validity."
+  activePath="/en/licenses"
+>
+  <section class="page-head wrap">
+    <div class="page-strip">
+      <div class="l">Legal</div>
+      <div class="l">Verifiable documents</div>
+    </div>
+    <h1 class="display reveal" style="margin-top:40px">
+      Licences and <em>authorisations</em>.
+    </h1>
+    <p class="lede reveal" style="margin-top:32px; max-width:60ch">
+      Every authorisation with its resolution number, issuing authority, and validity.
+      We publish the administrative acts so your legal or procurement team can verify
+      them without having to ask.
+    </p>
+  </section>
+
+  <section class="section wrap" style="padding-top:0">
+    {mostrarPlaceholders && (
+      <div class="dev-warning">
+        ⚠ PLACEHOLDERS — development only. Fill in `licencias` in
+        src/lib/credenciales.ts, upload the PDF to /public/docs/, and set `publicada: true`.
+      </div>
+    )}
+
+    {licencias.length > 0 ? (
+      <div class="licencias reveal">
+        {licencias.map((l) => (
+          <article class="licencia">
+            <h3>{l.titulo}</h3>
+            <div class="field"><span class="k">Authority</span>{l.entidad}</div>
+            <div class="field"><span class="k">Resolution</span>{l.resolucion}</div>
+            {l.pdf
+              ? <a class="doc-link" href={l.pdf} target="_blank" rel="noopener">
+                  View PDF
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
+                </a>
+              : <span class="field"><span class="k">Document</span>Available on request</span>}
+            <div class="field"><span class="k">Issued</span>{fecha(l.expedida)}</div>
+            <div class="field"><span class="k">Validity</span>{l.vigencia}</div>
+            <p class="alcance">{l.alcance}</p>
+          </article>
+        ))}
+      </div>
+    ) : (
+      <div class="reveal" style="border-top:1px solid var(--line); padding-top:40px">
+        <h2 style="max-width:20ch">This section is being <em>updated</em>.</h2>
+        <p class="lede" style="margin-top:20px; max-width:56ch">
+          If you need our current licences and authorisations for a procurement process
+          or a supplier audit, we will send them the same day.
+        </p>
+        <a href="/en/contact" class="doc-link" style="margin-top:28px; justify-self:start">
+          Request documents
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
+        </a>
+      </div>
+    )}
+  </section>
+
+  {hayLicencias() && (
+    <section class="section wrap" style="padding-top:0">
+      <div class="band reveal">
+        <div class="band-grid" style="grid-template-columns: 1.4fr 1fr">
+          <div>
+            <div class="eyebrow" style="color: color-mix(in oklab, #fff 55%, transparent)">Verification</div>
+            <h2 style="margin-top:14px; max-width:20ch">Need any <em>additional</em> document?</h2>
+            <p style="color: color-mix(in oklab, #fff 75%, transparent); margin-top:20px; max-width:44ch; font-size:15px; line-height:1.55">
+              Certificates of incorporation, insurance policies, tax registration, or
+              specific supporting documents for your procurement process.
+            </p>
+          </div>
+          <div style="display:flex; align-items:center; justify-content:flex-end;">
+            <a href="/en/contact" class="foot-cta">
+              Write to us
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
+            </a>
+          </div>
+        </div>
+      </div>
+    </section>
+  )}
+
+  <footer class="foot">
+    <div class="wrap">
+      <div class="foot-head reveal">
+        <div class="display">A new <em>case</em><br>on the radar?</div>
+        <a href="/en/contact" class="foot-cta">Write to us <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M5 12h14M13 6l6 6-6 6"/></svg></a>
+      </div>
+      <div class="foot-cols">
+        <div>
+          <img class="foot-logo" src="/brand/ekosolv-horizontal-white.svg" alt="EKOSOLV — Sustainability Consultants" />
+          <p style="opacity:.6; font-size:14px; margin-top:12px; max-width:36ch">Environmental consulting specialized in ANLA compliance, ESG, and circular economy.</p>
+        </div>
+        <div><h5>Services</h5><ul><li><a href="/en/ekonsulting">EKONSULTING</a></li><li><a href="/en/ekoraee">EKORAEE</a></li><li><a href="/en/ekopartner">EKOPARTNER</a></li><li><a href="/en/ekotrading">EKOTRADING</a></li></ul></div>
+        <div><h5>Site</h5><ul><li><a href="/en">Home</a></li><li><a href="/en/about">About</a></li><li><a href="/en/regulations">Regulations</a></li><li><a href="/en/blog">Journal</a></li></ul></div>
+        <div><h5>Contact</h5><ul><li>info@ekosolv.com</li><li>+57 321 271 2773</li><li>Edif. RPTV · Carrera 15 #31B-33<br>Bogotá D.C.</li></ul></div>
+      </div>
+      <div class="foot-bottom">
+        <div>© 2026 Ekosolv S.A.S. · NIT 900.659.506-9</div>
+      </div>
+    </div>
+  </footer>
+</LayoutEn>
