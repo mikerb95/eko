@@ -1,0 +1,304 @@
+---
+import { NAV, CTA, HOME, SCHEDULE, STRINGS, alternateUrl, isActive, type Lang } from '../config/nav'
+
+interface Props {
+  lang?: Lang
+  activePath?: string
+}
+
+const { lang = 'es', activePath = '/' } = Astro.props as Props
+
+const t = <K extends keyof typeof STRINGS>(k: K) => STRINGS[k][lang]
+const altUrl = alternateUrl(activePath, lang)
+const altLabel = lang === 'es' ? 'EN' : 'ES'
+const arrow = 'M5 12h14M13 6l6 6-6 6'
+---
+
+<header class="nav" id="nav">
+  <div class="wrap nav-inner">
+    <a href={HOME[lang]} class="brand" aria-label={t('brandAria')}>
+      <img src="/brand/ekosolv-horizontal.svg" alt={t('brandAria')} class="brand-logo" />
+    </a>
+
+    <nav class="nav-links" aria-label={t('primaryNav')}>
+      {NAV.map((item) => {
+        const active = isActive(item, activePath, lang)
+        if (!item.units) {
+          return (
+            <a
+              href={item.href![lang]}
+              class:list={['nav-link', { active }]}
+              aria-current={active ? 'page' : undefined}
+            >
+              {item.label[lang]}
+            </a>
+          )
+        }
+        return (
+          <div class="nav-group" data-nav-group>
+            <button
+              type="button"
+              class:list={['nav-link', 'nav-trigger', { active }]}
+              aria-expanded="false"
+              aria-controls="nav-panel-units"
+              data-nav-trigger
+            >
+              {item.label[lang]}
+              <svg class="nav-chevron" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" aria-hidden="true">
+                <path d="M6 9l6 6 6-6" />
+              </svg>
+            </button>
+
+            <div class="nav-panel" id="nav-panel-units" data-nav-panel hidden>
+              <div class="nav-panel-grid">
+                {item.units.map((u) => (
+                  <a
+                    href={u.href[lang]}
+                    class:list={['nav-unit', { active: activePath === u.href[lang] }]}
+                    data-accent={u.accent}
+                    aria-current={activePath === u.href[lang] ? 'page' : undefined}
+                  >
+                    <span class="nav-unit-name">{u.name}</span>
+                    <span class="nav-unit-desc">{u.desc[lang]}</span>
+                  </a>
+                ))}
+              </div>
+              <a href={SCHEDULE.href[lang]} class="nav-panel-foot">
+                {SCHEDULE.label[lang]}
+                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+                  <path d={arrow} />
+                </svg>
+              </a>
+            </div>
+          </div>
+        )
+      })}
+    </nav>
+
+    <div class="nav-right">
+      <a href={altUrl} class="nav-lang" title={t('switchLang')} hreflang={lang === 'es' ? 'en' : 'es'}>
+        {altLabel}
+      </a>
+      <a href={CTA.href[lang]} class="nav-cta">
+        {CTA.label[lang]}
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+          <path d={arrow} />
+        </svg>
+      </a>
+      <button
+        type="button"
+        class="nav-burger"
+        id="nav-burger"
+        aria-label={t('openMenu')}
+        aria-expanded="false"
+        aria-controls="nav-sheet"
+      >
+        <span></span><span></span><span></span>
+      </button>
+    </div>
+  </div>
+</header>
+
+<!-- Panel móvil -->
+<div class="nav-sheet" id="nav-sheet" hidden>
+  <div class="nav-sheet-scroll">
+    <p class="nav-sheet-eyebrow">{t('explore')}</p>
+    <div class="nav-sheet-units">
+      {NAV.find((i) => i.units)?.units!.map((u) => (
+        <a
+          href={u.href[lang]}
+          class:list={['nav-sheet-unit', { active: activePath === u.href[lang] }]}
+          data-accent={u.accent}
+          aria-current={activePath === u.href[lang] ? 'page' : undefined}
+        >
+          <span class="nav-sheet-unit-name">{u.name}</span>
+          <span class="nav-sheet-unit-desc">{u.desc[lang]}</span>
+        </a>
+      ))}
+    </div>
+
+    <nav class="nav-sheet-links" aria-label={t('primaryNav')}>
+      {NAV.filter((i) => !i.units).map((item) => {
+        const active = isActive(item, activePath, lang)
+        return (
+          <a
+            href={item.href![lang]}
+            class:list={[{ active }]}
+            aria-current={active ? 'page' : undefined}
+          >
+            {item.label[lang]}
+          </a>
+        )
+      })}
+      <a href={SCHEDULE.href[lang]} class:list={[{ active: activePath === SCHEDULE.href[lang] }]}>
+        {SCHEDULE.label[lang]}
+      </a>
+    </nav>
+  </div>
+
+  <div class="nav-sheet-foot">
+    <a href={CTA.href[lang]} class="nav-sheet-cta">
+      {CTA.label[lang]}
+      <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+        <path d={arrow} />
+      </svg>
+    </a>
+    <div class="nav-sheet-utils">
+      <a href={altUrl} hreflang={lang === 'es' ? 'en' : 'es'}>{altLabel}</a>
+      {lang === 'es' && <a href="/admin/login">{t('access')}</a>}
+    </div>
+  </div>
+</div>
+
+<script>
+  function initNav() {
+    const header = document.getElementById('nav')
+    const burger = document.getElementById('nav-burger')
+    const sheet = document.getElementById('nav-sheet')
+    if (!header || !burger || !sheet) return
+
+    const OPEN_DELAY = 120
+    const CLOSE_DELAY = 220
+    const reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches
+
+    /* ---------- Panel de escritorio ---------- */
+    const groups = Array.from(header.querySelectorAll<HTMLElement>('[data-nav-group]'))
+
+    groups.forEach((group) => {
+      const trigger = group.querySelector<HTMLButtonElement>('[data-nav-trigger]')
+      const panel = group.querySelector<HTMLElement>('[data-nav-panel]')
+      if (!trigger || !panel) return
+
+      let timer: number | undefined
+      const clear = () => { if (timer) { window.clearTimeout(timer); timer = undefined } }
+
+      const setOpen = (open: boolean) => {
+        clear()
+        if (open) panel.hidden = false
+        // un frame para que la transición de entrada tenga estado inicial
+        requestAnimationFrame(() => group.classList.toggle('open', open))
+        trigger.setAttribute('aria-expanded', String(open))
+        if (!open) {
+          const done = () => { if (!group.classList.contains('open')) panel.hidden = true }
+          reduce ? done() : window.setTimeout(done, 200)
+        }
+      }
+
+      const open = () => setOpen(true)
+      const close = () => setOpen(false)
+      const isOpen = () => group.classList.contains('open')
+
+      // Hover intencional: sólo con puntero fino, para no secuestrar el tap táctil.
+      const fine = window.matchMedia('(hover: hover) and (pointer: fine)')
+      group.addEventListener('pointerenter', () => {
+        if (!fine.matches) return
+        clear()
+        timer = window.setTimeout(open, OPEN_DELAY)
+      })
+      group.addEventListener('pointerleave', () => {
+        if (!fine.matches) return
+        clear()
+        timer = window.setTimeout(close, CLOSE_DELAY)
+      })
+
+      trigger.addEventListener('click', () => (isOpen() ? close() : open()))
+
+      // El foco saliendo del grupo lo cierra (navegación por teclado).
+      group.addEventListener('focusout', (e) => {
+        if (!group.contains(e.relatedTarget as Node)) close()
+      })
+
+      group.addEventListener('keydown', (e) => {
+        if ((e as KeyboardEvent).key !== 'Escape' || !isOpen()) return
+        close()
+        trigger.focus()
+      })
+
+      panel.querySelectorAll('a').forEach((a) => a.addEventListener('click', close))
+    })
+
+    /* ---------- Sheet móvil ---------- */
+    let scrollY = 0
+    let lastFocused: HTMLElement | null = null
+
+    const isSheetOpen = () => burger.classList.contains('open')
+
+    const openSheet = () => {
+      lastFocused = document.activeElement as HTMLElement
+      scrollY = window.scrollY
+      sheet.hidden = false
+      requestAnimationFrame(() => {
+        burger.classList.add('open')
+        sheet.classList.add('open')
+      })
+      burger.setAttribute('aria-expanded', 'true')
+      // position:fixed en vez de overflow:hidden — iOS no salta al top al cerrar.
+      document.body.style.position = 'fixed'
+      document.body.style.top = `-${scrollY}px`
+      document.body.style.width = '100%'
+      sheet.querySelector<HTMLElement>('a')?.focus()
+    }
+
+    const closeSheet = (restoreFocus = true) => {
+      if (!isSheetOpen()) return
+      burger.classList.remove('open')
+      sheet.classList.remove('open')
+      burger.setAttribute('aria-expanded', 'false')
+      document.body.style.position = ''
+      document.body.style.top = ''
+      document.body.style.width = ''
+      window.scrollTo(0, scrollY)
+      const done = () => { if (!isSheetOpen()) sheet.hidden = true }
+      reduce ? done() : window.setTimeout(done, 260)
+      if (restoreFocus) (lastFocused ?? burger).focus()
+    }
+
+    burger.addEventListener('click', () => (isSheetOpen() ? closeSheet() : openSheet()))
+    sheet.querySelectorAll('a').forEach((a) =>
+      a.addEventListener('click', () => closeSheet(false)),
+    )
+
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape' && isSheetOpen()) closeSheet()
+      if (e.key !== 'Tab' || !isSheetOpen()) return
+      // Focus trap: burger + contenido del sheet
+      const focusables = [
+        burger,
+        ...Array.from(sheet.querySelectorAll<HTMLElement>('a[href], button:not([disabled])')),
+      ].filter((el) => el.offsetParent !== null || el === burger)
+      if (!focusables.length) return
+      const first = focusables[0]
+      const last = focusables[focusables.length - 1]
+      if (e.shiftKey && document.activeElement === first) {
+        e.preventDefault()
+        last.focus()
+      } else if (!e.shiftKey && document.activeElement === last) {
+        e.preventDefault()
+        first.focus()
+      }
+    })
+
+    // Si se pasa a escritorio con el sheet abierto, cerrarlo.
+    const bp = window.matchMedia('(min-width: 1000px)')
+    const onBp = (e: MediaQueryListEvent | MediaQueryList) => {
+      if (e.matches && isSheetOpen()) closeSheet(false)
+    }
+    bp.addEventListener('change', onBp)
+
+    /* ---------- Compactar al hacer scroll ---------- */
+    let ticking = false
+    const onScroll = () => {
+      if (ticking) return
+      ticking = true
+      requestAnimationFrame(() => {
+        header.classList.toggle('scrolled', window.scrollY > 80)
+        ticking = false
+      })
+    }
+    window.addEventListener('scroll', onScroll, { passive: true })
+    onScroll()
+  }
+
+  document.addEventListener('astro:page-load', initNav)
+  initNav()
+</script>
