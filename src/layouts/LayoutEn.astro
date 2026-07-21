@@ -2,6 +2,7 @@
 import "../styles/global.css"
 import "../styles/blog.css"
 import { ClientRouter } from 'astro:transitions'
+import Nav from '../components/Nav.astro'
 
 interface Props {
   title?: string
@@ -11,22 +12,6 @@ interface Props {
 
 const { title = "Ekosolv — Environmental Consulting ANLA", description = "We help importers, producers, and tech operators in Colombia build their environmental management plans, licenses, and reports.", activePath = "/en" } = Astro.props
 
-const enToEs: Record<string, string> = {
-  '/en': '/',
-  '/en/services': '/servicios',
-  '/en/about': '/quienes-somos',
-  '/en/regulations': '/normativas',
-  '/en/cases': '/casos',
-  '/en/blog': '/blog',
-  '/en/schedule-a-collection': '/agenda-una-recoleccion',
-  '/en/contact': '/contacto',
-  '/en/ekonsulting': '/ekonsulting',
-  '/en/ekoraee': '/ekoraee',
-  '/en/ekopartner': '/ekopartner',
-  '/en/ekotrading': '/ekotrading',
-}
-const currentPath = Astro.url.pathname.replace(/\/$/, '') || '/en'
-const esUrl = enToEs[currentPath] ?? '/'
 ---
 
 <!DOCTYPE html>
@@ -49,30 +34,7 @@ const esUrl = enToEs[currentPath] ?? '/'
   <body>
     <div id="cursor"></div>
 
-    <header class="nav">
-      <div class="wrap nav-inner">
-        <a href="/en" class="brand" aria-label="EKOSOLV — Sustainability Consultants">
-          <img src="/brand/ekosolv-horizontal.svg" alt="EKOSOLV — Sustainability Consultants" class="brand-logo" />
-        </a>
-        <nav class="nav-links">
-          <a href="/en/services" class={activePath === '/en/services' ? 'active' : ''}>Services</a>
-          <a href="/en/about" class={activePath === '/en/about' ? 'active' : ''}>About</a>
-          <a href="/en/regulations" class={activePath === '/en/regulations' ? 'active' : ''}>Regulations</a>
-          <a href="/en/cases" class={activePath === '/en/cases' ? 'active' : ''}>Cases</a>
-          <a href="/en/blog" class={activePath.startsWith('/en/blog') ? 'active' : ''}>Journal</a>
-          <a href="/en/schedule-a-collection" class={activePath === '/en/schedule-a-collection' ? 'active' : ''}>Schedule</a>
-        </nav>
-        <div class="nav-right" style="display:flex; align-items:center; gap:12px;">
-          <a href={esUrl} class="lang-switch" style="font-family:var(--font-mono); font-size:11px; letter-spacing:0.06em; text-transform:uppercase; opacity:0.55; transition:opacity .2s;" title="Ver en español">ES</a>
-          <a href="/en/contact" class="nav-cta">
-            Let's talk
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-              <path d="M5 12h14M13 6l6 6-6 6"/>
-            </svg>
-          </a>
-        </div>
-      </div>
-    </header>
+    <Nav lang="en" activePath={activePath} />
 
     <main>
       <slot />
