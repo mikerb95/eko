@@ -257,7 +257,9 @@ const arrow = 'M5 12h14M13 6l6 6-6 6'
       sheet.classList.toggle('more-below', remaining > 4)
     }
     scroller?.addEventListener('scroll', updateMoreBelow, { passive: true })
-    window.addEventListener('resize', updateMoreBelow)
+    // ResizeObserver en vez de window.resize: queda atado al elemento, así que
+    // no se acumula un listener por cada navegación SPA.
+    if (scroller) new ResizeObserver(updateMoreBelow).observe(scroller)
 
     const closeSheet = (restoreFocus = true) => {
       if (!isSheetOpen()) return
