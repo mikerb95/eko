@@ -14,14 +14,37 @@ const cases = casosVisibles()
       <div class="l">Selection · 2024 – 2026</div>
     </div>
     <h1 class="display reveal" style="margin-top:40px">
-      Real<br><em>mandates</em>, measurable results.
+      How we <em>work</em>,<br>case by case.
     </h1>
     <p class="lede reveal" style="margin-top:32px; max-width:56ch">
-      A sample of mandates executed in the last 24 months. Client names are kept confidential under NDA.
+      Mandates executed with real clients. Names are kept confidential under NDA; the figures are the ones we can substantiate.
     </p>
   </section>
 
   <section class="section wrap">
+    {mostrarPlaceholders && (
+      <div class="dev-warning">
+        ⚠ PLACEHOLDERS — development only. The previous 6 cases were fabricated.
+        Fill in `casos` and `agregadoCasos` in src/lib/credenciales.ts with real
+        mandates and set `verificado: true`.
+      </div>
+    )}
+
+    {cases.length === 0 && (
+      <div class="reveal" style="border-top:1px solid var(--line); padding-top:40px">
+        <h2 style="max-width:22ch">This section is in <em>preparation</em>.</h2>
+        <p class="lede" style="margin-top:20px; max-width:56ch">
+          We are documenting our mandates in a format we can substantiate without
+          compromising client confidentiality. If you need references for a
+          procurement process, we will provide them directly.
+        </p>
+        <a href="/en/contact" class="doc-link" style="margin-top:28px">
+          Request references
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
+        </a>
+      </div>
+    )}
+
     <div class="cases reveal">
       {cases.map(c => (
         <article class={`case ${c.cls}`}>
