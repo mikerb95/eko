@@ -407,6 +407,26 @@ h3 { font-size: 22px; }
 .process-row h3 em { font-style: italic; color: var(--forest); }
 .process-row .desc { color: var(--ink-2); font-size: 15px; line-height: 1.55; max-width: 55ch; }
 .process-row .when { font-family: var(--font-mono); font-size: 12.5px; color: var(--mute); text-align: right; }
+
+/* ===== Service thumbnail (brand-mark motif, per-line accent) ===== */
+.svc-thumb {
+  position: relative;
+  width: 72px; height: 72px; border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+  flex-shrink: 0;
+  background: radial-gradient(circle at 30% 30%, var(--sg-1) 0%, var(--sg-2) 45%, var(--sg-3) 100%);
+  box-shadow: 0 6px 16px -6px color-mix(in oklab, var(--sg-3) 60%, transparent);
+}
+.svc-thumb::after {
+  content: ""; position: absolute; inset: 8px; border-radius: 50%;
+  border: 1px solid color-mix(in oklab, #fff 30%, transparent);
+}
+.svc-thumb svg { position: relative; width: 26px; height: 26px; color: #fff; }
+.svc-thumb.sg-deep   { --sg-1: var(--aqua); --sg-2: var(--deep);  --sg-3: var(--deep-2); }
+.svc-thumb.sg-forest { --sg-1: var(--aqua); --sg-2: var(--forest); --sg-3: #0f5b4d; }
+.svc-thumb.sg-clay   { --sg-1: #e0b98c; --sg-2: var(--clay); --sg-3: var(--clay-2); }
+.svc-thumb.sg-neutral{ --sg-1: #9aa5ad; --sg-2: var(--ink-2); --sg-3: var(--ink); }
+
 @media (max-width: 900px) {
   .process-row { grid-template-columns: 1fr; gap: 10px; }
   .process-row .when { text-align: left; }
