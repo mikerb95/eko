@@ -148,7 +148,31 @@ Esto responde a la lección de la Fase 0 — los seis logos falsos llevaban mese
 
 La página `/licencias` **ya es útil sin datos**: muestra un estado vacío honesto ("Estamos actualizando esta sección") con CTA a solicitar los documentos, en vez de una página rota.
 
-### 🔴 Bloqueo encontrado en 3.5
+### 3.5 — Footer unificado ✅
+
+**Resuelto.** El footer estaba copiado a mano en **28 páginas con 11 variantes distintas**, toda deriva accidental:
+
+- Dos descripciones de empresa diferentes conviviendo
+- Las páginas de servicio (`ekoraee`, `ekonsulting`, `ekopartner`, `ekotrading`, `agenda-una-recoleccion` y sus equivalentes en `/en`) **no tenían columna Legal**
+- Columnas que aparecían y desaparecían sin criterio
+
+Ahora hay un solo **`src/components/SiteFooter.astro`**. Las páginas solo pueden cambiar el titular:
+
+```astro
+<SiteFooter />                        <!-- español -->
+<SiteFooter lang="en" />              <!-- inglés -->
+<SiteFooter headline={`…`} />         <!-- titular a medida -->
+```
+
+El único titular distinto del sitio (`oportunidades2630`: *"¿Hablamos de la fase 1?"*) se preservó.
+
+**Enlaces legales:** *Licencias y autorizaciones* → `/licencias` (ES) y `/en/licenses` (EN), ya en las 25 páginas con footer. Los otros tres (*Política de tratamiento*, *Términos de servicio*, *Código de ética*) se renderizan atenuados con `data-pending` y **sin `<a>`**, porque los documentos no existen (**3.c**). Un enlace legal roto es peor que un texto sin enlace — la Política de Tratamiento es obligación de la Ley 1581 de 2012.
+
+Para activarlos: redactar el documento, crear la página y poner el `href` en `SiteFooter.astro`. Un solo sitio, no 28.
+
+**Efecto lateral:** `.foot-cols` pasó de `2fr 1fr 1fr 1fr` a `2fr repeat(4, 1fr)` con un breakpoint intermedio a 1100px, ahora que todos los footers tienen cuatro columnas.
+
+### 🔴 Bloqueo original en 3.5 (ya resuelto, se conserva como registro)
 
 El footer está **duplicado a mano en 18+ páginas** (`index`, `casos`, `servicios`, `contacto`, `normativas`, `quienes-somos`, `oportunidades2630`, `blog/[slug]`… y sus equivalentes en `/en`). Existe un `src/components/Footer.astro` **que no usa nadie**.
 
