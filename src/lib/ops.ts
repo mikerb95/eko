@@ -90,6 +90,8 @@ async function ensureSchema(): Promise<void> {
       address2 TEXT NOT NULL DEFAULT '',
       city TEXT NOT NULL DEFAULT '',
       postal_code TEXT NOT NULL DEFAULT '',
+      waste_type TEXT NOT NULL DEFAULT '',
+      estimated_quantity TEXT NOT NULL DEFAULT '',
       message TEXT NOT NULL DEFAULT '',
       source TEXT NOT NULL DEFAULT 'web',
       assigned_to TEXT NOT NULL DEFAULT '',
@@ -98,6 +100,14 @@ async function ensureSchema(): Promise<void> {
       created_at TEXT NOT NULL DEFAULT '',
       updated_at TEXT NOT NULL DEFAULT ''
     )`)
+    // Migración idempotente para bases ya existentes sin estas columnas.
+    for (const col of ['waste_type', 'estimated_quantity']) {
+      try {
+        await db.execute(`ALTER TABLE orders ADD COLUMN ${col} TEXT NOT NULL DEFAULT ''`)
+      } catch (e: any) {
+        if (!String(e?.message || '').includes('duplicate column')) throw e
+      }
+    }
     await db.execute(`CREATE TABLE IF NOT EXISTS order_events (
       id INTEGER PRIMARY KEY AUTOINCREMENT,
       order_id INTEGER NOT NULL,
