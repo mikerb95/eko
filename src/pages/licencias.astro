@@ -1,6 +1,7 @@
 ---
 import Layout from '../layouts/Layout.astro'
 import { hayLicencias, licenciasVisibles, mostrarPlaceholders } from '../lib/credenciales'
+import SiteFooter from '../components/SiteFooter.astro'
 
 const licencias = licenciasVisibles()
 
@@ -97,24 +98,5 @@ function fecha(iso: string): string {
     </section>
   )}
 
-  <footer class="foot">
-    <div class="wrap">
-      <div class="foot-head reveal">
-        <div class="display">¿Un nuevo <em>expediente</em><br>en el radar?</div>
-        <a href="/contacto" class="foot-cta">Escríbenos <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M5 12h14M13 6l6 6-6 6"/></svg></a>
-      </div>
-      <div class="foot-cols">
-        <div>
-          <img class="foot-logo" src="/brand/ekosolv-horizontal-white.svg" alt="EKOSOLV — Consultores en Sostenibilidad" />
-          <p style="opacity:.6; font-size:14px; margin-top:12px; max-width:36ch">Consultoría ambiental especializada en cumplimiento ANLA, ESG y economía circular.</p>
-        </div>
-        <div><h5>Servicios</h5><ul><li><a href="/ekonsulting">EKONSULTING</a></li><li><a href="/ekoraee">EKORAEE</a></li><li><a href="/ekopartner">EKOPARTNER</a></li><li><a href="/ekotrading">EKOTRADING</a></li></ul></div>
-        <div><h5>Sitio</h5><ul><li><a href="/">Inicio</a></li><li><a href="/quienes-somos">Nosotros</a></li><li><a href="/normativas">Normativas</a></li><li><a href="/blog">Diario</a></li></ul></div>
-        <div><h5>Contacto</h5><ul><li>info@ekosolv.com</li><li>+57 321 271 2773</li><li>Edif. RPTV · Carrera 15 #31B-33<br>Bogotá D.C.</li></ul></div>
-      </div>
-      <div class="foot-bottom">
-        <div>© 2026 Ekosolv S.A.S. · NIT 900.659.506-9</div>
-      </div>
-    </div>
-  </footer>
+  <SiteFooter />
 </Layout>
