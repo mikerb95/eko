@@ -25,17 +25,27 @@ La home real es **`src/pages/index.astro`**, markup de Astro escrito a mano. `sr
 
 ---
 
-## Fase 0 — Higiene previa (bloqueante)
+## Fase 0 — Higiene previa (bloqueante) ✅ COMPLETADA
 
-No se publica nada de las fases siguientes hasta cerrar esto. Dos de los tres puntos son riesgos de credibilidad activos.
+| # | Tarea | Estado |
+|---|---|---|
+| 0.1 | Unificar trayectoria a 2013 | ✅ Resuelto con `src/lib/brand.ts` como fuente única |
+| 0.2 | Quitar los 6 logos de clientes ficticios | ✅ Sección "Clientes" retirada en ES y EN |
+| 0.3 | Cerrar hallazgos críticos de `AUDITORIA.md` | ✅ Ya estaban resueltos, salvo `path-to-regexp` (ver abajo) |
 
-| # | Tarea | Archivo | Notas |
-|---|---|---|---|
-| 0.1 | Unificar trayectoria a 2013 | `src/pages/index.astro:198`, `src/pages/ekoraee.astro` (meta) | "Siete años" → "Trece años". Barrer todo el repo por otras menciones. |
-| 0.2 | Quitar los 6 logos de clientes ficticios | `src/pages/index.astro:229-236` | `Nodex`, `Andina.tech`, `Kairos`, `Ferra`, `Origen`, `Meridian` son inventados. **Sale ya**, aunque el reemplazo real llegue en la Fase 3. |
-| 0.3 | Cerrar hallazgos críticos de `AUDITORIA.md` | `src/lib/auth.ts`, `.gitignore` | Credenciales por defecto y `.vercel/output/` versionado. Bloqueante para la Fase 5 (subastas con usuarios públicos) y para poder vender seguridad a Lito. |
+**0.1 —** En vez de corregir cuatro números a mano se creó **`src/lib/brand.ts`**: `FOUNDED_YEAR`, `yearsActive` calculado, `stats` y `yearsSpelled(lang)`. Consumido por `index.astro`, `en/index.astro`, `quienes-somos.astro` y `en/about.astro`.
+
+Se encontró además que `/en/about` tenía **"12 years" escrito a mano** y ya desactualizado — el fallo exacto que la fuente única elimina. Esto adelanta la tarea 6.4.
+
+**0.2 —** Se retiró la sección completa (no solo los logos): dejar el encabezado sobre una rejilla vacía quedaba peor. Hay un comentario en el código de ambas homes apuntando a la Fase 3 para que nadie la reponga por error.
+
+**0.3 — `AUDITORIA.md` está desactualizado.** Verificado uno por uno: `auth.ts` ya lanza error en producción en vez de usar fallback; las credenciales viven en la tabla `users`; `/api/admin/login.ts` ya usa `checkRateLimit`; `.vercel/` y `data/*.db` están ignorados y sin rastrear; `bun.lock` ya no existe.
+
+> ⚠️ **Pendiente real:** 5 vulnerabilidades de npm (4 altas). `path-to-regexp` vía `@vercel/routing-utils` exige subir a **`@astrojs/vercel@11`**, que es un cambio incompatible. No se aplicó: debe probarse en un preview de Vercel antes de tocar producción.
 
 **Pregunta abierta 0.a** — ¿Los archivos de `src/storyblok/` y `src/data/pages/*.json` se eliminan o se conservan? Hoy son peso muerto que confunde. Recomiendo eliminarlos si `[...slug].astro` no sirve ninguna ruta en producción; verificar primero.
+
+**Nota de repositorio** — El repo **auto-commitea cada edición**. Además, `.gitignore:33` contiene `oportunidad_lito.md`, por lo que ese documento **no está en git**: existe solo en disco local. Decidir si es intencional.
 
 ---
 
