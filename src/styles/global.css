@@ -546,6 +546,11 @@ h3 { font-size: 22px; }
   text-align: right; letter-spacing: 0.05em;
 }
 .hero-visual .coords strong { display: block; color: #fff; font-size: 14px; letter-spacing: 0.02em; }
+@media (max-width: 900px) {
+  .hv-grid { grid-template-columns: 1fr; }
+  .hv-item { padding: 20px 0; }
+  .hv-title { max-width: 32ch; }
+}
 
 /* Sector pills */
 .sectors { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 24px; }
