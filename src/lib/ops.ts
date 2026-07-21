@@ -138,6 +138,8 @@ function rowToOrder(r: any): Order {
     address2: r.address2,
     city: r.city,
     postal_code: r.postal_code,
+    waste_type: r.waste_type,
+    estimated_quantity: r.estimated_quantity,
     message: r.message,
     source: r.source,
     assigned_to: r.assigned_to,
