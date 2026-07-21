@@ -430,6 +430,8 @@ h3 { font-size: 22px; }
 @media (max-width: 900px) {
   .process-row { grid-template-columns: 1fr; gap: 10px; }
   .process-row .when { text-align: left; }
+  .svc-thumb { width: 56px; height: 56px; }
+  .svc-thumb svg { width: 22px; height: 22px; }
 }
 
 /* ===== Normativas accordion ===== */
