@@ -1,35 +1,40 @@
-import { getLinks } from '../utils/api'
+import { SITE_LEGAL_NAME, SITE_NAME, SITE_TAGLINE, url } from '../lib/site'
+import { rutasEn, rutasEs } from '../lib/rutas'
+import { FOUNDED_YEAR, yearsActive } from '../lib/brand'
 
 export const GET = async () => {
-  try {
-    const links = await getLinks()
-    const baseUrl = 'https://ekoambiental.co'
+  const lista = (rutas) =>
+    rutas.map((r) => `- [${r.titulo}](${url(r.path)}): ${r.descripcion}`).join('\n')
 
-    const pages = links
-      .filter((l) => !l.is_folder)
-      .map((l) => `- [${l.slug === 'home' ? 'Inicio' : l.slug}](${baseUrl}/${l.slug === 'home' ? '' : l.slug})`)
-      .join('\n')
+  const body = `# ${SITE_NAME}
 
-    const body = `# EKO Ambiental
+> ${SITE_TAGLINE.es}
 
-> Consultoría en normativa ambiental para importadores y productores en Colombia
-
-Este archivo contiene un listado de todas las páginas y recursos del sitio.
-
-***
+${SITE_LEGAL_NAME} opera en Colombia desde ${FOUNDED_YEAR} (${yearsActive} años),
+acompañando a importadores, productores y operadores de tecnología en el
+cumplimiento de la normativa ambiental ante la ANLA, la estrategia ESG y la
+transición hacia la economía circular.
 
 ## Páginas
 
-${pages}
+${lista(rutasEs)}
 
----
+## Pages (English)
 
-Para más información visita [${baseUrl}](${baseUrl})
+${lista(rutasEn)}
+
+## Contacto
+
+- Correo: info@ekosolv.com
+- Teléfono: +57 321 271 2773
+- Dirección: Edif. RPTV · Carrera 15 #31B-33, Bogotá D.C., Colombia
+
+## Detalle
+
+- Texto completo de las publicaciones: ${url('/llms-full.txt')}
 `
-    return new Response(body, {
-      headers: { 'Content-Type': 'text/plain; charset=utf-8' },
-    })
-  } catch (error) {
-    return new Response(`Error generando llms.txt\n\n${error}`, { status: 500 })
-  }
+
+  return new Response(body, {
+    headers: { 'Content-Type': 'text/plain; charset=utf-8' },
+  })
 }
