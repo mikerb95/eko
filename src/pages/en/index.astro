@@ -2,10 +2,12 @@
 import LayoutEn from '../../layouts/LayoutEn.astro'
 import normativas from '../../data/normativas.json'
 
-const RADAR_CODES = ['RES 1297 · 2010', 'LEY 1672 · 2013', 'RES 1407 · 2018']
-const radar = RADAR_CODES
-  .map((code) => normativas.find((n) => n.code === code))
-  .filter(Boolean)
+// English copy of the same three entries surfaced on /en/regulations
+const radar = [
+  { code: 'RES 1297 · 2010', title: 'Post-consumer plan for Waste Electrical and Electronic Equipment', tags: ['WEEE', 'Post-consumer', 'Producer'] },
+  { code: 'LEY 1672 · 2013', title: 'WEEE Law', tags: ['EPR', 'Legal framework'] },
+  { code: 'RES 1407 · 2018', title: 'Environmental management plan for packaging waste', tags: ['Packaging', 'EPR', 'Marketer'] },
+]
 ---
 
 <LayoutEn title="Ekosolv — Environmental Consulting · ANLA · ESG · Circular Economy" activePath="/en">
