@@ -98,6 +98,7 @@ export const STRINGS = {
   switchLang: { es: 'View in English', en: 'Ver en español' },
   access: { es: 'Acceso', en: 'Admin access' },
   explore: { es: 'Explorar', en: 'Explore' },
+  skipToContent: { es: 'Saltar al contenido', en: 'Skip to content' },
 }
 
 /** Rutas equivalentes ES <-> EN para el switch de idioma. */
