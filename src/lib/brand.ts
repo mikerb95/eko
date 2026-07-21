@@ -13,7 +13,7 @@ export const yearsActive = new Date().getFullYear() - FOUNDED_YEAR
 /** Cifras del hero y del bloque "Por los números". */
 export const stats = {
   /** Toneladas de RAEE gestionadas desde FOUNDED_YEAR. PENDIENTE-DATO: actualizar a 2026. */
-  tonnesManaged: '1.000+',
+  tonnesManaged: 1000,
   /** Porcentaje de radicaciones aprobadas ante la ANLA. */
   approvalRate: 98,
   /** Sanciones en firme entre clientes activos. */
