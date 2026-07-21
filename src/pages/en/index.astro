@@ -97,6 +97,23 @@ const radar = [
     </div>
   </section>
 
+  {/*
+    Phase 4. With no video configured (credenciales.ts → videoEn.publicado),
+    this section does not exist in production.
+  */}
+  {video && (
+    <section class="section wrap" style="padding-block: clamp(40px, 6vw, 80px)">
+      {mostrarPlaceholders && (
+        <div class="dev-warning">
+          ⚠ PLACEHOLDER — development only. Fill in `videoEn` in
+          src/lib/credenciales.ts (id, poster in /public/images/, duration,
+          transcript) and set `publicado: true`.
+        </div>
+      )}
+      <VideoFacade video={video} lang="en" />
+    </section>
+  )}
+
   <div class="marquee">
     <div class="marquee-track">
       <span>
