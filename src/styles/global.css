@@ -712,15 +712,22 @@ h3 { font-size: 22px; }
 /* Selection */
 ::selection { background: var(--aqua); color: var(--ink); }
 
-/* Responsive nav */
-@media (max-width: 760px) { .nav-links { display: none; } }
+/* ===== Responsive nav ===== */
+/* Punto de corte a 1000px: por debajo, 6 links + panel + CTA se aprietan. */
+@media (max-width: 999px) {
+  .nav-links { display: none; }
+  .nav-cta { display: none; }
+  .nav-lang { display: none; }
+  .nav-burger { display: flex; }
+}
 
-/* Mobile nav burger */
+/* Burger */
 .nav-burger {
   display: none;
   flex-direction: column; justify-content: center; align-items: center;
-  gap: 5px; width: 40px; height: 40px; border-radius: 8px;
+  gap: 5px; width: 44px; height: 44px; border-radius: 8px;
   background: transparent; border: none; cursor: pointer; padding: 8px;
+  position: relative; z-index: 60;
 }
 .nav-burger span {
   display: block; width: 22px; height: 1.5px;
@@ -732,46 +739,104 @@ h3 { font-size: 22px; }
 .nav-burger.open span:nth-child(2) { opacity: 0; transform: scaleX(0); }
 .nav-burger.open span:nth-child(3) { transform: translateY(-6.5px) rotate(-45deg); }
 
-@media (max-width: 760px) { .nav-burger { display: flex; } }
-
-/* Mobile nav overlay */
-.nav-mobile-overlay {
-  display: none;
+/* ===== Panel móvil ===== */
+.nav-sheet {
   position: fixed; inset: 0; z-index: 49;
+  /* dvh: no salta al mostrarse/ocultarse la barra del navegador. */
+  height: 100dvh;
+  display: flex; flex-direction: column;
   background: color-mix(in oklab, var(--paper) 97%, transparent);
-  backdrop-filter: blur(12px);
-  -webkit-backdrop-filter: blur(12px);
-  padding-top: 88px;
+  backdrop-filter: blur(16px) saturate(1.4);
+  -webkit-backdrop-filter: blur(16px) saturate(1.4);
+  padding-top: 72px;
   opacity: 0; pointer-events: none;
   transition: opacity .25s ease;
 }
-.nav-mobile-overlay.open {
-  opacity: 1; pointer-events: auto;
+.nav-sheet.open { opacity: 1; pointer-events: auto; }
+.nav-sheet[hidden] { display: none; }
+
+/* Sólo esta zona hace scroll: el CTA de abajo queda siempre visible. */
+.nav-sheet-scroll {
+  flex: 1; min-height: 0; overflow-y: auto;
+  -webkit-overflow-scrolling: touch; overscroll-behavior: contain;
+  padding: 20px var(--pad) 24px;
 }
-.nav-mobile-links {
-  display: flex; flex-direction: column;
-  padding: 8px 24px;
+
+.nav-sheet-eyebrow {
+  font-family: var(--font-mono); font-size: 11.5px;
+  letter-spacing: 0.1em; text-transform: uppercase; color: var(--mute);
+  margin-bottom: 12px;
 }
-.nav-mobile-links a {
+
+.nav-sheet-units { display: flex; flex-direction: column; gap: 2px; }
+.nav-sheet-unit {
+  display: flex; flex-direction: column; gap: 3px;
+  padding: 14px 16px;
+  border-radius: var(--r-md);
+  border-left: 2px solid var(--line-2);
+  background: color-mix(in oklab, var(--paper-warm) 70%, transparent);
+}
+.nav-sheet-unit[data-accent="forest"] { border-left-color: var(--forest); }
+.nav-sheet-unit[data-accent="deep"]   { border-left-color: var(--deep); }
+.nav-sheet-unit[data-accent="clay"]   { border-left-color: var(--clay-2); }
+.nav-sheet-unit[data-accent="aqua"]   { border-left-color: var(--aqua); }
+.nav-sheet-unit.active { background: #fff; }
+.nav-sheet-unit-name { font-size: 17px; letter-spacing: -0.02em; color: var(--ink); }
+.nav-sheet-unit-desc { font-size: 13.5px; line-height: 1.4; color: var(--mute); text-wrap: pretty; }
+
+.nav-sheet-links { display: flex; flex-direction: column; margin-top: 28px; }
+.nav-sheet-links a {
   display: flex; align-items: center;
-  padding: 18px 0;
-  font-size: 22px; font-weight: 400; letter-spacing: -0.03em;
+  /* min-height garantiza objetivo táctil cómodo aunque el texto sea corto. */
+  min-height: 52px; padding: 12px 0;
+  font-size: 22px; letter-spacing: -0.03em;
   color: var(--ink); border-bottom: 1px solid var(--line);
   transition: color .15s ease;
 }
-.nav-mobile-links a:last-child { border-bottom: none; }
-.nav-mobile-links a:hover { color: var(--forest); }
-.nav-mobile-cta {
-  display: inline-flex !important; align-items: center; gap: 10px;
-  margin-top: 28px; padding: 14px 24px !important;
-  border-radius: 999px !important; border: none !important;
-  background: var(--deep); color: #fff !important;
-  font-size: 16px !important;
-  width: fit-content;
+.nav-sheet-links a:last-child { border-bottom: none; }
+.nav-sheet-links a:hover { color: var(--forest); }
+.nav-sheet-links a.active { color: var(--forest); }
+.nav-sheet-links a.active::before {
+  content: ""; width: 6px; height: 6px; border-radius: 50%;
+  background: var(--forest); margin-right: 12px; flex-shrink: 0;
 }
-.nav-mobile-cta:hover { background: var(--deep-2); color: #fff !important; }
 
-@media (max-width: 760px) { .nav-mobile-overlay { display: block; } }
+/* Pie fijo: acción principal + utilidades, fuera del área de scroll. */
+.nav-sheet-foot {
+  flex-shrink: 0;
+  padding: 18px var(--pad);
+  padding-bottom: calc(18px + env(safe-area-inset-bottom, 0px));
+  border-top: 1px solid var(--line);
+  background: color-mix(in oklab, var(--paper) 92%, transparent);
+  display: flex; flex-direction: column; gap: 14px;
+}
+.nav-sheet-cta {
+  display: inline-flex; align-items: center; justify-content: center; gap: 10px;
+  width: 100%; min-height: 52px; padding: 14px 24px;
+  border-radius: 999px; background: var(--deep); color: #fff;
+  font-size: 16.5px;
+  transition: background .2s ease;
+}
+.nav-sheet-cta:hover { background: var(--deep-2); }
+.nav-sheet-utils {
+  display: flex; align-items: center; justify-content: center; gap: 20px;
+  font-family: var(--font-mono); font-size: 11.5px;
+  letter-spacing: 0.08em; text-transform: uppercase; color: var(--mute);
+}
+.nav-sheet-utils a { padding: 8px 4px; transition: color .2s ease; }
+.nav-sheet-utils a:hover { color: var(--ink); }
+
+@media (min-width: 1000px) { .nav-sheet { display: none; } }
+
+/* ===== Movimiento reducido ===== */
+@media (prefers-reduced-motion: reduce) {
+  .nav, .nav-inner, .brand-logo,
+  .nav-panel, .nav-chevron, .nav-sheet,
+  .nav-burger span, .nav-cta, .nav-cta svg, .nav-panel-foot svg {
+    transition-duration: .01ms !important;
+  }
+  .nav-panel { transform: translateX(-50%) translateY(0); }
+}
 
 /* Newsletter band form */
 .news-form { align-self: end; }
