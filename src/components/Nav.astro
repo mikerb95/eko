@@ -258,15 +258,23 @@ const arrow = 'M5 12h14M13 6l6 6-6 6'
       a.addEventListener('click', () => closeSheet(false)),
     )
 
-    document.addEventListener('keydown', (e) => {
-      if (e.key === 'Escape' && isSheetOpen()) closeSheet()
-      if (e.key !== 'Tab' || !isSheetOpen()) return
-      // Focus trap: burger + contenido del sheet
+    // Escape + focus trap. Cuelgan de `document`, así que se registran una sola
+    // vez por sesión y resuelven los elementos vigentes en cada evento.
+    onceGlobal('keydown', (ev) => {
+      const e = ev as KeyboardEvent
+      const b = document.getElementById('nav-burger')
+      const s = document.getElementById('nav-sheet')
+      if (!b || !s || !b.classList.contains('open')) return
+      if (e.key === 'Escape') {
+        s.querySelectorAll('a').forEach(() => {})
+        b.click()
+        return
+      }
+      if (e.key !== 'Tab') return
       const focusables = [
-        burger,
-        ...Array.from(sheet.querySelectorAll<HTMLElement>('a[href], button:not([disabled])')),
-      ].filter((el) => el.offsetParent !== null || el === burger)
-      if (!focusables.length) return
+        b,
+        ...Array.from(s.querySelectorAll<HTMLElement>('a[href], button:not([disabled])')),
+      ]
       const first = focusables[0]
       const last = focusables[focusables.length - 1]
       if (e.shiftKey && document.activeElement === first) {
@@ -280,25 +288,43 @@ const arrow = 'M5 12h14M13 6l6 6-6 6'
 
     // Si se pasa a escritorio con el sheet abierto, cerrarlo.
     const bp = window.matchMedia('(min-width: 1000px)')
-    const onBp = (e: MediaQueryListEvent | MediaQueryList) => {
+    bp.addEventListener('change', (e) => {
       if (e.matches && isSheetOpen()) closeSheet(false)
-    }
-    bp.addEventListener('change', onBp)
+    })
 
     /* ---------- Compactar al hacer scroll ---------- */
-    let ticking = false
-    const onScroll = () => {
-      if (ticking) return
-      ticking = true
-      requestAnimationFrame(() => {
-        header.classList.toggle('scrolled', window.scrollY > 80)
-        ticking = false
-      })
+    const setScrolled = () => {
+      document.getElementById('nav')?.classList.toggle('scrolled', window.scrollY > 80)
     }
-    window.addEventListener('scroll', onScroll, { passive: true })
-    onScroll()
+    let ticking = false
+    onceGlobal(
+      'scroll',
+      () => {
+        if (ticking) return
+        ticking = true
+        requestAnimationFrame(() => {
+          setScrolled()
+          ticking = false
+        })
+      },
+      { passive: true },
+    )
+    setScrolled()
   }
 
+  /** Registra un listener en `document` una única vez por sesión. */
+  const registered = new Set<string>()
+  function onceGlobal(
+    type: string,
+    handler: (e: Event) => void,
+    opts?: AddEventListenerOptions,
+  ) {
+    if (registered.has(type)) return
+    registered.add(type)
+    document.addEventListener(type, handler, opts)
+  }
+
+  // `astro:page-load` también dispara en la carga inicial, así que es el único
+  // punto de entrada: llamar a initNav() aquí además duplicaría los listeners.
   document.addEventListener('astro:page-load', initNav)
-  initNav()
 </script>
