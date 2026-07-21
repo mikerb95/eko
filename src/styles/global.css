@@ -242,6 +242,9 @@ h3 { font-size: 22px; }
 .svc.wide { grid-column: span 8; min-height: 220px; }
 .svc.third { grid-column: span 4; }
 .svc.half { grid-column: span 6; }
+/* Tarjetas informativas: no navegan a ningún lado, no deben simular ser clicables. */
+.svc.static { cursor: default; min-height: 240px; }
+.svc.static h3 { font-size: clamp(24px, 2.2vw, 30px); max-width: 18ch; }
 @media (max-width: 900px) {
   .svc.big, .svc.small, .svc.thin, .svc.wide, .svc.third, .svc.half { grid-column: span 12; }
 }
