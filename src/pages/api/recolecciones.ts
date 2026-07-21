@@ -46,6 +46,8 @@ export const POST: APIRoute = async ({ request }) => {
       address2: field(b, 'address2', 300),
       city,
       postal_code: field(b, 'postal_code', 20),
+      waste_type: field(b, 'waste_type', 50),
+      estimated_quantity: field(b, 'estimated_quantity', 100),
       message: field(b, 'message', MAX),
       source: 'web',
     })
