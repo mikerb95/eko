@@ -2,6 +2,7 @@
 import Layout from '../layouts/Layout.astro'
 import normativas from '../data/normativas.json'
 import { FOUNDED_YEAR, stats, tonnesManaged, yearsActive } from '../lib/brand'
+import { clientesVisibles, mostrarPlaceholders, testimoniosVisibles } from '../lib/credenciales'
 
 const RADAR_CODES = ['RES 1297 · 2010', 'LEY 1672 · 2013', 'RES 1407 · 2018']
 const radar = RADAR_CODES
@@ -297,11 +298,65 @@ const radar = RADAR_CODES
   </section>
 
   {/*
-    Sección "Clientes" retirada: los seis logos eran placeholders de la plantilla
-    original (Nodex, Andina.tech, Kairos, Ferra, Origen, Meridian), no clientes reales.
-    Se repone en la Fase 3 de docs/plan-competitivo-lito.md con clientes reales,
-    una vez se tenga autorización escrita de uso de marca.
+    Fase 3. Testimonios y clientes salen de src/lib/credenciales.ts, que solo
+    entrega contenido marcado como autorizado. En producción, sin datos reales
+    estas secciones NO se renderizan — no vuelven los placeholders a la web.
   */}
+  {testimoniosVisibles().length > 0 && (
+    <section class="section wrap">
+      <div class="section-head reveal">
+        <div>
+          <div class="eyebrow">Testimonios · 04</div>
+          <h2>Lo que dicen quienes<br>ya <em>cumplieron</em>.</h2>
+        </div>
+        <div class="meta">Citas publicadas con autorización escrita de cada cliente.</div>
+      </div>
+
+      {mostrarPlaceholders && (
+        <div class="dev-warning">
+          ⚠ PLACEHOLDERS — visibles solo en desarrollo. Rellena `testimonios` en
+          src/lib/credenciales.ts y pon `autorizado: true` (requiere autorización escrita).
+        </div>
+      )}
+
+      <div class="quotes reveal">
+        {testimoniosVisibles().map((t) => (
+          <figure class="quote">
+            <blockquote>{t.quote}</blockquote>
+            <figcaption class="who">
+              <strong>{t.autor}</strong>
+              <span>{t.cargo} · {t.empresa}</span>
+            </figcaption>
+          </figure>
+        ))}
+      </div>
+    </section>
+  )}
+
+  {clientesVisibles().length > 0 && (
+    <section class="section wrap">
+      <div class="section-head reveal">
+        <div>
+          <div class="eyebrow">Clientes · 05</div>
+          <h2>Compañías que han <em>confiado</em><br>en nosotros.</h2>
+        </div>
+        <div class="meta">Trabajamos con importadoras, productoras, distribuidoras y operadores de infraestructura tecnológica en Colombia.</div>
+      </div>
+
+      {mostrarPlaceholders && (
+        <div class="dev-warning">
+          ⚠ PLACEHOLDERS — visibles solo en desarrollo. Rellena `clientes` en
+          src/lib/credenciales.ts y pon `autorizado: true` (requiere autorización de uso de marca).
+        </div>
+      )}
+
+      <div class="logos reveal">
+        {clientesVisibles().map((c) => (
+          <div>{c.logo ? <img src={c.logo} alt={c.nombre} /> : c.nombre}</div>
+        ))}
+      </div>
+    </section>
+  )}
 
   <footer class="foot">
     <div class="wrap">
