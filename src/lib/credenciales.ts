@@ -192,8 +192,8 @@ export const videoEs: Video = {
 
 export const videoEn: Video = {
   proveedor: 'youtube',
-  id: 'auhrVUGaGYA',
-  poster: 'https://img.youtube.com/vi/auhrVUGaGYA/maxresdefault.jpg',
+  id: 'hPLYLtJGmOI',
+  poster: 'https://img.youtube.com/vi/hPLYLtJGmOI/maxresdefault.jpg',
   titulo: 'Ekosolv corporate video',
   duracion: '',
   transcripcion: '',
