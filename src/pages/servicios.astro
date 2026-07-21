@@ -95,7 +95,7 @@ const icons: Record<string, string> = {
   <section class="section wrap">
     <div class="process reveal">
       {lines.map(s => (
-        <div class={`process-row ${s.accent ? s.accent + '-row' : ''}`} style="grid-template-columns: 72px 84px 220px 1fr 150px">
+        <div class={`process-row process-row-thumb ${s.accent ? s.accent + '-row' : ''}`}>
           <div class={`svc-thumb ${s.thumb}`} aria-hidden="true">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" set:html={icons[s.icon]} />
           </div>
