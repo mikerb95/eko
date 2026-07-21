@@ -2,7 +2,8 @@
 import LayoutEn from '../../layouts/LayoutEn.astro'
 import normativas from '../../data/normativas.json'
 import { FOUNDED_YEAR, stats, tonnesManaged, yearsActive } from '../../lib/brand'
-import { clientesVisibles, mostrarPlaceholders, testimoniosVisibles } from '../../lib/credenciales'
+import { clientesVisibles, mostrarPlaceholders, testimoniosVisibles, videoVisible } from '../../lib/credenciales'
+import VideoFacade from '../../components/VideoFacade.astro'
 import SiteFooter from '../../components/SiteFooter.astro'
 
 // English copy of the same three entries surfaced on /en/regulations
@@ -11,6 +12,8 @@ const radar = [
   { code: 'LEY 1672 · 2013', title: 'WEEE Law', tags: ['EPR', 'Legal framework'] },
   { code: 'RES 1407 · 2018', title: 'Environmental management plan for packaging waste', tags: ['Packaging', 'EPR', 'Marketer'] },
 ]
+
+const video = videoVisible('en')
 ---
 
 <LayoutEn title="Ekosolv — Environmental Consulting · ANLA · ESG · Circular Economy" activePath="/en">

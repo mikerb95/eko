@@ -2,13 +2,16 @@
 import Layout from '../layouts/Layout.astro'
 import normativas from '../data/normativas.json'
 import { FOUNDED_YEAR, stats, tonnesManaged, yearsActive } from '../lib/brand'
-import { clientesVisibles, mostrarPlaceholders, testimoniosVisibles } from '../lib/credenciales'
+import { clientesVisibles, mostrarPlaceholders, testimoniosVisibles, videoVisible } from '../lib/credenciales'
+import VideoFacade from '../components/VideoFacade.astro'
 import SiteFooter from '../components/SiteFooter.astro'
 
 const RADAR_CODES = ['RES 1297 · 2010', 'LEY 1672 · 2013', 'RES 1407 · 2018']
 const radar = RADAR_CODES
   .map((code) => normativas.find((n) => n.code === code))
   .filter(Boolean)
+
+const video = videoVisible('es')
 ---
 
 <Layout title="Ekosolv — Consultoría ambiental · ANLA · ESG · Economía circular" activePath="/">
