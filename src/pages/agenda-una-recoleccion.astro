@@ -82,9 +82,26 @@ import Layout from '../layouts/Layout.astro'
             <input type="text" name="postal_code" placeholder="110111" />
           </div>
         </div>
+        <div class="form-row">
+          <div class="field">
+            <label>Tipo de residuo</label>
+            <select name="waste_type">
+              <option value="">Selecciona…</option>
+              <option value="raee_computo">RAEE · Cómputo y periféricos</option>
+              <option value="raee_telco">RAEE · Telecomunicaciones</option>
+              <option value="raee_datacenter">RAEE · Infraestructura de data center</option>
+              <option value="baterias">Baterías y pilas</option>
+              <option value="otro">Otro</option>
+            </select>
+          </div>
+          <div class="field">
+            <label>Cantidad estimada</label>
+            <input type="text" name="estimated_quantity" placeholder="Ej. 40 equipos / 300 kg" />
+          </div>
+        </div>
         <div class="field">
           <label>Mensaje</label>
-          <textarea name="message" placeholder="Tipo de equipos, cantidad aproximada y fecha tentativa de recolección…"></textarea>
+          <textarea name="message" placeholder="Detalles adicionales y fecha tentativa de recolección…"></textarea>
         </div>
         <input type="text" name="website" tabindex="-1" autocomplete="off" aria-hidden="true" style="position:absolute; left:-9999px; height:0; width:0; opacity:0" />
         <p id="recoleccion-error" style="display:none; color:#b04a2e; margin:0"></p>
