@@ -120,13 +120,41 @@ El titular del band pasó de *"Trece años acompañando la industria tech"* (que
 
 Tienes los tres activos. Esta fase es la que más mueve la aguja en venta B2B y en licitaciones, donde el jurídico del cliente filtra por documentos verificables.
 
-**Tareas**
-- [ ] 3.1 Publicar licencias/autorizaciones en `public/docs/` y enlazarlas desde el footer (`Legal`) y desde `quienes-somos`
-- [ ] 3.2 Página o bloque "Licencias y autorizaciones" con número de resolución, entidad y vigencia — no solo el PDF suelto
-- [ ] 3.3 Sección de testimonios reales con nombre, cargo y empresa
-- [ ] 3.4 Reponer logos de clientes reales (los eliminados en 0.2)
-- [ ] 3.5 Completar los enlaces legales del footer, hoy sin `href`: *Política de tratamiento*, *Términos de servicio*, *Código de ética*
-- [ ] 3.6 Réplica en `/en`
+**Tareas** — 🟡 ESTRUCTURA LISTA, PENDIENTE DE DATOS
+- [x] 3.1 Estructura de datos y convención `public/docs/` definida
+- [x] 3.2 Página `/licencias` + `/en/licenses` con resolución, entidad, vigencia y PDF
+- [x] 3.3 Sección de testimonios en la home (ES y EN)
+- [x] 3.4 Sección de clientes repuesta, ahora alimentada por datos
+- [ ] 3.5 Enlaces legales del footer — **no ejecutado**, ver bloqueo abajo
+- [x] 3.6 Réplica en `/en`
+
+### El guardarraíl: `src/lib/credenciales.ts`
+
+Los placeholders quedan puestos y listos para rellenar, pero **no pueden llegar a producción**. Cada entrada lleva una bandera (`publicada`, `autorizado`) que por defecto es `false`, y las páginas consumen solo los selectores (`licenciasVisibles()`, `testimoniosVisibles()`, `clientesVisibles()`), nunca los arrays crudos.
+
+- **En desarrollo** (`import.meta.env.DEV`): se ven los placeholders con un aviso naranja `.dev-warning` que dice qué falta.
+- **En producción**: sin datos reales, las secciones **no se renderizan en absoluto**.
+
+Verificado en el build: 0 apariciones de `PENDIENTE` y 0 bloques `dev-warning` en `.vercel/output/static`. Verificado también a la inversa con el servidor de desarrollo: allí sí aparecen.
+
+Esto responde a la lección de la Fase 0 — los seis logos falsos llevaban meses publicados. Ahora eso es estructuralmente imposible.
+
+**Para activar cada cosa:**
+| Qué | Dónde | Requisito |
+|---|---|---|
+| Licencia | `licencias[]` → `publicada: true` | PDF en `public/docs/` |
+| Testimonio | `testimonios[]` → `autorizado: true` | Autorización escrita del cliente |
+| Logo de cliente | `clientes[]` → `autorizado: true` | Autorización de uso de marca |
+
+La página `/licencias` **ya es útil sin datos**: muestra un estado vacío honesto ("Estamos actualizando esta sección") con CTA a solicitar los documentos, en vez de una página rota.
+
+### 🔴 Bloqueo encontrado en 3.5
+
+El footer está **duplicado a mano en 18+ páginas** (`index`, `casos`, `servicios`, `contacto`, `normativas`, `quienes-somos`, `oportunidades2630`, `blog/[slug]`… y sus equivalentes en `/en`). Existe un `src/components/Footer.astro` **que no usa nadie**.
+
+Añadir los enlaces legales significa editar el mismo bloque 18 veces, y lo mismo pasará con cualquier cambio futuro de footer. **Recomiendo refactorizar a componente único antes de tocar 3.5**, no después.
+
+Además, 3.5 depende de la pregunta **3.c**: los tres documentos legales (*Política de tratamiento*, *Términos de servicio*, *Código de ética*) no existen redactados. No se enlazaron a páginas vacías: un enlace legal roto es peor que un texto sin enlace, sobre todo en la Política de Tratamiento de Datos, que en Colombia es una obligación de la Ley 1581 de 2012.
 
 **Preguntas abiertas**
 - 3.a ¿Tenemos **autorización escrita** de cada cliente para usar su marca y su cita? Sin esto, 3.3 y 3.4 no salen.
