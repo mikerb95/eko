@@ -40,3 +40,12 @@ export function yearsSpelled(lang: 'es' | 'en' = 'es'): string {
   const table = lang === 'en' ? SPELLED_EN : SPELLED_ES
   return table[yearsActive] ?? String(yearsActive)
 }
+
+/**
+ * "1.000+" / "1,000+". El separador de miles cambia entre es-CO y en —
+ * escribirlo a mano en cada plantilla es cómo se cuelan las erratas.
+ */
+export function tonnesManaged(lang: 'es' | 'en' = 'es'): string {
+  const locale = lang === 'en' ? 'en-US' : 'es-CO'
+  return `${stats.tonnesManaged.toLocaleString(locale)}+`
+}
