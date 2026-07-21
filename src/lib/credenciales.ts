@@ -183,21 +183,21 @@ export interface Video {
 export const videoEs: Video = {
   proveedor: 'youtube',
   id: 'auhrVUGaGYA',
-  poster: '',
-  titulo: 'PENDIENTE — título del vídeo corporativo',
-  duracion: '—',
-  transcripcion: 'PENDIENTE — transcripción completa del audio.',
-  publicado: false,
+  poster: 'https://img.youtube.com/vi/auhrVUGaGYA/maxresdefault.jpg',
+  titulo: 'Video institucional Ekosolv',
+  duracion: '',
+  transcripcion: '',
+  publicado: true,
 }
 
 export const videoEn: Video = {
   proveedor: 'youtube',
   id: 'auhrVUGaGYA',
-  poster: '',
-  titulo: 'PENDING — corporate video title',
-  duracion: '—',
-  transcripcion: 'PENDING — full transcript of the audio.',
-  publicado: false,
+  poster: 'https://img.youtube.com/vi/auhrVUGaGYA/maxresdefault.jpg',
+  titulo: 'Ekosolv corporate video',
+  duracion: '',
+  transcripcion: '',
+  publicado: true,
 }
 
 export const videoVisible = (lang: 'es' | 'en' = 'es'): Video | null => {
