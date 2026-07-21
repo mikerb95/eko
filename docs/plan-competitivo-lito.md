@@ -64,10 +64,16 @@ Se encontró además que `/en/about` tenía **"12 years" escrito a mano** y ya d
 5. **Respuesta en días, no en semanas.** *(PENDIENTE-DATO: definir el compromiso real de tiempo — es el diferenciador más creíble frente a un competidor de 20 años y estructura pesada)*
 
 **Tareas**
-- [ ] 1.1 Validar y corregir los 5 beneficios con el equipo
-- [ ] 1.2 Maquetar la sección reutilizando los estilos de tarjeta existentes (sin CSS nuevo si se puede)
-- [ ] 1.3 Réplica en `src/pages/en/index.astro`
-- [ ] 1.4 Renumerar los `eyebrow` de las secciones siguientes
+- [ ] 1.1 **Validar y corregir los 5 beneficios con el equipo** ← único punto pendiente
+- [x] 1.2 Maquetar la sección reutilizando los estilos de tarjeta existentes
+- [x] 1.3 Réplica en `src/pages/en/index.astro`
+- [x] 1.4 Numeración de secciones coherente (01, 02, 03)
+
+**Implementado.** Sección `Por qué Ekosolv · 03` entre EKORUTA y "Por los números", en ES y EN. Reutiliza la rejilla `.services` de 12 columnas con layout 3+2; el CSS nuevo se limitó a tres reglas en `global.css`:
+- `.svc.half` (span 6) para las dos tarjetas inferiores
+- `.svc.static` — quita `cursor: pointer`, que en tarjetas informativas simulaba falsamente que se puede hacer clic
+
+El copy está marcado **en el propio código** con comentarios `BORRADORES SIN VALIDAR` y `PENDIENTE-DATO 1.a`, para que nadie lo publique como definitivo por descuido.
 
 **Preguntas abiertas**
 - 1.a ¿Cuál es el compromiso real de tiempo de respuesta? Sin dato, el beneficio 5 se cae.
