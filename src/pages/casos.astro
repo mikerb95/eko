@@ -14,14 +14,38 @@ const cases = casosVisibles()
       <div class="l">Selección · 2024 – 2026</div>
     </div>
     <h1 class="display reveal" style="margin-top:40px">
-      Expedientes<br><em>reales</em>, resultados medibles.
+      Cómo <em>trabajamos</em>,<br>caso por caso.
     </h1>
     <p class="lede reveal" style="margin-top:32px; max-width:56ch">
-      Una muestra de los mandatos ejecutados en los últimos 24 meses. Los nombres de los clientes se mantienen bajo acuerdo de confidencialidad.
+      Mandatos ejecutados con clientes reales. Los nombres se mantienen bajo acuerdo de confidencialidad; las cifras son las que podemos sustentar.
     </p>
   </section>
 
   <section class="section wrap">
+    {mostrarPlaceholders && (
+      <div class="dev-warning">
+        ⚠ PLACEHOLDERS — visibles solo en desarrollo. Los 6 casos anteriores eran
+        inventados. Rellena `casos` y `agregadoCasos` en src/lib/credenciales.ts
+        con mandatos reales y pon `verificado: true`.
+      </div>
+    )}
+
+    {cases.length === 0 && (
+      <div class="reveal" style="border-top:1px solid var(--line); padding-top:40px">
+        <h2 style="max-width:22ch">Preparando esta <em>sección</em>.</h2>
+        <p class="lede" style="margin-top:20px; max-width:56ch">
+          Estamos documentando nuestros mandatos en un formato que podamos
+          sustentar sin comprometer la confidencialidad de los clientes. Si
+          quiere referencias para un proceso de contratación, se las damos
+          directamente.
+        </p>
+        <a href="/contacto" class="doc-link" style="margin-top:28px">
+          Pedir referencias
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
+        </a>
+      </div>
+    )}
+
     <div class="cases reveal">
       {cases.map(c => (
         <article class={`case ${c.cls}`}>
