@@ -1001,3 +1001,50 @@ body.nav-open .whatsapp-fab { opacity: 0; pointer-events: none; }
   .whatsapp-fab { bottom: 20px; right: 20px; width: 50px; height: 50px; }
   .whatsapp-fab svg { width: 24px; height: 24px; }
 }
+
+/* ===== Vídeo con fachada ===== */
+.vid { border-radius: var(--r-lg); overflow: hidden; }
+.vid-frame, .vid-facade {
+  display: block; width: 100%; aspect-ratio: 16 / 9;
+  border: 0; border-radius: var(--r-lg);
+}
+.vid-facade {
+  position: relative; cursor: pointer; padding: 0;
+  background-color: var(--ink); background-size: cover; background-position: center;
+  display: grid; place-items: center;
+}
+/* Velo para que el botón y el título se lean sobre cualquier póster. */
+.vid-facade::after {
+  content: ""; position: absolute; inset: 0; border-radius: var(--r-lg);
+  background: linear-gradient(to top, color-mix(in oklab, var(--ink) 75%, transparent) 0%, transparent 55%);
+  transition: background .3s ease;
+}
+.vid-facade:hover::after { background: linear-gradient(to top, color-mix(in oklab, var(--ink) 85%, transparent) 0%, color-mix(in oklab, var(--ink) 20%, transparent) 100%); }
+.vid-play {
+  position: relative; z-index: 1;
+  width: 76px; height: 76px; border-radius: 50%;
+  background: var(--aqua); color: var(--ink);
+  display: grid; place-items: center;
+  transition: transform .3s cubic-bezier(.2,.7,.2,1);
+}
+.vid-facade:hover .vid-play { transform: scale(1.08); }
+.vid-meta {
+  position: absolute; z-index: 1; left: 0; right: 0; bottom: 0;
+  display: flex; justify-content: space-between; align-items: flex-end; gap: 24px;
+  padding: clamp(20px, 3vw, 32px); text-align: left;
+}
+.vid-title {
+  font-family: var(--font-display); font-size: clamp(20px, 2.4vw, 30px);
+  letter-spacing: -0.02em; line-height: 1.1; color: var(--paper);
+}
+.vid-dur {
+  font-family: var(--font-mono); font-size: 12.5px; letter-spacing: 0.08em;
+  color: color-mix(in oklab, #fff 70%, transparent); flex-shrink: 0;
+}
+.vid-transcript { margin-top: 20px; border-top: 1px solid var(--line); padding-top: 16px; }
+.vid-transcript summary {
+  cursor: pointer; font-family: var(--font-mono); font-size: 12.5px;
+  letter-spacing: 0.08em; text-transform: uppercase; color: var(--mute);
+}
+.vid-transcript summary:hover { color: var(--ink); }
+.vid-transcript p { margin-top: 16px; color: var(--ink-2); font-size: 16px; line-height: 1.6; max-width: 70ch; }
