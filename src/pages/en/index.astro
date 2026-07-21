@@ -1,5 +1,11 @@
 ---
 import LayoutEn from '../../layouts/LayoutEn.astro'
+import normativas from '../../data/normativas.json'
+
+const RADAR_CODES = ['RES 1297 · 2010', 'LEY 1672 · 2013', 'RES 1407 · 2018']
+const radar = RADAR_CODES
+  .map((code) => normativas.find((n) => n.code === code))
+  .filter(Boolean)
 ---
 
 <LayoutEn title="Ekosolv — Environmental Consulting · ANLA · ESG · Circular Economy" activePath="/en">
