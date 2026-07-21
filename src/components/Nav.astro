@@ -244,7 +244,20 @@ const arrow = 'M5 12h14M13 6l6 6-6 6'
       document.body.style.top = `-${scrollY}px`
       document.body.style.width = '100%'
       sheet.querySelector<HTMLElement>('a')?.focus()
+      // Las medidas sólo son fiables una vez el sheet está en el flujo.
+      requestAnimationFrame(updateMoreBelow)
     }
+
+    // Indica que queda contenido por debajo del pliegue; se apaga al llegar al
+    // final del scroll o si la lista entra entera.
+    const scroller = sheet.querySelector<HTMLElement>('.nav-sheet-scroll')
+    function updateMoreBelow() {
+      if (!scroller) return
+      const remaining = scroller.scrollHeight - scroller.scrollTop - scroller.clientHeight
+      sheet.classList.toggle('more-below', remaining > 4)
+    }
+    scroller?.addEventListener('scroll', updateMoreBelow, { passive: true })
+    window.addEventListener('resize', updateMoreBelow)
 
     const closeSheet = (restoreFocus = true) => {
       if (!isSheetOpen()) return
