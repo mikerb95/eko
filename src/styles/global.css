@@ -942,7 +942,21 @@ body.nav-open .whatsapp-fab { opacity: 0; pointer-events: none; }
   border-top: 1px solid var(--line);
   background: color-mix(in oklab, var(--paper) 92%, transparent);
   display: flex; flex-direction: column; gap: 14px;
+  position: relative;
 }
+/* Degradado que avisa de que hay más contenido arriba del pie.
+   Se monta sobre el área de scroll y se desvanece al llegar al final. */
+.nav-sheet-foot::before {
+  content: "";
+  position: absolute; left: 0; right: 0; bottom: 100%; height: 44px;
+  pointer-events: none;
+  background: linear-gradient(to top,
+    color-mix(in oklab, var(--paper) 92%, transparent),
+    transparent);
+  opacity: 0;
+  transition: opacity .25s ease;
+}
+.nav-sheet.more-below .nav-sheet-foot::before { opacity: 1; }
 .nav-sheet-cta {
   display: inline-flex; align-items: center; justify-content: center; gap: 10px;
   width: 100%; min-height: 52px; padding: 14px 24px;
