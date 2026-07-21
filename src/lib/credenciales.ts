@@ -106,6 +106,51 @@ export const clientes: Cliente[] = [
   { nombre: 'PENDIENTE — cliente 6', logo: '', autorizado: false },
 ]
 
+// ── VÍDEO CORPORATIVO (Fase 4) ──────────────────────────────────────────
+
+export interface Video {
+  /** 'youtube' | 'vimeo' | 'file' (mp4 propio en /public/video/) */
+  proveedor: 'youtube' | 'vimeo' | 'file'
+  /** ID de YouTube/Vimeo, o ruta al archivo si proveedor === 'file' */
+  id: string
+  /** Imagen de portada en /public/images/. Obligatoria: es lo que se ve antes del clic. */
+  poster: string
+  /** Título accesible del reproductor */
+  titulo: string
+  /** Duración legible: "1:24" */
+  duracion: string
+  /** Transcripción en texto. Suma SEO y accesibilidad; se vuelca a llms.txt. */
+  transcripcion: string
+  /** ⚠️ Solo `true` cuando el vídeo y su póster existen de verdad. */
+  publicado: boolean
+}
+
+export const videoEs: Video = {
+  proveedor: 'youtube',
+  id: '',
+  poster: '',
+  titulo: 'PENDIENTE — título del vídeo corporativo',
+  duracion: '—',
+  transcripcion: 'PENDIENTE — transcripción completa del audio.',
+  publicado: false,
+}
+
+export const videoEn: Video = {
+  proveedor: 'youtube',
+  id: '',
+  poster: '',
+  titulo: 'PENDING — corporate video title',
+  duracion: '—',
+  transcripcion: 'PENDING — full transcript of the audio.',
+  publicado: false,
+}
+
+export const videoVisible = (lang: 'es' | 'en' = 'es'): Video | null => {
+  const v = lang === 'en' ? videoEn : videoEs
+  if (v.publicado) return v
+  return mostrarPlaceholders ? v : null
+}
+
 // ── SELECTORES ──────────────────────────────────────────────────────────
 // Las páginas SIEMPRE deben consumir estas funciones, nunca los arrays
 // crudos: son las que garantizan que un placeholder no llegue a producción.
