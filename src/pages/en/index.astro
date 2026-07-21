@@ -299,11 +299,65 @@ const radar = [
   </section>
 
   {/*
-    "Clients" section removed: the six logos were placeholders from the original
-    template (Nodex, Andina.tech, Kairos, Ferra, Origen, Meridian), not real clients.
-    To be restored in Phase 3 of docs/plan-competitivo-lito.md with real clients,
-    once written trademark-use authorisation is in place.
+    Phase 3. Testimonials and clients come from src/lib/credenciales.ts, which only
+    returns content explicitly marked as authorised. In production, with no real data
+    these sections are NOT rendered — placeholders never reach the live site.
   */}
+  {testimoniosVisibles().length > 0 && (
+    <section class="section wrap">
+      <div class="section-head reveal">
+        <div>
+          <div class="eyebrow">Testimonials · 04</div>
+          <h2>What those who already<br><em>complied</em> have to say.</h2>
+        </div>
+        <div class="meta">Quotes published with each client's written authorisation.</div>
+      </div>
+
+      {mostrarPlaceholders && (
+        <div class="dev-warning">
+          ⚠ PLACEHOLDERS — development only. Fill in `testimonios` in
+          src/lib/credenciales.ts and set `autorizado: true` (written authorisation required).
+        </div>
+      )}
+
+      <div class="quotes reveal">
+        {testimoniosVisibles().map((t) => (
+          <figure class="quote">
+            <blockquote>{t.quote}</blockquote>
+            <figcaption class="who">
+              <strong>{t.autor}</strong>
+              <span>{t.cargo} · {t.empresa}</span>
+            </figcaption>
+          </figure>
+        ))}
+      </div>
+    </section>
+  )}
+
+  {clientesVisibles().length > 0 && (
+    <section class="section wrap">
+      <div class="section-head reveal">
+        <div>
+          <div class="eyebrow">Clients · 05</div>
+          <h2>Companies that have <em>trusted</em><br>us.</h2>
+        </div>
+        <div class="meta">We work with importers, producers, distributors, and tech infrastructure operators in Colombia.</div>
+      </div>
+
+      {mostrarPlaceholders && (
+        <div class="dev-warning">
+          ⚠ PLACEHOLDERS — development only. Fill in `clientes` in
+          src/lib/credenciales.ts and set `autorizado: true` (trademark-use authorisation required).
+        </div>
+      )}
+
+      <div class="logos reveal">
+        {clientesVisibles().map((c) => (
+          <div>{c.logo ? <img src={c.logo} alt={c.nombre} /> : c.nombre}</div>
+        ))}
+      </div>
+    </section>
+  )}
 
   <footer class="foot">
     <div class="wrap">
