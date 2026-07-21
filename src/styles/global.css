@@ -105,28 +105,99 @@ img, svg { display: block; max-width: 100%; }
   content: ""; position: absolute; inset: 6px; border-radius: 50%;
   background: radial-gradient(circle at 70% 70%, transparent 40%, color-mix(in oklab, var(--ink) 25%, transparent) 100%);
 }
-.nav-links { display: flex; gap: 6px; align-items: center; }
-.nav-links a {
-  padding: 10px 14px; border-radius: 999px; font-size: 15.5px;
-  color: var(--ink-2); transition: background .2s ease, color .2s ease;
+/* --- Nivel 1: navegación --- */
+.nav-links { display: flex; gap: 2px; align-items: center; }
+.nav-link {
+  display: inline-flex; align-items: center; gap: 6px;
+  padding: 9px 14px; border-radius: 999px;
+  font-size: 15.5px; line-height: 1; white-space: nowrap;
+  color: var(--ink-2);
+  transition: background .2s ease, color .2s ease;
 }
-.nav-links a:hover { background: color-mix(in oklab, var(--ink) 5%, transparent); }
-.nav-links a.active { background: var(--ink); color: var(--paper); }
+.nav-link:hover { background: color-mix(in oklab, var(--ink) 5%, transparent); color: var(--ink); }
+.nav-link.active { background: var(--ink); color: var(--paper); }
+.nav-chevron { transition: transform .25s cubic-bezier(.2,.7,.2,1); opacity: .55; }
+.nav-group.open .nav-chevron { transform: rotate(180deg); opacity: 1; }
+
+/* --- Panel de Unidades --- */
+.nav-group { position: relative; }
+.nav-panel {
+  position: absolute; top: calc(100% + 14px); left: 50%;
+  width: min(640px, calc(100vw - var(--pad) * 2));
+  transform: translateX(-50%) translateY(-6px);
+  opacity: 0; pointer-events: none;
+  background: var(--paper-warm);
+  border: 1px solid var(--line);
+  border-radius: var(--r-lg);
+  box-shadow: 0 32px 64px -32px rgba(10, 20, 30, .38), 0 2px 8px -4px rgba(10, 20, 30, .12);
+  padding: 10px;
+  transition: opacity .18s ease, transform .18s cubic-bezier(.2,.7,.2,1);
+}
+.nav-group.open .nav-panel {
+  opacity: 1; pointer-events: auto;
+  transform: translateX(-50%) translateY(0);
+}
+/* Puente invisible: el cursor cruza el hueco sin que el panel se cierre. */
+.nav-panel::before {
+  content: ""; position: absolute; left: 0; right: 0; top: -14px; height: 14px;
+}
+.nav-panel-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 4px; }
+.nav-unit {
+  display: flex; flex-direction: column; gap: 5px;
+  padding: 16px 16px 18px;
+  border-radius: var(--r-md);
+  border-left: 2px solid transparent;
+  transition: background .2s ease, border-color .2s ease;
+}
+.nav-unit:hover, .nav-unit.active { background: #fff; }
+.nav-unit[data-accent="forest"]:hover, .nav-unit[data-accent="forest"].active { border-left-color: var(--forest); }
+.nav-unit[data-accent="deep"]:hover,   .nav-unit[data-accent="deep"].active   { border-left-color: var(--deep); }
+.nav-unit[data-accent="clay"]:hover,   .nav-unit[data-accent="clay"].active   { border-left-color: var(--clay-2); }
+.nav-unit[data-accent="aqua"]:hover,   .nav-unit[data-accent="aqua"].active   { border-left-color: var(--aqua); }
+.nav-unit-name {
+  font-size: 16px; letter-spacing: -0.015em; color: var(--ink);
+}
+.nav-unit-desc {
+  font-size: 13.5px; line-height: 1.4; color: var(--mute);
+  text-wrap: pretty;
+}
+.nav-panel-foot {
+  display: flex; align-items: center; gap: 8px;
+  margin-top: 6px; padding: 14px 16px 4px;
+  border-top: 1px solid var(--line);
+  font-family: var(--font-mono); font-size: 12px;
+  letter-spacing: 0.06em; text-transform: uppercase; color: var(--ink-2);
+  transition: color .2s ease;
+}
+.nav-panel-foot:hover { color: var(--forest); }
+.nav-panel-foot svg { transition: transform .25s cubic-bezier(.2,.7,.2,1); }
+.nav-panel-foot:hover svg { transform: translateX(3px); }
+
+/* --- Nivel 2/3: utilidades y acción --- */
+.nav-right { display: flex; align-items: center; gap: 12px; }
+.nav-lang {
+  font-family: var(--font-mono); font-size: 11px;
+  letter-spacing: 0.06em; text-transform: uppercase;
+  padding: 6px 8px; border-radius: 6px;
+  color: var(--ink-2); opacity: .55;
+  transition: opacity .2s ease, background .2s ease;
+}
+.nav-lang:hover { opacity: 1; background: color-mix(in oklab, var(--ink) 5%, transparent); }
 .nav-cta {
   display: inline-flex; align-items: center; gap: 8px;
   padding: 10px 16px 10px 18px; border-radius: 999px;
-  background: var(--deep); color: #fff; font-size: 15px;
+  background: var(--deep); color: #fff; font-size: 15px; white-space: nowrap;
   transition: transform .2s ease, background .2s ease;
 }
 .nav-cta:hover { background: var(--deep-2); transform: translateY(-1px); }
 .nav-cta svg { transition: transform .2s ease; }
 .nav-cta:hover svg { transform: translateX(3px); }
-.nav-login {
-  font-size: 14px; color: var(--ink-2); padding: 8px 12px;
-  border-radius: 999px; border: 1px solid color-mix(in oklab, var(--ink) 15%, transparent);
-  transition: background .2s ease, color .2s ease;
+
+/* Foco visible y consistente en toda la barra. */
+.nav :is(a, button):focus-visible,
+.nav-sheet :is(a, button):focus-visible {
+  outline: 2px solid var(--forest); outline-offset: 3px; border-radius: 999px;
 }
-.nav-login:hover { background: color-mix(in oklab, var(--ink) 5%, transparent); color: var(--ink); }
 
 /* ===== Page ===== */
 main { position: relative; z-index: 2; }
