@@ -67,7 +67,25 @@ Una empresa que gestiona RAEE y residuos peligrosos vive de la credibilidad norm
 - **"Wix es más barato/fácil de manejar nosotros mismos."** → Reconocer el punto, pero señalar el techo de Wix en SEO técnico, velocidad y que no pueden controlar bots de IA ni tener panel propio con datos reales (licencias, testimonios) versionados y auditables.
 - **"¿Por qué confiar en un desarrollador externo/nuevo?"** → Mostrar la demo ya construida como prueba de trabajo, no una promesa.
 
-## 5. Pendiente / a verificar antes de la llamada
-- [ ] Confirmar con Mike si el nuevo sitio (este repo) ya tiene resueltas las brechas mencionadas (cifras reales, certificaciones, blog activo) antes de prometerlas en la llamada.
+## 5. Estado real del sitio nuevo vs. lo que promete el pitch (verificado 2026-07-21)
+
+Revisé el repo contra las brechas que se le van a señalar a Ekosolv. Resultado mixto — hay que ajustar el guion antes de la llamada:
+
+### Resuelto de verdad
+- **`quienes-somos.astro`**: trayectoria dinámica (`yearsActive`, no hardcodeada), equipo con nombres reales, línea de tiempo con hitos verificables (ANLA REP+, COP16, Ministerio de Ambiente, Codechocó) — esto sí es más fuerte que el sitio actual y sí se puede mostrar en la demo.
+- **`licencias.astro` / `src/lib/credenciales.ts`**: bien diseñado — placeholders con bandera `publicada`/`autorizado`, solo visibles en `DEV` con aviso, y fallback honesto en producción ("Estamos actualizando esta sección... se las enviamos el mismo día") en vez de mostrar datos falsos. El comentario en el propio archivo dice explícitamente que esto se hizo *porque antes hubo 6 logos de clientes inventados publicados por meses* — o sea, ya hay precedente de este error en el proyecto.
+  - **Pero ojo:** ahora mismo todos los campos están en `PENDIENTE` — no hay ninguna licencia real cargada todavía. No se puede prometer en la llamada "mostramos sus licencias" sin antes cargar los PDFs reales.
+
+### ⚠️ Riesgo real — no mostrar así en la demo
+- **`casos.astro` (y su espejo `en/cases.astro`)**: a diferencia de `licencias.astro`, **no tiene ninguna guarda**. Es un arreglo hardcodeado de 6 "casos de éxito" con cifras inventadas y presentado como real: *"Expedientes reales, resultados medibles"*, *"$480M riesgo sancionatorio evitado"*, *"218 tiendas"*, *"$2.1B riesgo sancionatorio mitigado"*, con la excusa de "nombres bajo acuerdo de confidencialidad" para justificar que no hay cliente identificable. Esto es exactamente el mismo patrón de dato inventado que ya causó problema antes con los logos (ver nota en `credenciales.ts`), pero coló en una página nueva sin el mismo control.
+  - **Riesgo:** si esto se muestra a Ekosolv (o a cualquier prospecto) como "así se ve su sitio nuevo", pueden pedir ver esos casos reales o notar que son de fantasía — daña la credibilidad justo en el argumento central del pitch (que ellos sí necesitan mostrar prueba real).
+  - **Recomendación:** aplicarle a `casos.astro` la misma guarda que ya existe en `credenciales.ts` (placeholders solo en DEV, fallback honesto en producción) antes de usar este sitio en cualquier demo comercial.
+
+- **`blog/index.astro`**: el texto dice *"{posts.length} artículos · actualizado semanalmente"* — pero los posts en `src/data/blog-posts.json` son **el mismo contenido copiado del blog actual de Ekosolv**, con la misma última fecha (26 ago 2025, ~11 meses de antigüedad) que se identificó como debilidad del sitio en vivo. La etiqueta "actualizado semanalmente" es una afirmación falsa dado el dato real. No se resolvió la brecha de frescura de contenido — solo se migró el mismo contenido estancado con una etiqueta que dice lo contrario.
+
+## 6. Pendiente / a verificar antes de la llamada
+- [ ] **Prioridad alta:** aplicar guarda de "solo datos reales" a `casos.astro`/`en/cases.astro` (mismo patrón que `credenciales.ts`) antes de mostrar el sitio a cualquier prospecto.
+- [ ] Corregir o quitar "actualizado semanalmente" en `blog/index.astro` hasta que haya cadencia real de publicación.
+- [ ] Cargar al menos 1-2 licencias reales en `credenciales.ts` (con PDF y `publicada: true`) para poder mostrar la sección funcionando, no solo el fallback.
 - [ ] Decidir si se ofrece como "rediseño completo" o "auditoría + propuesta" como puerta de entrada más barata de aceptar.
-- [ ] Preparar 2-3 capturas de pantalla side-by-side (sitio actual vs. nuevo) para la demo.
+- [ ] Preparar 2-3 capturas de pantalla side-by-side (sitio actual vs. nuevo) para la demo — usando `quienes-somos` como la pieza más fuerte, no `casos`.
