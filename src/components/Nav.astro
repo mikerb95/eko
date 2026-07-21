@@ -236,6 +236,9 @@ const arrow = 'M5 12h14M13 6l6 6-6 6'
         sheet.classList.add('open')
       })
       burger.setAttribute('aria-expanded', 'true')
+      // Marca el estado abierto para que el FAB de WhatsApp (z-index 999) no
+      // quede flotando sobre el CTA del pie del panel.
+      document.body.classList.add('nav-open')
       // position:fixed en vez de overflow:hidden — iOS no salta al top al cerrar.
       document.body.style.position = 'fixed'
       document.body.style.top = `-${scrollY}px`
