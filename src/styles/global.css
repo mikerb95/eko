@@ -816,21 +816,22 @@ main:focus { outline: none; }
 body.nav-open .whatsapp-fab { opacity: 0; pointer-events: none; }
 
 /* ===== Responsive nav ===== */
-/* Punto de corte a 1000px: por debajo, 6 links + panel + CTA se aprietan. */
-@media (max-width: 999px) {
-  .nav-links { display: none; }
-  .nav-cta { display: none; }
-  .nav-lang { display: none; }
-  .nav-burger { display: flex; }
-}
-
-/* Burger */
+/* Burger — la regla base va ANTES de la media query: misma especificidad,
+   así que si fuera después anularía el `display: flex` del breakpoint. */
 .nav-burger {
   display: none;
   flex-direction: column; justify-content: center; align-items: center;
   gap: 5px; width: 44px; height: 44px; border-radius: 8px;
   background: transparent; border: none; cursor: pointer; padding: 8px;
   position: relative; z-index: 60;
+}
+
+/* Punto de corte a 1000px: por debajo, 6 links + panel + CTA se aprietan. */
+@media (max-width: 999px) {
+  .nav-links { display: none; }
+  .nav-cta { display: none; }
+  .nav-lang { display: none; }
+  .nav-burger { display: flex; }
 }
 .nav-burger span {
   display: block; width: 22px; height: 1.5px;
