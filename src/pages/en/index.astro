@@ -29,14 +29,6 @@ const radar = [
       grow with <span class="thin">purpose</span>.
     </h1>
 
-    <div class="hero-visual reveal">
-      <div class="label"><span class="pulse"></span>EKORUTA active · environmental and ESG strategy in progress</div>
-      <div class="coords">
-        04°42′N · 74°03′W<br>
-        <strong>Bogotá — Operations</strong>
-      </div>
-    </div>
-
     <div class="hero-foot reveal">
       <p class="lede">
         We support importers, producers, and tech operators in Colombia
@@ -54,6 +46,31 @@ const radar = [
             <path d="M5 12h14M13 6l6 6-6 6"/>
           </svg>
         </div>
+      </a>
+    </div>
+
+    <div class="hero-visual reveal">
+      <div class="hv-head">
+        <div class="label"><span class="pulse"></span>Regulatory radar · framework in force in Colombia</div>
+        <div class="coords">
+          04°42′N · 74°03′W<br>
+          <strong>Bogotá — Operations</strong>
+        </div>
+      </div>
+      <div class="hv-grid">
+        {radar.map((n) => (
+          <a class="hv-item" href="/en/regulations">
+            <div class="hv-code">{n.code}</div>
+            <div class="hv-title">{n.title}</div>
+            <div class="hv-tags">{n.tags.slice(0, 3).join(' · ')}</div>
+          </a>
+        ))}
+      </div>
+      <a class="hv-foot" href="/en/regulations">
+        See the {normativas.length} regulations we audit
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M5 12h14M13 6l6 6-6 6"/>
+        </svg>
       </a>
     </div>
 
