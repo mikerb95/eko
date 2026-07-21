@@ -130,7 +130,6 @@ main { position: relative; z-index: 2; }
   color: var(--mute); text-transform: uppercase;
 }
 .eyebrow::before { content: ""; width: 22px; height: 1px; background: var(--mute); }
-.hero-title.eyebrow,
 .hero > .eyebrow { display: flex; margin-bottom: clamp(20px, 3vw, 32px); }
 
 /* Display headings */
