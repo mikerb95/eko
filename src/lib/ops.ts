@@ -40,6 +40,8 @@ export interface Order {
   address2: string
   city: string
   postal_code: string
+  waste_type: string
+  estimated_quantity: string
   message: string
   source: string
   assigned_to: string
