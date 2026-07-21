@@ -192,11 +192,34 @@ Además, 3.5 depende de la pregunta **3.c**: los tres documentos legales (*Polí
 
 **Por qué:** Lito lo pone alto en la home. En industria pesada el comprador quiere ver camiones, planta y personas reales antes de confiar.
 
-**Tareas**
-- [ ] 4.1 Definir ubicación (recomiendo entre hero y Líneas de servicio)
-- [ ] 4.2 Implementar con carga diferida — **sin embed de YouTube directo**: usar fachada con póster que solo cargue el iframe al hacer clic, para no destruir el rendimiento actual
-- [ ] 4.3 Subtítulos en español e inglés (sirve para paridad `/en` y para accesibilidad)
-- [ ] 4.4 Transcripción en texto (SEO + `llms.txt`)
+**Tareas** — 🟡 IMPLEMENTADA CON PLACEHOLDER, PENDIENTE DEL ARCHIVO
+- [x] 4.1 Ubicación: entre el hero y el *marquee*, antes de Líneas de servicio
+- [x] 4.2 Fachada con carga diferida — `src/components/VideoFacade.astro`
+- [x] 4.4 Estructura de transcripción (`<details>` desplegable)
+- [ ] 4.3 Subtítulos — **requiere el archivo de vídeo**
+- [ ] Póster, ID, duración y transcripción — **requieren el archivo**
+
+### `VideoFacade.astro`
+
+Solo se pinta el póster; el `<iframe>` se inyecta al hacer clic. Un embed directo de YouTube trae ~1 MB de JS y varias conexiones a terceros **en cada carga de la home**, la vea o no el visitante — justo el problema que tiene Lito con sus 54 scripts.
+
+Verificado en desarrollo: **0 etiquetas `<iframe>`** y **0 peticiones a terceros** antes del clic. Usa `youtube-nocookie`, así que tampoco hay cookies hasta que el usuario decide reproducir.
+
+Soporta `youtube`, `vimeo` y `file` (mp4 propio en `/public/video/`). Para mp4 usa `<video preload="none">` nativo.
+
+### Qué requiere el archivo y qué no
+
+| Necesita el vídeo | Ya está resuelto |
+|---|---|
+| Póster (portada) | Fachada, estilos, comportamiento del clic |
+| ID / URL | Guarda de publicación |
+| Duración | Estructura de transcripción |
+| Transcripción | Paridad ES/EN |
+| Subtítulos | Accesibilidad del botón (`aria-label`) |
+
+**Para activarlo:** rellenar `videoEs` / `videoEn` en `src/lib/credenciales.ts` y poner `publicado: true`. Sin eso, la sección no existe en producción — misma guarda que la Fase 3, verificada en el build.
+
+**Recomendación cuando llegue el vídeo:** si dura más de ~90 s, cortar una versión breve para la home y dejar la completa en `/quienes-somos`.
 
 **Preguntas abiertas**
 - 4.a ¿Dónde está alojado el video: YouTube, Vimeo o archivo propio?
