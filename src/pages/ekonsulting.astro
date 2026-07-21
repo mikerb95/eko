@@ -77,6 +77,20 @@ const pilares = [
     </div>
   </section>
 
+  {videoEkonsulting && (
+    <section class="section wrap">
+      <div class="section-head reveal">
+        <div>
+          <div class="eyebrow">Video · EKONSULTING</div>
+          <h2>Cómo trabajamos<br>la línea de <em>consultoría</em>.</h2>
+        </div>
+      </div>
+      <div class="reveal" style="max-width:820px">
+        <VideoFacade video={videoEkonsulting} lang="es" />
+      </div>
+    </section>
+  )}
+
   <section class="section wrap">
     <div class="band reveal">
       <div class="band-grid" style="grid-template-columns: 1.4fr 1fr">
