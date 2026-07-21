@@ -406,7 +406,8 @@ h3 { font-size: 22px; }
   display: grid; grid-template-columns: 1.2fr 1fr 1fr 1fr; gap: 40px;
   align-items: start;
 }
-@media (max-width: 900px) { .band-grid { grid-template-columns: 1fr 1fr; } }
+@media (max-width: 900px) { .band-grid { grid-template-columns: 1fr 1fr !important; } }
+@media (max-width: 640px) { .band-grid { grid-template-columns: 1fr !important; } }
 .band h2 { color: var(--paper); font-size: clamp(34px, 4vw, 56px); max-width: 14ch; }
 .band h2 em { color: var(--aqua); }
 .stat .n {
