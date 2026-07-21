@@ -68,24 +68,26 @@ const cases = casosVisibles()
     </div>
   </section>
 
-  <section class="section wrap">
-    <div class="band reveal">
-      <div class="band-grid" style="grid-template-columns: 1.3fr 1fr 1fr">
-        <div>
-          <div class="eyebrow" style="color: color-mix(in oklab, #fff 55%, transparent)">Resultados agregados</div>
-          <h2 style="margin-top:14px; max-width:18ch">El impacto, <em>sumando</em> todos los mandatos.</h2>
-        </div>
-        <div class="stat">
-          <div class="n">$2.1<small>B</small></div>
-          <div class="lbl">Riesgo sancionatorio mitigado</div>
-        </div>
-        <div class="stat">
-          <div class="n">0</div>
-          <div class="lbl">Sanciones en firme · 2024–2026</div>
+  {hayAgregado() && (
+    <section class="section wrap">
+      <div class="band reveal">
+        <div class="band-grid" style="grid-template-columns: 1.3fr 1fr 1fr">
+          <div>
+            <div class="eyebrow" style="color: color-mix(in oklab, #fff 55%, transparent)">Resultados agregados</div>
+            <h2 style="margin-top:14px; max-width:18ch">El impacto, <em>sumando</em> todos los mandatos.</h2>
+          </div>
+          <div class="stat">
+            <div class="n">{agregadoCasos.riesgoMitigado}</div>
+            <div class="lbl">Riesgo sancionatorio mitigado</div>
+          </div>
+          <div class="stat">
+            <div class="n">{agregadoCasos.sanciones}</div>
+            <div class="lbl">Sanciones en firme</div>
+          </div>
         </div>
       </div>
-    </div>
-  </section>
+    </section>
+  )}
 
   <SiteFooter />
 </Layout>
