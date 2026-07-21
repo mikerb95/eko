@@ -1,8 +1,6 @@
 ---
 import Layout from '../layouts/Layout.astro'
-
-const FOUNDED_YEAR = 2013
-const yearsActive = new Date().getFullYear() - FOUNDED_YEAR
+import { yearsActive } from '../lib/brand'
 
 const team = [
   {
