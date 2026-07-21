@@ -38,6 +38,27 @@ const radar = RADAR_CODES
       </a>
     </div>
 
+    {/*
+      Fase 2 de docs/plan-competitivo-lito.md. Cifras de escala y trayectoria.
+      PENDIENTE-DATO 2.b: cuando exista el número de empresas atendidas, es mejor
+      tercera cifra que "normativas auditadas" — es la que usa la competencia.
+      PENDIENTE-DATO 2.a: confirmar si las toneladas siguen siendo 1.000+ en 2026.
+    */}
+    <div class="hero-stats reveal">
+      <div>
+        <div class="n">{yearsActive}</div>
+        <div class="lbl">Años en operación · desde {FOUNDED_YEAR}</div>
+      </div>
+      <div>
+        <div class="n">{stats.tonnesManaged}</div>
+        <div class="lbl">Toneladas de RAEE gestionadas</div>
+      </div>
+      <div>
+        <div class="n">{normativas.length}</div>
+        <div class="lbl">Normativas bajo seguimiento activo</div>
+      </div>
+    </div>
+
     <div class="hero-visual reveal">
       <div class="hv-head">
         <div class="label"><span class="pulse"></span>Radar normativo · marco vigente en Colombia</div>
