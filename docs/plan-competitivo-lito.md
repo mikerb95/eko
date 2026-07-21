@@ -228,6 +228,33 @@ Soporta `youtube`, `vimeo` y `file` (mp4 propio en `/public/video/`). Para mp4 u
 
 ---
 
+## Fase 3b — Recaída detectada en `/casos` ✅ CORREGIDA
+
+**Encontrado el 2026-07-21, ya en producción y en ambos idiomas.**
+
+`src/pages/casos.astro` y su espejo `en/cases.astro` publicaban **6 casos de éxito inventados** con cifras concretas presentadas como mandatos reales:
+
+- `$480M` de riesgo sancionatorio evitado
+- `218` tiendas en red de puntos RAEE
+- `1.2M` unidades cubiertas · `340k` kg gestionados
+- Agregado: **`$2.1B` de riesgo sancionatorio mitigado**
+
+**Lo más grave era el encuadre.** El titular decía *"Expedientes **reales**, resultados medibles"* y el subtítulo añadía *"los nombres de los clientes se mantienen bajo acuerdo de confidencialidad"* — una justificación preventiva de por qué no hay nombres verificables, pegada a datos inventados. Un prospecto no tiene forma de distinguirlo de un caso real.
+
+Esto es más serio que los 6 logos de la Fase 0: son afirmaciones de desempeño cuantificadas. En una licitación o una auditoría de proveedor, sostener `$2.1B` sin soporte es un problema real.
+
+**Corregido:** `casos` y `agregadoCasos` viven ahora en `credenciales.ts` con la misma guarda (`verificado: false`). El titular pasó a *"Cómo trabajamos, caso por caso"* y el subtítulo a *"las cifras son las que podemos sustentar"*. Con 0 casos verificados, la página muestra un estado honesto y ofrece referencias directas para procesos de contratación.
+
+Verificado en el build: `480M`, `2.1B`, `218`, `1.2M`, `340k` → **0 apariciones en producción**.
+
+### Lección: la guarda llegó tarde
+
+`credenciales.ts` se creó en la Fase 3 por el incidente de los logos, pero `/casos` ya tenía el mismo problema y **no se revisó**. Antes de dar por cerrada cualquier fase conviene barrer *todo* el sitio buscando cifras y nombres sin fuente, no solo la página que se está tocando.
+
+**Páginas aún sin auditar bajo este criterio:** `oportunidades2630`, `servicios`, `ekonsulting`, `ekopartner`, `ekotrading`, `quienes-somos` (los aliados y los hitos de la línea de tiempo).
+
+---
+
 ## Fase 5 — Plataforma de subastas / EKOTRADING *(proyecto grande)*
 
 **Por qué:** es el activo digital más fuerte de Lito y el que genera tráfico recurrente y base de datos de compradores. Encaja directo con EKOTRADING, que hoy solo se describe en prosa.
