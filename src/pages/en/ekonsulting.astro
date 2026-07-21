@@ -1,6 +1,10 @@
 ---
 import LayoutEn from '../../layouts/LayoutEn.astro'
 import SiteFooter from '../../components/SiteFooter.astro'
+import VideoFacade from '../../components/VideoFacade.astro'
+import { videoEkonsultingVisible } from '../../lib/credenciales'
+
+const videoEkonsulting = videoEkonsultingVisible('en')
 
 const deliverables = [
   "Environmental licensing (EIA, DAA, PMA)",
