@@ -34,6 +34,13 @@ const STATUS_PILL = {
   solicitada: 'feat', confirmada: 'deep', programada: 'deep', en_ruta: 'clay',
   recolectada: 'forest', certificada: 'forest', cerrada: '', cancelada: '',
 }
+const WASTE_TYPE_LABELS = {
+  raee_computo: 'RAEE · Cómputo y periféricos',
+  raee_telco: 'RAEE · Telecomunicaciones',
+  raee_datacenter: 'RAEE · Infraestructura de data center',
+  baterias: 'Baterías y pilas',
+  otro: 'Otro',
+}
 const fmtDate = (iso) => {
   if (!iso) return ''
   const d = new Date(iso)
