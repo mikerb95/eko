@@ -69,11 +69,22 @@ img, svg { display: block; max-width: 100%; }
   background: color-mix(in oklab, var(--paper) 78%, transparent);
   border-bottom: 1px solid color-mix(in oklab, var(--line) 70%, transparent);
   view-transition-name: nav;
+  transition: background .3s ease, border-color .3s ease, box-shadow .3s ease;
+}
+/* Al bajar, la barra se compacta y gana peso sobre el contenido. */
+.nav.scrolled {
+  background: color-mix(in oklab, var(--paper) 92%, transparent);
+  box-shadow: 0 1px 24px -12px rgba(10, 20, 30, .35);
 }
 .nav-inner {
   display: flex; align-items: center; justify-content: space-between;
-  height: 68px;
+  gap: 24px;
+  height: 72px;
+  transition: height .3s cubic-bezier(.2,.7,.2,1);
 }
+.nav.scrolled .nav-inner { height: 58px; }
+.nav .brand-logo { transition: height .3s cubic-bezier(.2,.7,.2,1); }
+.nav.scrolled .brand-logo { height: 28px; }
 .brand {
   display: flex; align-items: center; gap: 10px;
   font-family: var(--font-sans); font-size: 22px; letter-spacing: -0.04em;
