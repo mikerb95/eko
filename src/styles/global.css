@@ -521,10 +521,13 @@ h3 { font-size: 22px; }
 }
 .foot-cta:hover { background: #fff; transform: translateY(-2px); }
 .foot-cols {
-  display: grid; grid-template-columns: 2fr 1fr 1fr 1fr; gap: 32px;
+  display: grid; grid-template-columns: 2fr repeat(4, 1fr); gap: 32px;
   padding-top: 40px; border-top: 1px solid color-mix(in oklab, #fff 18%, transparent);
 }
+@media (max-width: 1100px) { .foot-cols { grid-template-columns: 1fr 1fr 1fr; } }
 @media (max-width: 900px) { .foot-cols { grid-template-columns: 1fr 1fr; } }
+/* Enlaces legales aún sin documento: se ven, pero no simulan ser navegables. */
+.foot-cols li[data-pending] { color: color-mix(in oklab, #fff 45%, transparent); }
 .foot-cols h5 { font-family: var(--font-mono); font-size: 12.5px; letter-spacing: 0.1em; text-transform: uppercase; color: color-mix(in oklab, #fff 55%, transparent); margin-bottom: 16px; }
 .foot-cols ul { list-style: none; display: flex; flex-direction: column; gap: 8px; font-size: 16px; color: color-mix(in oklab, #fff 85%, transparent); }
 .foot-cols a:hover { color: var(--aqua); }
