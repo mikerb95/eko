@@ -9,7 +9,9 @@ interface Props {
 const { lang = 'es', activePath = '/' } = Astro.props as Props
 
 const t = <K extends keyof typeof STRINGS>(k: K) => STRINGS[k][lang]
-const altUrl = alternateUrl(activePath, lang)
+// El switch de idioma se resuelve desde la URL real, no desde `activePath`
+// (que las páginas usan sólo para marcar el item activo y puede omitirse).
+const altUrl = alternateUrl(Astro.url.pathname, lang)
 const altLabel = lang === 'es' ? 'EN' : 'ES'
 const arrow = 'M5 12h14M13 6l6 6-6 6'
 ---
