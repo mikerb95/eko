@@ -85,6 +85,7 @@ async function openOrder(id) {
         <span>${esc(o.email)}</span><span>·</span><span>${esc(o.phone)}</span><span>·</span>
         <span>${esc(o.address)}${o.address2 ? ', ' + esc(o.address2) : ''}, ${esc(o.city)}${o.postal_code ? ' (' + esc(o.postal_code) + ')' : ''}, ${esc(o.country)}</span>
       </div>
+      ${(o.waste_type || o.estimated_quantity) ? `<div class="meta" style="margin-top:6px">${o.waste_type ? esc(WASTE_TYPE_LABELS[o.waste_type] || o.waste_type) : ''}${o.waste_type && o.estimated_quantity ? ' · ' : ''}${o.estimated_quantity ? esc(o.estimated_quantity) : ''}</div>` : ''}
       ${o.message ? `<div class="meta" style="margin-top:6px">“${esc(o.message)}”</div>` : ''}
     </div></div>`
   $('#order-events').innerHTML = '<div class="empty">Cargando historial…</div>'
