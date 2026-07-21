@@ -1,5 +1,11 @@
 ---
 import Layout from '../layouts/Layout.astro'
+import normativas from '../data/normativas.json'
+
+const RADAR_CODES = ['RES 1297 · 2010', 'LEY 1672 · 2013', 'RES 1407 · 2018']
+const radar = RADAR_CODES
+  .map((code) => normativas.find((n) => n.code === code))
+  .filter(Boolean)
 ---
 
 <Layout title="Ekosolv — Consultoría ambiental · ANLA · ESG · Economía circular" activePath="/">
@@ -21,14 +27,6 @@ import Layout from '../layouts/Layout.astro'
       crecer con <span class="thin">propósito</span>.
     </h1>
 
-    <div class="hero-visual reveal">
-      <div class="label"><span class="pulse"></span>EKORUTA activa · estrategia ambiental y ESG en curso</div>
-      <div class="coords">
-        04°42′N · 74°03′W<br>
-        <strong>Bogotá — Operaciones</strong>
-      </div>
-    </div>
-
     <div class="hero-foot reveal">
       <p class="lede">
         Acompañamos a importadores, productores y operadores de tecnología en Colombia
@@ -46,6 +44,31 @@ import Layout from '../layouts/Layout.astro'
             <path d="M5 12h14M13 6l6 6-6 6"/>
           </svg>
         </div>
+      </a>
+    </div>
+
+    <div class="hero-visual reveal">
+      <div class="hv-head">
+        <div class="label"><span class="pulse"></span>Radar normativo · marco vigente en Colombia</div>
+        <div class="coords">
+          04°42′N · 74°03′W<br>
+          <strong>Bogotá — Operaciones</strong>
+        </div>
+      </div>
+      <div class="hv-grid">
+        {radar.map((n) => (
+          <a class="hv-item" href="/normativas">
+            <div class="hv-code">{n.code}</div>
+            <div class="hv-title">{n.title}</div>
+            <div class="hv-tags">{n.tags.slice(0, 3).join(' · ')}</div>
+          </a>
+        ))}
+      </div>
+      <a class="hv-foot" href="/normativas">
+        Ver las {normativas.length} normativas que auditamos
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M5 12h14M13 6l6 6-6 6"/>
+        </svg>
       </a>
     </div>
 
