@@ -1,6 +1,10 @@
 ---
 import LayoutEn from '../../layouts/LayoutEn.astro'
 import SiteFooter from '../../components/SiteFooter.astro'
+import VideoFacade from '../../components/VideoFacade.astro'
+import { videoServiciosVisible } from '../../lib/credenciales'
+
+const videoServicios = videoServiciosVisible('en')
 
 const lines = [
   {
@@ -103,6 +107,20 @@ const lines = [
       ))}
     </div>
   </section>
+
+  {videoServicios && (
+    <section class="section wrap">
+      <div class="section-head reveal">
+        <div>
+          <div class="eyebrow">Video · Services</div>
+          <h2>Our service lines<br>in <em>action</em>.</h2>
+        </div>
+      </div>
+      <div class="reveal" style="max-width:820px">
+        <VideoFacade video={videoServicios} lang="en" />
+      </div>
+    </section>
+  )}
 
   <section class="section wrap">
     <div class="section-head reveal">
