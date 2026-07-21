@@ -126,6 +126,20 @@ const icons: Record<string, string> = {
     </div>
   </section>
 
+  {videoServicios && (
+    <section class="section wrap">
+      <div class="section-head reveal">
+        <div>
+          <div class="eyebrow">Video · Servicios</div>
+          <h2>Nuestras líneas de servicio<br>en <em>acción</em>.</h2>
+        </div>
+      </div>
+      <div class="reveal" style="max-width:820px">
+        <VideoFacade video={videoServicios} lang="es" />
+      </div>
+    </section>
+  )}
+
   <section class="section wrap">
     <div class="section-head reveal">
       <div>
