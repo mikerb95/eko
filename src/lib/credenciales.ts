@@ -106,6 +106,61 @@ export const clientes: Cliente[] = [
   { nombre: 'PENDIENTE — cliente 6', logo: '', autorizado: false },
 ]
 
+// ── CASOS DE ÉXITO ──────────────────────────────────────────────────────
+// Los 6 casos que había en /casos eran inventados, con cifras concretas
+// ("$480M de riesgo evitado", "218 tiendas", "$2.1B mitigado") presentadas
+// como mandatos reales bajo acuerdo de confidencialidad. Misma guarda.
+
+export interface Caso {
+  cls: '' | 'green' | 'clay'
+  label: string
+  kicker: [string, string]
+  title: string
+  titleEm: string
+  metrics: [string, string][]
+  /** ⚠️ Solo `true` con un mandato real y cifras verificadas. */
+  verificado: boolean
+}
+
+export interface AgregadoCasos {
+  mandatos: string
+  riesgoMitigado: string
+  sanciones: string
+  /** ⚠️ Solo `true` cuando las cifras agregadas se puedan sustentar. */
+  verificado: boolean
+}
+
+export const casos: Caso[] = [
+  {
+    cls: '', label: 'PENDIENTE — sector', kicker: ['Caso 01', 'PENDIENTE'],
+    title: 'PENDIENTE — resultado del mandato.', titleEm: 'PENDIENTE',
+    metrics: [['—', 'PENDIENTE'], ['—', 'PENDIENTE']], verificado: false,
+  },
+  {
+    cls: 'green', label: 'PENDIENTE — sector', kicker: ['Caso 02', 'PENDIENTE'],
+    title: 'PENDIENTE — resultado del mandato.', titleEm: 'PENDIENTE',
+    metrics: [['—', 'PENDIENTE'], ['—', 'PENDIENTE']], verificado: false,
+  },
+  {
+    cls: 'clay', label: 'PENDIENTE — sector', kicker: ['Caso 03', 'PENDIENTE'],
+    title: 'PENDIENTE — resultado del mandato.', titleEm: 'PENDIENTE',
+    metrics: [['—', 'PENDIENTE'], ['—', 'PENDIENTE']], verificado: false,
+  },
+]
+
+export const agregadoCasos: AgregadoCasos = {
+  mandatos: '—',
+  riesgoMitigado: '—',
+  sanciones: '—',
+  verificado: false,
+}
+
+export const casosVisibles = (): Caso[] =>
+  mostrarPlaceholders ? casos : casos.filter((c) => c.verificado)
+
+export const hayCasos = () => casos.some((c) => c.verificado)
+export const hayAgregado = () => agregadoCasos.verificado || mostrarPlaceholders
+
 // ── VÍDEO CORPORATIVO (Fase 4) ──────────────────────────────────────────
 
 export interface Video {
