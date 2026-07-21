@@ -85,14 +85,29 @@ El copy está marcado **en el propio código** con comentarios `BORRADORES SIN V
 
 **Por qué:** Lito pone "+150 empresas" y "+20 años" arriba del fold. Tu mejor cifra ("1.000 toneladas gestionadas desde 2013") está enterrada en un `<meta description>` de EKORAEE, donde ningún humano la lee.
 
-**Tareas**
-- [ ] 2.1 Subir 3 cifras al hero de `index.astro` (bajo el `lede`, antes del `hero-card`)
-- [ ] 2.2 Revisar el bloque "Por los números" para que no repita lo que ya diga el hero
-- [ ] 2.3 Sustituir el `eyebrow` geográfico actual (`… · Bogotá · Colombia`) por el encuadre por línea de servicio: consultoría remota a todo el país, logística RAEE con su propio alcance
-- [ ] 2.4 Añadir a `ekoraee.astro` una nota explícita de alcance geográfico de recolección
-- [ ] 2.5 Réplica en `/en`
+**Tareas** — ✅ IMPLEMENTADA (pendiente validar cifras)
+- [x] 2.1 Franja `.hero-stats` con 3 cifras, entre `hero-foot` y `hero-visual`
+- [x] 2.2 Bloque "Por los números" replanteado para no repetir el hero
+- [x] 2.3 `eyebrow` del hero reencuadrado por línea de servicio
+- [x] 2.4 Nota de alcance en `ekoraee.astro` (ES y EN)
+- [x] 2.5 Réplica en `/en`
 
-**Cifras candidatas** *(elegir 3, corregir valores)*: 1.000+ toneladas RAEE gestionadas · 13 años · 98% radicaciones aprobadas · 0 sanciones en firme · 4 líneas integradas.
+**Reparto de cifras** — se dividió para que hero y `band` no compitan:
+
+| Bloque | Cifras | Rol |
+|---|---|---|
+| Hero | 13 años · 1.000+ ton RAEE · 10 normativas | Escala y trayectoria |
+| Band "Por los números" | 98% · 0 sanciones · 4 líneas | Desempeño |
+
+El titular del band pasó de *"Trece años acompañando la industria tech"* (que duplicaba el hero) a **"Resultados que resisten una auditoría."** / *"Results that hold up to an audit."*
+
+**Tercera cifra del hero:** se usó `normativas.length` (10) porque es un dato real derivado de `src/data/normativas.json`, no inventado. Cuando exista el número de empresas atendidas (**2.b**) conviene sustituirla — es la cifra que usa la competencia.
+
+**`eyebrow` del hero:** `… · Bogotá · Colombia` → `… — consultoría en toda Colombia`. Las coordenadas de Bogotá del radar se conservan: describen la base de operaciones, que sigue siendo cierto.
+
+**Localización de cifras:** `tonnesManaged(lang)` en `brand.ts` formatea el separador de miles por locale (`1.000+` en es-CO, `1,000+` en en-US). Escribirlo a mano en cada plantilla es exactamente cómo se cuela una errata.
+
+**2.4 —** Como **2.c sigue sin respuesta**, la nota de EKORAEE no afirma cobertura: *"La asesoría normativa se presta de forma remota en todo el país. La recolección se coordina caso a caso según volumen y ubicación — escríbenos y confirmamos cobertura antes de agendar."* Marcada con `PENDIENTE-DATO 2.c` en el código.
 
 **Preguntas abiertas**
 - 2.a ¿La cifra de toneladas está actualizada a 2026? "1.000+ desde 2013" suena conservador para 13 años.
