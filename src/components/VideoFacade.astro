@@ -64,17 +64,25 @@ const t = es
 
 <script>
   // Sustituye la fachada por el iframe real solo cuando el usuario lo pide.
-  document.querySelectorAll<HTMLButtonElement>('.vid-facade').forEach((btn) => {
-    btn.addEventListener('click', () => {
-      const src = btn.dataset.src
-      if (!src) return
-      const frame = document.createElement('iframe')
-      frame.className = 'vid-frame'
-      frame.src = src
-      frame.title = btn.getAttribute('aria-label') ?? ''
-      frame.allow = 'accelerometer; autoplay; encrypted-media; picture-in-picture'
-      frame.allowFullscreen = true
-      btn.replaceWith(frame)
+  // Se reengancha en cada navegación con ClientRouter (astro:page-load
+  // dispara también en la carga inicial).
+  function initVideoFacades() {
+    document.querySelectorAll<HTMLButtonElement>('.vid-facade').forEach((btn) => {
+      if (btn.dataset.wired) return
+      btn.dataset.wired = 'true'
+      btn.addEventListener('click', () => {
+        const src = btn.dataset.src
+        if (!src) return
+        const frame = document.createElement('iframe')
+        frame.className = 'vid-frame'
+        frame.src = src
+        frame.title = btn.getAttribute('aria-label') ?? ''
+        frame.allow = 'accelerometer; autoplay; encrypted-media; picture-in-picture'
+        frame.allowFullscreen = true
+        btn.replaceWith(frame)
+      })
     })
-  })
+  }
+
+  document.addEventListener('astro:page-load', initVideoFacades)
 </script>
