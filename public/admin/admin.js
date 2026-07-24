@@ -5,6 +5,7 @@ const $$ = (s, r = document) => [...r.querySelectorAll(s)]
 let posts = window.__POSTS__ || []
 let norms = window.__NORMS__ || []
 let orders = window.__ORDERS__ || []
+let contacts = window.__CONTACTS__ || []
 let users = window.__USERS__ || []
 const role = window.__ROLE__ || ''
 
