@@ -774,7 +774,18 @@ h3 { font-size: 22px; }
 .hero-visual .coords strong { display: block; color: #fff; font-size: 14px; letter-spacing: 0.02em; }
 @media (max-width: 900px) {
   .hv-grid { grid-template-columns: 1fr; }
-  .hv-item { padding: 20px 0; }
+  .hv-item { padding: 22px clamp(14px, 4vw, 20px); }
+  .hv-item + .hv-item::before {
+    left: 12%; right: 12%; top: 0; bottom: auto;
+    width: auto; height: 1px;
+    background: linear-gradient(
+      to right,
+      transparent,
+      color-mix(in oklab, #fff 14%, transparent) 22%,
+      color-mix(in oklab, #fff 14%, transparent) 78%,
+      transparent
+    );
+  }
   .hv-title { max-width: 32ch; }
 }
 
