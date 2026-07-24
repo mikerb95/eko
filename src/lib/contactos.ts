@@ -1,0 +1,124 @@
+import { createClient, type Client } from '@libsql/client'
+
+// Mensajes del formulario de contacto público. Misma DB libSQL/Turso que el
+// CMS y las órdenes, con su propio módulo y tabla.
+
+export const CONTACT_STATUSES = ['nuevo', 'atendido'] as const
+export type ContactStatus = (typeof CONTACT_STATUSES)[number]
+
+export interface Contact {
+  id?: number
+  name: string
+  email: string
+  company: string
+  phone: string
+  sector: string
+  service_lines: string
+  message: string
+  source: string
+  status: ContactStatus
+  created_at?: string
+  updated_at?: string
+}
+
+let _db: Client | null = null
+let _ready: Promise<void> | null = null
+
+function client(): Client {
+  if (_db) return _db
+  const url = import.meta.env.DATABASE_URL || process.env.DATABASE_URL || 'file:./data/cms.db'
+  const authToken = import.meta.env.DATABASE_AUTH_TOKEN || process.env.DATABASE_AUTH_TOKEN
+  _db = createClient({ url, authToken })
+  return _db
+}
+
+async function ensureSchema(): Promise<void> {
+  if (_ready) return _ready
+  _ready = (async () => {
+    await client().execute(`CREATE TABLE IF NOT EXISTS contacts (
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      name TEXT NOT NULL DEFAULT '',
+      email TEXT NOT NULL DEFAULT '',
+      company TEXT NOT NULL DEFAULT '',
+      phone TEXT NOT NULL DEFAULT '',
+      sector TEXT NOT NULL DEFAULT '',
+      service_lines TEXT NOT NULL DEFAULT '',
+      message TEXT NOT NULL DEFAULT '',
+      source TEXT NOT NULL DEFAULT 'web',
+      status TEXT NOT NULL DEFAULT 'nuevo',
+      created_at TEXT NOT NULL DEFAULT '',
+      updated_at TEXT NOT NULL DEFAULT ''
+    )`)
+  })()
+  return _ready
+}
+
+const now = () => new Date().toISOString()
+
+function rowToContact(r: any): Contact {
+  return {
+    id: Number(r.id),
+    name: r.name,
+    email: r.email,
+    company: r.company,
+    phone: r.phone,
+    sector: r.sector,
+    service_lines: r.service_lines,
+    message: r.message,
+    source: r.source,
+    status: (CONTACT_STATUSES as readonly string[]).includes(r.status) ? r.status : 'nuevo',
+    created_at: r.created_at,
+    updated_at: r.updated_at,
+  }
+}
+
+export interface NewContactInput {
+  name: string
+  email: string
+  company?: string
+  phone?: string
+  sector?: string
+  service_lines?: string
+  message?: string
+  source?: string
+}
+
+export async function createContact(input: NewContactInput): Promise<Contact> {
+  await ensureSchema()
+  const ts = now()
+  const res = await client().execute({
+    sql: `INSERT INTO contacts (name,email,company,phone,sector,service_lines,message,source,status,created_at,updated_at)
+          VALUES (?,?,?,?,?,?,?,?,?,?,?)`,
+    args: [
+      input.name, input.email, input.company ?? '', input.phone ?? '',
+      input.sector ?? '', input.service_lines ?? '', input.message ?? '',
+      input.source ?? 'web', 'nuevo', ts, ts,
+    ],
+  })
+  return (await getContactById(Number(res.lastInsertRowid)))!
+}
+
+export async function listContacts(status?: string): Promise<Contact[]> {
+  await ensureSchema()
+  const db = client()
+  const res = status && (CONTACT_STATUSES as readonly string[]).includes(status)
+    ? await db.execute({ sql: 'SELECT * FROM contacts WHERE status = ? ORDER BY id DESC', args: [status] })
+    : await db.execute('SELECT * FROM contacts ORDER BY id DESC')
+  return res.rows.map(rowToContact)
+}
+
+export async function getContactById(id: number): Promise<Contact | null> {
+  await ensureSchema()
+  const res = await client().execute({ sql: 'SELECT * FROM contacts WHERE id = ? LIMIT 1', args: [id] })
+  return res.rows.length ? rowToContact(res.rows[0]) : null
+}
+
+export async function updateContactStatus(id: number, status: ContactStatus): Promise<Contact | null> {
+  await ensureSchema()
+  if (!(CONTACT_STATUSES as readonly string[]).includes(status)) return getContactById(id)
+  await client().execute({
+    sql: 'UPDATE contacts SET status = ?, updated_at = ? WHERE id = ?',
+    args: [status, now(), id],
+  })
+  return getContactById(id)
+}
