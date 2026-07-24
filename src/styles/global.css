@@ -315,7 +315,7 @@ h3 { font-size: 22px; }
   font-variant-numeric: tabular-nums;
 }
 .hero-stats .n em { font-style: italic; color: var(--forest); }
-.hero-stats .n small { font-size: .42em; color: var(--clay); margin-left: 3px; vertical-align: top; font-style: italic; }
+.hero-stats .n small { font-size: .42em; color: var(--clay-ink); margin-left: 3px; vertical-align: top; font-style: italic; }
 .hero-stats .lbl {
   font-family: var(--font-mono); font-size: 12px; letter-spacing: 0.08em;
   text-transform: uppercase; color: var(--mute); margin-top: 10px; line-height: 1.45;
