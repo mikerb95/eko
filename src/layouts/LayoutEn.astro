@@ -3,15 +3,30 @@ import "../styles/global.css"
 import "../styles/blog.css"
 import { ClientRouter } from 'astro:transitions'
 import Nav from '../components/Nav.astro'
+import { SITE_URL, url } from '../lib/site'
+import { hreflangFor } from '../lib/rutas'
 
 interface Props {
   title?: string
   description?: string
   activePath?: string
+  /** Canonical path for this page. Defaults to activePath. */
+  path?: string
+  /** Social share image (absolute path from /public). */
+  ogImage?: string
 }
 
-const { title = "Ekosolv — Environmental Consulting ANLA", description = "We help importers, producers, and tech operators in Colombia build their environmental management plans, licenses, and reports.", activePath = "/en" } = Astro.props
+const {
+  title = "Ekosolv — Environmental Consulting ANLA",
+  description = "We help importers, producers, and tech operators in Colombia build their environmental management plans, licenses, and reports.",
+  activePath = "/en",
+  path = activePath,
+  ogImage = "/images/quienes-somos/hero-banner.jpg",
+} = Astro.props
 
+const canonical = url(path)
+const ogImageUrl = ogImage.startsWith('http') ? ogImage : `${SITE_URL}${ogImage}`
+const alt = hreflangFor(path)
 ---
 
 <!DOCTYPE html>
