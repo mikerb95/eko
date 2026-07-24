@@ -69,26 +69,28 @@ img, svg { display: block; max-width: 100%; }
 }
 .blob {
   position: absolute;
+  top: var(--by, 0%); left: var(--bx, 0%);
   border-radius: 50%;
   filter: blur(70px);
   opacity: .28;
-  will-change: transform;
+  will-change: transform, top, left;
+  transition: top 1.4s cubic-bezier(.2,.7,.2,1), left 1.4s cubic-bezier(.2,.7,.2,1);
 }
 .blob-a {
   width: 46vw; height: 46vw; max-width: 620px; max-height: 620px;
-  top: -12%; left: -8%;
+  --bx: -8%; --by: -12%;
   background: radial-gradient(circle at 35% 35%, var(--aqua), var(--forest) 60%, transparent 75%);
   animation: blob-float-a 26s ease-in-out infinite;
 }
 .blob-b {
   width: 38vw; height: 38vw; max-width: 520px; max-height: 520px;
-  top: 30%; right: -10%;
+  --bx: 62%; --by: 30%;
   background: radial-gradient(circle at 60% 40%, var(--clay), var(--clay-2) 55%, transparent 75%);
   animation: blob-float-b 32s ease-in-out infinite;
 }
 .blob-c {
   width: 42vw; height: 42vw; max-width: 560px; max-height: 560px;
-  bottom: -14%; left: 22%;
+  --bx: 22%; --by: 64%;
   background: radial-gradient(circle at 45% 45%, var(--deep), var(--deep-2) 60%, transparent 75%);
   animation: blob-float-c 38s ease-in-out infinite;
 }
@@ -105,7 +107,7 @@ img, svg { display: block; max-width: 100%; }
   50% { transform: translate(3vw, -4vh) scale(1.06); }
 }
 @media (prefers-reduced-motion: reduce) {
-  .blob { animation: none; }
+  .blob { animation: none; transition: none; }
 }
 
 /* ===== Nav ===== */

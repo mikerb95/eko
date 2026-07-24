@@ -23,6 +23,20 @@
 | Tributario | Zonas económicas especiales con exenciones | Nuevas operaciones industriales y tecnológicas = renovación de parque tecnológico (RAEE) |
 | Ambiente | Plan "ABC" (Agua, Biodiversidad, Comunidades); deforestación, minería ilegal y cultivos ilícitos tratados como seguridad nacional | El foco estatal no está en posconsumo/RAEE → el marco existente sigue vigente pero la exigencia real vendrá del mercado |
 
+### Gabinete designado (al 24 de julio de 2026)
+
+A dos semanas de la posesión, De la Espriella tenía confirmadas **13 de 18 carteras**; quedaban pendientes al menos Salud, Trabajo y Ciencia y Tecnología. En su segundo Consejo de Ministros (19 de julio) revisó la hoja de ruta y advirtió que "no habrá espacio para la improvisación". Los nombramientos relevantes para el sector:
+
+**Ministro de Ambiente — Fabio Arjona Hincapié.** Biólogo marino con más de dos décadas en conservación; fue director/vicepresidente de Conservación Internacional Colombia, viceministro de Ambiente (1997–1998), director de la CAR de los Valles del Sinú y San Jorge (CVS), consultor del Banco Mundial y recibió la Orden de San Carlos (2022).
+- *Enfoque anunciado:* protección de ecosistemas, agua, bienestar animal y **soluciones basadas en la naturaleza**, bajo la tesis de que "el crecimiento económico y la protección ambiental pueden avanzar de manera conjunta".
+- *Señal para el sector:* respaldó públicamente el fracking "con estrictos estándares ambientales". Un ministro de perfil conservacionista pero pro-desarrollo confirma la lectura del cuadro anterior: el foco de la cartera será biodiversidad, agua y conservación, **no** el endurecimiento del posconsumo/RAEE. La exigencia sobre RAEE seguirá viniendo del marco vigente y del mercado, no de nueva fiscalización.
+
+**Ministra de Minas y Energía — María Nohemí Arboleda.** Ingeniera eléctrica (UNAL), gerente de **XM** (operador del Sistema Interconectado Nacional y del Mercado de Energía Mayorista) desde 2016. El sector lee su llegada como un giro hacia rigor técnico, estabilidad regulatoria y "soberanía energética".
+- *Agenda de choque atribuida:* reactivación de contratos de hidrocarburos, reapertura de exploración con fracking (con restricciones en áreas protegidas) y revisión institucional de Ecopetrol.
+- *Señal para el sector:* confirma y acelera el "boom de licenciamiento" del punto 4.1 — más proyectos minero-energéticos nuevos que requieren estudios, licencias, PMA e ICA.
+
+**Otras carteras confirmadas** (contexto): Interior — Rodrigo Lara; Hacienda — Miguel Gómez Martínez; Comercio — Mauricio Gómez Amín; Agricultura — Indalecio Dangond Baquero; Transporte — Elsa Noguera; Educación — Viviane Morales; Cancillería — Omar Bula Escobar; TIC — Alexandra Falla Zerrate; Defensa — Jorge Eduardo Mora López.
+
 ---
 
 ## 2. Perfil de la empresa
