@@ -70,6 +70,10 @@ export default defineConfig({
   adapter: vercel(),
   integrations: [securityHeaders()],
 
+  // Astro 7 cambió el default a 'jsx', que colapsa los espacios entre elementos
+  // inline (rompería separadores como "<span>·</span>"). Conservamos el de v6.
+  compressHTML: true,
+
   image: {
     // picsum.photos (imágenes de relleno) se retiró junto con la plantilla de
     // Storyblok. Solo se sirven imágenes propias desde /public.
