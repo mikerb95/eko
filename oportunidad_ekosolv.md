@@ -126,3 +126,25 @@ Revisé el repo contra las brechas que se le van a señalar a Ekosolv. Resultado
 - Anclar la demo en **`quienes-somos`** (línea de tiempo ANLA/COP16/Ministerio, 100% real) y en el **panel + agenda de recolección** (funcionalidad que Wix no da). Evitar abrir casos/licencias vacías salvo para mostrar "acá van tus datos reales".
 - Todo lo que promete el discurso ya existe en el sitio; lo único pendiente del lado de Ekosolv es **cargar los datos reales** (licencias, testimonios, cifras) para llenar los espacios preparados.
 - Marca alineada (2026-07-24): azul `#124E7D` y verde `#179C91` idénticos al corporativo; arena `#D0B49A` en fidelidad total. Tipografía intencionalmente distinta (serif editorial + Geist) como diferenciador premium, no como copia de las fuentes default de Wix (Avenir/DIN Neuzeit).
+
+---
+
+## 8. Guion corto — llamada de 2 minutos
+
+> Versión condensada de la sección 7 para el primer contacto telefónico. Objetivo único de la llamada: **conseguir la demo de 15 minutos**, no cerrar nada. Tono de colega, no de vendedor. No mencionar antecedentes laborales ni el reclamo pasado (ver contexto sensible en la memoria del proyecto); si el gerente lo saca, se resuelve hablado.
+
+**[0:00 – Reconocimiento]**
+> "Hola [nombre], te robo dos minutos. Estuve viendo la web de Ekosolv — la marca y el mensaje ambiental están muy bien cuidados, los felicito por eso."
+
+**[0:20 – El gancho, un solo problema]**
+> "Pero noté algo: el sitio habla de más de diez años de trayectoria y no muestra ni una cifra, ni una certificación, ni un testimonio de cliente. Y en su negocio, que vende cumplimiento y confianza, eso es justo lo primero que busca un comprador corporativo o una entidad pública antes de contratar."
+
+**[0:50 – La oferta, sin tecnicismos]**
+> "Ya armé una versión nueva del sitio pensada para resolver eso: un lugar para sus números y sus licencias reales, una página por cada servicio, un formulario para agendar recolecciones, y un panel propio para que lo manejen ustedes sin depender de la plantilla actual. Sus colores de marca están idénticos — no es un sitio distinto, es el mismo Ekosolv mejor presentado."
+
+**[1:30 – El cierre, bajar la barrera]**
+> "No es una promesa, ya está construido y funcionando. ¿Te muestro en vivo, 15 minutos, esta semana? Si te sirve seguimos, y si no, igual te queda la auditoría de lo que encontré. Sin compromiso."
+
+**[Si duda / objeción típica]**
+> - *"Ya tenemos sitio, funciona."* → "Totalmente, y se ve bien. No te hablo de estética: te hablo de que hoy no está mostrando la prueba de confianza que tu comprador necesita. Eso es lo que resuelve."
+> - *"¿Cuánto cuesta?"* → "Depende del alcance, pero por eso mejor te lo muestro primero: ves qué es y ahí hablamos de números con contexto. ¿15 minutos esta semana?"
