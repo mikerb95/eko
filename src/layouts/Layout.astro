@@ -3,15 +3,30 @@ import "../styles/global.css"
 import "../styles/blog.css"
 import { ClientRouter } from 'astro:transitions'
 import Nav from '../components/Nav.astro'
+import { SITE_URL, url } from '../lib/site'
+import { hreflangFor } from '../lib/rutas'
 
 interface Props {
   title?: string
   description?: string
   activePath?: string
+  /** Ruta canónica de esta página. Por defecto usa activePath. */
+  path?: string
+  /** Imagen para compartir en redes (ruta absoluta desde /public). */
+  ogImage?: string
 }
 
-const { title = "Eko — Consultoría ambiental ANLA", description = "Acompañamos a importadores, productores y operadores de tecnología en Colombia a construir sus planes de gestión ambiental, licencias y reportes.", activePath = "/" } = Astro.props
+const {
+  title = "Eko — Consultoría ambiental ANLA",
+  description = "Acompañamos a importadores, productores y operadores de tecnología en Colombia a construir sus planes de gestión ambiental, licencias y reportes.",
+  activePath = "/",
+  path = activePath,
+  ogImage = "/images/quienes-somos/hero-banner.jpg",
+} = Astro.props
 
+const canonical = url(path)
+const ogImageUrl = ogImage.startsWith('http') ? ogImage : `${SITE_URL}${ogImage}`
+const alt = hreflangFor(path)
 ---
 
 <!DOCTYPE html>
