@@ -4,8 +4,8 @@
 // externa (Redis/KV). No es una defensa perfecta contra múltiples instancias
 // concurrentes, pero cubre el caso común de fuerza bruta desde una IP.
 
-const MAX_ATTEMPTS = 5
-const WINDOW_MS = 10 * 60 * 1000 // 10 minutos
+const DEFAULT_MAX_ATTEMPTS = 5
+const DEFAULT_WINDOW_MS = 10 * 60 * 1000 // 10 minutos
 
 interface Bucket {
   count: number
