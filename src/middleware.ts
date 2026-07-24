@@ -9,6 +9,7 @@ const PUBLIC_API_PATHS = new Set(['/api/admin/login'])
 const WRITE_RULES: Array<{ prefix: string; roles: string[] }> = [
   { prefix: '/api/admin/users', roles: ['admin'] },
   { prefix: '/api/admin/recolecciones', roles: ['admin', 'operaciones', 'logistica'] },
+  { prefix: '/api/admin/contactos', roles: ['admin', 'operaciones', 'consultor'] },
   { prefix: '/api/admin/posts', roles: ['admin', 'consultor'] },
   { prefix: '/api/admin/normativas', roles: ['admin', 'consultor'] },
 ]
