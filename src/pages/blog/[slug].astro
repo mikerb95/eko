@@ -12,7 +12,7 @@ const allPosts = await getPosts()
 const related = allPosts.filter(p => p.slug !== post.slug).slice(0, 3)
 ---
 
-<Layout title={`${post.title} — Eko`} activePath="/blog">
+<Layout title={`${post.title} — Eko`} description={post.lede} activePath="/blog" path={`/blog/${post.slug}`}>
   <section class="page-head wrap">
     <div class="page-strip">
       <a class="l ulink" href="/blog">← Diario</a>
