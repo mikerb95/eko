@@ -139,10 +139,27 @@ const alt = hreflangFor(path)
         });
       }
 
+      // Reorganiza los blobs de fondo al azar en cada navegación
+      function randomizeBlobs() {
+        const zones = [
+          { xMin: -18, xMax: 4,  yMin: -22, yMax: 2 },
+          { xMin: 48,  xMax: 76, yMin: 6,   yMax: 48 },
+          { xMin: 2,   xMax: 34, yMin: 48,  yMax: 78 },
+        ];
+        document.querySelectorAll(".blob").forEach((el, i) => {
+          const z = zones[i % zones.length];
+          const bx = z.xMin + Math.random() * (z.xMax - z.xMin);
+          const by = z.yMin + Math.random() * (z.yMax - z.yMin);
+          el.style.setProperty("--bx", `${bx.toFixed(1)}%`);
+          el.style.setProperty("--by", `${by.toFixed(1)}%`);
+        });
+      }
+
       function init() {
         initRevealers();
         initAccordion();
         initChips();
+        randomizeBlobs();
       }
 
       document.addEventListener("astro:page-load", init);
