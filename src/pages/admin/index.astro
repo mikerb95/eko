@@ -68,6 +68,7 @@ if (isAdmin) {
 
     <nav class="tabs">
       <button class="tab is-active" data-tab="recolecciones">Recolecciones <span class="count">{pendingOrders ? `${pendingOrders} nuevas` : orders.length}</span></button>
+      <button class="tab" data-tab="contactos">Contactos <span class="count">{newContacts ? `${newContacts} nuevos` : contacts.length}</span></button>
       <button class="tab" data-tab="blog">Blog <span class="count">{posts.length}</span></button>
       <button class="tab" data-tab="normativas">Normativas <span class="count">{normativas.length}</span></button>
       {isAdmin && <button class="tab" data-tab="usuarios">Usuarios <span class="count">{users.length}</span></button>}
