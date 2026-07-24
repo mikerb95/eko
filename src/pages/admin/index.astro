@@ -21,6 +21,13 @@ try {
   if (!seedError) seedError = String(e?.message || e)
 }
 const pendingOrders = orders.filter((o) => o.status === 'solicitada').length
+let contacts: Awaited<ReturnType<typeof listContacts>> = []
+try {
+  contacts = await listContacts()
+} catch (e: any) {
+  if (!seedError) seedError = String(e?.message || e)
+}
+const newContacts = contacts.filter((c) => c.status === 'nuevo').length
 const user = Astro.locals.user || 'admin'
 const role = Astro.locals.role || ''
 const isAdmin = role === 'admin'
