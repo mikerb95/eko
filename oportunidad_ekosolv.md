@@ -112,6 +112,8 @@ Revisé el repo contra las brechas que se le van a señalar a Ekosolv. Resultado
 
 **Retención y autoridad (que vuelvan y te tomen como referente)**
 > "Hay un blog y un boletín para equipos ambientales — cambios de normativa, vencimientos, interpretaciones de la autoridad. En un sector donde la regulación cambia todo el tiempo, publicar eso te posiciona como el que sabe. Y a la vez captura correos de gente interesada que podés volver a contactar."
+>
+> *Ejemplo oportuno para la demo:* "Justo ahora entra un gobierno nuevo. El ministro de Ambiente, **Fabio Arjona**, viene de Conservación Internacional y habla de conciliar crecimiento con conservación; la de Minas y Energía, **María Nohemí Arboleda**, llega de XM con una agenda de reactivación minero-energética. Para tus clientes, eso significa más proyectos, más licencias y más presión de cumplimiento vía mercado. Un artículo tuyo esta semana explicando qué cambia para ellos con el nuevo gabinete es exactamente el tipo de contenido que te vuelve referente — y el sitio nuevo te deja publicarlo tú mismo, sin depender de nadie."
 
 **Control y autonomía (que dejes de depender de una plantilla)**
 > "Tenés un panel de administración propio: entrás, cargás una noticia, una normativa o revisás las solicitudes que llegaron — sin depender de nadie ni de una plataforma que decide por vos. Además la versión en inglés queda completa y bien hecha (hoy está a medio traducir, y eso, para alguien que te evalúa desde afuera, comunica descuido justo donde vendés rigor). Y el sitio carga más rápido y controla cómo se indexa tu contenido."
@@ -126,6 +128,7 @@ Revisé el repo contra las brechas que se le van a señalar a Ekosolv. Resultado
 - Anclar la demo en **`quienes-somos`** (línea de tiempo ANLA/COP16/Ministerio, 100% real) y en el **panel + agenda de recolección** (funcionalidad que Wix no da). Evitar abrir casos/licencias vacías salvo para mostrar "acá van tus datos reales".
 - Todo lo que promete el discurso ya existe en el sitio; lo único pendiente del lado de Ekosolv es **cargar los datos reales** (licencias, testimonios, cifras) para llenar los espacios preparados.
 - Marca alineada (2026-07-24): azul `#124E7D` y verde `#179C91` idénticos al corporativo; arena `#D0B49A` en fidelidad total. Tipografía intencionalmente distinta (serif editorial + Geist) como diferenciador premium, no como copia de las fuentes default de Wix (Avenir/DIN Neuzeit).
+- Gancho de actualidad (2026-07-24): apoyarse en el análisis de `docs/oportunidades-gobierno-2026-2030.md` para hablar del nuevo gabinete (Arjona en Ambiente, Arboleda en Minas y Energía) como ejemplo vivo del valor del blog. No entrar en política ni opinar del gobierno; usarlo solo como demostración de *contenido oportuno que ellos deberían estar publicando y hoy no publican*.
 
 ---
 
