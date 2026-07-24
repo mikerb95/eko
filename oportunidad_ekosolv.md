@@ -89,3 +89,40 @@ Revisé el repo contra las brechas que se le van a señalar a Ekosolv. Resultado
 - [ ] Cargar al menos 1-2 licencias reales en `credenciales.ts` (con PDF y `publicada: true`) para poder mostrar la sección funcionando, no solo el fallback.
 - [ ] Decidir si se ofrece como "rediseño completo" o "auditoría + propuesta" como puerta de entrada más barata de aceptar.
 - [ ] Preparar 2-3 capturas de pantalla side-by-side (sitio actual vs. nuevo) para la demo — usando `quienes-somos` como la pieza más fuerte, no `casos`.
+
+---
+
+## 7. Discurso "no técnico" para el gerente
+
+> Lenguaje de negocio, para reunión o llamada. Ordenado por bloque de beneficio. **Solo promete lo que la versión nueva entrega hoy** — no menciona datos que siguen en plantilla (licencias, casos), sino la *capacidad* de mostrarlos.
+
+### 7.1. Apertura (reconocer, no atacar)
+> "Antes que nada: la marca de Ekosolv está bien cuidada. El mensaje ambiental, el tono, el propósito ESG — eso está claro y se nota. Lo que quiero mostrarte no es un cambio de imagen, es cómo hacer que el sitio **trabaje** para vender lo que ustedes ya son."
+
+### 7.2. El problema de fondo (en una frase)
+> "Ekosolv vende confianza: cumplimiento, licencias, tranquilidad regulatoria. Pero el sitio actual no la *demuestra*. Habla de 12 años de trayectoria y no hay una sola cifra, una certificación visible, ni un testimonio de cliente. Y lo primero que hace un comprador corporativo o una entidad pública antes de firmar es buscar exactamente eso. Hoy no lo encuentra."
+
+### 7.3. Lo que mejora — por lo que te importa
+
+**Confianza (que es tu argumento de venta)**
+> "El sitio nuevo tiene un lugar preparado para tus números reales: toneladas gestionadas, años, resultados. Una sección de licencias y certificaciones donde subimos tus PDF y quedan a la vista — con el detalle de que, mientras no haya un documento real cargado, el sitio nunca inventa nada: muestra un mensaje honesto. Nunca vas a quedar expuesto con datos de fantasía. Y una sección de casos y testimonios lista para cuando quieras publicar clientes reales."
+
+**Conversión (que el visitante se vuelva contacto)**
+> "Hoy tu botón de contacto es un enlace de WhatsApp acortado — y con eso pierdes rastro de cuánta gente realmente te escribe. En el sitio nuevo cada servicio tiene su propia página, porque el que busca consultoría no es el mismo que necesita recolección de electrónicos, y no hay que hablarles igual. Y hay un formulario para **agendar una recolección** directamente desde la web: el cliente deja sus datos y la solicitud te llega ordenada, no perdida en un chat."
+
+**Retención y autoridad (que vuelvan y te tomen como referente)**
+> "Hay un blog y un boletín para equipos ambientales — cambios de normativa, vencimientos, interpretaciones de la autoridad. En un sector donde la regulación cambia todo el tiempo, publicar eso te posiciona como el que sabe. Y a la vez captura correos de gente interesada que podés volver a contactar."
+
+**Control y autonomía (que dejes de depender de una plantilla)**
+> "Tenés un panel de administración propio: entrás, cargás una noticia, una normativa o revisás las solicitudes que llegaron — sin depender de nadie ni de una plataforma que decide por vos. Además la versión en inglés queda completa y bien hecha (hoy está a medio traducir, y eso, para alguien que te evalúa desde afuera, comunica descuido justo donde vendés rigor). Y el sitio carga más rápido y controla cómo se indexa tu contenido."
+
+**Identidad (que siga siendo *tu* marca, mejor)**
+> "Respetamos tus colores de siempre — el azul y el verde de Ekosolv están idénticos. Lo que subimos de categoría es la presentación: una tipografía más editorial que le da al sitio aire de consultora seria, no de plantilla genérica. El color es tu marca de siempre; el diseño es el salto de nivel."
+
+### 7.4. Cierre (bajar la barrera)
+> "No te estoy trayendo una promesa ni un boceto. El sitio ya está construido y funcionando — te lo muestro en vivo en 15 minutos. Si te hace sentido, seguimos; si no, te queda la auditoría de lo que encontramos. Sin compromiso."
+
+### 7.5. Notas internas (NO decir en voz alta)
+- Anclar la demo en **`quienes-somos`** (línea de tiempo ANLA/COP16/Ministerio, 100% real) y en el **panel + agenda de recolección** (funcionalidad que Wix no da). Evitar abrir casos/licencias vacías salvo para mostrar "acá van tus datos reales".
+- Todo lo que promete el discurso ya existe en el sitio; lo único pendiente del lado de Ekosolv es **cargar los datos reales** (licencias, testimonios, cifras) para llenar los espacios preparados.
+- Marca alineada (2026-07-24): azul `#124E7D` y verde `#179C91` idénticos al corporativo; arena `#D0B49A` en fidelidad total. Tipografía intencionalmente distinta (serif editorial + Geist) como diferenciador premium, no como copia de las fuentes default de Wix (Avenir/DIN Neuzeit).
