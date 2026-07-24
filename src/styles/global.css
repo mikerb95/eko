@@ -474,7 +474,7 @@ h3 { font-size: 22px; }
   transition: padding .25s ease;
 }
 .norm:last-child { border-bottom: 1px solid var(--line); }
-.norm .code { font-family: var(--font-mono); font-size: 13px; color: var(--clay); letter-spacing: 0.05em; }
+.norm .code { font-family: var(--font-mono); font-size: 13px; color: var(--clay-ink); letter-spacing: 0.05em; }
 .norm h4 { font-family: var(--font-display); font-weight: 400; font-size: 22px; letter-spacing: -0.015em; margin-top: 4px; }
 .norm .plus { width: 32px; height: 32px; border-radius: 50%; border: 1px solid var(--line-2); display: grid; place-items: center; transition: all .2s ease; color: var(--ink); }
 .norm:hover .plus { background: var(--ink); color: var(--paper); border-color: var(--ink); }
