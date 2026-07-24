@@ -120,13 +120,52 @@ import SiteFooter from '../components/SiteFooter.astro'
   <SiteFooter />
 
   <script>
-    const form = document.getElementById("contact-form");
-    form?.addEventListener("submit", (e) => {
+    const form = document.getElementById("contact-form") as HTMLFormElement | null;
+    form?.addEventListener("submit", async (e) => {
       e.preventDefault();
       const btn = form.querySelector(".submit") as HTMLButtonElement;
       const text = form.querySelector(".submit-text") as HTMLElement;
-      if (text) text.textContent = "Enviado ✓";
-      if (btn) btn.style.background = "var(--forest)";
+      const err = document.getElementById("contact-error") as HTMLElement;
+      const serviceLines = [...form.querySelectorAll(".chip.on")]
+        .map((c) => (c.textContent || "").trim())
+        .filter(Boolean)
+        .join(", ");
+      const payload: Record<string, string> = {
+        name: (form.querySelector("#name") as HTMLInputElement)?.value ?? "",
+        company: (form.querySelector("#company") as HTMLInputElement)?.value ?? "",
+        email: (form.querySelector("#email") as HTMLInputElement)?.value ?? "",
+        phone: (form.querySelector("#phone") as HTMLInputElement)?.value ?? "",
+        sector: (form.querySelector("#sector") as HTMLSelectElement)?.value ?? "",
+        message: (form.querySelector("#message") as HTMLTextAreaElement)?.value ?? "",
+        service_lines: serviceLines,
+        website: (form.querySelector('[name="website"]') as HTMLInputElement)?.value ?? "",
+      };
+      btn.disabled = true;
+      text.textContent = "Enviando…";
+      err.style.display = "none";
+      try {
+        const res = await fetch("/api/contacto", {
+          method: "POST",
+          headers: { "content-type": "application/json" },
+          body: JSON.stringify(payload),
+        });
+        const j = await res.json();
+        if (res.ok) {
+          text.textContent = "Enviado ✓";
+          btn.style.background = "var(--forest)";
+          form.reset();
+        } else {
+          err.textContent = j.error || "No se pudo enviar el mensaje.";
+          err.style.display = "block";
+          btn.disabled = false;
+          text.textContent = "Enviar solicitud";
+        }
+      } catch {
+        err.textContent = "Error de conexión. Intenta de nuevo o escríbenos por WhatsApp.";
+        err.style.display = "block";
+        btn.disabled = false;
+        text.textContent = "Enviar solicitud";
+      }
     });
   </script>
 </Layout>
