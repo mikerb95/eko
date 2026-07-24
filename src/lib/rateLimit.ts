@@ -27,15 +27,19 @@ export interface RateLimitResult {
   retryAfterSeconds: number
 }
 
-export function checkRateLimit(key: string): RateLimitResult {
+export function checkRateLimit(
+  key: string,
+  maxAttempts = DEFAULT_MAX_ATTEMPTS,
+  windowMs = DEFAULT_WINDOW_MS,
+): RateLimitResult {
   const now = Date.now()
   sweep(now)
   const bucket = buckets.get(key)
   if (!bucket || bucket.resetAt <= now) {
-    buckets.set(key, { count: 1, resetAt: now + WINDOW_MS })
+    buckets.set(key, { count: 1, resetAt: now + windowMs })
     return { allowed: true, retryAfterSeconds: 0 }
   }
-  if (bucket.count >= MAX_ATTEMPTS) {
+  if (bucket.count >= maxAttempts) {
     return { allowed: false, retryAfterSeconds: Math.ceil((bucket.resetAt - now) / 1000) }
   }
   bucket.count += 1

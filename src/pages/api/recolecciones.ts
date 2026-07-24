@@ -1,15 +1,38 @@
 import type { APIRoute } from 'astro'
 import { createOrder } from '../../lib/ops'
+import { checkRateLimit, clientIp } from '../../lib/rateLimit'
 
 export const prerender = false
 
 const MAX = 2000
 
+// Endpoint público: 10 solicitudes por IP cada 10 minutos. Suficiente para un
+// uso legítimo (una persona solicita una recolección de vez en cuando) y frena
+// el relleno masivo de la tabla de órdenes.
+const RATE_MAX = 10
+const RATE_WINDOW_MS = 10 * 60 * 1000
+
 function field(b: any, key: string, max = 200): string {
   return String(b[key] ?? '').trim().slice(0, max)
 }
 
-export const POST: APIRoute = async ({ request }) => {
+export const POST: APIRoute = async (context) => {
+  const { request } = context
+  let fallbackIp = 'unknown'
+  try {
+    fallbackIp = context.clientAddress
+  } catch {
+    // clientAddress no disponible; nos quedamos con el header.
+  }
+  const ip = clientIp(request, fallbackIp)
+  const { allowed, retryAfterSeconds } = checkRateLimit(`recoleccion:${ip}`, RATE_MAX, RATE_WINDOW_MS)
+  if (!allowed) {
+    return new Response(
+      JSON.stringify({ error: 'Demasiadas solicitudes. Intenta de nuevo en unos minutos o escríbenos por WhatsApp.' }),
+      { status: 429, headers: { 'content-type': 'application/json', 'Retry-After': String(retryAfterSeconds) } },
+    )
+  }
+
   let b: any
   try {
     b = await request.json()
