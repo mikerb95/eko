@@ -250,7 +250,7 @@ main { position: relative; z-index: 2; }
 }
 .display em { font-style: italic; color: var(--forest); font-feature-settings: "ss01"; }
 .display .thin { color: var(--mute); }
-.display .clay { color: var(--clay); font-style: italic; }
+.display .clay { color: var(--clay-ink); font-style: italic; }
 
 h1, h2, h3, h4 { font-weight: 500; letter-spacing: -0.02em; line-height: 1.1; }
 h2 { font-size: clamp(32px, 4.5vw, 56px); font-family: var(--font-display); font-weight: 400; }
