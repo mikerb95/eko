@@ -1,7 +1,8 @@
 # Oportunidades para Ekosolv ante el gobierno de Colombia 2026–2030
 
-> Análisis estratégico — julio de 2026
+> Análisis estratégico — actualizado el 24 de julio de 2026
 > Contexto: definir qué oportunidades abre el nuevo gobierno para el sector de gestión ambiental / RAEE, y qué solución de software puede generar demanda inmediata al ofrecerla a la empresa.
+> **Actualización de julio:** se incorporan el gabinete designado (13 de 18 carteras confirmadas a la fecha), los perfiles de los ministros de Ambiente y de Minas y Energía, y las novedades normativas y de mercado del sector RAEE / economía circular.
 
 ---
 
