@@ -133,6 +133,62 @@ of.addEventListener('submit', async (e) => {
   else { $('#order-err').textContent = j.error || 'Error al guardar'; btn.disabled = false; t.textContent = 'Guardar' }
 })
 
+/* ---------- Contactos ---------- */
+const CONTACT_STATUS_LABELS = { nuevo: 'Nuevo', atendido: 'Atendido' }
+
+function renderContacts() {
+  const el = $('#contact-list')
+  if (!el) return
+  const filter = $('#contact-filter').value
+  const rows = filter ? contacts.filter((c) => c.status === filter) : contacts
+  if (!rows.length) {
+    el.innerHTML = '<div class="empty">Sin mensajes de contacto todavía. Los envíos del formulario público aparecen aquí.</div>'
+    return
+  }
+  el.innerHTML = rows.map((c) => `
+    <div class="row-card">
+      <div class="main">
+        <div class="title">${esc(c.name)}${c.company ? ' · ' + esc(c.company) : ''}</div>
+        <div class="meta">
+          <span class="pill ${c.status === 'nuevo' ? 'feat' : 'forest'}">${CONTACT_STATUS_LABELS[c.status] || esc(c.status)}</span>
+          <span>${esc(c.email)}</span>${c.phone ? `<span>·</span><span>${esc(c.phone)}</span>` : ''}
+          <span>·</span><span>${fmtDate(c.created_at)}</span>
+        </div>
+        ${c.sector ? `<div class="meta" style="margin-top:6px">Sector: ${esc(c.sector)}</div>` : ''}
+        ${c.service_lines ? `<div class="meta" style="margin-top:6px">Líneas: ${esc(c.service_lines)}</div>` : ''}
+        ${c.message ? `<div class="meta" style="margin-top:6px">“${esc(c.message)}”</div>` : ''}
+      </div>
+      <div class="row-actions">
+        <button class="icon-btn" data-contact-toggle="${c.id}" data-to="${c.status === 'nuevo' ? 'atendido' : 'nuevo'}">
+          ${c.status === 'nuevo' ? 'Marcar atendido' : 'Reabrir'}
+        </button>
+      </div>
+    </div>`).join('')
+  $$('[data-contact-toggle]', el).forEach((b) =>
+    b.addEventListener('click', () => toggleContact(Number(b.dataset.contactToggle), b.dataset.to)),
+  )
+}
+
+async function toggleContact(id, to) {
+  try {
+    const res = await fetch('/api/admin/contactos?id=' + id, {
+      method: 'PATCH',
+      headers: { 'content-type': 'application/json' },
+      body: JSON.stringify({ status: to }),
+    })
+    const j = await res.json()
+    if (res.ok && j.contact) {
+      const idx = contacts.findIndex((c) => c.id === id)
+      if (idx >= 0) contacts[idx] = j.contact
+      renderContacts()
+    }
+  } catch { /* silencioso: el usuario puede reintentar */ }
+}
+
+const contactFilterEl = $('#contact-filter')
+if (contactFilterEl) contactFilterEl.addEventListener('change', renderContacts)
+renderContacts()
+
 /* ---------- Usuarios (solo admin) ---------- */
 const ROLE_LABELS = {
   admin: 'Administrador', operaciones: 'Operaciones', logistica: 'Logística',
