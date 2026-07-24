@@ -84,8 +84,8 @@ Revisé el repo contra las brechas que se le van a señalar a Ekosolv. Resultado
 - **`blog/index.astro`**: el texto dice *"{posts.length} artículos · actualizado semanalmente"* — pero los posts en `src/data/blog-posts.json` son **el mismo contenido copiado del blog actual de Ekosolv**, con la misma última fecha (26 ago 2025, ~11 meses de antigüedad) que se identificó como debilidad del sitio en vivo. La etiqueta "actualizado semanalmente" es una afirmación falsa dado el dato real. No se resolvió la brecha de frescura de contenido — solo se migró el mismo contenido estancado con una etiqueta que dice lo contrario.
 
 ## 6. Pendiente / a verificar antes de la llamada
-- [ ] **Prioridad alta:** aplicar guarda de "solo datos reales" a `casos.astro`/`en/cases.astro` (mismo patrón que `credenciales.ts`) antes de mostrar el sitio a cualquier prospecto.
-- [ ] Corregir o quitar "actualizado semanalmente" en `blog/index.astro` hasta que haya cadencia real de publicación.
+- [x] **RESUELTO (2026-07-24):** `casos.astro`/`en/cases.astro` ya usan la guarda de `credenciales.ts` (`casosVisibles`, `hayAgregado`, `mostrarPlaceholders`); todos los casos están en `verificado:false`, así que en producción se muestra el fallback honesto, no las cifras inventadas. Además se suavizó el lede que aún afirmaba "mandatos con clientes reales / cifras que podemos sustentar".
+- [x] **RESUELTO (2026-07-24):** quitado "actualizado semanalmente" / "updated weekly" en `blog/index.astro` y `en/blog/index.astro` (ahora "cumplimiento ambiental" / "environmental compliance", coherente con el texto de más abajo "promedio dos piezas al mes").
 - [ ] Cargar al menos 1-2 licencias reales en `credenciales.ts` (con PDF y `publicada: true`) para poder mostrar la sección funcionando, no solo el fallback.
 - [ ] Decidir si se ofrece como "rediseño completo" o "auditoría + propuesta" como puerta de entrada más barata de aceptar.
 - [ ] Preparar 2-3 capturas de pantalla side-by-side (sitio actual vs. nuevo) para la demo — usando `quienes-somos` como la pieza más fuerte, no `casos`.
