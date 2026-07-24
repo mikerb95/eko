@@ -58,7 +58,15 @@ Estas obligaciones ya están en firme y generan demanda estructural independient
 - **Decreto 284 de 2018:** reglamenta la gestión integral de RAEE.
 - **Resolución 0851 de 2022:** clasificación nacional de AEE y lineamientos de los sistemas de recolección y gestión (SRS). Impone a los **productores metas de recolección que aumentan cada año**, con reporte anual obligatorio y sanciones por incumplimiento.
 - **Decreto 670 de 2025:** Programa Basura Cero — gestión integral de residuos sólidos.
-- **Dato de mercado:** Colombia recicla solo ~20% de sus RAEE; el país es pionero regional en normativa pero el cumplimiento operativo está rezagado → espacio de crecimiento grande para gestores formales certificados.
+
+**Novedades regulatorias 2026 (actividad reciente, previa al cambio de gobierno):**
+- **Caracterización de la cadena de AEE (MinAmbiente, marzo de 2026):** estudio técnico que sienta la base para afinar metas y trazabilidad de la Res. 0851. Señala que el Estado seguirá pidiendo *datos* a los obligados.
+- **Proyecto de resolución de economía circular en minería (abril de 2026):** habilita a proyectos mineros a reutilizar y valorizar residuos como materia prima. En línea con la **Ley 2250 de 2022**, que permite acceder a fondos de fomento por incorporar economía circular. Amplía el universo de clientes de Ekonsulting / Ekotrading más allá del RAEE clásico.
+- **Instrumento de control a la importación de AEE usados/reacondicionados** (Comercio + Ambiente, con apoyo de la DIAN): refuerza la responsabilidad extendida del productor y la gestión diferenciada al final de vida útil.
+
+**Datos de mercado actualizados:**
+- Colombia recicla solo **~20%** de sus RAEE; el país es pionero regional en normativa pero el cumplimiento operativo está rezagado → espacio de crecimiento grande para gestores formales certificados.
+- MinAmbiente estima la generación nacional de RAEE en **~197.000 t (2021) → ~216.000 t (2026)**: +9,4% en cinco años (~1,9% anual). Volumen creciente y sostenido, independiente del gobierno de turno.
 
 ---
 
