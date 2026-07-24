@@ -32,6 +32,33 @@ export const rutasEs: Ruta[] = [
   { path: '/contacto', titulo: 'Contacto', descripcion: 'Agenda un diagnóstico de 45 minutos, sin costo y confidencial.' },
 ]
 
+/**
+ * Pares de rutas equivalentes es↔en, para emitir `hreflang` en las cabeceras.
+ * `/oportunidades2630` existe solo en español, así que no tiene par: las
+ * páginas sin equivalente simplemente no emiten alternates.
+ */
+export const HREFLANG_PAIRS: Array<{ es: string; en: string }> = [
+  { es: '/', en: '/en' },
+  { es: '/servicios', en: '/en/services' },
+  { es: '/ekonsulting', en: '/en/ekonsulting' },
+  { es: '/ekoraee', en: '/en/ekoraee' },
+  { es: '/ekopartner', en: '/en/ekopartner' },
+  { es: '/ekotrading', en: '/en/ekotrading' },
+  { es: '/normativas', en: '/en/regulations' },
+  { es: '/casos', en: '/en/cases' },
+  { es: '/licencias', en: '/en/licenses' },
+  { es: '/quienes-somos', en: '/en/about' },
+  { es: '/agenda-una-recoleccion', en: '/en/schedule-a-collection' },
+  { es: '/blog', en: '/en/blog' },
+  { es: '/contacto', en: '/en/contact' },
+]
+
+/** Devuelve las dos rutas equivalentes de una página, o null si no hay par. */
+export function hreflangFor(path: string): { es: string; en: string } | null {
+  const norm = path !== '/' && path.length > 1 ? path.replace(/\/$/, '') : path
+  return HREFLANG_PAIRS.find((p) => p.es === norm || p.en === norm) ?? null
+}
+
 export const rutasEn: Ruta[] = [
   { path: '/en', titulo: 'Home', descripcion: 'ANLA compliance, ESG, and circular economy for the technology sector.' },
   { path: '/en/services', titulo: 'Services', descripcion: "Ekosolv's four service lines." },
