@@ -146,7 +146,7 @@ const alt = hreflangFor(path)
           { xMin: 48,  xMax: 76, yMin: 6,   yMax: 48 },
           { xMin: 2,   xMax: 34, yMin: 48,  yMax: 78 },
         ];
-        document.querySelectorAll(".blob").forEach((el, i) => {
+        document.querySelectorAll<HTMLElement>(".blob").forEach((el, i) => {
           const z = zones[i % zones.length];
           const bx = z.xMin + Math.random() * (z.xMax - z.xMin);
           const by = z.yMin + Math.random() * (z.yMax - z.yMin);
