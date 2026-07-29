@@ -1,6 +1,79 @@
 ---
 import Layout from '../layouts/Layout.astro'
 import SiteFooter from '../components/SiteFooter.astro'
+import TypeformFlow from '../components/TypeformFlow.astro'
+import type { TFStep } from '../components/TypeformFlow.astro'
+
+const steps: TFStep[] = [
+  {
+    title: '¿Cómo te llamas?',
+    subtitle: 'Empecemos por lo básico.',
+    row: true,
+    fields: [
+      { type: 'text', name: 'first_name', label: 'Nombre', placeholder: 'Tu nombre', required: true, autocomplete: 'given-name' },
+      { type: 'text', name: 'last_name', label: 'Apellido', placeholder: 'Tu apellido', required: true, autocomplete: 'family-name' },
+    ],
+  },
+  {
+    title: '¿Cómo te contactamos?',
+    subtitle: 'Coordinamos el retiro por aquí.',
+    row: true,
+    fields: [
+      { type: 'email', name: 'email', label: 'Email', placeholder: 'tu@correo.co', required: true, autocomplete: 'email' },
+      { type: 'tel', name: 'phone', label: 'Teléfono', placeholder: '+57', required: true, autocomplete: 'tel' },
+    ],
+  },
+  {
+    title: '¿Desde qué organización?',
+    row: true,
+    fields: [
+      { type: 'text', name: 'company', label: 'Empresa', placeholder: 'Nombre de la compañía', autocomplete: 'organization' },
+      { type: 'text', name: 'country', label: 'País / región', placeholder: 'Colombia', value: 'Colombia', required: true },
+    ],
+  },
+  {
+    title: '¿Dónde recogemos los equipos?',
+    subtitle: 'Dirección donde están los residuos a retirar.',
+    fields: [
+      { type: 'text', name: 'address', label: 'Dirección', placeholder: 'Calle / carrera y número', required: true, autocomplete: 'address-line1' },
+      { type: 'text', name: 'address2', label: 'Dirección — línea 2', placeholder: 'Apartamento, oficina, piso (opcional)', autocomplete: 'address-line2' },
+    ],
+  },
+  {
+    title: '¿En qué ciudad?',
+    row: true,
+    fields: [
+      { type: 'text', name: 'city', label: 'Ciudad', placeholder: 'Bogotá D.C.', required: true, autocomplete: 'address-level2' },
+      { type: 'text', name: 'postal_code', label: 'Código postal', placeholder: '110111', autocomplete: 'postal-code' },
+    ],
+  },
+  {
+    title: '¿Qué tipo de residuo es?',
+    subtitle: 'Elige la categoría que mejor lo describe.',
+    fields: [
+      {
+        type: 'choice',
+        name: 'waste_type',
+        label: 'Tipo de residuo',
+        options: [
+          { value: 'raee_computo', label: 'RAEE · Cómputo y periféricos' },
+          { value: 'raee_telco', label: 'RAEE · Telecomunicaciones' },
+          { value: 'raee_datacenter', label: 'RAEE · Infraestructura de data center' },
+          { value: 'baterias', label: 'Baterías y pilas' },
+          { value: 'otro', label: 'Otro' },
+        ],
+      },
+    ],
+  },
+  {
+    title: 'Cantidad y detalles',
+    subtitle: 'Un estimado nos ayuda a planear el transporte.',
+    fields: [
+      { type: 'text', name: 'estimated_quantity', label: 'Cantidad estimada', placeholder: 'Ej. 40 equipos / 300 kg' },
+      { type: 'textarea', name: 'message', label: 'Mensaje', placeholder: 'Detalles adicionales y fecha tentativa de recolección…' },
+    ],
+  },
+]
 ---
 
 <Layout title="Agenda una recolección — Ekosolv" description="Formulario de recolección de residuos electrónicos (RAEE). Programa el retiro de tus equipos obsoletos con transporte certificado y certificado de disposición final." activePath="/agenda-una-recoleccion">
@@ -12,427 +85,42 @@ import SiteFooter from '../components/SiteFooter.astro'
     <h1 class="display reveal" style="margin-top:40px">
       Agenda una <em>recolección</em>.
     </h1>
-    <p class="lede reveal" style="margin-top:32px; max-width:52ch">
-      Unas cuantas preguntas y coordinamos el retiro de tus equipos obsoletos. Transporte certificado y certificado de disposición final incluidos.
+    <p class="lede reveal" style="margin-top:32px; max-width:56ch">
+      Residuos electrónicos (RAEE) con transporte certificado y certificado de disposición final. Te tomará menos de un minuto — una pregunta a la vez.
     </p>
   </section>
 
-  <section class="section wrap" style="padding-top:8px">
-    <div class="tf reveal" id="tf">
-      <!-- Progress -->
-      <div class="tf-top">
-        <div class="tf-progress" aria-hidden="true"><span id="tf-bar"></span></div>
-        <div class="tf-count"><span id="tf-current">1</span> / <span id="tf-total">6</span></div>
-      </div>
-
-      <form class="tf-form" id="recoleccion-form" novalidate>
-        <!-- Step 1 -->
-        <div class="tf-step is-active" data-step data-required="first_name,last_name">
-          <p class="tf-eyebrow">Paso 1</p>
-          <h2 class="tf-q">Empecemos. ¿Cómo <em>te llamas</em>?</h2>
-          <p class="tf-help">Así sabremos con quién coordinar la recolección.</p>
-          <div class="tf-grid-2">
-            <div class="tf-field">
-              <label for="first_name">Nombre <span class="req">*</span></label>
-              <input id="first_name" type="text" name="first_name" placeholder="Escribe tu nombre" autocomplete="given-name" required />
-            </div>
-            <div class="tf-field">
-              <label for="last_name">Apellido <span class="req">*</span></label>
-              <input id="last_name" type="text" name="last_name" placeholder="Escribe tu apellido" autocomplete="family-name" required />
-            </div>
-          </div>
-        </div>
-
-        <!-- Step 2 -->
-        <div class="tf-step" data-step data-required="email,phone">
-          <p class="tf-eyebrow">Paso 2</p>
-          <h2 class="tf-q">¿Cómo <em>te contactamos</em>?</h2>
-          <p class="tf-help">Confirmamos fecha y hora del retiro por estos medios.</p>
-          <div class="tf-grid-2">
-            <div class="tf-field">
-              <label for="email">Email <span class="req">*</span></label>
-              <input id="email" type="email" name="email" placeholder="tu@correo.co" autocomplete="email" required />
-            </div>
-            <div class="tf-field">
-              <label for="phone">Teléfono <span class="req">*</span></label>
-              <input id="phone" type="tel" name="phone" placeholder="+57 300 000 0000" autocomplete="tel" required />
-            </div>
-          </div>
-        </div>
-
-        <!-- Step 3 -->
-        <div class="tf-step" data-step data-required="country">
-          <p class="tf-eyebrow">Paso 3</p>
-          <h2 class="tf-q">¿Desde qué <em>empresa</em> nos escribes?</h2>
-          <p class="tf-help">Opcional, pero nos ayuda a preparar la documentación.</p>
-          <div class="tf-grid-2">
-            <div class="tf-field">
-              <label for="company">Empresa</label>
-              <input id="company" type="text" name="company" placeholder="Nombre de la compañía" autocomplete="organization" />
-            </div>
-            <div class="tf-field">
-              <label for="country">País / región <span class="req">*</span></label>
-              <input id="country" type="text" name="country" placeholder="Colombia" value="Colombia" required />
-            </div>
-          </div>
-        </div>
-
-        <!-- Step 4 -->
-        <div class="tf-step" data-step data-required="address,city">
-          <p class="tf-eyebrow">Paso 4</p>
-          <h2 class="tf-q">¿Dónde <em>recogemos</em> los equipos?</h2>
-          <p class="tf-help">Indícanos la dirección exacta del punto de retiro.</p>
-          <div class="tf-field">
-            <label for="address">Dirección <span class="req">*</span></label>
-            <input id="address" type="text" name="address" placeholder="Calle / carrera y número" autocomplete="address-line1" required />
-          </div>
-          <div class="tf-field">
-            <label for="address2">Dirección — línea 2</label>
-            <input id="address2" type="text" name="address2" placeholder="Apartamento, oficina, piso (opcional)" autocomplete="address-line2" />
-          </div>
-          <div class="tf-grid-2">
-            <div class="tf-field">
-              <label for="city">Ciudad <span class="req">*</span></label>
-              <input id="city" type="text" name="city" placeholder="Bogotá D.C." autocomplete="address-level2" required />
-            </div>
-            <div class="tf-field">
-              <label for="postal_code">Código postal</label>
-              <input id="postal_code" type="text" name="postal_code" placeholder="110111" autocomplete="postal-code" />
-            </div>
-          </div>
-        </div>
-
-        <!-- Step 5 -->
-        <div class="tf-step" data-step data-required="">
-          <p class="tf-eyebrow">Paso 5</p>
-          <h2 class="tf-q">¿Qué vamos a <em>recoger</em>?</h2>
-          <p class="tf-help">Elige el tipo de residuo y cuéntanos el volumen aproximado.</p>
-          <input type="hidden" name="waste_type" id="waste_type" value="" />
-          <div class="tf-options" role="radiogroup" aria-label="Tipo de residuo">
-            <button type="button" class="tf-option" data-value="raee_computo" role="radio" aria-checked="false">
-              <span class="tf-option-key">A</span>
-              <span class="tf-option-label">RAEE · Cómputo y periféricos</span>
-            </button>
-            <button type="button" class="tf-option" data-value="raee_telco" role="radio" aria-checked="false">
-              <span class="tf-option-key">B</span>
-              <span class="tf-option-label">RAEE · Telecomunicaciones</span>
-            </button>
-            <button type="button" class="tf-option" data-value="raee_datacenter" role="radio" aria-checked="false">
-              <span class="tf-option-key">C</span>
-              <span class="tf-option-label">RAEE · Infraestructura de data center</span>
-            </button>
-            <button type="button" class="tf-option" data-value="baterias" role="radio" aria-checked="false">
-              <span class="tf-option-key">D</span>
-              <span class="tf-option-label">Baterías y pilas</span>
-            </button>
-            <button type="button" class="tf-option" data-value="otro" role="radio" aria-checked="false">
-              <span class="tf-option-key">E</span>
-              <span class="tf-option-label">Otro</span>
-            </button>
-          </div>
-          <div class="tf-field" style="margin-top:28px">
-            <label for="estimated_quantity">Cantidad estimada</label>
-            <input id="estimated_quantity" type="text" name="estimated_quantity" placeholder="Ej. 40 equipos / 300 kg" />
-          </div>
-        </div>
-
-        <!-- Step 6 -->
-        <div class="tf-step" data-step data-required="">
-          <p class="tf-eyebrow">Paso 6 · Último</p>
-          <h2 class="tf-q">¿Algo más que <em>debamos saber</em>?</h2>
-          <p class="tf-help">Detalles adicionales y fecha tentativa de recolección. Opcional.</p>
-          <div class="tf-field">
-            <label for="message">Mensaje</label>
-            <textarea id="message" name="message" placeholder="Cuéntanos aquí…"></textarea>
-          </div>
-        </div>
-
-        <!-- Success -->
-        <div class="tf-step tf-done" data-done>
-          <div class="tf-done-mark" aria-hidden="true">
-            <svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5"/></svg>
-          </div>
-          <h2 class="tf-q" id="tf-done-title">¡Solicitud recibida!</h2>
-          <p class="tf-help" id="tf-done-sub">Te contactaremos muy pronto para confirmar la recolección.</p>
-        </div>
-
-        <!-- honeypot -->
-        <input type="text" name="website" tabindex="-1" autocomplete="off" aria-hidden="true" style="position:absolute; left:-9999px; height:0; width:0; opacity:0" />
-        <p id="recoleccion-error" class="tf-error" role="alert"></p>
-      </form>
-
-      <!-- Nav -->
-      <div class="tf-nav" id="tf-nav">
-        <button type="button" class="tf-back" id="tf-back" aria-label="Volver al paso anterior">
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M19 12H5M11 18l-6-6 6-6"/></svg>
-          Atrás
-        </button>
-        <div class="tf-nav-right">
-          <span class="tf-enter-hint">Pulsa <kbd>Enter ↵</kbd></span>
-          <button type="button" class="tf-next" id="tf-next">
-            <span class="tf-next-text">Continuar</span>
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
-          </button>
-        </div>
-      </div>
-
-      <p class="tf-whatsapp">
-        ¿Prefieres WhatsApp?
-        <a href="https://wa.me/573212712773" target="_blank" rel="noopener">Agenda por WhatsApp →</a>
-      </p>
+  <section class="section wrap" style="padding-top:0">
+    <div class="reveal">
+      <TypeformFlow
+        formId="recoleccion-form"
+        endpoint="/api/recolecciones"
+        submitLabel="Enviar solicitud"
+        successMode="consecutive"
+        successTitle="¡Solicitud recibida!"
+        successBody="Recibimos tu solicitud de recolección. Te contactamos para coordinar el retiro."
+        whatsapp="https://wa.me/573212712773"
+        steps={steps}
+      />
     </div>
+
+    <p class="tf-alt reveal">
+      ¿Prefieres coordinar rápido?
+      <a href="https://wa.me/573212712773" target="_blank" rel="noopener">Agenda por WhatsApp →</a>
+    </p>
   </section>
 
   <SiteFooter />
 
   <style>
-    .tf { max-width: 760px; margin: 0 auto; }
-
-    /* Progress */
-    .tf-top { display: flex; align-items: center; gap: 18px; margin-bottom: 44px; }
-    .tf-progress { flex: 1; height: 3px; border-radius: 999px; background: var(--line); overflow: hidden; }
-    .tf-progress span {
-      display: block; height: 100%; width: 16.66%;
-      background: linear-gradient(90deg, var(--forest), var(--aqua));
-      border-radius: 999px; transition: width .5s cubic-bezier(.4,0,.2,1);
+    .tf-alt {
+      margin-top: clamp(40px, 6vw, 64px);
+      padding-top: 26px;
+      border-top: 1px solid var(--line);
+      font-size: 15px;
+      color: var(--ink-2);
+      max-width: 720px;
     }
-    .tf-count { font-family: var(--font-mono); font-size: 12.5px; letter-spacing: 0.06em; color: var(--mute); white-space: nowrap; }
-    .tf-count #tf-current { color: var(--ink); }
-
-    /* Steps */
-    .tf-form { position: relative; min-height: 300px; }
-    .tf-step { display: none; }
-    .tf-step.is-active { display: block; animation: tfIn .5s cubic-bezier(.2,.7,.2,1); }
-    @keyframes tfIn {
-      from { opacity: 0; transform: translateY(18px); }
-      to { opacity: 1; transform: none; }
-    }
-    @media (prefers-reduced-motion: reduce) { .tf-step.is-active { animation: none; } }
-
-    .tf-eyebrow { font-family: var(--font-mono); font-size: 12px; letter-spacing: 0.1em; text-transform: uppercase; color: var(--forest); margin-bottom: 18px; }
-    .tf-q { font-family: var(--font-display); font-weight: 400; font-size: clamp(29px, 4.4vw, 46px); line-height: 1.08; letter-spacing: -0.01em; color: var(--ink); }
-    .tf-q em { font-style: italic; color: var(--forest); }
-    .tf-help { color: var(--mute); font-size: 16.5px; line-height: 1.5; margin-top: 16px; max-width: 46ch; }
-
-    .tf-grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 26px 32px; margin-top: 36px; }
-    @media (max-width: 560px) { .tf-grid-2 { grid-template-columns: 1fr; gap: 26px; } }
-
-    .tf-field { display: flex; flex-direction: column; gap: 10px; margin-top: 36px; }
-    .tf-grid-2 .tf-field { margin-top: 0; }
-    .tf-field label { font-family: var(--font-mono); font-size: 12px; letter-spacing: 0.06em; text-transform: uppercase; color: var(--mute); }
-    .tf-field .req { color: var(--forest); }
-    .tf-field input, .tf-field textarea {
-      font-family: var(--font-sans); font-size: clamp(19px, 2.4vw, 23px); color: var(--ink);
-      background: transparent; border: 0; border-bottom: 2px solid var(--line-2);
-      padding: 8px 2px; outline: none; width: 100%;
-      transition: border-color .2s ease, box-shadow .2s ease;
-    }
-    .tf-field input::placeholder, .tf-field textarea::placeholder { color: color-mix(in oklab, var(--mute) 65%, transparent); }
-    .tf-field input:focus, .tf-field textarea:focus { border-color: var(--forest); box-shadow: 0 2px 0 -1px var(--forest); }
-    .tf-field input.invalid { border-color: var(--clay-2); }
-    .tf-field textarea { resize: vertical; min-height: 96px; line-height: 1.5; }
-
-    /* Option cards */
-    .tf-options { display: flex; flex-direction: column; gap: 12px; margin-top: 36px; }
-    .tf-option {
-      display: flex; align-items: center; gap: 16px; text-align: left;
-      padding: 16px 18px; border-radius: 14px; cursor: pointer;
-      background: color-mix(in oklab, var(--paper-warm) 70%, transparent);
-      border: 1.5px solid var(--line); color: var(--ink);
-      transition: border-color .18s ease, background .18s ease, transform .18s ease;
-    }
-    .tf-option:hover { border-color: color-mix(in oklab, var(--forest) 45%, var(--line)); background: color-mix(in oklab, var(--forest) 6%, #fff); transform: translateX(2px); }
-    .tf-option-key {
-      flex: none; width: 30px; height: 30px; display: grid; place-items: center;
-      border-radius: 8px; border: 1.5px solid var(--line-2); background: var(--paper);
-      font-family: var(--font-mono); font-size: 13px; color: var(--mute); transition: all .18s ease;
-    }
-    .tf-option-label { font-size: 17px; letter-spacing: -0.01em; }
-    .tf-option[aria-checked="true"] { border-color: var(--forest); background: color-mix(in oklab, var(--forest) 10%, #fff); }
-    .tf-option[aria-checked="true"] .tf-option-key { background: var(--forest); border-color: var(--forest); color: #fff; }
-
-    /* Success */
-    .tf-done { text-align: left; }
-    .tf-done-mark {
-      width: 60px; height: 60px; border-radius: 50%; display: grid; place-items: center;
-      background: color-mix(in oklab, var(--forest) 14%, #fff); color: var(--forest);
-      margin-bottom: 28px; animation: tfPop .5s cubic-bezier(.2,.9,.3,1.4);
-    }
-    @keyframes tfPop { from { transform: scale(.6); opacity: 0; } to { transform: scale(1); opacity: 1; } }
-
-    .tf-error { display: none; color: var(--clay-2); font-size: 14.5px; margin-top: 22px; }
-    .tf-error.show { display: block; }
-
-    /* Nav */
-    .tf-nav { display: flex; align-items: center; justify-content: space-between; gap: 16px; margin-top: 48px; padding-top: 28px; border-top: 1px solid var(--line); }
-    .tf-back {
-      display: inline-flex; align-items: center; gap: 8px; padding: 10px 14px 10px 12px;
-      border-radius: 999px; background: transparent; color: var(--mute); font-size: 15px;
-      transition: color .2s ease, background .2s ease;
-    }
-    .tf-back:hover { color: var(--ink); background: color-mix(in oklab, var(--ink) 5%, transparent); }
-    .tf-back[hidden] { visibility: hidden; }
-    .tf-nav-right { display: flex; align-items: center; gap: 16px; }
-    .tf-enter-hint { font-size: 13px; color: var(--mute); }
-    .tf-enter-hint kbd {
-      font-family: var(--font-mono); font-size: 11.5px; background: var(--paper-warm);
-      border: 1px solid var(--line-2); border-radius: 5px; padding: 2px 6px; color: var(--ink-2);
-    }
-    @media (max-width: 560px) { .tf-enter-hint { display: none; } }
-    .tf-next {
-      display: inline-flex; align-items: center; gap: 10px;
-      padding: 14px 24px; border-radius: 999px; background: var(--deep); color: #fff; font-size: 16px;
-      transition: transform .2s ease, background .2s ease;
-    }
-    .tf-next:hover { background: var(--deep-2); transform: translateY(-2px); }
-    .tf-next:disabled { opacity: .6; cursor: default; transform: none; }
-    .tf-next.done-state { background: var(--forest); }
-
-    .tf-whatsapp { margin-top: 26px; font-size: 15px; color: var(--mute); }
-    .tf-whatsapp a { color: var(--deep); font-weight: 500; }
-    .tf-whatsapp a:hover { color: var(--forest); }
+    .tf-alt a { color: var(--deep); font-weight: 500; margin-left: 6px; }
   </style>
-
-  <script>
-    (() => {
-      const root = document.getElementById("tf");
-      const form = document.getElementById("recoleccion-form") as HTMLFormElement | null;
-      if (!root || !form) return;
-
-      const steps = Array.from(root.querySelectorAll<HTMLElement>("[data-step]"));
-      const doneEl = root.querySelector<HTMLElement>("[data-done]")!;
-      const bar = document.getElementById("tf-bar")!;
-      const currentLabel = document.getElementById("tf-current")!;
-      const totalLabel = document.getElementById("tf-total")!;
-      const backBtn = document.getElementById("tf-back") as HTMLButtonElement;
-      const nextBtn = document.getElementById("tf-next") as HTMLButtonElement;
-      const nextText = nextBtn.querySelector(".tf-next-text") as HTMLElement;
-      const nav = document.getElementById("tf-nav")!;
-      const errEl = document.getElementById("recoleccion-error") as HTMLElement;
-      const total = steps.length;
-      totalLabel.textContent = String(total);
-
-      let idx = 0;
-
-      const showStep = (n: number, focus = true) => {
-        steps.forEach((s, i) => s.classList.toggle("is-active", i === n));
-        doneEl.classList.remove("is-active");
-        idx = n;
-        bar.style.width = `${((n + 1) / total) * 100}%`;
-        currentLabel.textContent = String(n + 1);
-        backBtn.hidden = n === 0;
-        nextText.textContent = n === total - 1 ? "Enviar solicitud" : "Continuar";
-        clearError();
-        if (focus) {
-          const first = steps[n].querySelector<HTMLElement>("input, textarea");
-          if (first) window.requestAnimationFrame(() => first.focus());
-        }
-      };
-
-      const clearError = () => { errEl.classList.remove("show"); errEl.textContent = ""; };
-      const showError = (msg: string) => { errEl.textContent = msg; errEl.classList.add("show"); };
-
-      const validateStep = (n: number): boolean => {
-        const step = steps[n];
-        const required = (step.dataset.required || "").split(",").map(s => s.trim()).filter(Boolean);
-        for (const name of required) {
-          const el = form.elements.namedItem(name) as HTMLInputElement | null;
-          if (!el) continue;
-          el.classList.remove("invalid");
-          if (!el.value.trim()) {
-            el.classList.add("invalid");
-            el.focus();
-            showError("Este campo es obligatorio para continuar.");
-            return false;
-          }
-          if (el.type === "email" && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(el.value.trim())) {
-            el.classList.add("invalid");
-            el.focus();
-            showError("Escribe un correo electrónico válido.");
-            return false;
-          }
-        }
-        return true;
-      };
-
-      const goNext = () => {
-        if (!validateStep(idx)) return;
-        if (idx < total - 1) { showStep(idx + 1); return; }
-        submit();
-      };
-
-      const goBack = () => { if (idx > 0) showStep(idx - 1); };
-
-      nextBtn.addEventListener("click", goNext);
-      backBtn.addEventListener("click", goBack);
-
-      // Enter to advance (Shift+Enter allows newline in textarea)
-      form.addEventListener("keydown", (e) => {
-        const target = e.target as HTMLElement;
-        if (e.key === "Enter") {
-          if (target.tagName === "TEXTAREA" && !e.shiftKey) { e.preventDefault(); goNext(); return; }
-          if (target.tagName !== "TEXTAREA") { e.preventDefault(); goNext(); }
-        }
-      });
-
-      // Clear invalid state as the user types
-      form.addEventListener("input", (e) => {
-        (e.target as HTMLElement).classList.remove("invalid");
-        clearError();
-      });
-
-      // Option cards
-      const waste = document.getElementById("waste_type") as HTMLInputElement;
-      root.querySelectorAll<HTMLButtonElement>(".tf-option").forEach((opt) => {
-        opt.addEventListener("click", () => {
-          root.querySelectorAll(".tf-option").forEach(o => o.setAttribute("aria-checked", "false"));
-          opt.setAttribute("aria-checked", "true");
-          waste.value = opt.dataset.value || "";
-        });
-      });
-      // Keyboard letters A–E to pick an option while on step 5
-      document.addEventListener("keydown", (e) => {
-        const opts = Array.from(root.querySelectorAll<HTMLButtonElement>(".tf-option"));
-        const step5 = opts[0]?.closest("[data-step]");
-        if (!step5 || !step5.classList.contains("is-active")) return;
-        if ((e.target as HTMLElement).tagName === "INPUT" || (e.target as HTMLElement).tagName === "TEXTAREA") return;
-        const key = e.key.toUpperCase();
-        const map: Record<string, number> = { A: 0, B: 1, C: 2, D: 3, E: 4 };
-        if (key in map && opts[map[key]]) { e.preventDefault(); opts[map[key]].click(); }
-      });
-
-      async function submit() {
-        clearError();
-        nextBtn.disabled = true;
-        backBtn.disabled = true;
-        nextText.textContent = "Enviando…";
-        const payload = Object.fromEntries(new FormData(form as HTMLFormElement).entries());
-        try {
-          const res = await fetch("/api/recolecciones", {
-            method: "POST",
-            headers: { "content-type": "application/json" },
-            body: JSON.stringify(payload),
-          });
-          const j = await res.json();
-          if (!res.ok) throw new Error(j.error || "No se pudo enviar la solicitud.");
-          steps.forEach(s => s.classList.remove("is-active"));
-          const doneSub = document.getElementById("tf-done-sub")!;
-          const doneTitle = document.getElementById("tf-done-title")!;
-          doneTitle.innerHTML = "¡Solicitud <em>recibida</em>!";
-          doneSub.textContent = `Guardamos tu solicitud ${j.consecutive}. Te contactaremos muy pronto para confirmar fecha y hora del retiro.`;
-          doneEl.classList.add("is-active");
-          bar.style.width = "100%";
-          currentLabel.textContent = String(total);
-          nav.style.display = "none";
-        } catch (ex) {
-          showError(ex instanceof Error ? ex.message : "Error de red. Intenta de nuevo o escríbenos por WhatsApp.");
-          nextBtn.disabled = false;
-          backBtn.disabled = false;
-          nextText.textContent = "Enviar solicitud";
-        }
-      }
-
-      showStep(0, false);
-    })();
-  </script>
 </Layout>
