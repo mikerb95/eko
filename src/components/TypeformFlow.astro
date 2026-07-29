@@ -104,6 +104,13 @@ const selectedValues = (f: Extract<TFField, { type: 'choice' }>) =>
   data-endpoint={endpoint}
   data-success-mode={successMode}
   data-submit-label={submitLabel}
+  data-t-continue={T.continue}
+  data-t-required={T.required}
+  data-t-email={T.email}
+  data-t-sending={T.sending}
+  data-t-submit-error={T.submitError}
+  data-t-net-error={T.netError}
+  data-t-consecutive={T.consecutive}
 >
   <div class="tf-progress" aria-hidden="true"><span class="tf-progress-bar"></span></div>
 
