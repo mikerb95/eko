@@ -1,6 +1,74 @@
 ---
 import Layout from '../layouts/Layout.astro'
 import SiteFooter from '../components/SiteFooter.astro'
+import TypeformFlow from '../components/TypeformFlow.astro'
+import type { TFStep } from '../components/TypeformFlow.astro'
+
+const steps: TFStep[] = [
+  {
+    title: '¿Con quién hablamos?',
+    subtitle: 'Cuéntanos quién eres y desde dónde escribes.',
+    row: true,
+    fields: [
+      { type: 'text', name: 'name', label: 'Nombre', placeholder: 'Tu nombre', required: true, autocomplete: 'name' },
+      { type: 'text', name: 'company', label: 'Empresa', placeholder: 'Nombre de la compañía', autocomplete: 'organization' },
+    ],
+  },
+  {
+    title: '¿Cómo te contactamos?',
+    subtitle: 'Respondemos en menos de 24 horas hábiles.',
+    row: true,
+    fields: [
+      { type: 'email', name: 'email', label: 'Email corporativo', placeholder: 'tu@empresa.co', required: true, autocomplete: 'email' },
+      { type: 'tel', name: 'phone', label: 'Teléfono', placeholder: '+57', autocomplete: 'tel' },
+    ],
+  },
+  {
+    title: '¿A qué sector perteneces?',
+    subtitle: 'Nos ayuda a preparar la sesión con el contexto correcto.',
+    fields: [
+      {
+        type: 'choice',
+        name: 'sector',
+        label: 'Sector',
+        options: [
+          { value: 'Importadora de tecnología', label: 'Importadora de tecnología' },
+          { value: 'Ensambladora / productora', label: 'Ensambladora / productora' },
+          { value: 'Telecomunicaciones', label: 'Telecomunicaciones' },
+          { value: 'Data center / infraestructura', label: 'Data center / infraestructura' },
+          { value: 'Retail electrónico', label: 'Retail electrónico' },
+          { value: 'Otro', label: 'Otro' },
+        ],
+      },
+    ],
+  },
+  {
+    title: '¿Qué necesitas resolver?',
+    subtitle: 'Selecciona las líneas de servicio que apliquen.',
+    fields: [
+      {
+        type: 'choice',
+        name: 'service_lines',
+        label: 'Línea de servicio',
+        multiple: true,
+        options: [
+          { value: 'EKONSULTING · Asesoría ANLA', label: 'EKONSULTING', hint: 'Asesoría ANLA' },
+          { value: 'EKORAEE · Residuos electrónicos', label: 'EKORAEE', hint: 'Residuos electrónicos', selected: true },
+          { value: 'EKOPARTNER · Operación residuos', label: 'EKOPARTNER', hint: 'Operación residuos' },
+          { value: 'EKOTRADING · Activos IT', label: 'EKOTRADING', hint: 'Activos IT' },
+          { value: 'Estrategia ESG', label: 'Estrategia ESG' },
+        ],
+      },
+    ],
+  },
+  {
+    title: 'Cuéntanos el contexto',
+    subtitle: 'Entre más detalle, mejor preparamos la sesión.',
+    fields: [
+      { type: 'textarea', name: 'message', label: 'Cuéntanos más', placeholder: 'Contexto de la obligación, tipo de residuos, volúmenes estimados, vencimientos próximos…' },
+    ],
+  },
+]
 ---
 
 <Layout title="Contacto — Ekosolv" activePath="/contacto">
@@ -40,132 +108,20 @@ import SiteFooter from '../components/SiteFooter.astro'
         </div>
       </div>
     </div>
-  </section>
 
-  <section class="section wrap" style="padding-top:0">
-    <div class="contact-grid reveal">
-      <div class="contact-info">
-        <div class="row"><div class="k">Email</div><div class="v ulink">info@ekosolv.com</div></div>
-        <div class="row"><div class="k">Teléfono</div><div class="v">+57 321 271 2773</div></div>
-        <div class="row"><div class="k">WhatsApp</div><div class="v">+57 321 271 2773</div></div>
-        <div class="row"><div class="k">Oficina</div><div class="v">Edificio RPTV<br>Carrera 15 #31B-33, Bogotá D.C.</div></div>
-        <div class="row"><div class="k">Horario</div><div class="v">Lun – Vie · 8:00 – 17:30 COT</div></div>
-        <div class="row">
-          <div class="k">Emergencias</div>
-          <div class="v">
-            Visitas no programadas de la autoridad ambiental:<br>
-            <span style="color:var(--deep); font-weight:500">+57 322 226 6729</span> · 24/7
-          </div>
-        </div>
-      </div>
-
-      <form class="form" id="contact-form">
-        <div class="form-row">
-          <div class="field">
-            <label for="name">Nombre *</label>
-            <input id="name" name="name" type="text" placeholder="Tu nombre" required />
-          </div>
-          <div class="field">
-            <label for="company">Empresa</label>
-            <input id="company" name="company" type="text" placeholder="Nombre de la compañía" />
-          </div>
-        </div>
-        <div class="form-row">
-          <div class="field">
-            <label for="email">Email corporativo *</label>
-            <input id="email" name="email" type="email" placeholder="tu@empresa.co" required />
-          </div>
-          <div class="field">
-            <label for="phone">Teléfono</label>
-            <input id="phone" name="phone" type="tel" placeholder="+57" />
-          </div>
-        </div>
-        <div class="field">
-          <label for="sector">Sector</label>
-          <select id="sector" name="sector">
-            <option>Importadora de tecnología</option>
-            <option>Ensambladora / productora</option>
-            <option>Telecomunicaciones</option>
-            <option>Data center / infraestructura</option>
-            <option>Retail electrónico</option>
-            <option>Otro</option>
-          </select>
-        </div>
-        <fieldset class="field">
-          <legend>Línea de servicio (selecciona las que apliquen)</legend>
-          <div class="chips">
-            <button type="button" class="chip" aria-pressed="false">EKONSULTING · Asesoría ANLA</button>
-            <button type="button" class="chip on" aria-pressed="true">EKORAEE · Residuos electrónicos</button>
-            <button type="button" class="chip" aria-pressed="false">EKOPARTNER · Operación residuos</button>
-            <button type="button" class="chip" aria-pressed="false">EKOTRADING · Activos IT</button>
-            <button type="button" class="chip" aria-pressed="false">Estrategia ESG</button>
-          </div>
-        </fieldset>
-        <div class="field">
-          <label for="message">Cuéntanos más</label>
-          <textarea id="message" name="message" placeholder="Contexto de la obligación, tipo de residuos, volúmenes estimados, vencimientos próximos…"></textarea>
-        </div>
-        <input type="text" name="website" tabindex="-1" autocomplete="off" aria-hidden="true" style="position:absolute; left:-9999px; height:0; width:0; opacity:0" />
-        <p id="contact-error" style="display:none; color:#b04a2e; margin:0"></p>
-        <button type="submit" class="submit">
-          <span class="submit-text">Enviar solicitud</span>
-          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6">
-            <path d="M5 12h14M13 6l6 6-6 6"/>
-          </svg>
-        </button>
-      </form>
+    <div class="reveal">
+      <TypeformFlow
+        formId="contact-form"
+        endpoint="/api/contacto"
+        submitLabel="Enviar solicitud"
+        successMode="simple"
+        successTitle="Solicitud enviada"
+        successBody="Gracias. Te contactamos en menos de 24 horas hábiles para agendar tu diagnóstico."
+        whatsapp="https://wa.me/573212712773"
+        steps={steps}
+      />
     </div>
   </section>
 
   <SiteFooter />
-
-  <script>
-    const form = document.getElementById("contact-form") as HTMLFormElement | null;
-    form?.addEventListener("submit", async (e) => {
-      e.preventDefault();
-      const btn = form.querySelector(".submit") as HTMLButtonElement;
-      const text = form.querySelector(".submit-text") as HTMLElement;
-      const err = document.getElementById("contact-error") as HTMLElement;
-      const serviceLines = [...form.querySelectorAll(".chip.on")]
-        .map((c) => (c.textContent || "").trim())
-        .filter(Boolean)
-        .join(", ");
-      const payload: Record<string, string> = {
-        name: (form.querySelector("#name") as HTMLInputElement)?.value ?? "",
-        company: (form.querySelector("#company") as HTMLInputElement)?.value ?? "",
-        email: (form.querySelector("#email") as HTMLInputElement)?.value ?? "",
-        phone: (form.querySelector("#phone") as HTMLInputElement)?.value ?? "",
-        sector: (form.querySelector("#sector") as HTMLSelectElement)?.value ?? "",
-        message: (form.querySelector("#message") as HTMLTextAreaElement)?.value ?? "",
-        service_lines: serviceLines,
-        website: (form.querySelector('[name="website"]') as HTMLInputElement)?.value ?? "",
-      };
-      btn.disabled = true;
-      text.textContent = "Enviando…";
-      err.style.display = "none";
-      try {
-        const res = await fetch("/api/contacto", {
-          method: "POST",
-          headers: { "content-type": "application/json" },
-          body: JSON.stringify(payload),
-        });
-        const j = await res.json();
-        if (res.ok) {
-          text.textContent = "Enviado ✓";
-          btn.style.background = "var(--forest)";
-          form.reset();
-        } else {
-          err.textContent = j.error || "No se pudo enviar el mensaje.";
-          err.style.display = "block";
-          btn.disabled = false;
-          text.textContent = "Enviar solicitud";
-        }
-      } catch {
-        err.textContent = "Error de conexión. Intenta de nuevo o escríbenos por WhatsApp.";
-        err.style.display = "block";
-        btn.disabled = false;
-        text.textContent = "Enviar solicitud";
-      }
-    });
-  </script>
 </Layout>
