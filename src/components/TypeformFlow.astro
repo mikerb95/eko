@@ -556,7 +556,7 @@ const selectedValues = (f: Extract<TFField, { type: 'choice' }>) =>
       steps.forEach((s, i) => s.classList.toggle('is-active', i === current))
       bar.style.width = `${((current + 1) / steps.length) * 100}%`
       backBtn.hidden = current === 0
-      nextLabel.textContent = isLast(current) ? submitLabel : 'Continuar'
+      nextLabel.textContent = isLast(current) ? submitLabel : t.continue
       clearError()
       if (focus) {
         const target = steps[current].querySelector(
