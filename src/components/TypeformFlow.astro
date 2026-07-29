@@ -205,6 +205,9 @@ const selectedValues = (f: Extract<TFField, { type: 'choice' }>) =>
     --tf-line: var(--line-2);
     max-width: 720px;
   }
+  /* Un display explícito en clases (.tf-back, etc.) gana sobre el [hidden] del
+     navegador; forzamos que ocultar siga funcionando. */
+  .tf-flow [hidden] { display: none !important; }
 
   /* Barra de progreso */
   .tf-progress {
