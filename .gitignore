@@ -31,3 +31,5 @@ pnpm-debug.log*
 # Local Netlify folder
 .netlify
 oportunidad_lito.md
+.vercel
+.env*
