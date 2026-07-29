@@ -231,7 +231,7 @@ const selectedValues = (f: Extract<TFField, { type: 'choice' }>) =>
     <p class="tf-success-body">{successBody}</p>
     {whatsapp && (
       <a class="tf-success-wa" href={whatsapp} target="_blank" rel="noopener">
-        ¿Prefieres WhatsApp? Escríbenos →
+        {T.wa}
       </a>
     )}
   </div>
