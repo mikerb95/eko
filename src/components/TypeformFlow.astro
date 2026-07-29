@@ -666,7 +666,7 @@ const selectedValues = (f: Extract<TFField, { type: 'choice' }>) =>
         successEl.hidden = false
         successEl.scrollIntoView({ behavior: 'smooth', block: 'nearest' })
       } catch (ex) {
-        showError(ex instanceof Error ? ex.message : 'Error de red. Intenta de nuevo o escríbenos por WhatsApp.')
+        showError(ex instanceof Error ? ex.message : t.netError)
         nextBtn.disabled = false
         nextLabel.textContent = submitLabel
       }
