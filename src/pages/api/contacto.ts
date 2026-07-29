@@ -1,5 +1,6 @@
 import type { APIRoute } from 'astro'
 import { createContact } from '../../lib/contactos'
+import { notifyNewContact } from '../../lib/email'
 import { checkRateLimit, clientIp } from '../../lib/rateLimit'
 
 export const prerender = false
@@ -48,7 +49,7 @@ export const POST: APIRoute = async (context) => {
   if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) return json({ error: 'Email inválido' }, 400)
 
   try {
-    await createContact({
+    const contact = await createContact({
       name,
       email,
       company: field(b, 'company'),
@@ -58,6 +59,9 @@ export const POST: APIRoute = async (context) => {
       message: field(b, 'message', MAX),
       source: 'web',
     })
+    // El aviso al equipo no condiciona la respuesta: el mensaje ya está guardado.
+    // notifyNewContact no lanza; devuelve { sent:false } y lo deja en el log.
+    await notifyNewContact(contact)
     return json({ ok: true })
   } catch (e: any) {
     console.error('[contacto] createContact failed:', e?.message || e)
