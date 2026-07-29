@@ -527,6 +527,15 @@ const selectedValues = (f: Extract<TFField, { type: 'choice' }>) =>
     const endpoint = flow.dataset.endpoint || ''
     const submitLabel = flow.dataset.submitLabel || 'Enviar'
     const successMode = flow.dataset.successMode || 'simple'
+    const t = {
+      continue: flow.dataset.tContinue || 'Continuar',
+      required: flow.dataset.tRequired || 'Completa este campo para continuar.',
+      email: flow.dataset.tEmail || 'Escribe un correo válido.',
+      sending: flow.dataset.tSending || 'Enviando…',
+      submitError: flow.dataset.tSubmitError || 'No se pudo enviar la solicitud.',
+      netError: flow.dataset.tNetError || 'Error de red. Intenta de nuevo o escríbenos por WhatsApp.',
+      consecutive: flow.dataset.tConsecutive || 'Tu radicado es %s.',
+    }
     if (!steps.length) return
 
     flow.setAttribute('data-enhanced', '')
