@@ -48,6 +48,7 @@ interface Props {
   successTitle?: string
   successBody?: string
   whatsapp?: string
+  lang?: 'es' | 'en'
 }
 
 const {
@@ -59,7 +60,36 @@ const {
   successTitle = 'Recibido',
   successBody = 'Gracias. Te contactamos muy pronto.',
   whatsapp,
+  lang = 'es',
 } = Astro.props
+
+// Microcopy de la interfaz según idioma. `%s` en `consecutive` se reemplaza por el radicado.
+const T = {
+  es: {
+    continue: 'Continuar',
+    back: 'Atrás',
+    hint: 'Pulsa',
+    required: 'Completa este campo para continuar.',
+    email: 'Escribe un correo válido.',
+    sending: 'Enviando…',
+    submitError: 'No se pudo enviar la solicitud.',
+    netError: 'Error de red. Intenta de nuevo o escríbenos por WhatsApp.',
+    consecutive: 'Tu radicado es %s. Te contactamos para coordinar el retiro.',
+    wa: '¿Prefieres WhatsApp? Escríbenos →',
+  },
+  en: {
+    continue: 'Continue',
+    back: 'Back',
+    hint: 'Press',
+    required: 'Please complete this field to continue.',
+    email: 'Enter a valid email.',
+    sending: 'Sending…',
+    submitError: 'Could not send the request.',
+    netError: 'Network error. Try again or reach us on WhatsApp.',
+    consecutive: 'Your reference is %s. We’ll reach out to coordinate the pickup.',
+    wa: 'Prefer WhatsApp? Write to us →',
+  },
+}[lang]
 
 const pad = (n: number) => String(n).padStart(2, '0')
 const letters = 'ABCDEFGHIJ'
