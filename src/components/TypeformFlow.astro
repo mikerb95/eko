@@ -647,7 +647,7 @@ const selectedValues = (f: Extract<TFField, { type: 'choice' }>) =>
     async function submit() {
       const payload = Object.fromEntries(new FormData(form).entries())
       nextBtn.disabled = true
-      nextLabel.textContent = 'Enviando…'
+      nextLabel.textContent = t.sending
       clearError()
       try {
         const res = await fetch(endpoint, {
@@ -656,10 +656,10 @@ const selectedValues = (f: Extract<TFField, { type: 'choice' }>) =>
           body: JSON.stringify(payload),
         })
         const j = await res.json().catch(() => ({}))
-        if (!res.ok) throw new Error(j.error || 'No se pudo enviar la solicitud.')
+        if (!res.ok) throw new Error(j.error || t.submitError)
         if (successMode === 'consecutive' && j.consecutive) {
           const body = successEl.querySelector('.tf-success-body') as HTMLElement
-          body.textContent = `Tu radicado es ${j.consecutive}. Te contactamos para coordinar el retiro.`
+          body.textContent = t.consecutive.replace('%s', j.consecutive)
         }
         form.hidden = true
         ;(flow.querySelector('.tf-progress') as HTMLElement).style.opacity = '0'
