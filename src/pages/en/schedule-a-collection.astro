@@ -1,6 +1,79 @@
 ---
 import LayoutEn from '../../layouts/LayoutEn.astro'
 import SiteFooter from '../../components/SiteFooter.astro'
+import TypeformFlow from '../../components/TypeformFlow.astro'
+import type { TFStep } from '../../components/TypeformFlow.astro'
+
+const steps: TFStep[] = [
+  {
+    title: 'What’s your name?',
+    subtitle: 'Let’s start with the basics.',
+    row: true,
+    fields: [
+      { type: 'text', name: 'first_name', label: 'First name', placeholder: 'Your first name', required: true, autocomplete: 'given-name' },
+      { type: 'text', name: 'last_name', label: 'Last name', placeholder: 'Your last name', required: true, autocomplete: 'family-name' },
+    ],
+  },
+  {
+    title: 'How can we reach you?',
+    subtitle: 'We’ll coordinate the pickup here.',
+    row: true,
+    fields: [
+      { type: 'email', name: 'email', label: 'Email', placeholder: 'you@email.com', required: true, autocomplete: 'email' },
+      { type: 'tel', name: 'phone', label: 'Phone', placeholder: '+1', required: true, autocomplete: 'tel' },
+    ],
+  },
+  {
+    title: 'Which organization?',
+    row: true,
+    fields: [
+      { type: 'text', name: 'company', label: 'Company', placeholder: 'Company name', autocomplete: 'organization' },
+      { type: 'text', name: 'country', label: 'Country / region', placeholder: 'Colombia', value: 'Colombia', required: true },
+    ],
+  },
+  {
+    title: 'Where do we pick up the equipment?',
+    subtitle: 'Address where the waste to be collected is located.',
+    fields: [
+      { type: 'text', name: 'address', label: 'Address', placeholder: 'Street and number', required: true, autocomplete: 'address-line1' },
+      { type: 'text', name: 'address2', label: 'Address — line 2', placeholder: 'Apartment, suite, floor (optional)', autocomplete: 'address-line2' },
+    ],
+  },
+  {
+    title: 'Which city?',
+    row: true,
+    fields: [
+      { type: 'text', name: 'city', label: 'City', placeholder: 'Bogotá D.C.', required: true, autocomplete: 'address-level2' },
+      { type: 'text', name: 'postal_code', label: 'Postal code', placeholder: '110111', autocomplete: 'postal-code' },
+    ],
+  },
+  {
+    title: 'What type of waste is it?',
+    subtitle: 'Pick the category that best describes it.',
+    fields: [
+      {
+        type: 'choice',
+        name: 'waste_type',
+        label: 'Waste type',
+        options: [
+          { value: 'raee_computo', label: 'WEEE · Computing & peripherals' },
+          { value: 'raee_telco', label: 'WEEE · Telecommunications' },
+          { value: 'raee_datacenter', label: 'WEEE · Data center infrastructure' },
+          { value: 'baterias', label: 'Batteries' },
+          { value: 'otro', label: 'Other' },
+        ],
+      },
+    ],
+  },
+  {
+    title: 'Quantity & details',
+    subtitle: 'An estimate helps us plan the transport.',
+    fields: [
+      { type: 'text', name: 'estimated_quantity', label: 'Estimated quantity', placeholder: 'E.g. 40 devices / 300 kg' },
+      { type: 'textarea', name: 'message', label: 'Message', placeholder: 'Additional details and tentative collection date…' },
+    ],
+  },
+]
 ---
 
 <LayoutEn title="Schedule a collection — Ekosolv" description="Electronic waste (WEEE) collection request form. Schedule the retrieval of your obsolete equipment with certified transport and final disposal certificate." activePath="/en/schedule-a-collection">
@@ -13,137 +86,41 @@ import SiteFooter from '../../components/SiteFooter.astro'
       Schedule a <em>collection</em>.
     </h1>
     <p class="lede reveal" style="margin-top:32px; max-width:56ch">
-      Electronic waste (WEEE) collection request form. Please fill in all required fields (<span style="color:var(--deep)">*</span>). Includes certified transport and final disposal certificate.
+      Electronic waste (WEEE) with certified transport and final disposal certificate. It takes under a minute — one question at a time.
     </p>
   </section>
 
   <section class="section wrap" style="padding-top:0">
-    <div class="contact-grid reveal">
-      <div class="contact-info">
-        <div class="row"><div class="k">Email</div><div class="v ulink">info@ekosolv.com</div></div>
-        <div class="row"><div class="k">Phone</div><div class="v">+57 321 271 2773</div></div>
-        <div class="row"><div class="k">WhatsApp</div><div class="v">+57 322 226 6729</div></div>
-        <div class="row"><div class="k">Office</div><div class="v">Edificio RPTV<br>Carrera 15 #31B-33, Bogotá D.C.</div></div>
-        <div class="row"><div class="k">Hours</div><div class="v">Mon – Fri · 8:00 – 17:30 COT</div></div>
-        <div class="row">
-          <div class="k">Shortcut</div>
-          <div class="v">
-            Prefer WhatsApp?<br>
-            <a href="https://wa.me/573212712773" target="_blank" rel="noopener" style="color:var(--deep); font-weight:500">Schedule via WhatsApp →</a>
-          </div>
-        </div>
-      </div>
-
-      <form class="form" id="recoleccion-form">
-        <div class="form-row">
-          <div class="field">
-            <label for="first_name">First name *</label>
-            <input id="first_name" type="text" name="first_name" placeholder="Your first name" required />
-          </div>
-          <div class="field">
-            <label for="last_name">Last name *</label>
-            <input id="last_name" type="text" name="last_name" placeholder="Your last name" required />
-          </div>
-        </div>
-        <div class="form-row">
-          <div class="field">
-            <label for="email">Email *</label>
-            <input id="email" type="email" name="email" placeholder="you@email.com" required />
-          </div>
-          <div class="field">
-            <label for="phone">Phone *</label>
-            <input id="phone" type="tel" name="phone" placeholder="+1" required />
-          </div>
-        </div>
-        <div class="form-row">
-          <div class="field">
-            <label for="company">Company</label>
-            <input id="company" type="text" name="company" placeholder="Company name" />
-          </div>
-          <div class="field">
-            <label for="country">Country / region *</label>
-            <input id="country" type="text" name="country" placeholder="Colombia" value="Colombia" required />
-          </div>
-        </div>
-        <div class="field">
-          <label for="address">Address *</label>
-          <input id="address" type="text" name="address" placeholder="Street and number" required />
-        </div>
-        <div class="field">
-          <label>Address — line 2</label>
-          <input type="text" name="address2" placeholder="Apartment, suite, floor (optional)" />
-        </div>
-        <div class="form-row">
-          <div class="field">
-            <label for="city">City *</label>
-            <input id="city" type="text" name="city" placeholder="Bogotá D.C." required />
-          </div>
-          <div class="field">
-            <label for="postal_code">Postal code</label>
-            <input id="postal_code" type="text" name="postal_code" placeholder="110111" />
-          </div>
-        </div>
-        <div class="form-row">
-          <div class="field">
-            <label for="waste_type">Waste type</label>
-            <select id="waste_type" name="waste_type">
-              <option value="">Select…</option>
-              <option value="raee_computo">WEEE · Computing & peripherals</option>
-              <option value="raee_telco">WEEE · Telecommunications</option>
-              <option value="raee_datacenter">WEEE · Data center infrastructure</option>
-              <option value="baterias">Batteries</option>
-              <option value="otro">Other</option>
-            </select>
-          </div>
-          <div class="field">
-            <label for="estimated_quantity">Estimated quantity</label>
-            <input id="estimated_quantity" type="text" name="estimated_quantity" placeholder="E.g. 40 devices / 300 kg" />
-          </div>
-        </div>
-        <div class="field">
-          <label for="message">Message</label>
-          <textarea id="message" name="message" placeholder="Additional details and tentative collection date…"></textarea>
-        </div>
-        <input type="text" name="website" tabindex="-1" autocomplete="off" aria-hidden="true" style="position:absolute; left:-9999px; height:0; width:0; opacity:0" />
-        <p id="recoleccion-error" style="display:none; color:#b04a2e; margin:0"></p>
-        <button type="submit" class="submit">
-          <span class="submit-text">Send</span>
-          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
-        </button>
-      </form>
+    <div class="reveal">
+      <TypeformFlow
+        formId="recoleccion-form"
+        endpoint="/api/recolecciones"
+        submitLabel="Send request"
+        successMode="consecutive"
+        successTitle="Request received!"
+        successBody="We received your collection request. We’ll reach out to coordinate the pickup."
+        whatsapp="https://wa.me/573212712773"
+        steps={steps}
+      />
     </div>
+
+    <p class="tf-alt reveal">
+      Prefer to coordinate quickly?
+      <a href="https://wa.me/573212712773" target="_blank" rel="noopener">Schedule via WhatsApp →</a>
+    </p>
   </section>
 
   <SiteFooter lang="en" />
 
-  <script>
-    const form = document.getElementById("recoleccion-form") as HTMLFormElement | null;
-    form?.addEventListener("submit", async (e) => {
-      e.preventDefault();
-      const btn = form.querySelector(".submit") as HTMLButtonElement;
-      const text = form.querySelector(".submit-text") as HTMLElement;
-      const err = document.getElementById("recoleccion-error") as HTMLElement;
-      btn.disabled = true;
-      text.textContent = "Sending…";
-      err.style.display = "none";
-      const payload = Object.fromEntries(new FormData(form).entries());
-      try {
-        const res = await fetch("/api/recolecciones", {
-          method: "POST",
-          headers: { "content-type": "application/json" },
-          body: JSON.stringify(payload),
-        });
-        const j = await res.json();
-        if (!res.ok) throw new Error(j.error || "Could not send the request.");
-        text.textContent = `Request ${j.consecutive} received! ✓`;
-        btn.style.background = "var(--forest)";
-        form.querySelectorAll("input, textarea").forEach((el) => ((el as HTMLInputElement).disabled = true));
-      } catch (ex) {
-        err.textContent = ex instanceof Error ? ex.message : "Network error. Try again or reach us on WhatsApp.";
-        err.style.display = "block";
-        btn.disabled = false;
-        text.textContent = "Send";
-      }
-    });
-  </script>
+  <style>
+    .tf-alt {
+      margin-top: clamp(40px, 6vw, 64px);
+      padding-top: 26px;
+      border-top: 1px solid var(--line);
+      font-size: 15px;
+      color: var(--ink-2);
+      max-width: 720px;
+    }
+    .tf-alt a { color: var(--deep); font-weight: 500; margin-left: 6px; }
+  </style>
 </LayoutEn>
