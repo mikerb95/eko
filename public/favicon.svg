@@ -1,124 +1,18 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!--
+  Favicon EKOSOLV: versión simplificada del isotipo para tamaños mínimos.
+  El isotipo completo (anillo + tres hojas con nervadura) vive en
+  /brand/ekosolv-isotype.png y se usa donde hay espacio: apple-touch-icon, OG.
+  A 16px ese detalle se empasta, así que aquí se reduce a la silueta esencial:
+  círculo de marca + una hoja calada en blanco.
+-->
 <svg
-   viewBox="8 22 144 144"
-   fill="none"
+   viewBox="0 0 64 64"
    version="1.1"
-   id="svg42"
    xmlns="http://www.w3.org/2000/svg"
    xmlns:svg="http://www.w3.org/2000/svg">
-  <defs
-     id="defs28">
-    <linearGradient
-       id="ring"
-       x1="40"
-       y1="30"
-       x2="120"
-       y2="150"
-       gradientUnits="userSpaceOnUse">
-      <stop
-         offset="0"
-         stop-color="#2F6DB5"
-         id="stop2" />
-      <stop
-         offset="0.5"
-         stop-color="#2E9B9B"
-         id="stop4" />
-      <stop
-         offset="1"
-         stop-color="#1F8A8A"
-         id="stop6" />
-    </linearGradient>
-    <linearGradient
-       id="leafL"
-       x1="55"
-       y1="40"
-       x2="80"
-       y2="120"
-       gradientUnits="userSpaceOnUse">
-      <stop
-         offset="0"
-         stop-color="#2FA0A0"
-         id="stop9" />
-      <stop
-         offset="1"
-         stop-color="#197E7E"
-         id="stop11" />
-    </linearGradient>
-    <linearGradient
-       id="leafR"
-       x1="105"
-       y1="40"
-       x2="80"
-       y2="120"
-       gradientUnits="userSpaceOnUse">
-      <stop
-         offset="0"
-         stop-color="#6CC56F"
-         id="stop14" />
-      <stop
-         offset="1"
-         stop-color="#46A85B"
-         id="stop16" />
-    </linearGradient>
-    <linearGradient
-       id="word"
-       x1="170"
-       y1="0"
-       x2="515"
-       y2="0"
-       gradientUnits="userSpaceOnUse">
-      <stop
-         offset="0"
-         stop-color="#1F8A8A"
-         id="stop19" />
-      <stop
-         offset="0.45"
-         stop-color="#2E9B9B"
-         id="stop21" />
-      <stop
-         offset="0.75"
-         stop-color="#E8920C"
-         id="stop23" />
-      <stop
-         offset="1"
-         stop-color="#F0A93B"
-         id="stop25" />
-    </linearGradient>
-  </defs>
+  <circle cx="32" cy="32" r="32" fill="#1F8A8A" />
   <path
-     id="circle30"
-     transform="rotate(118 80 92)"
-     style="stroke:url(#ring);stroke-width:13;stroke-linecap:round;stroke-dasharray:300, 77"
-     d="M 140,92 A 60,60 0 0 1 80,152 60,60 0 0 1 20,92 60,60 0 0 1 80,32 60,60 0 0 1 140,92 Z" />
-  <g
-     id="g40">
-    <path
-       d="M80 114 C 50 102, 46 58, 74 38 C 88 60, 92 92, 80 114 Z"
-       fill="url(#leafL)"
-       transform="rotate(-13 80 114)"
-       id="path32" />
-    <path
-       d="M80 114 C 110 102, 114 58, 86 38 C 72 60, 68 92, 80 114 Z"
-       fill="url(#leafR)"
-       transform="rotate(13 80 114)"
-       id="path34" />
-    <path
-       d="M80 110 C 66 90, 64 62, 73 42"
-       stroke="#ffffff"
-       stroke-opacity="0.5"
-       stroke-width="2.4"
-       stroke-linecap="round"
-       fill="none"
-       transform="rotate(-13 80 114)"
-       id="path36" />
-    <path
-       d="M80 110 C 94 90, 96 62, 87 42"
-       stroke="#ffffff"
-       stroke-opacity="0.5"
-       stroke-width="2.4"
-       stroke-linecap="round"
-       fill="none"
-       transform="rotate(13 80 114)"
-       id="path38" />
-  </g>
+     d="M50 15 C 26 16, 15 29, 16 41 C 17 49, 25 52, 33 49 C 46 44, 51 28, 50 15 Z"
+     fill="#ffffff" />
 </svg>
