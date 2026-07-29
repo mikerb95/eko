@@ -574,7 +574,7 @@ const selectedValues = (f: Extract<TFField, { type: 'choice' }>) =>
       ) as (HTMLInputElement | HTMLTextAreaElement)[]
       for (const el of inputs) {
         if (!el.value.trim()) {
-          showError('Completa este campo para continuar.')
+          showError(t.required)
           ;(el.closest('.tf-choices')
             ? (step.querySelector('.tf-choice') as HTMLElement)
             : el
@@ -582,7 +582,7 @@ const selectedValues = (f: Extract<TFField, { type: 'choice' }>) =>
           return false
         }
         if (el.getAttribute('type') === 'email' && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(el.value.trim())) {
-          showError('Escribe un correo válido.')
+          showError(t.email)
           el.focus()
           return false
         }
