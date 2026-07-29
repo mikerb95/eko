@@ -1,0 +1,644 @@
+---
+// Flujo de formulario guiado, una pregunta a la vez (estética tipo Typeform).
+// Motor genérico: las páginas solo declaran los pasos y el endpoint; este
+// componente renderiza el shell, valida y envía por fetch.
+
+export type TFOption = { value: string; label: string; hint?: string; selected?: boolean }
+
+export type TFField =
+  | {
+      type: 'text' | 'email' | 'tel'
+      name: string
+      label: string
+      placeholder?: string
+      required?: boolean
+      value?: string
+      autocomplete?: string
+    }
+  | {
+      type: 'textarea'
+      name: string
+      label: string
+      placeholder?: string
+      required?: boolean
+    }
+  | {
+      type: 'choice'
+      name: string
+      label: string
+      multiple?: boolean
+      required?: boolean
+      options: TFOption[]
+    }
+
+export type TFStep = {
+  title: string
+  subtitle?: string
+  row?: boolean
+  fields: TFField[]
+}
+
+interface Props {
+  formId: string
+  endpoint: string
+  submitLabel: string
+  steps: TFStep[]
+  /** 'consecutive' muestra el radicado devuelto por el API; 'simple' un mensaje fijo. */
+  successMode?: 'consecutive' | 'simple'
+  successTitle?: string
+  successBody?: string
+  whatsapp?: string
+}
+
+const {
+  formId,
+  endpoint,
+  submitLabel,
+  steps,
+  successMode = 'simple',
+  successTitle = 'Recibido',
+  successBody = 'Gracias. Te contactamos muy pronto.',
+  whatsapp,
+} = Astro.props
+
+const pad = (n: number) => String(n).padStart(2, '0')
+const letters = 'ABCDEFGHIJ'
+
+const selectedValues = (f: Extract<TFField, { type: 'choice' }>) =>
+  f.options.filter((o) => o.selected).map((o) => o.value)
+---
+
+<div
+  class="tf-flow"
+  id={formId}
+  data-endpoint={endpoint}
+  data-success-mode={successMode}
+  data-submit-label={submitLabel}
+>
+  <div class="tf-progress" aria-hidden="true"><span class="tf-progress-bar"></span></div>
+
+  <form class="tf-form" novalidate>
+    <div class="tf-viewport">
+      {
+        steps.map((step, i) => (
+          <fieldset class="tf-step" data-index={i}>
+            <div class="tf-step-head">
+              <span class="tf-step-count">
+                {pad(i + 1)} <span class="tf-sep">—</span> {pad(steps.length)}
+              </span>
+              <legend class="tf-title">{step.title}</legend>
+              {step.subtitle && <p class="tf-subtitle">{step.subtitle}</p>}
+            </div>
+
+            <div class={`tf-fields${step.row ? ' is-row' : ''}`}>
+              {step.fields.map((f) => {
+                if (f.type === 'choice') {
+                  const hiddenVal = selectedValues(f).join(', ')
+                  return (
+                    <div
+                      class="tf-choices"
+                      data-name={f.name}
+                      data-multiple={f.multiple ? 'true' : 'false'}
+                      role="group"
+                      aria-label={f.label}
+                    >
+                      <input
+                        type="hidden"
+                        name={f.name}
+                        value={hiddenVal}
+                        data-required={f.required ? 'true' : 'false'}
+                      />
+                      {f.options.map((o, oi) => (
+                        <button
+                          type="button"
+                          class="tf-choice"
+                          data-value={o.value}
+                          aria-pressed={o.selected ? 'true' : 'false'}
+                        >
+                          <span class="tf-choice-key">{letters[oi] ?? '•'}</span>
+                          <span class="tf-choice-text">
+                            <span class="tf-choice-label">{o.label}</span>
+                            {o.hint && <span class="tf-choice-hint">{o.hint}</span>}
+                          </span>
+                          <svg class="tf-choice-check" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2">
+                            <path d="M5 12.5l4.5 4.5L19 7" />
+                          </svg>
+                        </button>
+                      ))}
+                    </div>
+                  )
+                }
+
+                if (f.type === 'textarea') {
+                  return (
+                    <label class="tf-field">
+                      <span class="tf-label">{f.label}{f.required ? ' *' : ''}</span>
+                      <textarea
+                        class="tf-input tf-textarea"
+                        name={f.name}
+                        placeholder={f.placeholder}
+                        data-required={f.required ? 'true' : 'false'}
+                      />
+                    </label>
+                  )
+                }
+
+                return (
+                  <label class="tf-field">
+                    <span class="tf-label">{f.label}{f.required ? ' *' : ''}</span>
+                    <input
+                      class="tf-input"
+                      type={f.type}
+                      name={f.name}
+                      placeholder={f.placeholder}
+                      value={f.value}
+                      autocomplete={f.autocomplete}
+                      data-required={f.required ? 'true' : 'false'}
+                    />
+                  </label>
+                )
+              })}
+            </div>
+          </fieldset>
+        ))
+      }
+    </div>
+
+    {/* Honeypot anti-bots */}
+    <input class="tf-hp" type="text" name="website" tabindex="-1" autocomplete="off" aria-hidden="true" />
+
+    <p class="tf-error" role="alert" hidden></p>
+
+    <div class="tf-controls">
+      <div class="tf-controls-left">
+        <button type="button" class="tf-back" hidden>
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M19 12H5M11 6l-6 6 6 6" /></svg>
+          Atrás
+        </button>
+      </div>
+      <div class="tf-controls-right">
+        <span class="tf-hint">Pulsa <kbd>Enter ↵</kbd></span>
+        <button type="button" class="tf-next">
+          <span class="tf-next-label">Continuar</span>
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><path d="M5 12h14M13 6l6 6-6 6" /></svg>
+        </button>
+      </div>
+    </div>
+  </form>
+
+  <div class="tf-success" hidden>
+    <div class="tf-success-mark">
+      <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 12.5l5 5L20 6.5" /></svg>
+    </div>
+    <h2 class="tf-success-title">{successTitle}</h2>
+    <p class="tf-success-body">{successBody}</p>
+    {whatsapp && (
+      <a class="tf-success-wa" href={whatsapp} target="_blank" rel="noopener">
+        ¿Prefieres WhatsApp? Escríbenos →
+      </a>
+    )}
+  </div>
+</div>
+
+<style>
+  .tf-flow {
+    --tf-line: var(--line-2);
+    max-width: 720px;
+  }
+
+  /* Barra de progreso */
+  .tf-progress {
+    height: 3px;
+    border-radius: 999px;
+    background: color-mix(in oklab, var(--ink) 8%, transparent);
+    overflow: hidden;
+    margin-bottom: clamp(36px, 6vw, 64px);
+  }
+  .tf-progress-bar {
+    display: block;
+    height: 100%;
+    width: 0%;
+    border-radius: 999px;
+    background: linear-gradient(90deg, var(--forest), var(--deep));
+    transition: width .45s cubic-bezier(.22, 1, .36, 1);
+  }
+
+  .tf-viewport { position: relative; }
+
+  /* Cada pantalla */
+  .tf-step { border: 0; padding: 0; margin: 0; min-width: 0; }
+  .tf-flow[data-enhanced] .tf-step { display: none; }
+  .tf-flow[data-enhanced] .tf-step.is-active {
+    display: block;
+    animation: tf-in .5s cubic-bezier(.22, 1, .36, 1) both;
+  }
+  .tf-flow[data-enhanced] .tf-step.is-leaving {
+    display: block;
+    animation: tf-out .28s ease both;
+  }
+  @keyframes tf-in {
+    from { opacity: 0; transform: translateY(22px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+  @keyframes tf-out {
+    from { opacity: 1; transform: translateY(0); }
+    to { opacity: 0; transform: translateY(-14px); }
+  }
+
+  .tf-step-head { margin-bottom: 30px; }
+  .tf-step-count {
+    font-family: var(--font-mono);
+    font-size: 12px;
+    letter-spacing: 0.14em;
+    color: var(--forest);
+    text-transform: uppercase;
+  }
+  .tf-step-count .tf-sep { opacity: .5; }
+  .tf-title {
+    font-family: var(--font-display);
+    font-size: clamp(30px, 4.4vw, 46px);
+    line-height: 1.04;
+    letter-spacing: -0.02em;
+    color: var(--ink);
+    margin-top: 12px;
+    padding: 0;
+  }
+  .tf-subtitle {
+    font-size: 16px;
+    color: var(--ink-2);
+    margin-top: 14px;
+    max-width: 48ch;
+    line-height: 1.5;
+  }
+
+  .tf-fields { display: flex; flex-direction: column; gap: 26px; }
+  .tf-fields.is-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 26px 28px;
+  }
+  @media (max-width: 560px) { .tf-fields.is-row { grid-template-columns: 1fr; } }
+
+  .tf-field { display: flex; flex-direction: column; gap: 10px; }
+  .tf-label {
+    font-family: var(--font-mono);
+    font-size: 12px;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--mute);
+  }
+  .tf-input {
+    font-family: inherit;
+    font-size: clamp(19px, 2.2vw, 24px);
+    color: var(--ink);
+    background: transparent;
+    border: 0;
+    border-bottom: 2px solid var(--tf-line);
+    padding: 8px 0;
+    outline: none;
+    width: 100%;
+    transition: border-color .2s ease;
+  }
+  .tf-input::placeholder { color: color-mix(in oklab, var(--mute) 65%, transparent); }
+  .tf-input:focus { border-color: var(--deep); }
+  .tf-textarea {
+    resize: vertical;
+    min-height: 96px;
+    line-height: 1.45;
+    font-size: clamp(17px, 1.8vw, 20px);
+  }
+
+  /* Opciones seleccionables */
+  .tf-choices { display: flex; flex-direction: column; gap: 12px; }
+  .tf-choice {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    text-align: left;
+    width: 100%;
+    padding: 16px 18px;
+    border-radius: var(--r-md);
+    border: 1.5px solid var(--tf-line);
+    background: color-mix(in oklab, var(--paper-warm) 60%, transparent);
+    color: var(--ink);
+    cursor: pointer;
+    transition: border-color .18s ease, background .18s ease, transform .18s ease;
+  }
+  .tf-choice:hover {
+    border-color: color-mix(in oklab, var(--deep) 45%, var(--tf-line));
+    background: #fff;
+    transform: translateX(3px);
+  }
+  .tf-choice-key {
+    flex: none;
+    display: grid;
+    place-items: center;
+    width: 26px;
+    height: 26px;
+    border-radius: 6px;
+    border: 1.5px solid var(--tf-line);
+    font-family: var(--font-mono);
+    font-size: 12px;
+    color: var(--mute);
+    transition: all .18s ease;
+  }
+  .tf-choice-text { flex: 1; display: flex; flex-direction: column; gap: 2px; }
+  .tf-choice-label { font-size: 16px; letter-spacing: -0.01em; }
+  .tf-choice-hint { font-size: 13px; color: var(--mute); }
+  .tf-choice-check {
+    flex: none;
+    color: var(--forest);
+    opacity: 0;
+    transform: scale(.6);
+    transition: all .18s ease;
+  }
+  .tf-choice[aria-pressed='true'] {
+    border-color: var(--deep);
+    background: color-mix(in oklab, var(--deep) 7%, #fff);
+  }
+  .tf-choice[aria-pressed='true'] .tf-choice-key {
+    background: var(--deep);
+    border-color: var(--deep);
+    color: #fff;
+  }
+  .tf-choice[aria-pressed='true'] .tf-choice-check { opacity: 1; transform: scale(1); }
+
+  .tf-hp { position: absolute; left: -9999px; height: 0; width: 0; opacity: 0; }
+
+  .tf-error {
+    color: #b04a2e;
+    font-size: 14.5px;
+    margin: 22px 0 0;
+    font-family: var(--font-mono);
+  }
+
+  /* Controles */
+  .tf-controls {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 18px;
+    margin-top: clamp(34px, 5vw, 52px);
+  }
+  .tf-controls-right { display: flex; align-items: center; gap: 18px; }
+  .tf-back {
+    display: inline-flex;
+    align-items: center;
+    gap: 7px;
+    font-family: var(--font-mono);
+    font-size: 12.5px;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    color: var(--mute);
+    background: transparent;
+    padding: 8px 4px;
+    cursor: pointer;
+    transition: color .18s ease;
+  }
+  .tf-back:hover { color: var(--ink); }
+  .tf-hint {
+    font-family: var(--font-mono);
+    font-size: 12px;
+    color: var(--mute);
+  }
+  .tf-hint kbd {
+    font-family: var(--font-mono);
+    font-size: 11px;
+    background: color-mix(in oklab, var(--ink) 6%, transparent);
+    border: 1px solid var(--line);
+    border-radius: 5px;
+    padding: 2px 6px;
+    color: var(--ink-2);
+  }
+  @media (max-width: 560px) { .tf-hint { display: none; } }
+  .tf-next {
+    display: inline-flex;
+    align-items: center;
+    gap: 12px;
+    padding: 15px 26px;
+    border-radius: 999px;
+    background: var(--deep);
+    color: #fff;
+    font-size: 16px;
+    cursor: pointer;
+    transition: transform .18s ease, background .18s ease, opacity .18s ease;
+  }
+  .tf-next:hover { background: var(--deep-2); transform: translateY(-2px); }
+  .tf-next:disabled { opacity: .55; cursor: default; transform: none; }
+
+  /* Pantalla de éxito */
+  .tf-success { text-align: left; padding: 8px 0; }
+  .tf-success-mark {
+    width: 58px;
+    height: 58px;
+    border-radius: 50%;
+    display: grid;
+    place-items: center;
+    background: color-mix(in oklab, var(--forest) 14%, #fff);
+    color: var(--forest);
+    margin-bottom: 24px;
+    animation: tf-pop .5s cubic-bezier(.22, 1, .36, 1) both;
+  }
+  @keyframes tf-pop {
+    from { opacity: 0; transform: scale(.7); }
+    to { opacity: 1; transform: scale(1); }
+  }
+  .tf-success-title {
+    font-family: var(--font-display);
+    font-size: clamp(30px, 4.4vw, 46px);
+    letter-spacing: -0.02em;
+    line-height: 1.05;
+    color: var(--ink);
+  }
+  .tf-success-body {
+    font-size: 17px;
+    color: var(--ink-2);
+    margin-top: 16px;
+    max-width: 46ch;
+    line-height: 1.55;
+  }
+  .tf-success-wa {
+    display: inline-block;
+    margin-top: 24px;
+    color: var(--deep);
+    font-weight: 500;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .tf-flow[data-enhanced] .tf-step.is-active,
+    .tf-flow[data-enhanced] .tf-step.is-leaving,
+    .tf-success-mark { animation: none; }
+    .tf-progress-bar { transition: none; }
+  }
+</style>
+
+<script>
+  type Flow = HTMLElement
+
+  function initFlow(flow: Flow) {
+    const form = flow.querySelector('.tf-form') as HTMLFormElement
+    const steps = Array.from(flow.querySelectorAll('.tf-step')) as HTMLElement[]
+    const bar = flow.querySelector('.tf-progress-bar') as HTMLElement
+    const backBtn = flow.querySelector('.tf-back') as HTMLButtonElement
+    const nextBtn = flow.querySelector('.tf-next') as HTMLButtonElement
+    const nextLabel = flow.querySelector('.tf-next-label') as HTMLElement
+    const errEl = flow.querySelector('.tf-error') as HTMLElement
+    const successEl = flow.querySelector('.tf-success') as HTMLElement
+    const endpoint = flow.dataset.endpoint || ''
+    const submitLabel = flow.dataset.submitLabel || 'Enviar'
+    const successMode = flow.dataset.successMode || 'simple'
+    if (!steps.length) return
+
+    flow.setAttribute('data-enhanced', '')
+    let current = 0
+
+    const isLast = (i: number) => i === steps.length - 1
+
+    function showError(msg: string) {
+      errEl.textContent = msg
+      errEl.hidden = false
+    }
+    function clearError() {
+      errEl.hidden = true
+      errEl.textContent = ''
+    }
+
+    function render(focus = true) {
+      steps.forEach((s, i) => s.classList.toggle('is-active', i === current))
+      bar.style.width = `${((current + 1) / steps.length) * 100}%`
+      backBtn.hidden = current === 0
+      nextLabel.textContent = isLast(current) ? submitLabel : 'Continuar'
+      clearError()
+      if (focus) {
+        const target = steps[current].querySelector(
+          '.tf-input, .tf-choice',
+        ) as HTMLElement | null
+        // Evita saltos de scroll bruscos en móvil enfocando sin desplazar.
+        target?.focus({ preventScroll: true })
+      }
+    }
+
+    function validate(i: number): boolean {
+      const step = steps[i]
+      const inputs = Array.from(
+        step.querySelectorAll('[data-required="true"]'),
+      ) as (HTMLInputElement | HTMLTextAreaElement)[]
+      for (const el of inputs) {
+        if (!el.value.trim()) {
+          showError('Completa este campo para continuar.')
+          ;(el.closest('.tf-choices')
+            ? (step.querySelector('.tf-choice') as HTMLElement)
+            : el
+          )?.focus()
+          return false
+        }
+        if (el.getAttribute('type') === 'email' && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(el.value.trim())) {
+          showError('Escribe un correo válido.')
+          el.focus()
+          return false
+        }
+      }
+      return true
+    }
+
+    function goTo(i: number) {
+      if (i < 0 || i >= steps.length || i === current) return
+      const leaving = steps[current]
+      leaving.classList.add('is-leaving')
+      setTimeout(() => leaving.classList.remove('is-leaving'), 280)
+      current = i
+      render()
+      flow.scrollIntoView({ behavior: 'smooth', block: 'nearest' })
+    }
+
+    function next() {
+      if (!validate(current)) return
+      if (isLast(current)) {
+        submit()
+      } else {
+        goTo(current + 1)
+      }
+    }
+
+    // Selección de opciones
+    flow.querySelectorAll('.tf-choices').forEach((group) => {
+      const multiple = (group as HTMLElement).dataset.multiple === 'true'
+      const hidden = group.querySelector('input[type="hidden"]') as HTMLInputElement
+      const buttons = Array.from(group.querySelectorAll('.tf-choice')) as HTMLButtonElement[]
+      const step = group.closest('.tf-step') as HTMLElement
+      const soloChoice =
+        step.querySelectorAll('.tf-input').length === 0 &&
+        step.querySelectorAll('.tf-choices').length === 1
+
+      const sync = () => {
+        const vals = buttons
+          .filter((b) => b.getAttribute('aria-pressed') === 'true')
+          .map((b) => b.dataset.value || '')
+        hidden.value = vals.join(', ')
+      }
+
+      buttons.forEach((btn) => {
+        btn.addEventListener('click', () => {
+          const on = btn.getAttribute('aria-pressed') === 'true'
+          if (multiple) {
+            btn.setAttribute('aria-pressed', on ? 'false' : 'true')
+          } else {
+            buttons.forEach((b) => b.setAttribute('aria-pressed', 'false'))
+            btn.setAttribute('aria-pressed', 'true')
+          }
+          sync()
+          clearError()
+          if (!multiple && soloChoice && !isLast(current)) {
+            setTimeout(() => next(), 320)
+          }
+        })
+      })
+    })
+
+    async function submit() {
+      const payload = Object.fromEntries(new FormData(form).entries())
+      nextBtn.disabled = true
+      nextLabel.textContent = 'Enviando…'
+      clearError()
+      try {
+        const res = await fetch(endpoint, {
+          method: 'POST',
+          headers: { 'content-type': 'application/json' },
+          body: JSON.stringify(payload),
+        })
+        const j = await res.json().catch(() => ({}))
+        if (!res.ok) throw new Error(j.error || 'No se pudo enviar la solicitud.')
+        if (successMode === 'consecutive' && j.consecutive) {
+          const body = successEl.querySelector('.tf-success-body') as HTMLElement
+          body.textContent = `Tu radicado es ${j.consecutive}. Te contactamos para coordinar el retiro.`
+        }
+        form.hidden = true
+        ;(flow.querySelector('.tf-progress') as HTMLElement).style.opacity = '0'
+        successEl.hidden = false
+        successEl.scrollIntoView({ behavior: 'smooth', block: 'nearest' })
+      } catch (ex) {
+        showError(ex instanceof Error ? ex.message : 'Error de red. Intenta de nuevo o escríbenos por WhatsApp.')
+        nextBtn.disabled = false
+        nextLabel.textContent = submitLabel
+      }
+    }
+
+    nextBtn.addEventListener('click', next)
+    backBtn.addEventListener('click', () => goTo(current - 1))
+
+    form.addEventListener('keydown', (e) => {
+      if (e.key !== 'Enter') return
+      const t = e.target as HTMLElement
+      if (t.tagName === 'TEXTAREA' && !(e.metaKey || e.ctrlKey)) return
+      if (t.classList.contains('tf-choice')) return // el botón maneja su propio toggle
+      e.preventDefault()
+      next()
+    })
+
+    form.addEventListener('submit', (e) => e.preventDefault())
+
+    render(false)
+  }
+
+  document.querySelectorAll('.tf-flow').forEach((el) => initFlow(el as HTMLElement))
+</script>
