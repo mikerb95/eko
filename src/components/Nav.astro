@@ -81,9 +81,22 @@ const arrow = 'M5 12h14M13 6l6 6-6 6'
     </nav>
 
     <div class="nav-right">
-      <a href={altUrl} class="nav-lang" title={t('switchLang')} hreflang={lang === 'es' ? 'en' : 'es'}>
-        {altLabel}
-      </a>
+      <div class="nav-lang" role="group" aria-label={t('switchLang')}>
+        <span class="nav-lang-thumb" data-lang-thumb aria-hidden="true"></span>
+        {(['es', 'en'] as Lang[]).map((code) =>
+          code === lang ? (
+            <span class="nav-lang-opt active" aria-current="true">
+              <Flag code={code === 'es' ? 'es' : 'us'} />
+              {code.toUpperCase()}
+            </span>
+          ) : (
+            <a href={altUrl} class="nav-lang-opt" title={t('switchLang')} hreflang={code}>
+              <Flag code={code === 'es' ? 'es' : 'us'} />
+              {code.toUpperCase()}
+            </a>
+          )
+        )}
+      </div>
       <a href={CTA.href[lang]} class="nav-cta">
         {CTA.label[lang]}
         <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
