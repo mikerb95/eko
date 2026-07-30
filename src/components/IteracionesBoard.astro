@@ -1,0 +1,1137 @@
+---
+/**
+ * Tablero XP del propio sitio: iteraciones, historias y Definition of Done.
+ *
+ * Los datos vienen de src/data/iteraciones.ts y se serializan a un <script
+ * type="application/json"> que el script del cliente lee. Se hace así, y no con
+ * define:vars, para no depender de que el JSON sobreviva a la interpolación en
+ * un atributo y para que los datos sean inspeccionables desde el navegador.
+ *
+ * Toda la interacción es progresiva: sin JavaScript se ve el resumen y el aviso
+ * de la etiqueta <noscript>, no una página en blanco.
+ */
+import {
+  PARES,
+  COLUMNAS,
+  ITERACIONES,
+  COMMITS_POR_MES,
+  COMMITS_TOTAL,
+  REPO,
+} from '../data/iteraciones'
+
+const payload = JSON.stringify({ PARES, COLUMNAS, ITERACIONES, COMMITS_POR_MES, REPO })
+const conCommits = ITERACIONES.filter((i) => i.commits != null)
+---
+
+<section class="board" aria-label="Tablero de iteraciones">
+  <script type="application/json" id="iterData" set:html={payload} />
+
+  <header class="board-head">
+    <p class="board-sub">
+      Tablero XP de este sitio, reconstruido del historial real de Git: {COMMITS_TOTAL} commits
+      en {conCommits.length} iteraciones. Cada historia lleva su Definition of Done, y un criterio
+      solo está en verde si hoy se puede verificar en el repositorio.
+    </p>
+    <div class="view-toggle" id="viewToggle" role="group" aria-label="Vista del tablero">
+      <button type="button" class="view-btn view-btn--on" data-view="board">Tablero</button>
+      <button type="button" class="view-btn" data-view="charts">Gráficos</button>
+    </div>
+  </header>
+
+  <div class="tabs-wrap" id="tabsWrap">
+    <button type="button" class="tabs-arrow tabs-arrow--left" id="tabsPrev" aria-label="Iteraciones anteriores" hidden>
+      <span aria-hidden="true">‹</span>
+    </button>
+    <div class="tabs" id="iterTabs" role="tablist" aria-label="Iteraciones"></div>
+    <button type="button" class="tabs-arrow tabs-arrow--right" id="tabsNext" aria-label="Iteraciones siguientes" hidden>
+      <span aria-hidden="true">›</span>
+    </button>
+  </div>
+
+  <noscript>
+    <p class="noscript">
+      El tablero es interactivo y necesita JavaScript. El detalle de cada iteración también está en
+      <code>src/data/iteraciones.ts</code>.
+    </p>
+  </noscript>
+
+  <div class="kpis" id="iterSummary"></div>
+
+  <article class="progress-card" id="iterProgressCard">
+    <div class="progress-top">
+      <div>
+        <h3 class="progress-title" id="iterProgressTitle"></h3>
+        <p class="progress-meta" id="iterProgressMeta"></p>
+      </div>
+      <span class="progress-pct" id="iterProgressPct"></span>
+    </div>
+    <p class="progress-resumen" id="iterProgressResumen"></p>
+    <div class="bar" id="iterBar" role="img" aria-label="Avance de los criterios de DoD"></div>
+    <div class="bar-legend" id="iterBarLegend"></div>
+    <a class="gh-link" id="iterProgressGh" href={REPO} target="_blank" rel="noopener noreferrer" hidden>
+      <span id="iterProgressGhText"></span>
+      <span aria-hidden="true">→</span>
+    </a>
+  </article>
+
+  <div class="board-cols" id="iterBoard"></div>
+
+  <div class="charts" id="iterCharts" hidden>
+    <article class="chart">
+      <div class="chart-head">
+        <div>
+          <h3 class="chart-title">Actividad de commits</h3>
+          <p class="chart-sub">Commits por mes en el historial del repositorio.</p>
+        </div>
+      </div>
+      <div class="chart-canvas" id="chartMes"></div>
+    </article>
+    <article class="chart">
+      <div class="chart-head">
+        <div>
+          <h3 class="chart-title">Commits por iteración</h3>
+          <p class="chart-sub">Volumen de cada iteración cerrada. El backlog no tiene commits.</p>
+        </div>
+      </div>
+      <div class="chart-canvas" id="chartIter"></div>
+    </article>
+  </div>
+
+  <div class="modal" id="historiaModal" role="dialog" aria-modal="true" aria-labelledby="hModalTitle" hidden>
+    <div class="modal-card">
+      <header class="modal-head">
+        <span class="modal-id" id="hModalId"></span>
+        <h3 class="modal-title" id="hModalTitle"></h3>
+        <button type="button" class="modal-close" id="hModalClose" aria-label="Cerrar">
+          <span aria-hidden="true">×</span>
+        </button>
+      </header>
+      <div class="modal-body">
+        <div class="modal-meta" id="hModalMeta"></div>
+        <h4 class="modal-label">Definition of Done</h4>
+        <ul class="modal-tests" id="hModalTests"></ul>
+        <div id="hModalArchivosBox" hidden>
+          <h4 class="modal-label">Dónde vive en el repositorio</h4>
+          <ul class="modal-files" id="hModalArchivos"></ul>
+        </div>
+        <p class="modal-nota" id="hModalNota" hidden></p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<script>
+  interface Criterio { texto: string; estado: 'pass' | 'fail' | 'pend' }
+  interface Historia {
+    id: string
+    titulo: string
+    tipo: string
+    valor: string
+    col: string
+    par: string
+    agente?: string
+    fecha?: string
+    tags: string[]
+    dod: Criterio[]
+    archivos?: string[]
+    nota?: string
+  }
+  interface Iteracion {
+    id: string
+    fase: string
+    nombre: string
+    rango: string
+    ghSince: string
+    ghUntil: string
+    commits: number | null
+    resumen: string
+    historias: Historia[]
+  }
+
+  function initBoard() {
+    const dataEl = document.getElementById('iterData')
+    if (!dataEl || dataEl.dataset.ready === '1') return
+    dataEl.dataset.ready = '1'
+
+    const DATA = JSON.parse(dataEl.textContent || '{}')
+    const PARES: Record<string, { nombre: string; rol: string; color: string }> = DATA.PARES
+    const COLUMNAS: Array<{ id: string; nombre: string; color: string }> = DATA.COLUMNAS
+    const ITERACIONES: Iteracion[] = DATA.ITERACIONES
+    const COMMITS_POR_MES: Array<{ mes: string; commits: number }> = DATA.COMMITS_POR_MES
+    const REPO: string = DATA.REPO
+
+    const $ = (id: string) => document.getElementById(id)!
+    const ghUrl = (since: string, until: string) =>
+      `${REPO}/commits/main/?since=${since}&until=${until}`
+
+    const NS = 'http://www.w3.org/2000/svg'
+    const SVG = new Set(['svg', 'g', 'path', 'line', 'rect', 'text'])
+    function el(tag: string, attrs: Record<string, string> = {}, ...kids: Array<string | Node>) {
+      const node = SVG.has(tag)
+        ? document.createElementNS(NS, tag)
+        : document.createElement(tag)
+      for (const [k, v] of Object.entries(attrs)) node.setAttribute(k, v)
+      for (const k of kids) node.appendChild(typeof k === 'string' ? document.createTextNode(k) : k)
+      return node as HTMLElement
+    }
+
+    // La iteración abierta al entrar es la última cerrada, no el backlog: es lo
+    // que alguien quiere ver primero al abrir el tablero.
+    const cerradas = ITERACIONES.filter((i) => i.commits != null)
+    let actual = cerradas[cerradas.length - 1] || ITERACIONES[0]
+
+    /* ---------- Pestañas de iteración ---------- */
+
+    const tabsBox = $('iterTabs')
+    const tabEls = ITERACIONES.map((it) => {
+      const tab = el('button', {
+        type: 'button',
+        class: 'tab' + (it.id === actual.id ? ' tab--on' : ''),
+        role: 'tab',
+        'aria-selected': it.id === actual.id ? 'true' : 'false',
+        title: it.nombre,
+      })
+      tab.dataset.id = it.id
+      tab.appendChild(el('span', { class: 'tab-fase' }, it.fase))
+      tab.appendChild(el('span', { class: 'tab-name' }, it.nombre))
+      const range = el('span', { class: 'tab-range' }, it.rango)
+      if (it.commits != null) range.appendChild(el('span', { class: 'tab-commits' }, `${it.commits}`))
+      tab.appendChild(range)
+      tab.addEventListener('click', () => select(it.id))
+      tabsBox.appendChild(tab)
+      return tab
+    })
+
+    function select(id: string) {
+      actual = ITERACIONES.find((i) => i.id === id) || ITERACIONES[0]
+      tabEls.forEach((t) => {
+        const on = t.dataset.id === actual.id
+        t.classList.toggle('tab--on', on)
+        t.setAttribute('aria-selected', on ? 'true' : 'false')
+      })
+      render()
+    }
+
+    const wrap = $('tabsWrap')
+    const prev = $('tabsPrev')
+    const next = $('tabsNext')
+
+    function updateArrows() {
+      const max = tabsBox.scrollWidth - tabsBox.clientWidth
+      const hasPrev = tabsBox.scrollLeft > 2
+      const hasNext = tabsBox.scrollLeft < max - 2
+      prev.hidden = !hasPrev
+      next.hidden = !hasNext
+      wrap.classList.toggle('has-prev', hasPrev)
+      wrap.classList.toggle('has-next', hasNext)
+    }
+    const scrollTabs = (dir: number) =>
+      tabsBox.scrollBy({ left: dir * Math.max(tabsBox.clientWidth * 0.8, 220), behavior: 'smooth' })
+    prev.addEventListener('click', () => scrollTabs(-1))
+    next.addEventListener('click', () => scrollTabs(1))
+    tabsBox.addEventListener('scroll', updateArrows, { passive: true })
+    window.addEventListener('resize', updateArrows)
+
+    // Deja visible la pestaña activa, que no es la primera.
+    const activo = tabEls.find((t) => t.classList.contains('tab--on'))
+    if (activo) activo.scrollIntoView({ block: 'nearest', inline: 'center' })
+    updateArrows()
+
+    /* ---------- Conmutador tablero / gráficos ---------- */
+
+    $('viewToggle').addEventListener('click', (e) => {
+      const btn = (e.target as HTMLElement).closest('.view-btn') as HTMLElement | null
+      if (!btn) return
+      document
+        .querySelectorAll<HTMLElement>('.board .view-btn')
+        .forEach((b) => b.classList.toggle('view-btn--on', b === btn))
+      const charts = btn.dataset.view === 'charts'
+      $('iterBoard').hidden = charts
+      $('iterProgressCard').hidden = charts
+      $('iterCharts').hidden = !charts
+      if (charts) renderCharts()
+    })
+
+    /* ---------- Cálculo de avance ---------- */
+
+    function dodStats(historias: Historia[]) {
+      const dod = historias.flatMap((h) => h.dod || [])
+      const total = dod.length
+      const pass = dod.filter((d) => d.estado === 'pass').length
+      const fail = dod.filter((d) => d.estado === 'fail').length
+      return { total, pass, fail, pend: total - pass - fail, pct: total ? Math.round((pass / total) * 100) : 0 }
+    }
+
+    /* ---------- Render principal ---------- */
+
+    function render() {
+      const h = actual.historias
+      const aceptadas = h.filter((s) => s.col === 'aceptada').length
+      const enCurso = h.filter((s) => s.col === 'desarrollo' || s.col === 'aceptacion').length
+      const d = dodStats(h)
+
+      const summary = $('iterSummary')
+      summary.replaceChildren()
+      const tiles = [
+        { label: 'Historias', value: String(h.length), sub: `${aceptadas} aceptadas`, tone: 'deep' },
+        { label: 'DoD', value: `${d.pass}/${d.total}`, sub: `${d.pend} pendientes`, tone: 'aqua' },
+        { label: 'Completado', value: `${d.pct}%`, sub: `${enCurso} en curso`, tone: 'forest' },
+        {
+          label: 'Commits',
+          value: actual.commits != null ? String(actual.commits) : '—',
+          sub: actual.rango,
+          tone: 'clay',
+        },
+      ]
+      for (const t of tiles) {
+        const tile = el('div', { class: 'kpi' })
+        const label = el('div', { class: 'kpi-label' })
+        label.appendChild(el('i', { class: `kpi-dot kpi-dot--${t.tone}` }))
+        label.appendChild(document.createTextNode(t.label))
+        tile.appendChild(label)
+        tile.appendChild(el('div', { class: 'kpi-value' }, t.value))
+        tile.appendChild(el('div', { class: 'kpi-sub' }, t.sub))
+        summary.appendChild(tile)
+      }
+
+      $('iterProgressTitle').textContent = actual.nombre
+      $('iterProgressMeta').textContent =
+        `${actual.fase} · ${actual.rango} · ${d.pass} de ${d.total} criterios de DoD cumplidos`
+      $('iterProgressResumen').textContent = actual.resumen || ''
+      $('iterProgressPct').textContent = `${d.pct}%`
+
+      const gh = $('iterProgressGh') as HTMLAnchorElement
+      if (actual.commits != null) {
+        gh.href = ghUrl(actual.ghSince, actual.ghUntil)
+        $('iterProgressGhText').textContent = `Ver los ${actual.commits} commits de este periodo en GitHub`
+        gh.hidden = false
+      } else {
+        gh.hidden = true
+      }
+
+      const bar = $('iterBar')
+      bar.replaceChildren()
+      const segs = [
+        { color: 'var(--forest)', v: d.pass },
+        { color: 'var(--clay-2)', v: d.fail },
+        { color: 'var(--line-2)', v: d.pend },
+      ]
+      for (const s of segs) {
+        if (s.v <= 0 || !d.total) continue
+        const seg = el('div', { class: 'bar-seg' })
+        seg.style.background = s.color
+        seg.style.width = `${(s.v / d.total) * 100}%`
+        bar.appendChild(seg)
+      }
+
+      const legend = $('iterBarLegend')
+      legend.replaceChildren()
+      const keys: Array<[string, string, number]> = [
+        ['var(--forest)', 'Cumplidos', d.pass],
+        ['var(--line-2)', 'Pendientes', d.pend],
+      ]
+      if (d.fail) keys.push(['var(--clay-2)', 'Retirados o rotos', d.fail])
+      for (const [color, texto, n] of keys) {
+        const span = el('span', {}, `${texto} ${n}`)
+        const dot = el('i', {})
+        dot.style.background = color
+        span.prepend(dot)
+        legend.appendChild(span)
+      }
+
+      const board = $('iterBoard')
+      board.replaceChildren()
+      for (const col of COLUMNAS) {
+        const items = h.filter((s) => s.col === col.id)
+        const colEl = el('div', { class: 'col' })
+        const head = el('div', { class: 'col-head' })
+        const dot = el('span', { class: 'col-dot' })
+        dot.style.background = col.color
+        head.appendChild(dot)
+        head.appendChild(el('span', { class: 'col-name' }, col.nombre))
+        head.appendChild(el('span', { class: 'col-count' }, String(items.length)))
+        colEl.appendChild(head)
+        const body = el('div', { class: 'col-body' })
+        if (!items.length) body.appendChild(el('div', { class: 'col-empty' }, 'Sin historias'))
+        else for (const s of items) body.appendChild(historiaCard(s))
+        colEl.appendChild(body)
+        board.appendChild(colEl)
+      }
+    }
+
+    /* ---------- Tarjeta de historia ---------- */
+
+    const TIPO: Record<string, string> = { historia: 'Historia', bug: 'Bug', tarea: 'Tarea', spike: 'Spike' }
+    const VALOR: Record<string, string> = { alto: 'Valor alto', medio: 'Valor medio', bajo: 'Valor bajo' }
+    const ICONO: Record<string, string> = { pass: '✓', fail: '✕', pend: '' }
+
+    function criterioLi(c: Criterio, cls: string) {
+      const li = el('li', { class: cls })
+      const icon = el('span', { class: `test-icon test-icon--${c.estado}` }, ICONO[c.estado] ?? '')
+      icon.setAttribute('aria-hidden', 'true')
+      li.appendChild(icon)
+      li.appendChild(document.createTextNode(c.texto))
+      return li
+    }
+
+    function historiaCard(s: Historia) {
+      const par = PARES[s.par] || { nombre: s.par, rol: '', color: '#6B7580' }
+      const dod = s.dod || []
+      const pass = dod.filter((c) => c.estado === 'pass').length
+
+      const card = el('button', { type: 'button', class: 'card' })
+
+      const top = el('div', { class: 'card-top' })
+      top.appendChild(el('span', { class: 'card-id' }, s.id))
+      top.appendChild(el('span', { class: `card-type card-type--${s.tipo}` }, TIPO[s.tipo] || s.tipo))
+      if (dod.length) top.appendChild(el('span', { class: 'card-pts' }, `${pass}/${dod.length} DoD`))
+      card.appendChild(top)
+
+      card.appendChild(el('p', { class: 'card-title' }, s.titulo))
+
+      if (s.tags?.length) {
+        const tags = el('div', { class: 'card-tags' })
+        for (const t of s.tags) tags.appendChild(el('span', { class: 'tag' }, `#${t}`))
+        card.appendChild(tags)
+      }
+
+      if (dod.length) {
+        const tests = el('ul', { class: 'card-tests' })
+        for (const c of dod) tests.appendChild(criterioLi(c, 'card-test'))
+        card.appendChild(tests)
+      }
+
+      const foot = el('div', { class: 'card-foot' })
+      const valor = el('span', { class: `card-valor card-valor--${s.valor}` })
+      valor.appendChild(el('i', {}))
+      valor.appendChild(document.createTextNode(VALOR[s.valor] || s.valor))
+      foot.appendChild(valor)
+      if (s.agente) foot.appendChild(el('span', { class: 'card-agente' }, s.agente))
+      const avatar = el('span', { class: 'avatar', title: `${par.nombre} — ${par.rol}` }, s.par)
+      avatar.style.background = par.color
+      foot.appendChild(avatar)
+      card.appendChild(foot)
+
+      card.addEventListener('click', () => openModal(s))
+      return card
+    }
+
+    /* ---------- Detalle de historia ---------- */
+
+    const modal = $('historiaModal')
+    let lastFocus: HTMLElement | null = null
+
+    function openModal(s: Historia) {
+      const par = PARES[s.par] || { nombre: s.par, rol: '' }
+      const colNombre = COLUMNAS.find((c) => c.id === s.col)?.nombre || s.col
+
+      $('hModalId').textContent = s.id
+      $('hModalTitle').textContent = s.titulo
+
+      const fecha = s.fecha
+        ? new Date(`${s.fecha}T00:00:00`).toLocaleDateString('es-CO', {
+            year: 'numeric',
+            month: 'long',
+            day: 'numeric',
+          })
+        : actual.rango
+
+      const meta = $('hModalMeta')
+      meta.replaceChildren()
+      const filas: Array<[string, string]> = [
+        ['Estado', colNombre],
+        ['Tipo', TIPO[s.tipo] || s.tipo],
+        ['Valor', VALOR[s.valor] || s.valor],
+        ['Fecha', fecha],
+        ['Pareja', `${par.nombre}${par.rol ? ` — ${par.rol}` : ''}`],
+      ]
+      for (const [k, v] of filas) {
+        const row = el('span', {})
+        row.appendChild(el('span', { class: 'modal-meta-label' }, `${k}:`))
+        row.appendChild(document.createTextNode(` ${v}`))
+        meta.appendChild(row)
+      }
+
+      const tests = $('hModalTests')
+      tests.replaceChildren()
+      for (const c of s.dod || []) tests.appendChild(criterioLi(c, `modal-test modal-test--${c.estado}`))
+
+      const archivosBox = $('hModalArchivosBox')
+      const archivos = $('hModalArchivos')
+      archivos.replaceChildren()
+      if (s.archivos?.length) {
+        for (const f of s.archivos) archivos.appendChild(el('li', {}, f))
+        archivosBox.hidden = false
+      } else {
+        archivosBox.hidden = true
+      }
+
+      const nota = $('hModalNota')
+      if (s.nota) {
+        nota.textContent = s.nota
+        nota.hidden = false
+      } else {
+        nota.hidden = true
+      }
+
+      lastFocus = document.activeElement as HTMLElement
+      modal.hidden = false
+      document.body.style.overflow = 'hidden'
+      ;($('hModalClose') as HTMLButtonElement).focus()
+    }
+
+    function closeModal() {
+      modal.hidden = true
+      document.body.style.overflow = ''
+      lastFocus?.focus()
+    }
+
+    $('hModalClose').addEventListener('click', closeModal)
+    modal.addEventListener('click', (e) => {
+      if (e.target === modal) closeModal()
+    })
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape' && !modal.hidden) closeModal()
+    })
+
+    /* ---------- Gráficos ---------- */
+
+    let chartsDone = false
+
+    function barChart(
+      host: HTMLElement,
+      datos: Array<{ etiqueta: string; valor: number; titulo?: string }>,
+      color: string,
+    ) {
+      host.replaceChildren()
+      const W = 640
+      const H = 220
+      const padL = 34
+      const padB = 42
+      const padT = 12
+      const max = Math.max(1, ...datos.map((d) => d.valor))
+      const innerW = W - padL - 10
+      const innerH = H - padB - padT
+      const step = innerW / datos.length
+      const barW = Math.min(46, step * 0.6)
+
+      const svg = el('svg', {
+        viewBox: `0 0 ${W} ${H}`,
+        role: 'img',
+        'aria-label': datos.map((d) => `${d.etiqueta}: ${d.valor}`).join('; '),
+      })
+
+      // Rejilla horizontal y escala.
+      for (let i = 0; i <= 3; i++) {
+        const v = Math.round((max / 3) * i)
+        const y = padT + innerH - (v / max) * innerH
+        svg.appendChild(
+          el('line', {
+            x1: String(padL),
+            x2: String(W - 10),
+            y1: y.toFixed(1),
+            y2: y.toFixed(1),
+            stroke: 'var(--line)',
+            'stroke-width': '1',
+          }),
+        )
+        svg.appendChild(
+          el('text', { x: String(padL - 8), y: (y + 4).toFixed(1), class: 'ax', 'text-anchor': 'end' }, String(v)),
+        )
+      }
+
+      datos.forEach((d, i) => {
+        const h = (d.valor / max) * innerH
+        const x = padL + step * i + (step - barW) / 2
+        const y = padT + innerH - h
+        const rect = el('rect', {
+          x: x.toFixed(1),
+          y: y.toFixed(1),
+          width: barW.toFixed(1),
+          height: Math.max(d.valor > 0 ? 2 : 0, h).toFixed(1),
+          rx: '3',
+          fill: color,
+        })
+        rect.appendChild(el('title', {}, `${d.titulo || d.etiqueta}: ${d.valor} commits`))
+        svg.appendChild(rect)
+        if (d.valor > 0) {
+          svg.appendChild(
+            el(
+              'text',
+              { x: (x + barW / 2).toFixed(1), y: (y - 5).toFixed(1), class: 'val', 'text-anchor': 'middle' },
+              String(d.valor),
+            ),
+          )
+        }
+        svg.appendChild(
+          el(
+            'text',
+            { x: (x + barW / 2).toFixed(1), y: String(H - padB + 18), class: 'ax', 'text-anchor': 'middle' },
+            d.etiqueta,
+          ),
+        )
+      })
+
+      host.appendChild(svg)
+    }
+
+    function renderCharts() {
+      if (chartsDone) return
+      chartsDone = true
+
+      const MESES = ['ene', 'feb', 'mar', 'abr', 'may', 'jun', 'jul', 'ago', 'sep', 'oct', 'nov', 'dic']
+      barChart(
+        $('chartMes'),
+        COMMITS_POR_MES.map((m) => {
+          const [y, mm] = m.mes.split('-')
+          return { etiqueta: `${MESES[Number(mm) - 1]} ${y.slice(2)}`, valor: m.commits, titulo: m.mes }
+        }),
+        'var(--deep)',
+      )
+
+      barChart(
+        $('chartIter'),
+        ITERACIONES.filter((i) => i.commits != null).map((i, idx) => ({
+          etiqueta: `it-${idx}`,
+          valor: i.commits as number,
+          titulo: i.nombre,
+        })),
+        'var(--forest)',
+      )
+    }
+
+    render()
+  }
+
+  document.addEventListener('astro:page-load', initBoard)
+  initBoard()
+</script>
+
+<style>
+  .board {
+    --ok: var(--forest);
+    color: var(--ink);
+    font-family: var(--font-sans);
+  }
+
+  /* ===== Cabecera ===== */
+  .board-head {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    align-items: flex-start;
+    gap: 20px;
+    margin-bottom: 22px;
+  }
+  .board-sub {
+    max-width: 62ch;
+    font-size: 15px;
+    line-height: 1.6;
+    color: var(--mute);
+  }
+  .view-toggle {
+    display: inline-flex;
+    gap: 2px;
+    padding: 3px;
+    border: 1px solid var(--line);
+    border-radius: 999px;
+    background: color-mix(in oklab, var(--paper-warm) 70%, transparent);
+  }
+  .view-btn {
+    padding: 6px 16px;
+    font-size: 14px;
+    font-weight: 500;
+    color: var(--mute);
+    border-radius: 999px;
+    transition: background 0.15s, color 0.15s;
+  }
+  .view-btn:hover { color: var(--ink); background: color-mix(in oklab, var(--ink) 5%, transparent); }
+  .view-btn--on, .view-btn--on:hover { color: var(--paper-warm); background: var(--ink); }
+
+  .noscript {
+    padding: 14px 16px;
+    margin-bottom: 20px;
+    font-size: 14px;
+    color: var(--mute);
+    border: 1px dashed var(--line-2);
+    border-radius: var(--r-md);
+  }
+  .noscript code { font-family: var(--font-mono); font-size: 13px; }
+
+  /* ===== Pestañas de iteración ===== */
+  .tabs-wrap { position: relative; margin-bottom: 22px; }
+  .tabs {
+    display: flex;
+    gap: 10px;
+    overflow-x: auto;
+    padding: 2px 2px 10px;
+    scroll-snap-type: x proximity;
+    scrollbar-width: thin;
+  }
+  .tabs::-webkit-scrollbar { height: 7px; }
+  .tabs::-webkit-scrollbar-thumb { background: var(--line-2); border-radius: 999px; }
+  .tabs-wrap.has-prev .tabs { padding-left: 46px; }
+  .tabs-wrap.has-next .tabs { padding-right: 46px; }
+
+  .tabs-arrow {
+    position: absolute;
+    top: 0;
+    bottom: 12px;
+    z-index: 3;
+    display: grid;
+    place-items: center;
+    width: 34px;
+    font-size: 20px;
+    color: var(--deep);
+    background: color-mix(in oklab, var(--paper) 88%, transparent);
+    backdrop-filter: blur(6px);
+    border: 1px solid var(--line);
+    border-radius: var(--r-sm);
+  }
+  .tabs-arrow:hover { background: var(--paper-warm); }
+  .tabs-arrow[hidden] { display: none; }
+  .tabs-arrow--left { left: 0; }
+  .tabs-arrow--right { right: 0; }
+
+  .tab {
+    flex: none;
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+    width: 200px;
+    padding: 11px 13px;
+    text-align: left;
+    scroll-snap-align: start;
+    border: 1px solid var(--line);
+    border-radius: var(--r-md);
+    background: color-mix(in oklab, var(--paper-warm) 60%, transparent);
+    transition: border-color 0.15s, background 0.15s, transform 0.15s, box-shadow 0.15s;
+  }
+  .tab:hover {
+    border-color: var(--line-2);
+    background: var(--paper-warm);
+    transform: translateY(-1px);
+  }
+  .tab-fase {
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--mute);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+  .tab-name {
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+    min-height: 2.6em;
+    font-size: 13.5px;
+    font-weight: 600;
+    line-height: 1.3;
+  }
+  .tab-range {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 11.5px;
+    color: var(--mute);
+    font-variant-numeric: tabular-nums;
+  }
+  .tab-commits {
+    margin-left: auto;
+    padding: 1px 8px;
+    font-size: 10.5px;
+    font-weight: 600;
+    border-radius: 999px;
+    background: color-mix(in oklab, var(--ink) 7%, transparent);
+  }
+  .tab--on {
+    border-color: var(--forest);
+    background: color-mix(in oklab, var(--forest) 9%, var(--paper-warm));
+    box-shadow: 0 8px 22px -18px color-mix(in oklab, var(--forest) 80%, transparent);
+  }
+  .tab--on .tab-fase { color: color-mix(in oklab, var(--forest) 75%, var(--ink)); }
+  .tab--on .tab-commits { background: color-mix(in oklab, var(--forest) 18%, transparent); }
+
+  /* ===== Fichas de indicador ===== */
+  .kpis {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(170px, 1fr));
+    gap: 14px;
+    margin-bottom: 18px;
+  }
+  .kpi {
+    padding: 15px 17px;
+    border: 1px solid var(--line);
+    border-radius: var(--r-md);
+    background: color-mix(in oklab, var(--paper-warm) 72%, transparent);
+  }
+  .kpi-label {
+    display: flex;
+    align-items: center;
+    gap: 7px;
+    margin-bottom: 7px;
+    font-size: 11.5px;
+    font-weight: 600;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: var(--mute);
+  }
+  .kpi-dot { width: 8px; height: 8px; border-radius: 999px; flex: none; }
+  .kpi-dot--deep { background: var(--deep); }
+  .kpi-dot--aqua { background: var(--aqua); }
+  .kpi-dot--forest { background: var(--forest); }
+  .kpi-dot--clay { background: var(--clay-2); }
+  .kpi-value {
+    font-family: var(--font-display);
+    font-size: 32px;
+    line-height: 1.05;
+    font-variant-numeric: tabular-nums;
+  }
+  .kpi-sub { margin-top: 4px; font-size: 12.5px; color: var(--mute); }
+
+  /* ===== Tarjeta de avance ===== */
+  .progress-card {
+    padding: 20px 22px;
+    margin-bottom: 22px;
+    border: 1px solid var(--line);
+    border-radius: var(--r-lg);
+    background: color-mix(in oklab, var(--paper-warm) 72%, transparent);
+  }
+  .progress-top {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    gap: 18px;
+  }
+  .progress-title { font-family: var(--font-display); font-size: 24px; font-weight: 400; line-height: 1.2; }
+  .progress-meta { margin-top: 5px; font-size: 13px; color: var(--mute); }
+  .progress-pct {
+    flex: none;
+    font-family: var(--font-display);
+    font-size: 40px;
+    line-height: 1;
+    color: var(--forest);
+    font-variant-numeric: tabular-nums;
+  }
+  .progress-resumen { margin-top: 14px; max-width: 78ch; font-size: 15px; line-height: 1.6; }
+  .bar {
+    display: flex;
+    gap: 2px;
+    height: 7px;
+    margin-top: 18px;
+    overflow: hidden;
+    border-radius: 999px;
+    background: var(--line);
+  }
+  .bar-seg { height: 100%; }
+  .bar-legend {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 16px;
+    margin-top: 10px;
+    font-size: 12.5px;
+    color: var(--mute);
+  }
+  .bar-legend span { display: inline-flex; align-items: center; gap: 6px; }
+  .bar-legend i { width: 9px; height: 9px; border-radius: 2px; }
+  .gh-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 7px;
+    margin-top: 14px;
+    font-size: 13.5px;
+    font-weight: 500;
+    color: var(--deep);
+  }
+  .gh-link:hover { text-decoration: underline; }
+  .gh-link[hidden] { display: none; }
+
+  /* ===== Columnas ===== */
+  .board-cols {
+    display: grid;
+    grid-template-columns: repeat(5, minmax(210px, 1fr));
+    align-items: start;
+    gap: 12px;
+    padding-bottom: 8px;
+    overflow-x: auto;
+  }
+  @media (max-width: 1180px) {
+    .board-cols { grid-template-columns: none; grid-auto-flow: column; grid-auto-columns: 74%; }
+  }
+  @media (max-width: 620px) {
+    .board-cols { grid-auto-columns: 88%; }
+  }
+  .col {
+    display: flex;
+    flex-direction: column;
+    min-height: 120px;
+    border: 1px solid var(--line);
+    border-radius: var(--r-md);
+    background: color-mix(in oklab, var(--paper-cool) 55%, transparent);
+  }
+  .col-head {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 10px 13px;
+    border-bottom: 1px solid var(--line);
+  }
+  .col-dot { width: 8px; height: 8px; border-radius: 999px; flex: none; }
+  .col-name {
+    font-size: 11.5px;
+    font-weight: 700;
+    letter-spacing: 0.07em;
+    text-transform: uppercase;
+  }
+  .col-count {
+    margin-left: auto;
+    padding: 1px 8px;
+    font-size: 11.5px;
+    font-weight: 600;
+    color: var(--mute);
+    border: 1px solid var(--line);
+    border-radius: 999px;
+    font-variant-numeric: tabular-nums;
+  }
+  .col-body { display: flex; flex-direction: column; gap: 9px; padding: 10px; }
+  .col-empty {
+    padding: 18px 8px;
+    font-size: 12.5px;
+    text-align: center;
+    color: var(--mute);
+    border: 1px dashed var(--line-2);
+    border-radius: var(--r-sm);
+  }
+
+  /* ===== Tarjeta de historia ===== */
+  .card {
+    display: flex;
+    flex-direction: column;
+    gap: 9px;
+    width: 100%;
+    padding: 12px;
+    text-align: left;
+    background: var(--paper-warm);
+    border: 1px solid var(--line);
+    border-radius: var(--r-sm);
+    transition: border-color 0.15s, box-shadow 0.15s, transform 0.15s;
+  }
+  .card:hover {
+    border-color: var(--line-2);
+    transform: translateY(-1px);
+    box-shadow: 0 10px 24px -18px color-mix(in oklab, var(--ink) 60%, transparent);
+  }
+  .card:focus-visible { outline: 2px solid var(--deep); outline-offset: 2px; }
+  .card-top { display: flex; align-items: center; gap: 8px; }
+  .card-id { font-family: var(--font-mono); font-size: 11px; font-weight: 500; color: var(--mute); }
+  .card-type {
+    padding: 2px 7px;
+    font-size: 9.5px;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    border-radius: 999px;
+  }
+  .card-type--historia { color: var(--deep-2); background: color-mix(in oklab, var(--deep) 14%, transparent); }
+  .card-type--bug { color: var(--clay-ink); background: color-mix(in oklab, var(--clay-2) 26%, transparent); }
+  .card-type--tarea { color: var(--mute); background: color-mix(in oklab, var(--ink) 7%, transparent); }
+  .card-type--spike { color: var(--forest); background: color-mix(in oklab, var(--forest) 14%, transparent); }
+  .card-pts {
+    margin-left: auto;
+    padding: 2px 8px;
+    font-size: 11px;
+    font-weight: 700;
+    color: var(--forest);
+    background: color-mix(in oklab, var(--forest) 12%, transparent);
+    border-radius: var(--r-sm);
+    font-variant-numeric: tabular-nums;
+  }
+  .card-title { font-size: 13.5px; font-weight: 600; line-height: 1.4; }
+  .card-tags { display: flex; flex-wrap: wrap; gap: 4px; }
+  .tag {
+    padding: 2px 6px;
+    font-size: 10.5px;
+    color: var(--mute);
+    background: color-mix(in oklab, var(--ink) 5%, transparent);
+    border-radius: 4px;
+  }
+  .card-tests { display: flex; flex-direction: column; gap: 4px; list-style: none; }
+  .card-test {
+    display: flex;
+    align-items: flex-start;
+    gap: 7px;
+    font-size: 11.5px;
+    line-height: 1.45;
+    color: var(--mute);
+  }
+  .test-icon {
+    display: grid;
+    place-items: center;
+    flex: none;
+    width: 14px;
+    height: 14px;
+    margin-top: 1px;
+    font-size: 9px;
+    font-weight: 700;
+    border-radius: 3px;
+  }
+  .test-icon--pass { color: #0f5c4f; background: color-mix(in oklab, var(--forest) 24%, transparent); }
+  .test-icon--fail { color: var(--clay-ink); background: color-mix(in oklab, var(--clay-2) 32%, transparent); }
+  .test-icon--pend { background: transparent; border: 1px solid var(--line-2); }
+  .card-foot {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding-top: 9px;
+    border-top: 1px solid var(--line);
+  }
+  .card-valor { display: inline-flex; align-items: center; gap: 5px; font-size: 10.5px; font-weight: 600; }
+  .card-valor i { width: 7px; height: 7px; border-radius: 999px; background: currentColor; }
+  .card-valor--alto { color: var(--clay-ink); }
+  .card-valor--medio { color: var(--deep); }
+  .card-valor--bajo { color: var(--mute); }
+  .card-agente {
+    padding: 1px 6px;
+    font-size: 10px;
+    font-weight: 600;
+    color: var(--forest);
+    background: color-mix(in oklab, var(--forest) 12%, transparent);
+    border-radius: 4px;
+  }
+  .avatar {
+    display: grid;
+    place-items: center;
+    width: 23px;
+    height: 23px;
+    margin-left: auto;
+    font-size: 9.5px;
+    font-weight: 700;
+    color: #fff;
+    border-radius: 999px;
+  }
+
+  /* ===== Gráficos ===== */
+  .charts { display: grid; grid-template-columns: 1fr; gap: 16px; }
+  @media (min-width: 980px) { .charts { grid-template-columns: 1fr 1fr; } }
+  .charts[hidden] { display: none; }
+  .chart {
+    padding: 18px 20px;
+    border: 1px solid var(--line);
+    border-radius: var(--r-lg);
+    background: color-mix(in oklab, var(--paper-warm) 72%, transparent);
+  }
+  .chart-head { margin-bottom: 14px; }
+  .chart-title { font-family: var(--font-display); font-size: 20px; font-weight: 400; }
+  .chart-sub { margin-top: 3px; font-size: 13px; color: var(--mute); }
+  .chart-canvas svg { display: block; width: 100%; height: auto; overflow: visible; }
+  .chart-canvas :global(.ax) { font-size: 11px; fill: var(--mute); font-family: var(--font-sans); }
+  .chart-canvas :global(.val) {
+    font-size: 11px;
+    font-weight: 600;
+    fill: var(--ink);
+    font-family: var(--font-sans);
+    font-variant-numeric: tabular-nums;
+  }
+
+  /* ===== Detalle ===== */
+  .modal {
+    position: fixed;
+    inset: 0;
+    z-index: 80;
+    display: grid;
+    place-items: center;
+    padding: 16px;
+    background: color-mix(in oklab, var(--ink) 55%, transparent);
+    backdrop-filter: blur(4px);
+  }
+  .modal[hidden] { display: none; }
+  .modal-card {
+    width: 100%;
+    max-width: 620px;
+    max-height: 88vh;
+    overflow: auto;
+    background: var(--paper-warm);
+    border: 1px solid var(--line-2);
+    border-radius: var(--r-lg);
+    box-shadow: 0 30px 70px -24px color-mix(in oklab, var(--ink) 70%, transparent);
+  }
+  .modal-head {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 15px 20px;
+    border-bottom: 1px solid var(--line);
+  }
+  .modal-id { font-family: var(--font-mono); font-size: 11.5px; color: var(--mute); flex: none; }
+  .modal-title { flex: 1; font-size: 15px; font-weight: 600; line-height: 1.35; }
+  .modal-close {
+    display: grid;
+    place-items: center;
+    flex: none;
+    width: 32px;
+    height: 32px;
+    font-size: 20px;
+    color: var(--mute);
+    border: 1px solid var(--line);
+    border-radius: var(--r-sm);
+  }
+  .modal-close:hover { color: var(--ink); background: color-mix(in oklab, var(--ink) 5%, transparent); }
+  .modal-body { padding: 20px; }
+  .modal-meta {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px 18px;
+    padding-bottom: 16px;
+    margin-bottom: 16px;
+    font-size: 13px;
+    border-bottom: 1px solid var(--line);
+  }
+  .modal-meta-label { color: var(--mute); }
+  .modal-label {
+    margin-bottom: 10px;
+    font-size: 11.5px;
+    font-weight: 700;
+    letter-spacing: 0.07em;
+    text-transform: uppercase;
+    color: var(--mute);
+  }
+  .modal-tests { display: flex; flex-direction: column; gap: 8px; list-style: none; }
+  .modal-test {
+    display: flex;
+    align-items: flex-start;
+    gap: 9px;
+    font-size: 14px;
+    line-height: 1.5;
+  }
+  .modal-test--pend { color: var(--mute); }
+  .modal-files {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    list-style: none;
+    font-family: var(--font-mono);
+    font-size: 12.5px;
+    color: var(--mute);
+  }
+  .modal-body > div[hidden] { display: none; }
+  #hModalArchivosBox { margin-top: 20px; }
+  .modal-nota {
+    margin-top: 18px;
+    padding: 12px 14px;
+    font-size: 13.5px;
+    line-height: 1.55;
+    color: var(--clay-ink);
+    background: color-mix(in oklab, var(--clay) 20%, transparent);
+    border-radius: var(--r-sm);
+  }
+  .modal-nota[hidden] { display: none; }
+
+  @media (prefers-reduced-motion: reduce) {
+    .tab, .card { transition: none; }
+    .tab:hover, .card:hover { transform: none; }
+  }
+</style>
