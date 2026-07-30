@@ -115,16 +115,19 @@ export async function seedAdminIfEmpty(): Promise<void> {
   const db = client()
   const res = await db.execute('SELECT COUNT(*) AS n FROM users')
   if (Number(res.rows[0].n) > 0) return
-  const username = env('ADMIN_USERNAME', 'admin')
+  const username = env('ADMIN_USERNAME', 'dev')
   const password = env('ADMIN_PASSWORD')
   if (!password) {
-    console.warn('[users] Tabla vacía y ADMIN_PASSWORD no definido: no se creó el admin inicial')
+    console.warn('[users] Tabla vacía y ADMIN_PASSWORD no definido: no se creó la cuenta inicial')
     return
   }
   const ts = now()
+  // El nombre visible dice lo que la cuenta es. Si aparece "Acceso de
+  // desarrollo" en el panel de producción, alguien arrancó por entorno y esa
+  // cuenta hay que reemplazarla por usuarios nominales con su rol.
   await db.execute({
     sql: `INSERT INTO users (username,name,role,pass_hash,active,created_at,updated_at) VALUES (?,?,?,?,1,?,?)`,
-    args: [username, 'Administrador', 'admin', await hashPassword(password), ts, ts],
+    args: [username, 'Acceso de desarrollo', 'admin', await hashPassword(password), ts, ts],
   })
 }
 
