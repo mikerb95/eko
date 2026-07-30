@@ -610,6 +610,7 @@ h3 { font-size: 22px; }
   display: flex; justify-content: space-between; align-items: center; font-family: var(--font-mono); font-size: 12px; letter-spacing: 0.05em;
   color: color-mix(in oklab, #fff 50%, transparent); margin-top: 56px;
   text-transform: uppercase;
+  flex-wrap: wrap; gap: 14px 24px;
 }
 .foot-docs {
   display: flex; align-items: center; flex-wrap: wrap; gap: 8px 14px;
