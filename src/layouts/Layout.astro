@@ -14,6 +14,11 @@ interface Props {
   path?: string
   /** Imagen para compartir en redes (ruta absoluta desde /public). */
   ogImage?: string
+  /**
+   * Excluye la página de los buscadores. Para documentación interna del
+   * proyecto, que vive en el sitio pero no es contenido comercial.
+   */
+  noindex?: boolean
 }
 
 const {
