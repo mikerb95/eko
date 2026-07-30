@@ -86,12 +86,12 @@ const arrow = 'M5 12h14M13 6l6 6-6 6'
           code === lang ? (
             <span class="nav-lang-opt active" aria-current="true">
               <Flag code={code === 'es' ? 'es' : 'us'} />
-              {code.toUpperCase()}
+              <span class="sr-only">{code.toUpperCase()}</span>
             </span>
           ) : (
             <a href={altUrl} class="nav-lang-opt" title={t('switchLang')} hreflang={code}>
               <Flag code={code === 'es' ? 'es' : 'us'} />
-              {code.toUpperCase()}
+              <span class="nav-lang-code">{code.toUpperCase()}</span>
             </a>
           )
         )}
