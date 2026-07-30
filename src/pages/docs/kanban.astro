@@ -130,15 +130,18 @@ const cerradas = ITERACIONES.filter((i) => i.commits != null).length
             de marca. Están en el tablero con su nota, porque un pendiente sin dueño visible no se
             resuelve nunca.
           </p>
-        </div>
-        <div>
-          <h2 class="method-title">La fuente</h2>
+        </details>
+        <details class="method-item" open>
+          <summary>
+            <h2 class="method-title">La fuente</h2>
+            <span class="method-chev" aria-hidden="true"></span>
+          </summary>
           <p class="method-body">
             Todo sale de <code>src/data/iteraciones.ts</code>, y los conteos de commits se pueden
             recontar con <code>git log</code> sobre el rango de fechas de cada iteración. Si un
             número de aquí no coincide con el historial, el que está mal es el de esta página.
           </p>
-        </div>
+        </details>
       </div>
     </div>
   </section>
