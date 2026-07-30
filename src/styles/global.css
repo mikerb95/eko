@@ -1080,6 +1080,8 @@ body.nav-open .whatsapp-fab { opacity: 0; pointer-events: none; }
   transition: color .2s ease;
 }
 .nav-sheet-utils a:hover { color: var(--ink); }
+.nav-sheet-lang { gap: 8px; }
+.nav-sheet-lang .flag { flex: none; display: block; border-radius: 2.2px; }
 
 @media (min-width: 1000px) { .nav-sheet { display: none; } }
 
