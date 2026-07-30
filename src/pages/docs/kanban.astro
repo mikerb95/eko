@@ -105,9 +105,12 @@ const cerradas = ITERACIONES.filter((i) => i.commits != null).length
             trabajo abierto: el código está, la verificación no. <b>Aceptada</b> significa que todos
             los criterios que dependían del equipo se cumplieron.
           </p>
-        </div>
-        <div>
-          <h2 class="method-title">La Definition of Done</h2>
+        </details>
+        <details class="method-item" open>
+          <summary>
+            <h2 class="method-title">La Definition of Done</h2>
+            <span class="method-chev" aria-hidden="true"></span>
+          </summary>
           <p class="method-body">
             Cada criterio apunta a algo comprobable en el repositorio, no a una intención. Un
             criterio en verde se puede abrir y verificar; uno pendiente marca el trabajo que falta,
