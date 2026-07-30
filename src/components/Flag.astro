@@ -1,0 +1,53 @@
+---
+// Banderas inline (ES / US) para el switch de idioma.
+// Trazadas a mano en viewBox 20x14 (proporción 10:7) para que casen con el
+// tamaño del texto sin pedir un request extra ni depender de emojis, que en
+// Windows no renderizan banderas.
+interface Props {
+  code: 'es' | 'us'
+  class?: string
+}
+
+const { code, class: className } = Astro.props as Props
+const id = `flag-${code}-${Math.random().toString(36).slice(2, 8)}`
+---
+
+{code === 'es' ? (
+  <svg class:list={['flag', className]} viewBox="0 0 20 14" width="20" height="14" role="img" aria-hidden="true" focusable="false">
+    <clipPath id={id}><rect width="20" height="14" rx="2.2" /></clipPath>
+    <g clip-path={`url(#${id})`}>
+      <rect width="20" height="14" fill="#AA151B" />
+      <rect y="3.5" width="20" height="7" fill="#F1BF00" />
+      <g fill="#AA151B" opacity=".9">
+        <rect x="4.1" y="5.6" width="2.6" height="2.9" rx=".5" />
+        <rect x="3.5" y="5.1" width="3.8" height="1" rx=".4" />
+      </g>
+    </g>
+    <rect width="20" height="14" rx="2.2" fill="none" stroke="rgba(0,0,0,.14)" stroke-width="1" />
+  </svg>
+) : (
+  <svg class:list={['flag', className]} viewBox="0 0 20 14" width="20" height="14" role="img" aria-hidden="true" focusable="false">
+    <clipPath id={id}><rect width="20" height="14" rx="2.2" /></clipPath>
+    <g clip-path={`url(#${id})`}>
+      <rect width="20" height="14" fill="#fff" />
+      <g fill="#B31942">
+        <rect width="20" height="1.077" y="0" />
+        <rect width="20" height="1.077" y="2.154" />
+        <rect width="20" height="1.077" y="4.308" />
+        <rect width="20" height="1.077" y="6.462" />
+        <rect width="20" height="1.077" y="8.615" />
+        <rect width="20" height="1.077" y="10.769" />
+        <rect width="20" height="1.077" y="12.923" />
+      </g>
+      <rect width="8.6" height="7.54" fill="#0A3161" />
+      <g fill="#fff">
+        <circle cx="1.6" cy="1.4" r=".52" /><circle cx="4.3" cy="1.4" r=".52" /><circle cx="7" cy="1.4" r=".52" />
+        <circle cx="2.95" cy="2.75" r=".52" /><circle cx="5.65" cy="2.75" r=".52" />
+        <circle cx="1.6" cy="4.1" r=".52" /><circle cx="4.3" cy="4.1" r=".52" /><circle cx="7" cy="4.1" r=".52" />
+        <circle cx="2.95" cy="5.45" r=".52" /><circle cx="5.65" cy="5.45" r=".52" />
+        <circle cx="1.6" cy="6.6" r=".52" /><circle cx="4.3" cy="6.6" r=".52" /><circle cx="7" cy="6.6" r=".52" />
+      </g>
+    </g>
+    <rect width="20" height="14" rx="2.2" fill="none" stroke="rgba(0,0,0,.14)" stroke-width="1" />
+  </svg>
+)}
