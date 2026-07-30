@@ -118,9 +118,12 @@ const cerradas = ITERACIONES.filter((i) => i.commits != null).length
             retiraron —contenido que no se podía sostener— quedan como fallidos, porque borrarlos
             haría que el tablero contara una historia más limpia que la real.
           </p>
-        </div>
-        <div>
-          <h2 class="method-title">Los bloqueos</h2>
+        </details>
+        <details class="method-item" open>
+          <summary>
+            <h2 class="method-title">Los bloqueos</h2>
+            <span class="method-chev" aria-hidden="true"></span>
+          </summary>
           <p class="method-body">
             Varias historias no dependen de código sino de decisiones o de activos: el dominio
             definitivo, los buzones internos de aviso, los PDF de las licencias, las autorizaciones
