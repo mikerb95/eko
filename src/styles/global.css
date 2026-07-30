@@ -249,14 +249,32 @@ img, svg { display: block; max-width: 100%; }
 
 /* --- Nivel 2/3: utilidades y acción --- */
 .nav-right { display: flex; align-items: center; gap: 12px; }
+/* Switch de idioma: control segmentado con bandera + código.
+   El lado activo va elevado sobre el riel; el inactivo es el enlace. */
 .nav-lang {
+  display: inline-flex; align-items: center; gap: 2px;
+  padding: 3px; border-radius: 999px;
+  background: color-mix(in oklab, var(--ink) 5%, transparent);
+  border: 1px solid var(--line);
+}
+.nav-lang-opt {
+  display: inline-flex; align-items: center; gap: 6px;
+  padding: 5px 10px; border-radius: 999px;
   font-family: var(--font-mono); font-size: 11px;
   letter-spacing: 0.06em; text-transform: uppercase;
-  padding: 6px 8px; border-radius: 6px;
-  color: var(--ink-2); opacity: .55;
-  transition: opacity .2s ease, background .2s ease;
+  color: var(--mute); white-space: nowrap;
+  transition: color .2s ease, background .2s ease;
 }
-.nav-lang:hover { opacity: 1; background: color-mix(in oklab, var(--ink) 5%, transparent); }
+.nav-lang-opt.active {
+  color: var(--ink);
+  background: var(--bg, #fff);
+  box-shadow: 0 1px 2px rgba(0, 0, 0, .08);
+}
+.nav-lang-opt:not(.active):hover { color: var(--ink); background: color-mix(in oklab, var(--ink) 6%, transparent); }
+.nav-lang .flag { flex: none; display: block; border-radius: 2.2px; }
+/* La bandera del lado inactivo se apaga hasta el hover. */
+.nav-lang-opt:not(.active) .flag { filter: saturate(.25) opacity(.7); transition: filter .2s ease; }
+.nav-lang-opt:not(.active):hover .flag { filter: none; }
 .nav-cta {
   display: inline-flex; align-items: center; gap: 8px;
   padding: 10px 16px 10px 18px; border-radius: 999px;
