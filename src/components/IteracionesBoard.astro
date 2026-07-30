@@ -873,6 +873,9 @@ const conCommits = ITERACIONES.filter((i) => i.commits != null)
     padding-bottom: 8px;
     overflow-x: auto;
   }
+  /* Sin esto, el display declarado aquí le gana al [hidden] del navegador y el
+     conmutador de vista deja el tablero visible debajo de los gráficos. */
+  .board-cols[hidden], .progress-card[hidden] { display: none; }
   @media (max-width: 1180px) {
     .board-cols { grid-template-columns: none; grid-auto-flow: column; grid-auto-columns: 74%; }
   }
