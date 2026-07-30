@@ -135,11 +135,20 @@ El stack actual del repo ya sirve de base: **Astro + libSQL (Turso) + Vercel**, 
 >
 > Hallazgos de julio de 2026 que aún **no** están incorporados en las secciones 3 y 4 de este documento y que sustentan estos borradores: el traslado de la consulta previa al Estado, la reforma (no eliminación) de la ANLA con uso de IA, las cifras de deforestación en parques del ministro designado, el límite de <2% del territorio para fracking y la auditoría al Fondo para la Vida.
 
-### B1 — Resolución 0851: qué cambia para su empresa desde enero de 2026
-- **Línea:** EKORAEE + EKONSULTING · **Audiencia:** productores de AEE obligados a metas de recolección.
-- **Ángulo:** la Res. 0851 de 2022 entró en plena vigencia el **1 de enero de 2026** y derogó las Resoluciones 372 y 503 de 2009, 1738 de 2010 y 361 de 2011. Todos los obligados están operando este año bajo clasificación y requisitos de SRS nuevos.
-- **Puntos clave:** metas de recolección que suben cada año; reporte anual obligatorio y sanciones; la Caracterización de la cadena de AEE (MinAmbiente, marzo de 2026) anticipa mayor exigencia de trazabilidad y datos.
-- **Por verificar antes de publicar:** listado exacto de obligaciones que cambiaron y fechas de reporte, contra el texto de la resolución y el Decreto 284 de 2018.
+### B1 — Resolución 0851 en 2026: cobertura geográfica y CORALINA
+- **Línea:** EKORAEE + EKONSULTING · **Audiencia:** productores de AEE y sistemas de recolección y gestión (SRG) colectivos.
+- **Estado:** ✅ **redactado** — ver `docs/borradores/b1-resolucion-0851-2026.md`. Pendiente de revisión de gerencia.
+
+> ⚠️ **Corrección (30 jul 2026).** La versión anterior de este borrador afirmaba que la Res. 0851 de 2022 "entró en plena vigencia el 1 de enero de 2026" y que derogó las Resoluciones 372 y 503 de 2009, 1738 de 2010 y 361 de 2011. **Ambas afirmaciones son falsas** y provenían de un resumen de búsqueda que mezclaba normas distintas. Verificado contra el texto oficial:
+>
+> - **Art. 24:** rige **desde el 1 de enero de 2023** y deroga la **Res. 1297 de 2010** (mod. por Res. 2246 de 2017), la **Res. 1511 de 2010** y la **Res. 1512 de 2010**.
+> - El gancho real de 2026 es el **Art. 14**: a partir de 2026 los SRG colectivos de las nuevas subcategorías de AEE de consumo masivo deben tener cobertura geográfica en la **jurisdicción de CORALINA** (San Andrés, Providencia y Santa Catalina).
+> - **Art. 19, Tabla 5:** cronograma progresivo de cobertura geográfica — año 1: 10%, año 2: 12%, año 3: 15%, **año 4: 18%**, año 5: 22%, año 6: 26%, año 7: 32%, año 8: 38%, año 9: 46%, año 10: 56%, año 11: 68%, año 12: 72%, año 13: 75%.
+> - **Art. 20:** informe anual ante la **ANLA** por **VITAL**, período 1 de enero–31 de diciembre, según calendario mensual. **Art. 21:** cambios en puntos de recolección se actualizan en máximo **15 días hábiles**.
+>
+> Lección para el resto de los borradores: **ningún dato normativo se publica desde un resumen de prensa o de buscador.** Solo desde el texto de la norma.
+
+- **Nota de solapamiento:** ya existe el post `resolucion-0851-tu-viejo-computador` (26 ago 2025, `featured`), que cubre la 0851 a nivel conceptual y de consumidor final. B1 **no lo reemplaza**: es el complemento técnico para empresas obligadas y debe enlazarlo.
 - **CTA:** diagnóstico de cumplimiento posconsumo.
 
 ### B2 — Licenciamiento ambiental en el nuevo gobierno: qué esperar
