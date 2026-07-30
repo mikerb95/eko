@@ -166,10 +166,19 @@ const conCommits = ITERACIONES.filter((i) => i.commits != null)
 
     const NS = 'http://www.w3.org/2000/svg'
     const SVG = new Set(['svg', 'g', 'path', 'line', 'rect', 'text'])
+    // Astro limita los estilos de este componente con un atributo data-astro-cid-*
+    // que solo lleva el markup del .astro. Los nodos que se crean aquí no lo
+    // heredan, así que se copia del contenedor: sin esto, pestañas, fichas,
+    // columnas y tarjetas se renderizan sin ninguna de sus reglas.
+    const scope = Array.from((dataEl.closest('.board') as HTMLElement).attributes)
+      .map((a) => a.name)
+      .find((n) => n.startsWith('data-astro-cid-'))
+
     function el(tag: string, attrs: Record<string, string> = {}, ...kids: Array<string | Node>) {
       const node = SVG.has(tag)
         ? document.createElementNS(NS, tag)
         : document.createElement(tag)
+      if (scope) node.setAttribute(scope, '')
       for (const [k, v] of Object.entries(attrs)) node.setAttribute(k, v)
       for (const k of kids) node.appendChild(typeof k === 'string' ? document.createTextNode(k) : k)
       return node as HTMLElement
