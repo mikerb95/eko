@@ -215,3 +215,15 @@ Publicar B1 cierra además un problema del sitio: el blog llevaba casi un año s
 - [MinAmbiente — RAEE](https://www.minambiente.gov.co/asuntos-ambientales-sectorial-y-urbana/residuos-de-aparato-electricos-y-electronicos-raee/)
 - [El Colombiano — Manejo de RAEE en Colombia (~20% de reciclaje)](https://www.elcolombiano.com/medio-ambiente/colombia-avanza-en-manejo-de-residuos-electricos-y-electronicos-raee-MD15165797)
 - [MinAmbiente — Estímulos para el aprovechamiento y gestión integral de RAEE (2025)](https://quimicos.minambiente.gov.co/wp-content/uploads/2025/09/ESTIMULOS-APROVECHAMIENTO-Y-GESTION-DE-RAEE-ver.-15-09-25_compressed-1.pdf)
+
+**Fuentes agregadas el 30 de julio de 2026 (base de los borradores de la sección 6):**
+
+- [Cambio — Arjona ratifica la ANLA, agilizará licencias y trasladaría la consulta previa al Estado](https://cambiocolombia.com/medio-ambiente/articulo/2026/7/ministro-de-ambiente-designado-por-el-nuevo-gobierno-descarta-eliminar-la-anla-y-promete-agilizar-licencias)
+- [El Tiempo — "El fracking no será en todos los sitios": Arjona explica la política ambiental del nuevo gobierno](https://www.eltiempo.com/vida/medio-ambiente/el-fracking-no-sera-en-todos-los-sitios-el-nombrado-ministro-de-ambiente-fabio-arjona-revela-como-sera-la-politica-ambiental-del-nuevo-gobierno-3568662)
+- [Infobae — Arjona advierte "descuido" de parques nacionales y desmiente cifras de deforestación de Petro (18 jul 2026)](https://www.infobae.com/colombia/2026/07/18/ministro-designado-de-ambiente-advirtio-descuido-de-parques-nacionales-y-desmintio-cifras-de-deforestacion-de-gobierno-petro/)
+- [Infobae — Minería espera giro con De la Espriella: ACM prevé inversiones por más de US$2.600 millones (11 jul 2026)](https://www.infobae.com/colombia/2026/07/11/mineria-espera-giro-con-de-la-espriella-acm-preve-inversiones-por-mas-de-us2600-millones/)
+- [Valora Analitik — De la Espriella propone giro energético, incentivos tributarios y reordenamiento del campo](https://www.valoraanalitik.com/de-la-espriella-propone-giro-energetico-incentivos-tributarios-y-reordenamiento-del-campo/)
+- [Portafolio — Agua y biodiversidad marcarán la agenda ambiental del gobierno](https://www.portafolio.co/economia/gobierno/agua-y-biodiversidad-marcaran-la-agenda-ambiental-del-gobierno-de-de-la-espriella-dice-su-minambiente-497419)
+- [El Espectador — Estrategias de Cepeda y De la Espriella contra la minería ilegal](https://www.elespectador.com/ambiente/amazonas/las-estrategias-de-ivan-cepeda-y-abelardo-de-la-espriella-para-combatir-la-mineria-ilegal/)
+- [El Tiempo — Lo que viene para el sector ambiental: habrá fracking y lucha contra la deforestación](https://www.eltiempo.com/vida/medio-ambiente/lo-que-viene-para-el-sector-ambiental-en-el-gobierno-de-abelardo-de-la-espriella-habra-fracking-y-lucha-contra-la-deforestacion-3567139)
+- [Mongabay — Los candidatos relegaron la agenda ambiental en campaña (mayo 2026)](https://es.mongabay.com/2026/05/elecciones-colombia-candidatos-presidente-agenda-ambiental/)
