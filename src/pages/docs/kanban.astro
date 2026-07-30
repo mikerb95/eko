@@ -207,8 +207,86 @@ const cerradas = ITERACIONES.filter((i) => i.commits != null).length
     background: color-mix(in oklab, var(--ink) 6%, transparent);
   }
 
+  /* Los bloques del método son <details> para poder plegarlos en móvil. En
+     escritorio se ven como antes: abiertos, sin marcador y sin ser clicables. */
+  .method-item summary {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: 12px;
+    list-style: none;
+  }
+  .method-item summary::-webkit-details-marker { display: none; }
+  .method-chev { display: none; }
+
+  @media (min-width: 761px) {
+    .method-item summary { pointer-events: none; }
+  }
+
+  /* ===== Solo móvil ===== */
+  @media (max-width: 760px) {
+    /* El lede completo se lee arriba de todo y empuja el tablero fuera de
+       pantalla; en móvil basta la frase que fija la idea. */
+    .lede-rest { display: none; }
+
+    .docs-nav {
+      grid-template-columns: none;
+      grid-auto-flow: column;
+      grid-auto-columns: max-content;
+      gap: 8px;
+      margin-top: 28px;
+      overflow-x: auto;
+      scrollbar-width: none;
+      /* Sangrado hasta el borde para que se note que hay más chips al lado. */
+      margin-inline: calc(var(--gutter, 20px) * -1);
+      padding-inline: var(--gutter, 20px);
+    }
+    .docs-nav::-webkit-scrollbar { display: none; }
+    .doc-chip { padding: 9px 14px; }
+    .doc-chip-name { white-space: nowrap; }
+    .doc-chip-desc { display: none; }
+
+    .method { padding: 20px 18px; }
+    .method-grid {
+      grid-template-columns: none;
+      gap: 0;
+      margin-top: 16px;
+    }
+    .method-item + .method-item { border-top: 1px solid var(--line); }
+    .method-item summary {
+      padding: 14px 0;
+      cursor: pointer;
+    }
+    .method-item .method-title {
+      font-size: 18px;
+      margin-bottom: 0;
+    }
+    .method-item .method-body { padding-bottom: 16px; font-size: 15px; }
+    .method-chev {
+      display: block;
+      flex: none;
+      width: 20px;
+      height: 20px;
+      position: relative;
+      border: 1px solid var(--line-2);
+      border-radius: 999px;
+      transition: transform 0.18s;
+    }
+    .method-chev::before,
+    .method-chev::after {
+      content: '';
+      position: absolute;
+      inset: 50% 4px auto;
+      height: 1.5px;
+      background: var(--mute);
+    }
+    .method-chev::after { transform: rotate(90deg); }
+    .method-item[open] .method-chev { transform: rotate(45deg); }
+  }
+
   @media (prefers-reduced-motion: reduce) {
     .doc-chip { transition: none; }
     .doc-chip:hover { transform: none; }
+    .method-chev { transition: none; }
   }
 </style>
