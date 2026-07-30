@@ -30,6 +30,7 @@ export const rutasEs: Ruta[] = [
   { path: '/oportunidades2630', titulo: 'Oportunidades 2026–2030', descripcion: 'Análisis del entorno regulatorio y político colombiano para el periodo 2026–2030, con fuentes citadas.' },
   { path: '/blog', titulo: 'Diario', descripcion: 'Artículos sobre economía circular, normativa ambiental y sostenibilidad empresarial.' },
   { path: '/contacto', titulo: 'Contacto', descripcion: 'Agenda un diagnóstico de 45 minutos, sin costo y confidencial.' },
+  { path: '/docs', titulo: 'Documentación de ingeniería', descripcion: 'Requerimientos, casos de uso, diagramas UML y plan de calidad del sistema, generados desde datos tipados del repositorio.' },
 ]
 
 /**
