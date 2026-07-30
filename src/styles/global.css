@@ -611,6 +611,22 @@ h3 { font-size: 22px; }
   color: color-mix(in oklab, #fff 50%, transparent); margin-top: 56px;
   text-transform: uppercase;
 }
+.foot-docs {
+  display: flex; align-items: center; flex-wrap: wrap; gap: 8px 14px;
+  text-transform: none; letter-spacing: 0.02em;
+}
+.foot-docs-label {
+  text-transform: uppercase; letter-spacing: 0.08em;
+  color: color-mix(in oklab, #fff 32%, transparent);
+}
+.foot-docs a {
+  color: color-mix(in oklab, #fff 62%, transparent);
+  text-decoration: underline; text-underline-offset: 3px;
+  text-decoration-color: color-mix(in oklab, #fff 25%, transparent);
+  transition: color .2s ease, text-decoration-color .2s ease;
+}
+.foot-docs a:hover { color: var(--aqua); text-decoration-color: var(--aqua); }
+
 .gh-badge {
   display: inline-flex; align-items: center; gap: 6px;
   padding: 6px 12px; border-radius: 999px;
