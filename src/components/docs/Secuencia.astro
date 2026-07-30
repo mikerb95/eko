@@ -1,0 +1,252 @@
+---
+/**
+ * Diagrama de secuencia dibujado en SVG desde los datos de `diagramas.ts`.
+ *
+ * Los mensajes van numerados en el diagrama y con su texto completo en la lista
+ * de abajo. Se hace así, y no con el texto entero sobre cada flecha, porque a
+ * 190 px de separación entre participantes el texto de una llamada real —
+ * `CREATE TABLE IF NOT EXISTS + INSERT`— se sale del carril y pisa al vecino.
+ *
+ * El SVG no lleva `marker` en `defs`: los ids serían globales y dos diagramas
+ * en la misma página se pisarían. Las puntas de flecha se dibujan a mano.
+ */
+import type { Secuencia } from '../../data/diagramas'
+
+interface Props {
+  sec: Secuencia
+}
+
+const { sec } = Astro.props
+
+const STEP = 190
+const PAD = 24
+const TOP = 62 // debajo de las cabeceras de participante
+const ROW = 40
+const HEAD_H = 34
+
+const cols = sec.participantes.length
+const W = PAD * 2 + cols * STEP
+const H = TOP + sec.mensajes.length * ROW + 26
+
+const idx = (id: string) => sec.participantes.findIndex((p) => p.id === id)
+const cx = (id: string) => PAD + idx(id) * STEP + STEP / 2
+
+/** Etiqueta corta para el diagrama; el texto completo va en la lista. */
+const corto = (t: string) => (t.length > 30 ? `${t.slice(0, 29)}…` : t)
+
+const mensajes = sec.mensajes.map((m, i) => {
+  const y = TOP + i * ROW + 18
+  const x1 = cx(m.de)
+  const x2 = cx(m.a)
+  const dir = x2 >= x1 ? 1 : -1
+  return { ...m, n: i + 1, y, x1, x2, dir }
+})
+---
+
+<figure class="seq">
+  <figcaption class="seq-cap">
+    <h4 class="seq-title">{sec.nombre}</h4>
+    <p class="seq-desc">{sec.descripcion}</p>
+  </figcaption>
+
+  <div class="seq-scroll">
+    <svg
+      viewBox={`0 0 ${W} ${H}`}
+      width={W}
+      height={H}
+      role="img"
+      aria-label={`Diagrama de secuencia: ${sec.nombre}. ${mensajes
+        .map((m) => `${m.n}. ${m.texto}`)
+        .join('; ')}`}
+    >
+      {/* Líneas de vida */}
+      {
+        sec.participantes.map((p) => (
+          <line
+            x1={cx(p.id)}
+            x2={cx(p.id)}
+            y1={HEAD_H + 6}
+            y2={H - 14}
+            class="life"
+          />
+        ))
+      }
+
+      {/* Cabeceras de participante */}
+      {
+        sec.participantes.map((p, i) => (
+          <>
+            <rect
+              x={PAD + i * STEP + 10}
+              y={4}
+              width={STEP - 20}
+              height={HEAD_H - 4}
+              rx="8"
+              class="head"
+            />
+            <text x={cx(p.id)} y={HEAD_H - 8} class="head-t" text-anchor="middle">
+              {p.nombre}
+            </text>
+          </>
+        ))
+      }
+
+      {/* Mensajes */}
+      {
+        mensajes.map((m) =>
+          m.tipo === 'self' ? (
+            <>
+              <path
+                d={`M ${m.x1} ${m.y - 8} h 26 v 16 h -26`}
+                class:list={['arrow', { err: m.error }]}
+                fill="none"
+              />
+              <path
+                d={`M ${m.x1} ${m.y + 8} l 6 -3 m -6 3 l 6 3`}
+                class:list={['arrow', { err: m.error }]}
+                fill="none"
+              />
+              <text x={m.x1 + 34} y={m.y - 2} class:list={['msg', { err: m.error }]}>
+                <tspan class="num">{m.n}</tspan>{' '}{corto(m.texto)}
+              </text>
+            </>
+          ) : (
+            <>
+              <line
+                x1={m.x1}
+                x2={m.x2}
+                y1={m.y}
+                y2={m.y}
+                class:list={['arrow', { err: m.error, ret: m.tipo === 'return' }]}
+              />
+              <path
+                d={`M ${m.x2} ${m.y} l ${-8 * m.dir} -4 m ${8 * m.dir} 4 l ${-8 * m.dir} 4`}
+                class:list={['arrow', { err: m.error }]}
+                fill="none"
+              />
+              <text
+                x={(m.x1 + m.x2) / 2}
+                y={m.y - 7}
+                class:list={['msg', { err: m.error }]}
+                text-anchor="middle"
+              >
+                <tspan class="num">{m.n}</tspan>{' '}{corto(m.texto)}
+              </text>
+            </>
+          ),
+        )
+      }
+    </svg>
+  </div>
+
+  <ol class="seq-list">
+    {
+      mensajes.map((m) => (
+        <li class:list={{ err: m.error }}>
+          <span class="seq-n">{m.n}</span>
+          <span>
+            <b>
+              {sec.participantes[idx(m.de)]?.nombre}
+              {m.tipo === 'return' ? ' → ' : ' → '}
+              {sec.participantes[idx(m.a)]?.nombre}
+            </b>
+            {' · '}
+            {m.texto}
+            {m.nota && <em class="seq-nota">{m.nota}</em>}
+          </span>
+        </li>
+      ))
+    }
+  </ol>
+
+  <p class="seq-src">
+    Implementado en {sec.fuente.map((f, i) => (<><code>{f}</code>{i < sec.fuente.length - 1 ? ' · ' : ''}</>))}
+  </p>
+</figure>
+
+<style>
+  .seq {
+    padding: clamp(16px, 2.5vw, 24px);
+    border: 1px solid var(--line);
+    border-radius: var(--r-lg);
+    background: color-mix(in oklab, var(--paper-warm) 70%, transparent);
+  }
+  .seq-cap { margin-bottom: 16px; }
+  .seq-title { font-family: var(--font-display); font-size: 21px; font-weight: 400; }
+  .seq-desc {
+    margin-top: 5px;
+    max-width: 78ch;
+    font-size: 14.5px;
+    line-height: 1.6;
+    color: var(--ink-2);
+  }
+
+  .seq-scroll {
+    overflow-x: auto;
+    padding-bottom: 6px;
+    scrollbar-width: thin;
+  }
+  .seq-scroll svg { display: block; height: auto; max-width: none; }
+
+  .life { stroke: var(--line-2); stroke-width: 1; stroke-dasharray: 3 4; }
+  .head { fill: color-mix(in oklab, var(--deep) 10%, var(--paper-warm)); stroke: var(--line); }
+  .head-t {
+    font-family: var(--font-sans);
+    font-size: 11.5px;
+    font-weight: 600;
+    fill: var(--ink);
+  }
+  .arrow { stroke: var(--deep); stroke-width: 1.4; }
+  .arrow.ret { stroke-dasharray: 5 4; stroke: var(--mute); }
+  .arrow.err { stroke: var(--clay-2); stroke-dasharray: 4 3; }
+  .msg {
+    font-family: var(--font-sans);
+    font-size: 10.5px;
+    fill: var(--ink-2);
+  }
+  .msg.err { fill: var(--clay-ink); }
+  .num { font-weight: 700; fill: var(--forest); }
+
+  .seq-list {
+    display: grid;
+    gap: 6px;
+    margin-top: 16px;
+    padding-top: 14px;
+    border-top: 1px solid var(--line);
+    list-style: none;
+    font-size: 13.5px;
+    line-height: 1.5;
+  }
+  .seq-list li { display: flex; gap: 9px; align-items: flex-start; }
+  .seq-list li.err { color: var(--clay-ink); }
+  .seq-n {
+    display: grid;
+    place-items: center;
+    flex: none;
+    width: 19px;
+    height: 19px;
+    margin-top: 1px;
+    font-size: 10.5px;
+    font-weight: 700;
+    color: var(--forest);
+    background: color-mix(in oklab, var(--forest) 13%, transparent);
+    border-radius: 999px;
+    font-variant-numeric: tabular-nums;
+  }
+  .seq-list b { font-weight: 600; }
+  .seq-nota {
+    display: block;
+    margin-top: 2px;
+    font-size: 12.5px;
+    font-style: normal;
+    color: var(--mute);
+  }
+  .seq-src { margin-top: 14px; font-size: 12.5px; color: var(--mute); }
+  .seq-src code { font-family: var(--font-mono); font-size: 12px; }
+
+  @media (max-width: 760px) {
+    .seq-title { font-size: 18px; }
+    .seq-desc { font-size: 14px; }
+    .seq-list { font-size: 13px; }
+  }
+</style>
