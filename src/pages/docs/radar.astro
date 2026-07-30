@@ -1,0 +1,571 @@
+---
+/**
+ * Documentación del proyecto — radar regulatorio y editorial.
+ *
+ * Página interna: va con noindex y no entra en rutas.ts, así que no aparece en
+ * el sitemap, en robots.txt ni en llms.txt. No se enlaza desde la navegación
+ * pública; se comparte por URL con quien tenga que revisar el pipeline.
+ *
+ * Para qué sirve: mostrar en una sola vista qué novedades del entorno se
+ * detectaron, qué contenido o negocio propone cada una, y qué falta para
+ * ejecutarlo. Todo sale de src/data/radar.ts.
+ */
+import Layout from '../../layouts/Layout.astro'
+import SiteFooter from '../../components/SiteFooter.astro'
+import {
+  ACTUALIZADO,
+  REPO,
+  NOVEDADES,
+  BORRADORES,
+  VERIFICACIONES,
+  HALLAZGOS_TECNICOS,
+} from '../../data/radar'
+
+const documentos = [
+  {
+    nombre: 'Radar regulatorio',
+    href: '/docs/radar',
+    desc: 'Novedades del entorno, borradores propuestos y verificaciones.',
+    activo: true,
+  },
+  {
+    nombre: 'Tablero Kanban',
+    href: '/docs/kanban',
+    desc: 'Iteraciones, historias y Definition of Done.',
+  },
+  {
+    nombre: 'Análisis 2026–2030',
+    href: `${REPO}/blob/main/docs/oportunidades-gobierno-2026-2030.md`,
+    desc: 'Documento completo con contexto político, oportunidades y fuentes.',
+  },
+  {
+    nombre: 'Pendientes',
+    href: `${REPO}/blob/main/pendientes.md`,
+    desc: 'Activos por entregar, decisiones abiertas y deuda técnica.',
+  },
+]
+
+const etiquetaEstado = {
+  verificado: 'Verificado en la norma',
+  'por-verificar': 'Por verificar',
+  corregido: 'Corregido',
+} as const
+
+const etiquetaBorrador = {
+  redactado: 'Redactado',
+  listo: 'Listo para escribir',
+  espera: 'Espera un dato',
+  bloqueado: 'Bloqueado',
+} as const
+
+const verificadas = NOVEDADES.filter((n) => n.estado === 'verificado').length
+const publicables = BORRADORES.filter(
+  (b) => b.estado === 'redactado' || b.estado === 'listo'
+).length
+---
+
+<Layout
+  title="Radar regulatorio y editorial — Documentación del proyecto | Ekosolv"
+  description="Novedades del entorno político y normativo colombiano, el contenido y las oportunidades que proponen, y qué falta para ejecutarlas."
+  activePath="/docs/radar"
+  noindex
+>
+  <section class="page-head wrap">
+    <div class="page-strip">
+      <div class="l">Documentación del proyecto</div>
+      <div class="l">{NOVEDADES.length} novedades · {BORRADORES.length} borradores</div>
+    </div>
+
+    <h1 class="display reveal" style="margin-top:40px">
+      Qué cambió afuera<br />y qué <em>hacemos</em> con eso.
+    </h1>
+
+    <p class="lede reveal" style="margin-top:32px; max-width:62ch">
+      No es un resumen de prensa: es un pipeline.<span class="lede-rest">
+        Cada novedad del entorno político o normativo entra aquí con su fuente, con lo que implica
+        para una línea de negocio concreta y con el contenido que propone. Lo que está verificado
+        contra el texto de la norma se puede publicar; lo que viene de prensa espera. Actualizado el
+        {ACTUALIZADO}.</span
+      >
+    </p>
+
+    <nav class="docs-nav reveal" aria-label="Documentos del proyecto">
+      {
+        documentos.map((d) => (
+          <a
+            href={d.href}
+            class:list={['doc-chip', { 'doc-chip--on': d.activo }]}
+            aria-current={d.activo ? 'page' : undefined}
+            target={d.activo || d.href.startsWith('/') ? undefined : '_blank'}
+            rel={d.activo || d.href.startsWith('/') ? undefined : 'noopener noreferrer'}
+          >
+            <span class="doc-chip-name">{d.nombre}</span>
+            <span class="doc-chip-desc">{d.desc}</span>
+          </a>
+        ))
+      }
+    </nav>
+  </section>
+
+  <section class="section wrap">
+    <div class="eyebrow">Novedades del entorno</div>
+    <p class="radar-intro reveal">
+      {verificadas} de {NOVEDADES.length} leídas en la fuente primaria. Las demás no se publican
+      todavía.
+    </p>
+
+    <div class="radar-grid">
+      {
+        NOVEDADES.map((n) => (
+          <article class:list={['radar-card', 'reveal', `is-${n.estado}`]}>
+            <header class="radar-card-head">
+              <span class="radar-dot" aria-hidden="true"></span>
+              <span class="radar-code">{n.code}</span>
+              <span class="radar-fecha">{n.fecha}</span>
+            </header>
+
+            <h2 class="radar-title">{n.titulo}</h2>
+            <p class="radar-body">{n.hallazgo}</p>
+
+            <div class="radar-implica">
+              <span class="radar-label">Qué implica</span>
+              <p>{n.implicacion}</p>
+            </div>
+
+            <footer class="radar-card-foot">
+              <div class="radar-lineas">
+                {n.lineas.map((l) => (
+                  <span class="radar-pill">{l}</span>
+                ))}
+              </div>
+              <span class="radar-estado">{etiquetaEstado[n.estado]}</span>
+              <a class="radar-fuente" href={n.fuente.url} target="_blank" rel="noopener noreferrer">
+                {n.fuente.titulo} ↗
+              </a>
+            </footer>
+          </article>
+        ))
+      }
+    </div>
+  </section>
+
+  <section class="section wrap">
+    <div class="eyebrow">Pipeline editorial</div>
+    <p class="radar-intro reveal">
+      {publicables} de {BORRADORES.length} pueden avanzar hoy. El resto espera un dato o una
+      decisión de negocio — y el motivo está escrito.
+    </p>
+
+    <div class="pipe reveal">
+      <table class="pipe-table">
+        <thead>
+          <tr>
+            <th scope="col">#</th>
+            <th scope="col">Borrador</th>
+            <th scope="col">Línea</th>
+            <th scope="col">Estado</th>
+            <th scope="col">Qué falta</th>
+          </tr>
+        </thead>
+        <tbody>
+          {
+            BORRADORES.map((b) => (
+              <tr class={`pipe-${b.estado}`}>
+                <td class="pipe-id">{b.id}</td>
+                <td class="pipe-titulo">
+                  {b.titulo}
+                  {b.archivo && <code class="pipe-archivo">{b.archivo}</code>}
+                </td>
+                <td class="pipe-linea">{b.linea}</td>
+                <td>
+                  <span class="pipe-badge">{etiquetaBorrador[b.estado]}</span>
+                </td>
+                <td class="pipe-nota">{b.nota}</td>
+              </tr>
+            ))
+          }
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <section class="section wrap">
+    <div class="method reveal">
+      <div class="eyebrow">Control de datos</div>
+      <p class="radar-intro" style="margin-bottom:4px">
+        Tres afirmaciones que no sobrevivieron la verificación. Quedan escritas a propósito: la
+        trazabilidad de los errores es lo que hace confiable el resto.
+      </p>
+      <div class="verif-list">
+        {
+          VERIFICACIONES.map((v) => (
+            <div class="verif-item">
+              <p class="verif-claim">“{v.afirmacion}”</p>
+              <p class="verif-real">{v.realidad}</p>
+              <span class="verif-fuente">{v.fuente}</span>
+            </div>
+          ))
+        }
+      </div>
+    </div>
+  </section>
+
+  <section class="section wrap">
+    <div class="eyebrow">Hallazgos técnicos abiertos</div>
+    <p class="radar-intro reveal">
+      Cosas del sitio que este trabajo dejó al descubierto. No son del contenido: son del sistema.
+    </p>
+
+    <div class="hall-grid">
+      {
+        HALLAZGOS_TECNICOS.map((h) => (
+          <article class="hall-card reveal">
+            <h3 class="hall-title">
+              <span class="radar-dot" aria-hidden="true"></span>
+              {h.titulo}
+            </h3>
+            <p class="hall-body" set:html={h.detalle.replace(/`([^`]+)`/g, '<code>$1</code>')} />
+            <code class="hall-archivo">{h.archivo}</code>
+          </article>
+        ))
+      }
+    </div>
+  </section>
+
+  <SiteFooter lang="es" />
+</Layout>
+
+<style>
+  /* Reutiliza .docs-nav / .doc-chip / .method del tablero, replicados aquí
+     porque los estilos de página en Astro tienen alcance por componente. */
+  .docs-nav {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(210px, 1fr));
+    gap: 10px;
+    margin-top: 40px;
+  }
+  .doc-chip {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    padding: 13px 15px;
+    border: 1px solid var(--line);
+    border-radius: var(--r-md);
+    background: color-mix(in oklab, var(--paper-warm) 55%, transparent);
+    transition: border-color 0.15s, background 0.15s, transform 0.15s;
+  }
+  .doc-chip:hover {
+    border-color: var(--line-2);
+    background: var(--paper-warm);
+    transform: translateY(-1px);
+  }
+  .doc-chip-name { font-size: 14.5px; font-weight: 600; }
+  .doc-chip-desc { font-size: 12.5px; line-height: 1.45; color: var(--mute); }
+  .doc-chip--on {
+    border-color: var(--forest);
+    background: color-mix(in oklab, var(--forest) 9%, var(--paper-warm));
+  }
+  .doc-chip--on:hover { transform: none; }
+
+  .method {
+    padding: clamp(24px, 4vw, 40px);
+    border: 1px solid var(--line);
+    border-radius: var(--r-lg);
+    background: color-mix(in oklab, var(--paper-warm) 60%, transparent);
+  }
+
+  .radar-intro {
+    font-family: var(--font-mono);
+    font-size: 13px;
+    color: var(--mute);
+    margin-top: 14px;
+    max-width: 68ch;
+    line-height: 1.6;
+  }
+
+  /* ---------- Novedades ---------- */
+  .radar-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+    gap: 14px;
+    margin-top: 30px;
+  }
+  .radar-card {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    padding: clamp(20px, 2.5vw, 28px);
+    border: 1px solid var(--line);
+    border-radius: var(--r-lg);
+    background: color-mix(in oklab, var(--paper-warm) 45%, transparent);
+    transition: background 0.18s, border-color 0.18s;
+  }
+  .radar-card:hover {
+    border-color: var(--line-2);
+    background: color-mix(in oklab, var(--forest) 5%, var(--paper-warm));
+  }
+  .radar-card-head {
+    display: flex;
+    align-items: center;
+    gap: 9px;
+    flex-wrap: wrap;
+  }
+  /* Punto de color junto al título en vez de franja lateral. */
+  .radar-dot {
+    width: 7px;
+    height: 7px;
+    border-radius: 50%;
+    background: var(--forest);
+    flex: none;
+  }
+  .is-por-verificar .radar-dot { background: var(--clay); }
+  .radar-code {
+    font-family: var(--font-mono);
+    font-size: 11.5px;
+    letter-spacing: 0.09em;
+    text-transform: uppercase;
+    color: var(--deep);
+  }
+  .radar-fecha {
+    font-family: var(--font-mono);
+    font-size: 11.5px;
+    color: var(--mute);
+    margin-left: auto;
+  }
+  .radar-title {
+    font-family: var(--font-display);
+    font-size: clamp(19px, 2vw, 23px);
+    font-weight: 400;
+    line-height: 1.25;
+  }
+  .radar-body {
+    font-size: 14.5px;
+    line-height: 1.6;
+    color: var(--ink-2);
+  }
+  .radar-implica {
+    padding: 14px 16px;
+    border-radius: var(--r-md);
+    background: color-mix(in oklab, var(--deep) 6%, transparent);
+  }
+  .radar-label {
+    display: block;
+    font-family: var(--font-mono);
+    font-size: 10.5px;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--deep);
+    margin-bottom: 6px;
+  }
+  .radar-implica p { font-size: 14px; line-height: 1.6; }
+  .radar-card-foot {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 8px;
+    margin-top: auto;
+    padding-top: 12px;
+    border-top: 1px solid var(--line);
+  }
+  .radar-lineas { display: flex; flex-wrap: wrap; gap: 6px; }
+  .radar-pill {
+    font-family: var(--font-mono);
+    font-size: 10.5px;
+    letter-spacing: 0.06em;
+    padding: 3px 8px;
+    border-radius: 999px;
+    border: 1px solid var(--line-2);
+    color: var(--mute);
+  }
+  .radar-estado {
+    font-family: var(--font-mono);
+    font-size: 10.5px;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    padding: 3px 8px;
+    border-radius: 999px;
+    background: color-mix(in oklab, var(--forest) 15%, transparent);
+    color: color-mix(in oklab, var(--forest) 75%, var(--ink));
+  }
+  .is-por-verificar .radar-estado {
+    background: color-mix(in oklab, var(--clay) 30%, transparent);
+    color: color-mix(in oklab, var(--ink) 80%, var(--clay));
+  }
+  .radar-fuente {
+    flex-basis: 100%;
+    font-family: var(--font-mono);
+    font-size: 11.5px;
+    color: var(--mute);
+    text-decoration: underline;
+    text-underline-offset: 3px;
+  }
+  .radar-fuente:hover { color: var(--deep); }
+
+  /* ---------- Pipeline ---------- */
+  .pipe {
+    margin-top: 30px;
+    border: 1px solid var(--line);
+    border-radius: var(--r-lg);
+    overflow-x: auto;
+  }
+  .pipe-table {
+    width: 100%;
+    min-width: 760px;
+    border-collapse: collapse;
+    font-size: 14px;
+  }
+  .pipe-table th {
+    text-align: left;
+    font-family: var(--font-mono);
+    font-size: 10.5px;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--mute);
+    font-weight: 400;
+    padding: 13px 16px;
+    border-bottom: 1px solid var(--line);
+    background: color-mix(in oklab, var(--paper-warm) 60%, transparent);
+  }
+  .pipe-table td {
+    padding: 15px 16px;
+    border-bottom: 1px solid var(--line);
+    vertical-align: top;
+    line-height: 1.55;
+  }
+  .pipe-table tr:last-child td { border-bottom: none; }
+  .pipe-table tbody tr { transition: background 0.15s; }
+  .pipe-table tbody tr:hover { background: color-mix(in oklab, var(--forest) 4%, transparent); }
+  .pipe-id {
+    font-family: var(--font-mono);
+    font-size: 12.5px;
+    color: var(--deep);
+    white-space: nowrap;
+  }
+  .pipe-titulo { font-weight: 600; max-width: 32ch; }
+  .pipe-archivo {
+    display: block;
+    font-family: var(--font-mono);
+    font-size: 11px;
+    font-weight: 400;
+    color: var(--mute);
+    margin-top: 5px;
+    word-break: break-all;
+  }
+  .pipe-linea {
+    font-family: var(--font-mono);
+    font-size: 11.5px;
+    color: var(--mute);
+    white-space: nowrap;
+  }
+  .pipe-nota { font-size: 13.5px; color: var(--ink-2); max-width: 40ch; }
+  .pipe-badge {
+    display: inline-block;
+    font-family: var(--font-mono);
+    font-size: 10.5px;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    padding: 4px 9px;
+    border-radius: 999px;
+    white-space: nowrap;
+    border: 1px solid var(--line-2);
+    color: var(--mute);
+  }
+  .pipe-redactado .pipe-badge {
+    background: color-mix(in oklab, var(--forest) 16%, transparent);
+    border-color: transparent;
+    color: color-mix(in oklab, var(--forest) 78%, var(--ink));
+  }
+  .pipe-listo .pipe-badge {
+    background: color-mix(in oklab, var(--deep) 12%, transparent);
+    border-color: transparent;
+    color: var(--deep);
+  }
+  .pipe-espera .pipe-badge {
+    background: color-mix(in oklab, var(--clay) 32%, transparent);
+    border-color: transparent;
+    color: color-mix(in oklab, var(--ink) 82%, var(--clay));
+  }
+
+  /* ---------- Verificaciones ---------- */
+  .verif-list {
+    display: grid;
+    gap: 12px;
+    margin-top: 26px;
+  }
+  .verif-item {
+    padding: 18px 20px;
+    border-radius: var(--r-md);
+    background: color-mix(in oklab, var(--clay) 12%, transparent);
+  }
+  .verif-claim {
+    font-family: var(--font-display);
+    font-size: 17px;
+    line-height: 1.4;
+    color: var(--mute);
+    text-decoration: line-through;
+    text-decoration-thickness: 1px;
+  }
+  .verif-real {
+    font-size: 14.5px;
+    line-height: 1.6;
+    margin-top: 9px;
+  }
+  .verif-fuente {
+    display: inline-block;
+    font-family: var(--font-mono);
+    font-size: 11px;
+    color: var(--mute);
+    margin-top: 9px;
+  }
+
+  /* ---------- Hallazgos técnicos ---------- */
+  .hall-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(290px, 1fr));
+    gap: 14px;
+    margin-top: 30px;
+  }
+  .hall-card {
+    padding: clamp(18px, 2.2vw, 24px);
+    border: 1px solid var(--line);
+    border-radius: var(--r-lg);
+    transition: background 0.18s;
+  }
+  .hall-card:hover { background: color-mix(in oklab, var(--paper-warm) 70%, transparent); }
+  .hall-title {
+    display: flex;
+    align-items: baseline;
+    gap: 9px;
+    font-family: var(--font-display);
+    font-size: 18px;
+    font-weight: 400;
+    line-height: 1.3;
+  }
+  .hall-title .radar-dot { background: var(--deep); transform: translateY(-2px); }
+  .hall-body {
+    font-size: 14px;
+    line-height: 1.6;
+    color: var(--ink-2);
+    margin-top: 10px;
+  }
+  .hall-body code,
+  .radar-intro code {
+    font-family: var(--font-mono);
+    font-size: 12.5px;
+    padding: 1px 5px;
+    border-radius: 4px;
+    background: color-mix(in oklab, var(--ink) 6%, transparent);
+  }
+  .hall-archivo {
+    display: inline-block;
+    font-family: var(--font-mono);
+    font-size: 11px;
+    color: var(--mute);
+    margin-top: 12px;
+    word-break: break-all;
+  }
+
+  @media (max-width: 560px) {
+    .radar-fecha { margin-left: 0; }
+  }
+</style>
