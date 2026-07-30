@@ -94,8 +94,11 @@ const cerradas = ITERACIONES.filter((i) => i.commits != null).length
     <div class="method reveal">
       <div class="eyebrow">Cómo leer el tablero</div>
       <div class="method-grid">
-        <div>
-          <h2 class="method-title">Las columnas</h2>
+        <details class="method-item" open>
+          <summary>
+            <h2 class="method-title">Las columnas</h2>
+            <span class="method-chev" aria-hidden="true"></span>
+          </summary>
           <p class="method-body">
             <b>Cola</b> es lo que existe como necesidad pero no tiene fecha. <b>Planeada</b> es lo
             siguiente, con su bloqueo identificado. <b>En desarrollo</b> y <b>En aceptación</b> son
