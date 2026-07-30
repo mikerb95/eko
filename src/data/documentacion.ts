@@ -689,12 +689,13 @@ export const RF: RequerimientoFuncional[] = [
   {
     id: 'RF-59',
     modulo: 'acceso',
-    nombre: 'Crear el primer administrador al arrancar',
+    nombre: 'Arrancar con una única cuenta de desarrollo',
     descripcion:
-      'Si la tabla de usuarios está vacía, se crea el admin inicial desde variables de entorno; sin contraseña definida, se avisa y no se crea nada.',
+      'Si la tabla de usuarios está vacía, se crea una sola cuenta desde variables de entorno para poder levantar el panel en local; sin contraseña definida, se avisa y no se crea nada. Los usuarios reales se crean desde el panel, con su rol.',
     prioridad: 'media',
     estado: 'ok',
-    archivos: ['src/lib/users.ts'],
+    archivos: ['src/lib/users.ts', '.env.example'],
+    nota: 'Es un arranque de desarrollo, no la forma de gestionar usuarios: una credencial en variables de entorno no se rota ni se audita por persona. El valor por defecto del usuario es dev, no admin, para que una cuenta genérica no sobreviva por descuido.',
   },
   {
     id: 'RF-60',
