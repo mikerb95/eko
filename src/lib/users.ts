@@ -108,8 +108,14 @@ export async function verifyPassword(password: string, stored: string): Promise<
 }
 
 // ---------- Bootstrap ----------
-// Si la tabla está vacía, crea el primer admin con las credenciales de entorno
-// (las mismas del login antiguo) para no bloquear el acceso en la migración.
+// Si la tabla está vacía, crea UNA cuenta con las credenciales de entorno, para
+// poder levantar el panel en local sin tener acceso previo.
+//
+// Es un arranque de desarrollo, no la forma de crear usuarios: una credencial
+// en variables de entorno no se rota, no se audita por persona y no tiene rol
+// distinto de admin. Los usuarios reales se crean desde la pestaña Usuarios,
+// cada uno con el rol mínimo que necesita. Nunca dejar aquí un usuario genérico
+// tipo admin/admin: por eso el valor por defecto es `dev` y no `admin`.
 export async function seedAdminIfEmpty(): Promise<void> {
   await ensureSchema()
   const db = client()
