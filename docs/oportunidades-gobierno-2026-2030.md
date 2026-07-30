@@ -129,7 +129,73 @@ El stack actual del repo ya sirve de base: **Astro + libSQL (Turso) + Vercel**, 
 
 ---
 
-## 6. Fuentes
+## 6. Borradores (blogs por revisar)
+
+> Estado: **borradores sin publicar.** Ninguno está aprobado ni redactado en su versión final. Antes de publicar cualquiera: (1) verificar cada cifra en la fuente oficial citada, (2) no incluir cifras propias de Ekosolv que no estén en `ekosolv-datos-de-marca` (trayectoria desde 2013, +1.000 t gestionadas), (3) replicar en `/en` — la paridad ES/EN es obligatoria.
+>
+> Hallazgos de julio de 2026 que aún **no** están incorporados en las secciones 3 y 4 de este documento y que sustentan estos borradores: el traslado de la consulta previa al Estado, la reforma (no eliminación) de la ANLA con uso de IA, las cifras de deforestación en parques del ministro designado, el límite de <2% del territorio para fracking y la auditoría al Fondo para la Vida.
+
+### B1 — Resolución 0851: qué cambia para su empresa desde enero de 2026
+- **Línea:** EKORAEE + EKONSULTING · **Audiencia:** productores de AEE obligados a metas de recolección.
+- **Ángulo:** la Res. 0851 de 2022 entró en plena vigencia el **1 de enero de 2026** y derogó las Resoluciones 372 y 503 de 2009, 1738 de 2010 y 361 de 2011. Todos los obligados están operando este año bajo clasificación y requisitos de SRS nuevos.
+- **Puntos clave:** metas de recolección que suben cada año; reporte anual obligatorio y sanciones; la Caracterización de la cadena de AEE (MinAmbiente, marzo de 2026) anticipa mayor exigencia de trazabilidad y datos.
+- **Por verificar antes de publicar:** listado exacto de obligaciones que cambiaron y fechas de reporte, contra el texto de la resolución y el Decreto 284 de 2018.
+- **CTA:** diagnóstico de cumplimiento posconsumo.
+
+### B2 — Licenciamiento ambiental en el nuevo gobierno: qué esperar
+- **Línea:** EKONSULTING · **Audiencia:** empresas con proyectos en trámite ante la ANLA.
+- **Ángulo:** el ministro designado Fabio Arjona confirmó que **la ANLA no se elimina**, pero se reforma para agilizar licencias: plazos definidos de respuesta, requisitos diferenciados según impacto del proyecto, más capacidad técnica e incorporación de IA en el análisis.
+- **Contexto de demanda:** reactivación minero-energética con licenciamiento exprés; la ACM prevé inversiones por **US$2.600 millones**; emergencia energética anunciada para los primeros 90 días.
+- **Tesis editorial:** más velocidad estatal no reduce el rigor técnico exigido al solicitante — lo adelanta. Los expedientes mal armados se caerán más rápido, no más lento.
+- **CTA:** revisión previa de expediente / acompañamiento ICA.
+
+### B3 — Consulta previa pasa al Estado: qué implica para el cronograma de su proyecto
+- **Línea:** EKONSULTING / EKOPARTNER · **Audiencia:** titulares de proyectos con comunidades en área de influencia.
+- **Ángulo:** Arjona propone **trasladar la gestión de la consulta previa del sector privado al Estado** para unificar criterios y dar seguridad jurídica.
+- **Nota interna (no publicar):** esto es un **riesgo comercial**, no solo un tema editorial. Si alguna línea de Ekosolv factura por gestionar consultas previas, hay que evaluar el impacto antes de posicionarse públicamente sobre el tema. Definir esto **antes** de escribir el post.
+- **Estado:** en espera de decisión interna.
+
+### B4 — Fracking en menos del 2% del territorio: lo que sí exige la norma
+- **Línea:** EKONSULTING · **Audiencia:** operadores y proveedores del sector hidrocarburos.
+- **Ángulo:** "el fracking no será en todos los sitios" — Arjona lo avala con controles estrictos, restringido a valles interandinos y Magdalena Medio, **excluido de resguardos indígenas y parques nacionales**, y aclara que la decisión final es de la política energética del gobierno.
+- **Tono:** técnico y neutral, sin tomar partido a favor ni en contra. El valor del post es explicar el régimen de licenciamiento y monitoreo aplicable, no opinar.
+- **Riesgo reputacional:** tema polarizado. Requiere aprobación de gerencia antes de publicar.
+
+### B5 — Economía circular en minería: un mercado nuevo más allá del RAEE
+- **Línea:** EKOTRADING + EKONSULTING · **Audiencia:** titulares mineros.
+- **Ángulo:** el proyecto de resolución de economía circular en minería (abril de 2026) habilita reutilizar y valorizar residuos mineros como materia prima; con la **Ley 2250 de 2022** se puede acceder a fondos de fomento por incorporar economía circular.
+- **Gancho:** amplía el universo de clientes de Ekosolv más allá del RAEE clásico.
+- **Por verificar:** si la resolución ya fue expedida o sigue en proyecto al momento de publicar.
+
+### B6 — El cumplimiento ambiental se privatiza: quién va a auditarlo si el Estado se reduce
+- **Línea:** EKONSULTING (ESG) · **Audiencia:** gerencias de sostenibilidad y áreas financieras.
+- **Ángulo:** con la meta de reducir el Estado en 40%, menos auditoría estatal y más presión de inversionistas, banca y cadenas de suministro. Señal concreta del giro: Arjona anunció **auditoría al Fondo para la Vida** por más de 2.000 contratos de servicios que considera redundantes.
+- **Tesis:** el cumplimiento no desaparece cuando el fiscalizador se achica; cambia de contraparte y se vuelve requisito de acceso a capital y a clientes grandes.
+- **Nota interna:** si Ekosolv tiene contratos con entidades del sector ambiental, asumir revisión y demoras en el arranque del gobierno. Verificar exposición antes de publicar.
+
+### B7 — Colombia recicla solo el 20% de sus RAEE
+- **Línea:** EKORAEE · **Audiencia:** amplia (SEO / autoridad de marca).
+- **Ángulo:** brecha entre normativa pionera y cumplimiento operativo rezagado. Generación nacional estimada **~197.000 t (2021) → ~216.000 t (2026)**, +9,4% en cinco años.
+- **Advertencia:** la cifra de 216.000 t la vi atribuida a estudios de MinAmbiente en una fuente débil. **Confirmar en minambiente.gov.co antes de usarla**; si no se confirma, publicar sin ese dato.
+- **Nota de contexto:** la agenda declarada del nuevo gobierno (ABC: agua, biodiversidad, comunidades) **no menciona RAEE ni posconsumo**. La exigencia seguirá viniendo del marco vigente y del mercado, no de nueva fiscalización — eso es precisamente el argumento del post.
+
+### Prioridad sugerida
+
+| Orden | Borrador | Razón |
+|---|---|---|
+| 1 | B1 | Vigencia ya activa, urgencia real para el lector, cero riesgo reputacional |
+| 2 | B2 | Alta demanda inmediata, encaja con la línea más rentable |
+| 3 | B7 | Buen contenido de autoridad/SEO, sin dependencias internas |
+| 4 | B5 | Abre mercado nuevo; esperar confirmación normativa |
+| 5 | B6 | Requiere verificar exposición contractual |
+| 6 | B4 | Requiere aprobación de gerencia |
+| 7 | B3 | Bloqueado hasta decisión interna sobre la línea de consulta previa |
+
+Publicar B1 cierra además un problema del sitio: el blog llevaba casi un año sin publicación, y la etiqueta "actualizado semanalmente" ya se retiró por ser falsa (ver `ekosolv-datos-de-marca`).
+
+---
+
+## 7. Fuentes
 
 - [El Tiempo — Resultados segunda vuelta presidencial 2026](https://www.eltiempo.com/politica/elecciones-colombia-2026/resultados-segunda-vuelta-presidencial-2026-siga-el-minuto-a-minuto-del-preconteo-de-la-registraduria-nacional-3565893)
 - [El Tiempo — Los 10 pilares del plan de gobierno de De la Espriella](https://www.eltiempo.com/politica/elecciones-colombia-2026/abelardo-de-la-espriella-anuncio-los-10-pilares-de-su-gobierno-plan-colombia-ii-reduccion-del-estado-en-40-7-megacarceles-y-otras-medidas-3561778)

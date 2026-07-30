@@ -1135,6 +1135,76 @@ const conCommits = ITERACIONES.filter((i) => i.commits != null)
   }
   .modal-nota[hidden] { display: none; }
 
+  /* ===== Solo móvil =====
+     En pantalla angosta el tablero se lee como un muro de texto: cada tarjeta
+     repite su Definition of Done completa y las etiquetas, que es justo lo que
+     ya muestra el detalle al tocarla. Aquí la tarjeta se queda en título más
+     contador de DoD, y el resto del texto largo se recorta o se apoya en el
+     modal. Nada de esto cambia en escritorio. */
+  @media (max-width: 760px) {
+    .board-head { gap: 14px; margin-bottom: 18px; }
+    /* El intro del tablero repite lo que ya dice el lede de la página. */
+    .board-sub { display: none; }
+    .view-toggle { width: 100%; }
+    .view-btn { flex: 1; padding: 8px 12px; }
+
+    .tab { width: 158px; padding: 10px 12px; }
+    .tab-name { font-size: 13px; }
+
+    .kpis {
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+      margin-bottom: 14px;
+    }
+    .kpi { padding: 12px 13px; }
+    .kpi-label { margin-bottom: 5px; font-size: 10.5px; }
+    .kpi-value { font-size: 26px; }
+    .kpi-sub { font-size: 11.5px; }
+
+    .progress-card { padding: 16px 17px; margin-bottom: 18px; }
+    .progress-top { gap: 12px; }
+    .progress-title { font-size: 20px; }
+    .progress-pct { font-size: 30px; }
+    .progress-resumen {
+      display: -webkit-box;
+      -webkit-line-clamp: 4;
+      -webkit-box-orient: vertical;
+      overflow: hidden;
+      margin-top: 12px;
+      font-size: 14.5px;
+    }
+    .bar-legend { gap: 6px 14px; font-size: 12px; }
+
+    /* La tarjeta se vuelve un resumen tocable: el DoD y las etiquetas viven
+       en el detalle, no repetidos en la columna. */
+    .card-tests, .card-tags { display: none; }
+    .card { gap: 8px; padding: 11px 12px; }
+    .card-title { font-size: 14px; }
+    .card-foot { padding-top: 8px; }
+
+    .chart { padding: 15px 16px; }
+    .chart-title { font-size: 18px; }
+
+    /* El detalle pasa a hoja inferior: se alcanza con el pulgar y cabe el DoD
+       completo sin que la tarjeta flote a media pantalla. */
+    .modal { padding: 0; place-items: end stretch; }
+    .modal-card {
+      max-width: none;
+      max-height: 92vh;
+      border-width: 1px 0 0;
+      border-radius: var(--r-lg) var(--r-lg) 0 0;
+    }
+    .modal-head {
+      position: sticky;
+      top: 0;
+      z-index: 1;
+      padding: 14px 16px;
+      background: var(--paper-warm);
+    }
+    .modal-body { padding: 16px; }
+    .modal-meta { gap: 6px 14px; font-size: 12.5px; }
+  }
+
   @media (prefers-reduced-motion: reduce) {
     .tab, .card { transition: none; }
     .tab:hover, .card:hover { transform: none; }
