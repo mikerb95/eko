@@ -79,7 +79,10 @@ Y una obligación que se pasa por alto con frecuencia, la del artículo 21: cuan
 
 Cuatro preguntas concretas, que un responsable de cumplimiento debería poder responder sin abrir una carpeta:
 
-En qué año de operación está su sistema y, por lo tanto, qué porcentaje del artículo 19 le aplica. Si alguna de sus subcategorías cae en el supuesto del artículo 14 y necesita cobertura en CORALINA este año. Si el informe del artículo 20 está radicado en VITAL dentro del mes que le corresponde según el calendario. Y si los puntos de recolección que están publicados coinciden con los que realmente operan hoy.
+- ¿En qué año de operación está su sistema y, por lo tanto, qué porcentaje del artículo 19 le aplica?
+- ¿Alguna de sus subcategorías cae en el supuesto del artículo 14 y necesita cobertura en CORALINA este año?
+- ¿El informe del artículo 20 está radicado en VITAL dentro del mes que le corresponde según el calendario?
+- ¿Los puntos de recolección publicados coinciden con los que realmente operan hoy?
 
 Si alguna respuesta es "creo que sí", ahí hay trabajo pendiente.
 

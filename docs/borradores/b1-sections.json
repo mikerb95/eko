@@ -71,7 +71,16 @@
     },
     {
       "type": "p",
-      "text": "Cuatro preguntas concretas, que un responsable de cumplimiento debería poder responder sin abrir una carpeta: en qué año de operación está su sistema y, por lo tanto, qué porcentaje del artículo 19 le aplica; si alguna de sus subcategorías cae en el supuesto del artículo 14 y necesita cobertura en CORALINA este año; si el informe del artículo 20 está radicado en VITAL dentro del mes que le corresponde según el calendario; y si los puntos de recolección que están publicados coinciden con los que realmente operan hoy."
+      "text": "Cuatro preguntas concretas, que un responsable de cumplimiento debería poder responder sin abrir una carpeta:"
+    },
+    {
+      "type": "list",
+      "items": [
+        "¿En qué año de operación está su sistema y, por lo tanto, qué porcentaje del artículo 19 le aplica?",
+        "¿Alguna de sus subcategorías cae en el supuesto del artículo 14 y necesita cobertura en CORALINA este año?",
+        "¿El informe del artículo 20 está radicado en VITAL dentro del mes que le corresponde según el calendario?",
+        "¿Los puntos de recolección publicados coinciden con los que realmente operan hoy?"
+      ]
     },
     {
       "type": "p",
