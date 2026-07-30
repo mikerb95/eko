@@ -161,7 +161,10 @@ const arrow = 'M5 12h14M13 6l6 6-6 6'
       </svg>
     </a>
     <div class="nav-sheet-utils">
-      <a href={altUrl} hreflang={lang === 'es' ? 'en' : 'es'}>{altLabel}</a>
+      <a href={altUrl} class="nav-sheet-lang" hreflang={lang === 'es' ? 'en' : 'es'}>
+        <Flag code={lang === 'es' ? 'us' : 'es'} />
+        {altLabel}
+      </a>
       {lang === 'es' && <a href="/admin/login">{t('access')}</a>}
     </div>
   </div>
