@@ -1,22 +1,22 @@
 /**
  * Documentación de ingeniería del proyecto: requerimientos, actores y casos de uso.
  *
- * Reglas de esta fuente de datos —las mismas del tablero en `iteraciones.ts`—:
+ * Reglas de esta fuente de datos —las mismas del tablero en iteraciones.ts—:
  *
  * 1. Nada se inventa. Cada requerimiento describe algo que existe en el
- *    repositorio y `archivos` apunta a dónde vive. Si un requerimiento no se
- *    puede abrir en el código, va como `pend`, no como `ok`.
- * 2. `estado: 'ok'` solo si está implementado y verificable hoy; `'parcial'`
+ *    repositorio y archivos apunta a dónde vive. Si un requerimiento no se
+ *    puede abrir en el código, va como pend, no como ok.
+ * 2. estado: 'ok' solo si está implementado y verificable hoy; 'parcial'
  *    cuando el código está pero le falta configuración, activo o verificación;
- *    `'pend'` cuando todavía no existe.
+ *    'pend' cuando todavía no existe.
  * 3. Los conteos de la página se calculan de estos arreglos, no se escriben a
  *    mano: un requerimiento nuevo actualiza los indicadores solo.
  * 4. Los módulos son los del sistema real, no los del plan. El plan del panel
  *    (M1–M8 de docs/plan-panel-operaciones.md) es otra cosa y va referenciado
  *    donde corresponde.
  *
- * Complementos: `diagramas.ts` (BPMN, secuencia, componentes, clases, objetos)
- * y `calidad.ts` (niveles de prueba, V&V, usabilidad).
+ * Complementos: diagramas.ts (BPMN, secuencia, componentes, clases, objetos)
+ * y calidad.ts (niveles de prueba, V&V, usabilidad).
  */
 
 export const REPO = 'https://github.com/mikerb95/eko'
@@ -154,7 +154,7 @@ export const RF: RequerimientoFuncional[] = [
     prioridad: 'alta',
     estado: 'parcial',
     archivos: ['src/pages/licencias.astro', 'src/lib/credenciales.ts'],
-    nota: 'La página y el modelo existen, pero ninguna licencia tiene `publicada: true`: faltan los PDF y los números de resolución reales.',
+    nota: 'La página y el modelo existen, pero ninguna licencia tiene publicada: true: faltan los PDF y los números de resolución reales.',
   },
   {
     id: 'RF-06',
@@ -174,7 +174,7 @@ export const RF: RequerimientoFuncional[] = [
     prioridad: 'media',
     estado: 'parcial',
     archivos: ['src/pages/casos.astro', 'src/lib/credenciales.ts'],
-    nota: 'Ningún caso tiene `verificado: true`. En producción la sección no muestra nada hasta que haya casos reales; en desarrollo se ven los placeholders con aviso.',
+    nota: 'Ningún caso tiene verificado: true. En producción la sección no muestra nada hasta que haya casos reales; en desarrollo se ven los placeholders con aviso.',
   },
   {
     id: 'RF-08',
@@ -361,7 +361,7 @@ export const RF: RequerimientoFuncional[] = [
     modulo: 'recoleccion',
     nombre: 'Registrar la orden con consecutivo único',
     descripcion:
-      'Cada solicitud genera una orden con consecutivo propio, estado inicial `solicitada` y fecha de creación.',
+      'Cada solicitud genera una orden con consecutivo propio, estado inicial solicitada y fecha de creación.',
     prioridad: 'alta',
     estado: 'ok',
     archivos: ['src/lib/ops.ts', 'src/pages/api/recolecciones.ts'],
@@ -441,7 +441,7 @@ export const RF: RequerimientoFuncional[] = [
     id: 'RF-34',
     modulo: 'captacion',
     nombre: 'Clasificar el mensaje por estado',
-    descripcion: 'Cada mensaje nace `nuevo` y se marca `atendido` desde el panel.',
+    descripcion: 'Cada mensaje nace nuevo y se marca atendido desde el panel.',
     prioridad: 'media',
     estado: 'ok',
     archivos: ['src/lib/contactos.ts', 'src/pages/api/admin/contactos.ts'],
@@ -461,7 +461,7 @@ export const RF: RequerimientoFuncional[] = [
     id: 'RF-36',
     modulo: 'captacion',
     nombre: 'Registrar el origen de cada contacto',
-    descripcion: 'Toda solicitud y todo mensaje guardan su `source` para poder atribuir la captación.',
+    descripcion: 'Toda solicitud y todo mensaje guardan su source para poder atribuir la captación.',
     prioridad: 'baja',
     estado: 'ok',
     archivos: ['src/lib/contactos.ts', 'src/lib/ops.ts'],
@@ -562,7 +562,7 @@ export const RF: RequerimientoFuncional[] = [
     prioridad: 'alta',
     estado: 'pend',
     archivos: ['docs/plan-panel-operaciones.md'],
-    nota: 'Módulo M2 del plan del panel. Hoy el estado `certificada` existe pero no hay documento asociado.',
+    nota: 'Módulo M2 del plan del panel. Hoy el estado certificada existe pero no hay documento asociado.',
   },
   {
     id: 'RF-47',
@@ -894,7 +894,7 @@ export const RNF: RequerimientoNoFuncional[] = [
     categoria: 'Eficiencia de desempeño',
     nombre: 'Páginas públicas prerenderizadas',
     criterio:
-      'El sitio compila en modo estático; solo los endpoints y el panel corren en servidor (`prerender = false`).',
+      'El sitio compila en modo estático; solo los endpoints y el panel corren en servidor (prerender = false).',
     estado: 'ok',
     archivos: ['astro.config.mjs', 'src/pages/api/'],
   },
@@ -1061,7 +1061,7 @@ export const RNF: RequerimientoNoFuncional[] = [
     id: 'RNF-22',
     categoria: 'Mantenibilidad',
     nombre: 'Tipado estricto en todo el código propio',
-    criterio: '`astro check` sobre TypeScript pasa sin errores en el árbol del proyecto.',
+    criterio: 'astro check sobre TypeScript pasa sin errores en el árbol del proyecto.',
     estado: 'ok',
     archivos: ['tsconfig.json', 'package.json'],
   },
@@ -1471,7 +1471,7 @@ export const CU_EXTENDIDOS: CasoUsoExtendido[] = [
       'La IP del solicitante no ha superado 10 solicitudes en los últimos 10 minutos.',
     ],
     postcondiciones: [
-      'Existe una orden con consecutivo único y estado `solicitada`.',
+      'Existe una orden con consecutivo único y estado solicitada.',
       'El solicitante conoce su consecutivo.',
       'Si el correo está configurado, el equipo recibió el aviso; si no, la orden sigue registrada y visible en el panel.',
     ],
@@ -1506,7 +1506,7 @@ export const CU_EXTENDIDOS: CasoUsoExtendido[] = [
       {
         n: 7,
         actor: 'Módulo de operaciones',
-        accion: 'Asegura el esquema, genera el consecutivo y guarda la orden con estado `solicitada`.',
+        accion: 'Asegura el esquema, genera el consecutivo y guarda la orden con estado solicitada.',
       },
       {
         n: 8,
@@ -1544,7 +1544,7 @@ export const CU_EXTENDIDOS: CasoUsoExtendido[] = [
         nombre: 'El correo no está configurado',
         pasos: [
           'En el paso 8, faltan RESEND_API_KEY, NOTIFY_FROM o NOTIFY_EMAIL.',
-          'El módulo registra el aviso en el log y devuelve `{ sent: false }`.',
+          'El módulo registra el aviso en el log y devuelve { sent: false }.',
           'El flujo continúa en el paso 9: el panel queda como fuente de verdad.',
         ],
       },
@@ -1785,7 +1785,7 @@ export const CU_EXTENDIDOS: CasoUsoExtendido[] = [
     disparador: 'El solicitante envía el formulario de /contacto.',
     precondiciones: ['La IP no ha superado 10 mensajes en 10 minutos.'],
     postcondiciones: [
-      'Existe un contacto con estado `nuevo` visible en la bandeja del panel.',
+      'Existe un contacto con estado nuevo visible en la bandeja del panel.',
       'Si el correo está configurado, el equipo recibió el aviso con reply-to del remitente.',
     ],
     flujoPrincipal: [
@@ -1798,7 +1798,7 @@ export const CU_EXTENDIDOS: CasoUsoExtendido[] = [
         actor: 'Endpoint',
         accion: 'Exige nombre y correo, valida el formato del correo y acota cada campo.',
       },
-      { n: 6, actor: 'Módulo de contactos', accion: 'Guarda el contacto con estado `nuevo`.' },
+      { n: 6, actor: 'Módulo de contactos', accion: 'Guarda el contacto con estado nuevo.' },
       { n: 7, actor: 'Módulo de correo', accion: 'Intenta el aviso interno, sin lanzar excepciones.' },
       { n: 8, actor: 'Endpoint', accion: 'Responde 200.' },
     ],

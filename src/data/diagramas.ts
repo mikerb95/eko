@@ -2,10 +2,10 @@
  * Diagramas del sistema: BPMN, secuencia, componentes, paquetes, clases y objetos.
  *
  * Todo se modela como datos y lo dibuja el componente correspondiente. La razón
- * es la misma que en `iteraciones.ts` y `documentacion.ts`: un diagrama exportado
+ * es la misma que en iteraciones.ts y documentacion.ts: un diagrama exportado
  * como imagen se desincroniza del código en la primera semana, y nadie lo vuelve
  * a abrir. Aquí, cambiar el sistema obliga a cambiar el diagrama en un archivo
- * revisable, y `fuente` dice de qué parte del repositorio salió cada cosa.
+ * revisable, y fuente dice de qué parte del repositorio salió cada cosa.
  *
  * Las clases NO son un modelo ideal: son las tablas que los módulos crean de
  * verdad con CREATE TABLE, más los tipos que viajan en memoria.
@@ -17,7 +17,7 @@ export type TipoPaso = 'inicio' | 'tarea' | 'decision' | 'mensaje' | 'fin'
 
 export interface PasoBpmn {
   id: string
-  /** id del carril en `carriles` */
+  /** id del carril en carriles */
   carril: string
   /** Columna en la que se dibuja: fija el orden temporal. */
   col: number

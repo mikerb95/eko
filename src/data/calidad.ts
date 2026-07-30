@@ -8,12 +8,12 @@
  * Se documenta igual, y con esa frase por delante, porque una sección de
  * testing que enumera quince niveles sin decir cuáles corren de verdad es peor
  * que no tenerla: convierte la documentación en publicidad. Aquí cada nivel
- * declara su estado real —`activo`, `manual` o `pend`— y la evidencia de por
+ * declara su estado real —activo, manual o pend— y la evidencia de por
  * qué se puede afirmar eso.
  *
- * `activo`  la comprobación corre y falla el build o el despliegue si no pasa.
- * `manual`  se hace, pero la ejecuta una persona y no queda registro repetible.
- * `pend`    no existe todavía.
+ * activo  la comprobación corre y falla el build o el despliegue si no pasa.
+ * manual  se hace, pero la ejecuta una persona y no queda registro repetible.
+ * pend    no existe todavía.
  *
  * Al añadir pruebas de verdad: cambiar el estado aquí en el mismo commit que
  * las añade, no después.
@@ -50,7 +50,7 @@ export const NIVELES: NivelPrueba[] = [
     nombre: 'Compilación',
     proposito: '¿El proyecto se construye entero, sin rutas rotas ni imports colgando?',
     estado: 'activo',
-    como: '`npm run build` genera las 27 páginas públicas más los endpoints. Un fallo rompe el despliegue en Vercel.',
+    como: 'npm run build genera las 27 páginas públicas más los endpoints. Un fallo rompe el despliegue en Vercel.',
     evidencia: 'El despliegue de Vercel es la puerta: si el build falla, no hay producción.',
     herramienta: 'astro build',
   },
@@ -59,7 +59,7 @@ export const NIVELES: NivelPrueba[] = [
     nombre: 'Tipos',
     proposito: '¿Los datos que viajan entre módulos son los que cada módulo espera?',
     estado: 'activo',
-    como: '`astro check` sobre TypeScript en modo estricto, incluidos los datos tipados de src/data.',
+    como: 'astro check sobre TypeScript en modo estricto, incluidos los datos tipados de src/data.',
     evidencia:
       'Es lo que sostiene el modelo de datos: un requerimiento con un campo mal escrito no compila.',
     herramienta: 'astro check + tsc',
@@ -111,7 +111,7 @@ export const NIVELES: NivelPrueba[] = [
     nombre: 'Pruebas unitarias',
     proposito: '¿Cada función del dominio hace lo que promete, aislada?',
     estado: 'pend',
-    como: 'Los candidatos naturales son puros y no necesitan servidor: derivación y verificación de contraseña, firma y expiración de sesión, contador del límite de tasa, recorte de campos y `hreflangFor`.',
+    como: 'Los candidatos naturales son puros y no necesitan servidor: derivación y verificación de contraseña, firma y expiración de sesión, contador del límite de tasa, recorte de campos y hreflangFor.',
     evidencia: 'No hay dependencia de pruebas en package.json.',
     herramienta: 'Vitest (propuesto)',
   },
