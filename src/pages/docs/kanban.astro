@@ -149,6 +149,23 @@ const cerradas = ITERACIONES.filter((i) => i.commits != null).length
   <SiteFooter lang="es" />
 </Layout>
 
+<script>
+  /**
+   * En móvil los bloques del método arrancan plegados —dejan de ser cuatro
+   * párrafos seguidos— salvo el primero. En escritorio no se toca nada, y sin
+   * JavaScript quedan todos abiertos, que es el estado del markup.
+   */
+  function foldMethod() {
+    if (!window.matchMedia('(max-width: 760px)').matches) return
+    document
+      .querySelectorAll<HTMLDetailsElement>('.method-item')
+      .forEach((d, i) => { if (i > 0) d.open = false })
+  }
+
+  document.addEventListener('astro:page-load', foldMethod)
+  foldMethod()
+</script>
+
 <style>
   .docs-nav {
     display: grid;
@@ -238,8 +255,8 @@ const cerradas = ITERACIONES.filter((i) => i.commits != null).length
       overflow-x: auto;
       scrollbar-width: none;
       /* Sangrado hasta el borde para que se note que hay más chips al lado. */
-      margin-inline: calc(var(--gutter, 20px) * -1);
-      padding-inline: var(--gutter, 20px);
+      margin-inline: calc(var(--pad) * -1);
+      padding-inline: var(--pad);
     }
     .docs-nav::-webkit-scrollbar { display: none; }
     .doc-chip { padding: 9px 14px; }
