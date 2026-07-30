@@ -1,0 +1,201 @@
+---
+/**
+ * Documentación del proyecto — tablero Kanban de iteraciones.
+ *
+ * Página interna: va con noindex y no entra en rutas.ts, así que no aparece en
+ * el sitemap, en robots.txt ni en llms.txt. No se enlaza desde la navegación
+ * pública; se comparte por URL con quien tenga que revisar el avance.
+ */
+import Layout from '../../layouts/Layout.astro'
+import SiteFooter from '../../components/SiteFooter.astro'
+import IteracionesBoard from '../../components/IteracionesBoard.astro'
+import { REPO, COMMITS_TOTAL, ITERACIONES } from '../../data/iteraciones'
+
+/** Documentos del repositorio que acompañan al tablero. */
+const documentos = [
+  {
+    nombre: 'Tablero Kanban',
+    href: '/docs/kanban',
+    desc: 'Iteraciones, historias y Definition of Done.',
+    activo: true,
+  },
+  {
+    nombre: 'Pendientes',
+    href: `${REPO}/blob/main/pendientes.md`,
+    desc: 'Activos por entregar, decisiones abiertas y deuda técnica.',
+  },
+  {
+    nombre: 'Auditoría',
+    href: `${REPO}/blob/main/AUDITORIA.md`,
+    desc: 'Hallazgos de seguridad e integridad, con recomendaciones.',
+  },
+  {
+    nombre: 'Plan del panel',
+    href: `${REPO}/blob/main/docs/plan-panel-operaciones.md`,
+    desc: 'Módulos M1–M8 del panel de operaciones y modelo de datos.',
+  },
+  {
+    nombre: 'Plan competitivo',
+    href: `${REPO}/blob/main/docs/plan-competitivo-lito.md`,
+    desc: 'Fases de respuesta a la competencia, con lo hecho y lo bloqueado.',
+  },
+]
+
+const cerradas = ITERACIONES.filter((i) => i.commits != null).length
+---
+
+<Layout
+  title="Tablero Kanban — Documentación del proyecto | Ekosolv"
+  description="Tablero XP del sitio de Ekosolv: iteraciones reconstruidas del historial de Git, historias de usuario y Definition of Done."
+  activePath="/docs/kanban"
+  noindex
+>
+  <section class="page-head wrap">
+    <div class="page-strip">
+      <div class="l">Documentación del proyecto</div>
+      <div class="l">{COMMITS_TOTAL} commits · {cerradas} iteraciones</div>
+    </div>
+
+    <h1 class="display reveal" style="margin-top:40px">
+      Cómo se<br />construyó <em>este sitio</em>.
+    </h1>
+
+    <p class="lede reveal" style="margin-top:32px; max-width:62ch">
+      No es un plan: es el registro de lo que pasó. Las iteraciones salen de los bloques reales de
+      actividad en el historial de Git, y cada historia se cerró solo cuando sus criterios de
+      Definition of Done quedaron verificables en el repositorio. Lo que sigue pendiente aparece
+      pendiente, con el motivo del bloqueo.
+    </p>
+
+    <nav class="docs-nav reveal" aria-label="Documentos del proyecto">
+      {
+        documentos.map((d) => (
+          <a
+            href={d.href}
+            class:list={['doc-chip', { 'doc-chip--on': d.activo }]}
+            aria-current={d.activo ? 'page' : undefined}
+            target={d.activo ? undefined : '_blank'}
+            rel={d.activo ? undefined : 'noopener noreferrer'}
+          >
+            <span class="doc-chip-name">{d.nombre}</span>
+            <span class="doc-chip-desc">{d.desc}</span>
+          </a>
+        ))
+      }
+    </nav>
+  </section>
+
+  <section class="section wrap">
+    <IteracionesBoard />
+  </section>
+
+  <section class="section wrap">
+    <div class="method reveal">
+      <div class="eyebrow">Cómo leer el tablero</div>
+      <div class="method-grid">
+        <div>
+          <h2 class="method-title">Las columnas</h2>
+          <p class="method-body">
+            <b>Cola</b> es lo que existe como necesidad pero no tiene fecha. <b>Planeada</b> es lo
+            siguiente, con su bloqueo identificado. <b>En desarrollo</b> y <b>En aceptación</b> son
+            trabajo abierto: el código está, la verificación no. <b>Aceptada</b> significa que todos
+            los criterios que dependían del equipo se cumplieron.
+          </p>
+        </div>
+        <div>
+          <h2 class="method-title">La Definition of Done</h2>
+          <p class="method-body">
+            Cada criterio apunta a algo comprobable en el repositorio, no a una intención. Un
+            criterio en verde se puede abrir y verificar; uno pendiente marca el trabajo que falta,
+            aunque la historia ya esté aceptada. Los criterios que se cumplieron y luego se
+            retiraron —contenido que no se podía sostener— quedan como fallidos, porque borrarlos
+            haría que el tablero contara una historia más limpia que la real.
+          </p>
+        </div>
+        <div>
+          <h2 class="method-title">Los bloqueos</h2>
+          <p class="method-body">
+            Varias historias no dependen de código sino de decisiones o de activos: el dominio
+            definitivo, los buzones internos de aviso, los PDF de las licencias, las autorizaciones
+            de marca. Están en el tablero con su nota, porque un pendiente sin dueño visible no se
+            resuelve nunca.
+          </p>
+        </div>
+        <div>
+          <h2 class="method-title">La fuente</h2>
+          <p class="method-body">
+            Todo sale de <code>src/data/iteraciones.ts</code>, y los conteos de commits se pueden
+            recontar con <code>git log</code> sobre el rango de fechas de cada iteración. Si un
+            número de aquí no coincide con el historial, el que está mal es el de esta página.
+          </p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <SiteFooter lang="es" />
+</Layout>
+
+<style>
+  .docs-nav {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(210px, 1fr));
+    gap: 10px;
+    margin-top: 40px;
+  }
+  .doc-chip {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    padding: 13px 15px;
+    border: 1px solid var(--line);
+    border-radius: var(--r-md);
+    background: color-mix(in oklab, var(--paper-warm) 55%, transparent);
+    transition: border-color 0.15s, background 0.15s, transform 0.15s;
+  }
+  .doc-chip:hover {
+    border-color: var(--line-2);
+    background: var(--paper-warm);
+    transform: translateY(-1px);
+  }
+  .doc-chip-name { font-size: 14.5px; font-weight: 600; }
+  .doc-chip-desc { font-size: 12.5px; line-height: 1.45; color: var(--mute); }
+  .doc-chip--on {
+    border-color: var(--forest);
+    background: color-mix(in oklab, var(--forest) 9%, var(--paper-warm));
+  }
+  .doc-chip--on:hover { transform: none; }
+
+  .method {
+    padding: clamp(24px, 4vw, 40px);
+    border: 1px solid var(--line);
+    border-radius: var(--r-lg);
+    background: color-mix(in oklab, var(--paper-warm) 60%, transparent);
+  }
+  .method-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: clamp(20px, 3vw, 36px);
+    margin-top: 28px;
+  }
+  .method-title {
+    font-family: var(--font-display);
+    font-size: 22px;
+    font-weight: 400;
+    margin-bottom: 10px;
+  }
+  .method-body { font-size: 15.5px; line-height: 1.65; color: var(--ink-2); }
+  .method-body b { font-weight: 600; }
+  .method-body code {
+    font-family: var(--font-mono);
+    font-size: 14px;
+    padding: 1px 5px;
+    border-radius: 4px;
+    background: color-mix(in oklab, var(--ink) 6%, transparent);
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .doc-chip { transition: none; }
+    .doc-chip:hover { transform: none; }
+  }
+</style>
