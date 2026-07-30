@@ -24,7 +24,7 @@ const conCommits = ITERACIONES.filter((i) => i.commits != null)
 ---
 
 <section class="board" aria-label="Tablero de iteraciones">
-  <script type="application/json" id="iterData" set:html={payload} />
+  <script is:inline type="application/json" id="iterData" set:html={payload} />
 
   <header class="board-head">
     <p class="board-sub">
@@ -230,7 +230,10 @@ const conCommits = ITERACIONES.filter((i) => i.commits != null)
     prev.addEventListener('click', () => scrollTabs(-1))
     next.addEventListener('click', () => scrollTabs(1))
     tabsBox.addEventListener('scroll', updateArrows, { passive: true })
-    window.addEventListener('resize', updateArrows)
+    // ResizeObserver en vez de un listener de resize en window: initBoard vuelve
+    // a correr en cada navegación del ClientRouter, y los listeners colgados de
+    // window se acumularían navegación tras navegación.
+    new ResizeObserver(updateArrows).observe(tabsBox)
 
     // Deja visible la pestaña activa, que no es la primera.
     const activo = tabEls.find((t) => t.classList.contains('tab--on'))
@@ -490,8 +493,10 @@ const conCommits = ITERACIONES.filter((i) => i.commits != null)
     modal.addEventListener('click', (e) => {
       if (e.target === modal) closeModal()
     })
-    document.addEventListener('keydown', (e) => {
-      if (e.key === 'Escape' && !modal.hidden) closeModal()
+    // El listener va en el modal, no en document, por la misma razón: al abrirlo
+    // el foco queda en su botón de cierre, así que la tecla llega igual.
+    modal.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape') closeModal()
     })
 
     /* ---------- Gráficos ---------- */
