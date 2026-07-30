@@ -80,8 +80,8 @@ const cerradas = ITERACIONES.filter((i) => i.commits != null).length
             href={d.href}
             class:list={['doc-chip', { 'doc-chip--on': d.activo }]}
             aria-current={d.activo ? 'page' : undefined}
-            target={d.activo ? undefined : '_blank'}
-            rel={d.activo ? undefined : 'noopener noreferrer'}
+            target={d.activo || d.href.startsWith('/') ? undefined : '_blank'}
+            rel={d.activo || d.href.startsWith('/') ? undefined : 'noopener noreferrer'}
           >
             <span class="doc-chip-name">{d.nombre}</span>
             <span class="doc-chip-desc">{d.desc}</span>
