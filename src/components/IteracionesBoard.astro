@@ -1184,6 +1184,21 @@ const conCommits = ITERACIONES.filter((i) => i.commits != null)
     }
     .bar-legend { gap: 6px 14px; font-size: 12px; }
 
+    /* El carrusel horizontal de columnas no funciona en móvil: la fila toma la
+       altura de la columna más larga, así que al lado de una columna corta
+       queda un hueco de varias pantallas. Apiladas, cada columna mide lo que
+       ocupa y el scroll es el vertical de la página. */
+    .board-cols {
+      grid-template-columns: 1fr;
+      grid-auto-flow: row;
+      grid-auto-columns: auto;
+      gap: 10px;
+      overflow-x: visible;
+    }
+    .col { min-height: 0; }
+    .col-body { padding: 9px; }
+    .col-empty { padding: 11px 8px; font-size: 12px; }
+
     /* La tarjeta se vuelve un resumen tocable: el DoD y las etiquetas viven
        en el detalle, no repetidos en la columna. */
     .card-tests, .card-tags { display: none; }
