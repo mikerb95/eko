@@ -1,0 +1,217 @@
+---
+/**
+ * Proceso BPMN con carriles, dibujado con CSS grid desde `diagramas.ts`.
+ *
+ * Cada paso declara su carril y su columna, así que la posición es un dato y no
+ * el resultado de un motor de layout. Dos pasos pueden caer en la misma celda
+ * —una decisión y su rama de error suelen hacerlo—, así que las celdas apilan.
+ */
+import type { ProcesoBpmn } from '../../data/diagramas'
+
+interface Props {
+  proceso: ProcesoBpmn
+}
+
+const { proceso } = Astro.props
+
+const cols = Math.max(...proceso.pasos.map((p) => p.col)) + 1
+
+/** Agrupa por celda: varios pasos pueden compartir carril y columna. */
+const celdas = new Map<string, typeof proceso.pasos>()
+for (const paso of proceso.pasos) {
+  const key = `${paso.carril}:${paso.col}`
+  const actual = celdas.get(key)
+  if (actual) actual.push(paso)
+  else celdas.set(key, [paso])
+}
+
+const TIPO_LABEL = {
+  inicio: 'Inicio',
+  tarea: 'Tarea',
+  decision: 'Decisión',
+  mensaje: 'Mensaje',
+  fin: 'Fin',
+} as const
+
+const notas = proceso.pasos.filter((p) => p.nota)
+---
+
+<figure class="bpmn">
+  <figcaption class="bpmn-cap">
+    <h4 class="bpmn-title">{proceso.nombre}</h4>
+    <p class="bpmn-desc">{proceso.descripcion}</p>
+  </figcaption>
+
+  <div class="bpmn-scroll">
+    <div class="bpmn-grid" style={`--cols:${cols}`}>
+      {
+        proceso.carriles.map((carril, fila) => (
+          <>
+            <div class="lane-name" style={`grid-row:${fila + 1}`}>
+              {carril.nombre}
+            </div>
+            <div class="lane-track" style={`grid-row:${fila + 1}`} aria-hidden="true" />
+            {Array.from({ length: cols }).map((_, col) => {
+              const pasos = celdas.get(`${carril.id}:${col}`)
+              if (!pasos) return null
+              return (
+                <div class="cell" style={`grid-row:${fila + 1}; grid-column:${col + 2}`}>
+                  {pasos.map((p) => (
+                    <div class:list={['step', `step--${p.tipo}`]}>
+                      {p.guarda && <span class="guard">{p.guarda}</span>}
+                      <span class="step-name">{p.nombre}</span>
+                      <span class="step-type">{TIPO_LABEL[p.tipo]}</span>
+                    </div>
+                  ))}
+                </div>
+              )
+            })}
+          </>
+        ))
+      }
+    </div>
+  </div>
+
+  {
+    notas.length > 0 && (
+      <ul class="bpmn-notas">
+        {notas.map((p) => (
+          <li>
+            <b>{p.nombre}:</b> {p.nota}
+          </li>
+        ))}
+      </ul>
+    )
+  }
+
+  <p class="bpmn-src">
+    Implementado en {proceso.fuente.map((f, i) => (<><code>{f}</code>{i < proceso.fuente.length - 1 ? ' · ' : ''}</>))}
+  </p>
+</figure>
+
+<style>
+  .bpmn {
+    padding: clamp(16px, 2.5vw, 24px);
+    border: 1px solid var(--line);
+    border-radius: var(--r-lg);
+    background: color-mix(in oklab, var(--paper-warm) 70%, transparent);
+  }
+  .bpmn-cap { margin-bottom: 16px; }
+  .bpmn-title { font-family: var(--font-display); font-size: 21px; font-weight: 400; }
+  .bpmn-desc {
+    margin-top: 5px;
+    max-width: 78ch;
+    font-size: 14.5px;
+    line-height: 1.6;
+    color: var(--ink-2);
+  }
+
+  .bpmn-scroll { overflow-x: auto; padding-bottom: 6px; scrollbar-width: thin; }
+  .bpmn-grid {
+    display: grid;
+    grid-template-columns: 116px repeat(var(--cols), 172px);
+    align-items: center;
+    gap: 10px;
+    min-width: min-content;
+  }
+
+  .lane-name {
+    grid-column: 1;
+    position: sticky;
+    left: 0;
+    z-index: 2;
+    padding: 8px 10px;
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: var(--mute);
+    background: var(--paper-warm);
+    border: 1px solid var(--line);
+    border-radius: var(--r-sm);
+  }
+  /* Riel de fondo: da continuidad al carril sin dibujar flechas falsas. */
+  .lane-track {
+    grid-column: 2 / -1;
+    height: 1px;
+    background: repeating-linear-gradient(
+      to right,
+      var(--line) 0 8px,
+      transparent 8px 14px
+    );
+  }
+
+  .cell {
+    display: grid;
+    gap: 6px;
+    z-index: 1;
+  }
+  .step {
+    display: flex;
+    flex-direction: column;
+    gap: 3px;
+    padding: 9px 11px;
+    background: var(--paper-warm);
+    border: 1px solid var(--line-2);
+    border-radius: var(--r-sm);
+  }
+  .step-name { font-size: 12.5px; font-weight: 600; line-height: 1.35; }
+  .step-type {
+    font-size: 9.5px;
+    font-weight: 700;
+    letter-spacing: 0.07em;
+    text-transform: uppercase;
+    color: var(--mute);
+  }
+  .guard {
+    align-self: flex-start;
+    padding: 1px 7px;
+    font-size: 10px;
+    font-weight: 700;
+    color: var(--deep-2);
+    background: color-mix(in oklab, var(--deep) 13%, transparent);
+    border-radius: 999px;
+  }
+
+  .step--inicio {
+    border-color: var(--forest);
+    background: color-mix(in oklab, var(--forest) 10%, var(--paper-warm));
+  }
+  .step--inicio .step-type { color: color-mix(in oklab, var(--forest) 70%, var(--ink)); }
+  .step--decision {
+    border-style: dashed;
+    border-color: var(--deep);
+    background: color-mix(in oklab, var(--deep) 7%, var(--paper-warm));
+  }
+  .step--mensaje {
+    border-color: var(--clay-2);
+    background: color-mix(in oklab, var(--clay) 16%, var(--paper-warm));
+  }
+  .step--fin {
+    border-color: var(--ink);
+    background: color-mix(in oklab, var(--ink) 6%, var(--paper-warm));
+  }
+
+  .bpmn-notas {
+    display: grid;
+    gap: 6px;
+    margin-top: 16px;
+    padding-top: 14px;
+    border-top: 1px solid var(--line);
+    list-style: none;
+    font-size: 13px;
+    line-height: 1.55;
+    color: var(--mute);
+  }
+  .bpmn-notas b { font-weight: 600; color: var(--ink-2); }
+
+  .bpmn-src { margin-top: 14px; font-size: 12.5px; color: var(--mute); }
+  .bpmn-src code { font-family: var(--font-mono); font-size: 12px; }
+
+  @media (max-width: 760px) {
+    .bpmn-title { font-size: 18px; }
+    .bpmn-desc { font-size: 14px; }
+    .bpmn-grid { grid-template-columns: 96px repeat(var(--cols), 150px); gap: 8px; }
+    .lane-name { font-size: 10px; padding: 7px 8px; }
+  }
+</style>
