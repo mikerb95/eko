@@ -45,6 +45,7 @@ const alt = hreflangFor(path)
     <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
     <title>{title}</title>
     <meta name="description" content={description} />
+    {noindex && <meta name="robots" content="noindex, nofollow" />}
     <link rel="canonical" href={canonical} />
     {alt && <link rel="alternate" hreflang="es" href={url(alt.es)} />}
     {alt && <link rel="alternate" hreflang="en" href={url(alt.en)} />}
