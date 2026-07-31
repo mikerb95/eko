@@ -391,6 +391,12 @@ h3 { font-size: 22px; }
   transition: transform .3s cubic-bezier(.2,.7,.2,1);
 }
 .hero-card:hover .arrow { transform: rotate(-45deg) scale(1.05); }
+@media (max-width: 860px) {
+  .hero-foot { grid-template-columns: 1fr; align-items: stretch; }
+  .hero-card { padding: 24px; gap: 20px; }
+  .hero-card .big { font-size: clamp(28px, 8vw, 40px); }
+  .hero-card .arrow { width: 46px; height: 46px; }
+}
 
 /* Cifras del hero: escala y trayectoria por encima del pliegue.
    El bloque .band más abajo cubre desempeño — no repetir cifras entre ambos. */
