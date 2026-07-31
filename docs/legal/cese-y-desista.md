@@ -51,7 +51,7 @@ Uso no autorizado de obra protegida.**
 
 Referencia: [URL DEL SITIO INFRACTOR]
 
-Yo, **Mike Restrepo**, mayor de edad, identificado con cédula de ciudadanía
+Yo, **Mike Rodríguez**, mayor de edad, identificado con cédula de ciudadanía
 número **[NÚMERO]** expedida en **[CIUDAD]**, actuando en nombre propio y en
 calidad de titular exclusivo de los derechos de autor sobre la obra que más
 adelante se identifica, me permito requerirlos formalmente en los siguientes
@@ -74,7 +74,7 @@ Andina 351 de 1993.
 
 La obra ostenta aviso expreso de reserva de derechos, visible en el pie de
 todas sus páginas y en el archivo de licencia del repositorio, en los
-siguientes términos: *"Copyright © 2026 Mike Restrepo. Todos los derechos
+siguientes términos: *"Copyright © 2026 Mike Rodríguez. Todos los derechos
 reservados."*
 
 ### II. Los hechos que constituyen la infracción
@@ -171,7 +171,7 @@ Atentamente,
 
 <br>
 
-**Mike Restrepo**
+**Mike Rodríguez**
 C.C. [NÚMERO] de [CIUDAD]
 Correo electrónico: 0368dev@gmail.com
 Teléfono: [TELÉFONO]
