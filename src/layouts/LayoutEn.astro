@@ -12,7 +12,10 @@ interface Props {
   activePath?: string
   /** Canonical path for this page. Defaults to activePath. */
   path?: string
-  /** Social share image (absolute path from /public). */
+  /**
+   * Social share image (absolute path from /public).
+   * The home card is generated with `node scripts/og/generar.mjs`.
+   */
   ogImage?: string
 }
 
