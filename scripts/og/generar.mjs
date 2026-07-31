@@ -16,7 +16,7 @@ import { execFileSync } from 'node:child_process'
 import { mkdirSync, readFileSync, writeFileSync, rmSync } from 'node:fs'
 import { dirname, resolve } from 'node:path'
 import { fileURLToPath } from 'node:url'
-import { tmpdir } from 'node:os'
+import { homedir } from 'node:os'
 import sharp from 'sharp'
 
 const aqui = dirname(fileURLToPath(import.meta.url))
@@ -35,7 +35,9 @@ const html = readFileSync(resolve(aqui, 'plantilla.html'), 'utf-8')
   .replace('{{SERIF_ITALIC}}', dataUri('scripts/og/fuentes/instrument-serif-italic.woff2', 'font/woff2'))
   .replace('{{LOGO}}', dataUri('public/brand/ekosolv-horizontal-white.svg', 'image/svg+xml'))
 
-const trabajo = resolve(tmpdir(), `og-ekosolv-${process.pid}`)
+// Bajo $HOME y no en /tmp: el Chromium empaquetado como snap está confinado
+// y no puede escribir en el /tmp del sistema.
+const trabajo = resolve(homedir(), '.cache', `og-ekosolv-${process.pid}`)
 mkdirSync(trabajo, { recursive: true })
 const entrada = resolve(trabajo, 'og.html')
 const captura = resolve(trabajo, 'og.png')
