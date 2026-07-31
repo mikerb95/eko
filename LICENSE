@@ -1,0 +1,157 @@
+# LICENCIA DE SOFTWARE PROPIETARIO — TODOS LOS DERECHOS RESERVADOS
+
+Copyright © 2026 Mike Restrepo. Todos los derechos reservados.
+All rights reserved.
+
+Titular: Mike Restrepo, persona natural, domiciliado en Bogotá D.C., Colombia.
+Contacto legal: 0368dev@gmail.com
+Repositorio de origen: https://github.com/mikerb95/eko
+
+---
+
+## 1. Objeto y alcance de la obra protegida
+
+Esta licencia cubre la totalidad de este repositorio y de la obra derivada de
+él (en adelante, "la Obra"), incluyendo de manera enunciativa y no taxativa:
+
+a) El código fuente en cualquier lenguaje (Astro, TypeScript, JavaScript, CSS,
+   SQL) y su compilación, transpilación o empaquetado.
+b) La arquitectura de la aplicación, la organización de directorios, el modelo
+   de datos, los esquemas de las tablas y las rutas de la API.
+c) El diseño visual: sistema tipográfico, paleta cromática, retículas,
+   composiciones, animaciones, transiciones y estados de interacción.
+d) Los textos, títulos, redacciones, nomenclaturas y taxonomías de contenido
+   escritos para este proyecto.
+e) Las estructuras de datos de negocio (`src/data/`), incluyendo la
+   sistematización, selección y disposición de la información normativa, que
+   se protege como base de datos conforme a la Decisión Andina 351 de 1993,
+   artículo 4 literal ll).
+f) La documentación técnica y de proyecto.
+
+## 2. Titularidad
+
+La Obra es creación original de Mike Restrepo, quien ostenta la titularidad
+exclusiva de los derechos patrimoniales y la totalidad de los derechos morales
+sobre ella.
+
+**Ausencia de obra por encargo.** A la fecha de esta licencia no existe contrato
+de obra por encargo, cesión de derechos patrimoniales ni relación laboral
+vigente que transfiera la titularidad de la Obra a tercero alguno. Conforme al
+artículo 20 de la Ley 23 de 1982, modificado por el artículo 28 de la Ley 1450
+de 2011, y al artículo 183 de la Ley 23 de 1982, toda transferencia de derechos
+patrimoniales debe constar por escrito. Ningún despliegue, demostración,
+entrega o uso de la Obra por parte de un tercero constituye cesión.
+
+**Marcas y contenido de terceros.** Los signos distintivos, denominaciones
+comerciales, logotipos e imágenes corporativas de EKOSOLV S.A.S. (NIT
+900.659.506-9) que aparecen en la Obra son propiedad de su titular y se
+utilizan únicamente en el contexto de este proyecto. Esta licencia no reclama
+derecho alguno sobre ellos, y su presencia no confiere a su titular derecho
+alguno sobre el código, la arquitectura ni el diseño aquí licenciados.
+
+## 3. Prohibiciones
+
+Queda **expresamente prohibido**, sin autorización previa, expresa, escrita y
+firmada del titular:
+
+1. Reproducir la Obra, total o parcialmente, por cualquier medio o
+   procedimiento, incluido el almacenamiento temporal o permanente.
+2. Copiar, clonar, descargar, replicar o extraer el código fuente, el marcado
+   HTML resultante, las hojas de estilo o los recursos gráficos.
+3. Distribuir, comunicar públicamente, poner a disposición, vender,
+   sublicenciar, arrendar o prestar la Obra.
+4. Realizar obras derivadas, adaptaciones, traducciones, transformaciones o
+   reescrituras de la Obra o de cualquiera de sus partes.
+5. Reutilizar el diseño visual o la arquitectura de información en otro
+   sitio, producto o presentación comercial, aun cuando el código se haya
+   escrito de nuevo. La imitación sustancial de la expresión original
+   constituye infracción, con independencia del medio técnico empleado.
+6. Suprimir, alterar, ocultar o eludir los avisos de copyright, las menciones
+   de autoría, los comentarios de titularidad del código y las marcas de
+   identificación incorporadas en la Obra.
+7. Emplear la Obra para entrenar, ajustar (*fine-tuning*), evaluar o alimentar
+   modelos de aprendizaje automático, sistemas de inteligencia artificial
+   generativa o conjuntos de datos destinados a ellos. Esta prohibición es
+   independiente de lo dispuesto en `robots.txt` y no se entiende renunciada
+   por la ausencia de restricción técnica.
+8. Realizar extracción automatizada de contenido (*scraping*, *crawling*,
+   *mirroring*) más allá de la indexación por buscadores generales para
+   resultados de búsqueda.
+9. Aplicar ingeniería inversa, descompilar o desensamblar los artefactos
+   compilados.
+
+## 4. Ausencia de licencia implícita
+
+El acceso público al sitio web, la publicación del repositorio, la entrega de
+una demostración o el envío de un enlace de previsualización **no otorgan
+licencia alguna**, ni expresa ni tácita. No se concede ningún derecho por
+agotamiento, estoppel ni por conducta concluyente. El silencio del titular
+frente a un uso no autorizado no constituye consentimiento ni tolerancia.
+
+Toda licencia debe constar en documento escrito, firmado por el titular, con
+indicación expresa de modalidad de uso, territorio, plazo y contraprestación,
+según el artículo 77 de la Ley 23 de 1982.
+
+## 5. Marco legal aplicable
+
+La Obra está protegida desde el momento de su creación, sin necesidad de
+registro, conforme a:
+
+- **Ley 23 de 1982**, sobre derechos de autor (Colombia).
+- **Ley 44 de 1993**, que modifica y adiciona la anterior.
+- **Decisión Andina 351 de 1993**, Régimen Común sobre Derecho de Autor y
+  Derechos Conexos.
+- **Ley 1915 de 2018**, que actualiza el régimen y refuerza las medidas de
+  observancia.
+- **Ley 599 de 2000, Código Penal**, artículos 270, 271 y 272, que tipifican
+  la violación a los derechos morales y patrimoniales de autor y a los
+  mecanismos de protección, con penas privativas de la libertad y multa.
+- **Convenio de Berna** para la Protección de las Obras Literarias y
+  Artísticas, y **Tratado de la OMPI sobre Derecho de Autor (WCT)**, que
+  extienden esta protección a los países signatarios.
+
+El registro ante la Dirección Nacional de Derecho de Autor (DNDA) es
+declarativo y no constitutivo: la ausencia de registro no afecta la protección
+ni la titularidad aquí declaradas.
+
+## 6. Consecuencias del uso no autorizado
+
+El uso de la Obra en contravención de esta licencia faculta al titular para,
+de manera acumulativa y sin necesidad de requerimiento previo:
+
+a) Exigir el cese inmediato del uso y el retiro de las copias.
+b) Solicitar medidas cautelares de suspensión y retiro de contenido ante la
+   autoridad competente.
+c) Presentar solicitudes de retiro (*takedown*) ante proveedores de hosting,
+   registradores de dominio, plataformas y motores de búsqueda.
+d) Reclamar la indemnización de perjuicios, incluidos el daño emergente, el
+   lucro cesante y las utilidades obtenidas por el infractor.
+e) Iniciar la acción penal correspondiente.
+f) Repetir contra quien haya facilitado, encargado o comercializado la copia,
+   incluidas agencias y desarrolladores intermediarios.
+
+## 7. Ley aplicable y jurisdicción
+
+Esta licencia se rige por las leyes de la República de Colombia. Las
+controversias se someten a los jueces y autoridades competentes de Bogotá D.C.,
+con renuncia expresa a cualquier otro fuero.
+
+## 8. Sin garantía
+
+La Obra se ofrece "tal cual", sin garantía de ninguna clase. En ningún caso el
+titular responde por daños derivados del uso de la Obra por terceros no
+autorizados.
+
+---
+
+## Nota sobre el origen del repositorio
+
+El andamiaje inicial de este repositorio (commit `a4091b6`, 18 de abril de
+2026) provino de la plantilla pública `bejamas/astro-storyblok-finance-starter`.
+La totalidad de esos archivos fue reemplazada en el desarrollo posterior: no
+subsiste en `src/` ningún componente, utilidad, estilo ni página de aquella
+plantilla. Esta licencia se predica exclusivamente de la obra original aquí
+contenida y no reclama derecho alguno sobre material de terceros.
+
+Las dependencias de `node_modules/` conservan sus licencias respectivas y no
+están cubiertas por este documento.
