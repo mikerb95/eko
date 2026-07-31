@@ -27,11 +27,16 @@ export const rutasEs: Ruta[] = [
   { path: '/licencias', titulo: 'Licencias y autorizaciones', descripcion: 'Licencias, registros y autorizaciones con número de resolución, entidad y vigencia.' },
   { path: '/quienes-somos', titulo: 'Quiénes somos', descripcion: 'Equipo, trayectoria desde 2013, hitos y aliados institucionales.' },
   { path: '/agenda-una-recoleccion', titulo: 'Agenda una recolección', descripcion: 'Programa el retiro de equipos obsoletos con transporte certificado y certificado de disposición final.' },
-  { path: '/oportunidades2630', titulo: 'Oportunidades 2026–2030', descripcion: 'Análisis del entorno regulatorio y político colombiano para el periodo 2026–2030, con fuentes citadas.' },
   { path: '/blog', titulo: 'Diario', descripcion: 'Artículos sobre economía circular, normativa ambiental y sostenibilidad empresarial.' },
   { path: '/contacto', titulo: 'Contacto', descripcion: 'Agenda un diagnóstico de 45 minutos, sin costo y confidencial.' },
-  { path: '/docs', titulo: 'Documentación de ingeniería', descripcion: 'Requerimientos, casos de uso, diagramas UML y plan de calidad del sistema, generados desde datos tipados del repositorio.' },
 ]
+
+/*
+ * `/docs`, `/docs/radar`, `/docs/kanban` y `/oportunidades2630` ya no están en
+ * este inventario: son páginas internas detrás de sesión (src/middleware.ts).
+ * Anunciarlas en el sitemap y en llms.txt solo mandaría a los buscadores a una
+ * redirección al login.
+ */
 
 /**
  * Pares de rutas equivalentes es↔en, para emitir `hreflang` en las cabeceras.
