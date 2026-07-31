@@ -364,6 +364,8 @@ h3 { font-size: 22px; }
   display: grid; grid-template-columns: 1.3fr 1fr; gap: clamp(20px, 3vw, 40px);
   align-items: end;
 }
+/* Sin esto las columnas heredan min-width:auto y la card se sale del viewport. */
+.hero-foot > * { min-width: 0; }
 .hero-card {
   background: var(--ink); color: var(--paper);
   border-radius: var(--r-lg);
