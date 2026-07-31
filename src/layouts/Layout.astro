@@ -30,6 +30,18 @@ const {
   noindex = false,
 } = Astro.props
 
+/*
+ * Un solo meta robots por página. Se combinan las directivas de indexación con
+ * la reserva frente a entrenamiento de modelos: si van en dos etiquetas
+ * separadas los buscadores las fusionan igual, pero queda una etiqueta
+ * duplicada difícil de auditar. `noai` y `noimageai` no son estándar formal;
+ * valen como manifestación expresa de voluntad, que es lo que exige la
+ * cláusula 3.7 de LICENSE para que la prohibición sea oponible.
+ */
+const robots = [noindex ? 'noindex, nofollow' : null, 'noai', 'noimageai']
+  .filter(Boolean)
+  .join(', ')
+
 const canonical = url(path)
 const ogImageUrl = ogImage.startsWith('http') ? ogImage : `${SITE_URL}${ogImage}`
 const alt = hreflangFor(path)
