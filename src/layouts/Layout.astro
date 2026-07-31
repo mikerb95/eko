@@ -47,6 +47,7 @@ const robots = [noindex ? 'noindex, nofollow' : null, 'noai', 'noimageai']
 
 const canonical = url(path)
 const ogImageUrl = ogImage.startsWith('http') ? ogImage : `${SITE_URL}${ogImage}`
+const ogImageType = ogImageUrl.endsWith('.png') ? 'image/png' : 'image/jpeg'
 const alt = hreflangFor(path)
 ---
 
