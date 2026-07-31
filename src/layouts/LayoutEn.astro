@@ -24,11 +24,12 @@ const {
   description = "We help importers, producers, and tech operators in Colombia build their environmental management plans, licenses, and reports.",
   activePath = "/en",
   path = activePath,
-  ogImage = "/images/quienes-somos/hero-banner.jpg",
+  ogImage = "/og/portada-en.jpg",
 } = Astro.props
 
 const canonical = url(path)
 const ogImageUrl = ogImage.startsWith('http') ? ogImage : `${SITE_URL}${ogImage}`
+const ogImageType = ogImageUrl.endsWith('.png') ? 'image/png' : 'image/jpeg'
 const alt = hreflangFor(path)
 ---
 
