@@ -659,9 +659,11 @@ h3 { font-size: 22px; }
   text-transform: none; letter-spacing: 0.02em;
 }
 .foot-docs-label {
+  display: inline-flex; align-items: center; gap: 6px;
   text-transform: uppercase; letter-spacing: 0.08em;
   color: color-mix(in oklab, #fff 32%, transparent);
 }
+.foot-docs-label svg { flex: none; opacity: .85; }
 .foot-docs a {
   color: color-mix(in oklab, #fff 62%, transparent);
   text-decoration: underline; text-underline-offset: 3px;
