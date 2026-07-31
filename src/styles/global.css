@@ -654,6 +654,15 @@ h3 { font-size: 22px; }
   text-transform: uppercase;
   flex-wrap: wrap; gap: 14px 24px;
 }
+/* Bloque de titularidad. La línea de la empresa mantiene el tratamiento mono
+   en versalitas del pie; el aviso de autoría va debajo, en caja baja y más
+   tenue, para que se lea como nota legal y no compita con el resto. */
+.foot-copy { display: grid; gap: 6px; max-width: 62ch; }
+.foot-rights {
+  text-transform: none; letter-spacing: 0.01em; font-size: 11px; line-height: 1.55;
+  color: color-mix(in oklab, #fff 34%, transparent);
+  text-wrap: pretty;
+}
 .foot-docs {
   display: flex; align-items: center; flex-wrap: wrap; gap: 8px 14px;
   text-transform: none; letter-spacing: 0.02em;
