@@ -59,7 +59,13 @@ const alt = hreflangFor(path)
     <meta name="twitter:card" content="summary_large_image" />
     <meta name="twitter:title" content={title} />
     <meta name="twitter:description" content={description} />
-    <meta name="twitter:image" content={ogImageUrl} />
+    {/* Reserva de derechos. Va en el <head> porque es lo primero que queda en
+        una copia hecha con "guardar como" o con un scraper: el aviso viaja con
+        el archivo aunque se pierda el footer. Ver LICENSE en la raíz. */}
+    <meta name="copyright" content={`© ${new Date().getFullYear()} Mike Rodríguez. Todos los derechos reservados.`} />
+    <meta name="author" content="Mike Rodríguez" />
+    <meta name="rights" content="All rights reserved. Prohibida la reproducción, adaptación o reutilización total o parcial de este sitio, su código y su diseño." />
+    <meta name="robots" content="noai, noimageai" />
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Geist:wght@300..700&family=Geist+Mono:wght@300..500&display=swap" rel="stylesheet" />
