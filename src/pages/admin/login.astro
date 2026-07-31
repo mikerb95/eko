@@ -53,7 +53,11 @@ if (await verifySession(token)) return Astro.redirect(next)
             body: JSON.stringify(data),
           })
           const j = await res.json()
-          if (res.ok) { location.href = '/admin' }
+          if (res.ok) {
+            // Mismo criterio que en el servidor: solo rutas internas.
+            const raw = new URLSearchParams(location.search).get('next') || ''
+            location.href = /^\/(?!\/)/.test(raw) ? raw : '/admin'
+          }
           else { err.textContent = j.error || 'Error de acceso'; btn.disabled = false; t.textContent = 'Entrar' }
         } catch {
           err.textContent = 'No se pudo conectar'; btn.disabled = false; t.textContent = 'Entrar'
