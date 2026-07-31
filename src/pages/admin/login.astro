@@ -2,9 +2,14 @@
 export const prerender = false
 import { verifySession, SESSION_COOKIE } from '../../lib/auth'
 
+// Destino tras entrar. Solo se acepta una ruta interna que empiece por una
+// sola '/': con '//host' o 'https://host' el parámetro sería un open redirect.
+const raw = Astro.url.searchParams.get('next') || ''
+const next = /^\/(?!\/)/.test(raw) ? raw : '/admin'
+
 // If already logged in, go to dashboard
 const token = Astro.cookies.get(SESSION_COOKIE)?.value
-if (await verifySession(token)) return Astro.redirect('/admin')
+if (await verifySession(token)) return Astro.redirect(next)
 ---
 
 <!DOCTYPE html>
