@@ -1,0 +1,166 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<style>
+  @font-face {
+    font-family: 'Geist';
+    src: url({{GEIST}}) format('woff2');
+    font-weight: 300 700;
+  }
+  @font-face {
+    font-family: 'Instrument Serif';
+    src: url({{SERIF}}) format('woff2');
+    font-style: normal;
+  }
+  @font-face {
+    font-family: 'Instrument Serif';
+    src: url({{SERIF_ITALIC}}) format('woff2');
+    font-style: italic;
+  }
+
+  /* Paleta tomada de src/styles/global.css */
+  :root {
+    --ink: #0E1C26;
+    --paper: #EDEBEB;
+    --deep: #124E7D;
+    --aqua: #00AA9F;
+    --clay: #D0B49A;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    width: 1200px;
+    height: 630px;
+    overflow: hidden;
+    background: var(--ink);
+    color: var(--paper);
+    font-family: 'Geist', sans-serif;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  .lienzo {
+    position: relative;
+    width: 100%;
+    height: 100%;
+    padding: 62px 70px 58px;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    isolation: isolate;
+  }
+
+  /* Los mismos halos difusos del hero del sitio. */
+  .halo {
+    position: absolute;
+    border-radius: 50%;
+    filter: blur(90px);
+    z-index: -1;
+  }
+  .halo-aqua {
+    width: 620px; height: 620px;
+    top: -260px; right: -170px;
+    background: radial-gradient(circle, rgba(0,170,159,.55), rgba(0,170,159,0) 70%);
+  }
+  .halo-deep {
+    width: 720px; height: 720px;
+    bottom: -400px; left: -220px;
+    background: radial-gradient(circle, rgba(18,78,125,.62), rgba(18,78,125,0) 70%);
+  }
+  .halo-clay {
+    width: 340px; height: 340px;
+    bottom: -160px; right: 120px;
+    background: radial-gradient(circle, rgba(208,180,154,.20), rgba(208,180,154,0) 70%);
+  }
+
+  header { display: flex; align-items: center; justify-content: space-between; }
+  header img { height: 44px; display: block; }
+
+  .eyebrow {
+    font-size: 17px;
+    font-weight: 500;
+    letter-spacing: .16em;
+    text-transform: uppercase;
+    color: rgba(237,235,235,.62);
+  }
+  .eyebrow b { color: var(--aqua); font-weight: 500; }
+
+  .titular {
+    font-family: 'Instrument Serif', serif;
+    font-weight: 400;
+    font-size: 92px;
+    line-height: 1.04;
+    letter-spacing: -.015em;
+    margin-top: 34px;
+  }
+  .titular em { font-style: italic; color: var(--aqua); }
+  .titular span { color: rgba(237,235,235,.72); }
+
+  .bajada {
+    margin-top: 22px;
+    font-size: 23px;
+    line-height: 1.45;
+    font-weight: 300;
+    color: rgba(237,235,235,.74);
+    max-width: 640px;
+  }
+
+  footer {
+    display: flex;
+    align-items: flex-end;
+    justify-content: space-between;
+    padding-top: 26px;
+    border-top: 1px solid rgba(237,235,235,.14);
+  }
+
+  .pruebas { display: flex; gap: 34px; align-items: center; }
+  .prueba { display: flex; align-items: center; gap: 11px; font-size: 19px; }
+  .punto {
+    width: 9px; height: 9px; border-radius: 50%;
+    background: var(--aqua);
+    box-shadow: 0 0 0 5px rgba(0,170,159,.15);
+  }
+  .prueba b { font-weight: 600; }
+  .prueba span { color: rgba(237,235,235,.66); font-weight: 300; }
+
+  .dominio {
+    font-size: 19px;
+    font-weight: 500;
+    letter-spacing: .06em;
+    color: rgba(237,235,235,.82);
+  }
+</style>
+</head>
+<body>
+  <div class="lienzo">
+    <span class="halo halo-aqua"></span>
+    <span class="halo halo-deep"></span>
+    <span class="halo halo-clay"></span>
+
+    <header>
+      <img src="{{LOGO}}" alt="Ekosolv">
+      <div class="eyebrow">Consultoría ambiental <b>·</b> Colombia</div>
+    </header>
+
+    <div>
+      <h1 class="titular">
+        Cumplir con la <em>ANLA</em>,<br>
+        crecer con <span>propósito</span>.
+      </h1>
+      <p class="bajada">
+        Cumplimiento ANLA, estrategia ESG y economía circular para importadores,
+        productores y operadores de tecnología.
+      </p>
+    </div>
+
+    <footer>
+      <div class="pruebas">
+        <div class="prueba"><i class="punto"></i><b>Desde 2013</b></div>
+        <div class="prueba"><i class="punto"></i><b>+1.000&nbsp;t</b>&nbsp;<span>de RAEE gestionadas</span></div>
+      </div>
+      <div class="dominio">ekosolv.com</div>
+    </footer>
+  </div>
+</body>
+</html>
