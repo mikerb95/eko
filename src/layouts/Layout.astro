@@ -12,7 +12,10 @@ interface Props {
   activePath?: string
   /** Ruta canónica de esta página. Por defecto usa activePath. */
   path?: string
-  /** Imagen para compartir en redes (ruta absoluta desde /public). */
+  /**
+   * Imagen para compartir en redes (ruta absoluta desde /public).
+   * La de portada se genera con `node scripts/og/generar.mjs`.
+   */
   ogImage?: string
   /**
    * Excluye la página de los buscadores. Para documentación interna del
