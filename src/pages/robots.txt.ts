@@ -10,6 +10,8 @@ export const GET: APIRoute = async () => {
 Allow: /
 Disallow: /admin
 Disallow: /api/
+Disallow: /docs
+Disallow: /oportunidades2630
 
 Sitemap: ${url('/sitemap.xml')}
 `
