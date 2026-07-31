@@ -59,6 +59,7 @@ const t = es
         { label: 'Oportunidades 2026–2030', href: '/oportunidades2630' },
       ],
       logoAlt: 'EKOSOLV — Consultores en Sostenibilidad',
+      rights: 'Sitio, diseño y código fuente © {year} Mike Restrepo. Todos los derechos reservados. Prohibida su reproducción, adaptación o reutilización, total o parcial, por cualquier medio.',
     }
   : {
       headline: 'A new <em>case</em><br>on the radar?',
@@ -97,6 +98,7 @@ const t = es
         { label: 'Opportunities 2026–2030', href: '/oportunidades2630' },
       ],
       logoAlt: 'EKOSOLV — Sustainability Consultants',
+      rights: 'Site, design and source code © {year} Mike Restrepo. All rights reserved. Reproduction, adaptation or reuse, in whole or in part, by any means, is prohibited.',
     }
 
 const year = new Date().getFullYear()
@@ -158,7 +160,18 @@ const year = new Date().getFullYear()
     </div>
 
     <div class="foot-bottom">
-      <div>© {year} Ekosolv S.A.S. · NIT 900.659.506-9</div>
+      {/*
+        Dos titularidades distintas, a propósito. La primera es de la empresa:
+        cubre marca, razón social y contenido corporativo. La segunda es la
+        autoría del sitio como obra —código, arquitectura y diseño—, que no se
+        transfiere por el solo hecho de publicarlo. Ver LICENSE en la raíz del
+        repositorio; sin este aviso no hay a quién atribuir la obra si aparece
+        copiada.
+      */}
+      <div class="foot-copy">
+        <div>© {year} Ekosolv S.A.S. · NIT 900.659.506-9</div>
+        <div class="foot-rights">{t.rights.replace('{year}', String(year))}</div>
+      </div>
 
       {/* Documentación del proyecto. Son páginas internas: van con noindex y el
           middleware exige sesión de administrador, así que quien no la tenga
