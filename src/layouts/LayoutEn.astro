@@ -53,6 +53,11 @@ const alt = hreflangFor(path)
     <meta name="twitter:title" content={title} />
     <meta name="twitter:description" content={description} />
     <meta name="twitter:image" content={ogImageUrl} />
+    {/* Reserva de derechos. Ver la nota equivalente en Layout.astro. */}
+    <meta name="copyright" content={`© ${new Date().getFullYear()} Mike Rodríguez. All rights reserved.`} />
+    <meta name="author" content="Mike Rodríguez" />
+    <meta name="rights" content="All rights reserved. Reproduction, adaptation or reuse of this site, its code and its design, in whole or in part, is prohibited." />
+    <meta name="robots" content="noai, noimageai" />
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Geist:wght@300..700&family=Geist+Mono:wght@300..500&display=swap" rel="stylesheet" />
