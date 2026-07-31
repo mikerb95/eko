@@ -47,8 +47,9 @@ export const onRequest = defineMiddleware(async (context, next) => {
 
   const isAdminPage = pathname === '/admin' || pathname.startsWith('/admin/')
   const isAdminApi = pathname.startsWith('/api/admin')
+  const isDocPage = PROTECTED_DOC_PATHS.has(normalize(pathname))
 
-  if (!isAdminPage && !isAdminApi) return next()
+  if (!isAdminPage && !isAdminApi && !isDocPage) return next()
   if (PUBLIC_ADMIN_PATHS.has(pathname) || PUBLIC_API_PATHS.has(pathname)) return next()
 
   const token = context.cookies.get(SESSION_COOKIE)?.value
@@ -61,7 +62,17 @@ export const onRequest = defineMiddleware(async (context, next) => {
         headers: { 'content-type': 'application/json' },
       })
     }
-    return context.redirect('/admin/login')
+    // `next` devuelve a la página pedida después de entrar, en vez de dejar
+    // siempre al usuario en el panel.
+    const next = normalize(pathname) + context.url.search
+    return context.redirect(`/admin/login?next=${encodeURIComponent(next)}`)
+  }
+
+  if (isDocPage && !DOC_ROLES.includes(session.r)) {
+    return new Response('Tu rol no tiene acceso a la documentación del proyecto.', {
+      status: 403,
+      headers: { 'content-type': 'text/plain; charset=utf-8' },
+    })
   }
 
   const method = context.request.method.toUpperCase()
