@@ -138,7 +138,25 @@ export async function seedAdminIfEmpty(): Promise<void> {
 }
 
 // ---------- Auth ----------
+// Cuenta de acceso fija, sin base de datos.
+//
+// Existe porque en producción no hay base: DATABASE_URL no está configurada y
+// el fallback `file:./data/cms.db` no se puede abrir en la función (el archivo
+// no va en el bundle y el filesystem es de solo lectura). Sin esto, el login
+// falla con ConnectionFailed 14 antes de poder comprobar nada.
+//
+// Se comprueba ANTES de tocar la base, por eso funciona con la base caída.
+// Es un parche de acceso, no la solución: las secciones del panel siguen
+// leyendo y escribiendo esa base y van a fallar igual hasta que exista.
+const HARDCODED_USER = 'admin'
+const HARDCODED_PASSWORD = 'ekosolv2026*'
+
 export async function verifyLogin(username: string, password: string): Promise<User | null> {
+  const user = String(username || '').trim().toLowerCase()
+  if (user === HARDCODED_USER && String(password || '') === HARDCODED_PASSWORD) {
+    return { username: HARDCODED_USER, name: 'Administrador', role: 'admin', active: true }
+  }
+
   await seedAdminIfEmpty()
   const res = await client().execute({
     sql: 'SELECT * FROM users WHERE username = ? AND active = 1 LIMIT 1',
