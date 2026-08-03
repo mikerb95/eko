@@ -48,12 +48,43 @@ function canWrite(pathname: string, role: string): boolean {
   return rule.roles.includes(role)
 }
 
+const SAFE_METHODS = new Set(['GET', 'HEAD', 'OPTIONS'])
+
+/**
+ * Defensa CSRF para la API.
+ *
+ * La cookie de sesión es `SameSite=Lax`, que ya impide que un sitio ajeno la
+ * envíe en un POST. Esto es la segunda capa, y hace falta porque el
+ * `security.checkOrigin` de Astro NO cubre este caso: mirando su código
+ * (`core/app/origin-check.js`) solo rechaza peticiones cruzadas cuando el
+ * `content-type` es de formulario. Todo el panel habla `application/json`, así
+ * que para nosotros ese chequeo no valida nada.
+ *
+ * Se rechaza solo cuando el navegador declara un origen distinto. Un cliente
+ * sin navegador (el `curl` con el que hoy se opera la bandeja de Zoho) no manda
+ * `Origin` ni `Sec-Fetch-Site` y sigue funcionando: quien no tiene cookies de
+ * por medio tampoco puede montar un CSRF.
+ */
+function isCrossSiteWrite(request: Request, origin: string): boolean {
+  if (SAFE_METHODS.has(request.method.toUpperCase())) return false
+  if (request.headers.get('sec-fetch-site') === 'cross-site') return true
+  const reqOrigin = request.headers.get('origin')
+  return !!reqOrigin && reqOrigin !== origin
+}
+
 export const onRequest = defineMiddleware(async (context, next) => {
   const { pathname } = context.url
 
+  if (pathname.startsWith('/api/') && isCrossSiteWrite(context.request, context.url.origin)) {
+    return new Response(JSON.stringify({ error: 'Origen no permitido' }), {
+      status: 403,
+      headers: { 'content-type': 'application/json' },
+    })
+  }
+
   const isAdminPage = pathname === '/admin' || pathname.startsWith('/admin/')
   const isAdminApi = pathname.startsWith('/api/admin')
-  const isDocPage = PROTECTED_DOC_PATHS.has(normalize(pathname))
+  const isDocPage = isProtectedDoc(pathname)
 
   if (!isAdminPage && !isAdminApi && !isDocPage) return next()
   if (PUBLIC_ADMIN_PATHS.has(pathname) || PUBLIC_API_PATHS.has(pathname)) return next()
