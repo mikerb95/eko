@@ -2,6 +2,10 @@
 
 **Proyecto:** eko-ambiental (Astro + Vercel)
 **Fecha:** 2026-07-05
+**Revisado:** 2026-08-03
+
+> Los hallazgos 1 a 7 son del corte original del 5 de julio y se conservan con su
+> estado actualizado. Lo detectado después va en "Hallazgos posteriores".
 
 ## Alcance
 
