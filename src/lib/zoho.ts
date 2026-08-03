@@ -27,7 +27,14 @@ import {
   enqueue,
   type OutboxItem,
 } from './zohoOutbox'
-import { contactToLead, orderToLead, type ZohoLead } from './zohoMap'
+import {
+  contactToLead,
+  orderToLead,
+  contactToSubscriber,
+  orderToSubscriber,
+  type ZohoLead,
+  type ZohoSubscriber,
+} from './zohoMap'
 import type { Contact } from './contactos'
 import type { Order } from './ops'
 
