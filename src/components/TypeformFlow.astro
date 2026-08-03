@@ -30,6 +30,20 @@ export type TFField =
       required?: boolean
       options: TFOption[]
     }
+  | {
+      /**
+       * Casilla de autorización de tratamiento de datos (Ley 1581 de 2012).
+       * Nunca se renderiza premarcada: la autorización tiene que ser un acto
+       * del titular, y una casilla marcada por defecto no es autorización.
+       */
+      type: 'consent'
+      name: string
+      /** HTML del texto de la casilla; suele traer el enlace a la política. */
+      html: string
+      /** Aviso de privacidad corto que va debajo, sin casilla propia. */
+      notice?: string
+      required?: boolean
+    }
 
 export type TFStep = {
   title: string
