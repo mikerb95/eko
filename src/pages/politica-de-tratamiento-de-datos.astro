@@ -1,0 +1,329 @@
+---
+import Layout from '../layouts/Layout.astro'
+import SiteFooter from '../components/SiteFooter.astro'
+import LegalDoc from '../components/LegalDoc.astro'
+import type { LegalSection } from '../components/LegalDoc.astro'
+import {
+  RESPONSABLE,
+  FINALIDADES,
+  ENCARGADOS,
+  DERECHOS,
+  PLAZOS,
+  POLITICA_VERSION,
+  POLITICA_VIGENCIA,
+  LEGAL_PATHS,
+} from '../lib/legal'
+
+const secciones: LegalSection[] = [
+  { id: 'responsable', titulo: 'Responsable del tratamiento' },
+  { id: 'alcance', titulo: 'Alcance' },
+  { id: 'datos', titulo: 'Datos que recolectamos' },
+  { id: 'finalidades', titulo: 'Finalidades' },
+  { id: 'autorizacion', titulo: 'Autorización del titular' },
+  { id: 'derechos', titulo: 'Derechos del titular' },
+  { id: 'procedimiento', titulo: 'Consultas y reclamos' },
+  { id: 'encargados', titulo: 'Encargados y transferencia internacional' },
+  { id: 'seguridad', titulo: 'Seguridad de la información' },
+  { id: 'conservacion', titulo: 'Conservación y supresión' },
+  { id: 'sensibles', titulo: 'Datos sensibles y de menores' },
+  { id: 'cookies', titulo: 'Cookies' },
+  { id: 'vigencia', titulo: 'Vigencia y cambios' },
+]
+---
+
+<Layout
+  title="Política de tratamiento de datos personales — Ekosolv"
+  description="Política de tratamiento de datos personales de Ekosolv S.A.S. conforme a la Ley 1581 de 2012 y el Decreto 1074 de 2015: finalidades, derechos del titular, canal de atención y transferencia internacional."
+  activePath="/politica-de-tratamiento-de-datos"
+>
+  <LegalDoc
+    eyebrow="Legal · Protección de datos"
+    eyebrowRight="Ley 1581 de 2012"
+    titulo="Política de tratamiento de"
+    tituloEm="datos personales"
+    intro="Qué datos recogemos cuando usted nos escribe o agenda una recolección, para qué los usamos, quién más los procesa y cómo puede pedir que los corrijamos o los borremos. Está redactada para leerse, no para blindarnos."
+    version={POLITICA_VERSION}
+    vigencia={POLITICA_VIGENCIA}
+    secciones={secciones}
+  >
+    <section class="legal-sec" id="responsable">
+      <h2><span>Responsable del tratamiento</span></h2>
+      <p>
+        El responsable del tratamiento de sus datos personales es
+        <strong>{RESPONSABLE.razonSocial}</strong>, sociedad colombiana identificada
+        con NIT {RESPONSABLE.nit}.
+      </p>
+      <div class="legal-table-wrap">
+        <table>
+          <tbody>
+            <tr>
+              <td>Domicilio</td>
+              <td>{RESPONSABLE.direccion}</td>
+            </tr>
+            <tr>
+              <td>Teléfono</td>
+              <td><a href={RESPONSABLE.telefonoHref}>{RESPONSABLE.telefono}</a></td>
+            </tr>
+            <tr>
+              <td>Canal de atención al titular</td>
+              <td><a href={`mailto:${RESPONSABLE.correo}`}>{RESPONSABLE.correo}</a></td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+      <p>
+        Cualquier solicitud relacionada con sus datos personales se atiende por el
+        correo anterior. No hace falta un formato especial ni justificar el motivo.
+      </p>
+    </section>
+
+    <section class="legal-sec" id="alcance">
+      <h2><span>Alcance</span></h2>
+      <p>
+        Esta política aplica a los datos personales que recolectamos a través de este
+        sitio web, por correo electrónico, por WhatsApp, por teléfono y en el curso de
+        la relación comercial con nuestros clientes y proveedores. Se rige por la
+        <strong>Ley 1581 de 2012</strong>, el <strong>Decreto 1074 de 2015</strong> y
+        las demás normas colombianas sobre protección de datos personales.
+      </p>
+      <p>
+        Nuestros servicios están dirigidos a empresas. Aun así, los datos de las
+        personas naturales que actúan por cuenta de esas empresas son datos personales
+        y reciben el mismo tratamiento que describe este documento.
+      </p>
+    </section>
+
+    <section class="legal-sec" id="datos">
+      <h2><span>Datos que recolectamos</span></h2>
+      <p>
+        Solo pedimos lo que necesitamos para atender la solicitud. Lo que recoge cada
+        formulario del sitio:
+      </p>
+      <h3>Formulario de contacto</h3>
+      <ul>
+        <li>Nombre.</li>
+        <li>Correo electrónico corporativo.</li>
+        <li>Teléfono, si usted decide darlo.</li>
+        <li>Empresa y sector.</li>
+        <li>Líneas de servicio de interés y el mensaje que usted escriba.</li>
+      </ul>
+      <h3>Formulario de agendamiento de recolección</h3>
+      <ul>
+        <li>Nombre y apellido.</li>
+        <li>Correo electrónico y teléfono.</li>
+        <li>Empresa y país.</li>
+        <li>
+          <strong>Dirección, ciudad y código postal</strong> del sitio donde están los
+          residuos, porque sin eso no hay recolección posible.
+        </li>
+        <li>Tipo de residuo, cantidad estimada y detalles que usted añada.</li>
+      </ul>
+      <h3>En ambos casos</h3>
+      <ul>
+        <li>
+          La fecha y hora en que usted autorizó el tratamiento, la versión de esta
+          política que aceptó y la dirección IP desde la que lo hizo. Eso no es
+          curiosidad: la ley nos obliga a conservar prueba de la autorización.
+        </li>
+      </ul>
+      <p>
+        No compramos bases de datos ni recolectamos datos de fuentes que usted no
+        conozca.
+      </p>
+    </section>
+
+    <section class="legal-sec" id="finalidades">
+      <h2><span>Finalidades</span></h2>
+      <p>Tratamos sus datos personales para:</p>
+      <ul>
+        {FINALIDADES.es.map((f) => <li>{f}</li>)}
+      </ul>
+      <p>
+        Esta lista es cerrada. Si en el futuro necesitamos usar sus datos para algo que
+        no esté aquí, se lo pedimos aparte, con una autorización nueva.
+      </p>
+    </section>
+
+    <section class="legal-sec" id="autorizacion">
+      <h2><span>Autorización del titular</span></h2>
+      <p>
+        Antes de recolectar sus datos le pedimos autorización previa, expresa e
+        informada, con una casilla que usted marca. Nunca viene marcada por defecto y
+        no enviamos el formulario si usted no la marca.
+      </p>
+      <p>
+        Guardamos la fecha, la hora y la versión del texto que usted aceptó, para poder
+        acreditar no solo <em>que</em> autorizó sino <em>qué</em> autorizó. Si quiere
+        copia de su autorización, la pedimos por el canal de atención y se la enviamos.
+      </p>
+      <div class="legal-note">
+        <p>
+          Puede revocar la autorización en cualquier momento escribiéndonos. La
+          revocación no aplica cuando exista un deber legal o contractual que nos
+          obligue a conservar el dato, como los soportes de una recolección ya
+          ejecutada, que hacen parte de la trazabilidad ambiental que la autoridad
+          puede exigirnos.
+        </p>
+      </div>
+    </section>
+
+    <section class="legal-sec" id="derechos">
+      <h2><span>Derechos del titular</span></h2>
+      <p>Como titular de sus datos personales usted tiene derecho a:</p>
+      <ul>
+        {DERECHOS.es.map((d) => <li>{d}</li>)}
+      </ul>
+      <p>
+        Estos derechos los ejerce el titular, sus causahabientes, su representante o
+        apoderado, o un tercero autorizado por la ley.
+      </p>
+    </section>
+
+    <section class="legal-sec" id="procedimiento">
+      <h2><span>Consultas y reclamos</span></h2>
+      <p>
+        Escríbanos a <a href={`mailto:${RESPONSABLE.correo}`}>{RESPONSABLE.correo}</a>
+        con su nombre, un correo o teléfono de contacto y lo que necesita. Si nos deja
+        claro qué dato quiere corregir o suprimir, resolvemos más rápido.
+      </p>
+      <h3>Consultas</h3>
+      <p>
+        Respondemos en un máximo de <strong>{PLAZOS.consultaDias} días hábiles</strong>.
+        Si no alcanzamos, le explicamos por qué y la resolvemos dentro de los
+        {' '}{PLAZOS.consultaProrrogaDias} días hábiles siguientes al vencimiento del
+        primer plazo.
+      </p>
+      <h3>Reclamos</h3>
+      <p>
+        Respondemos en un máximo de <strong>{PLAZOS.reclamoDias} días hábiles</strong>
+        contados desde el día siguiente a su recibo. Si el reclamo está incompleto, se
+        lo decimos dentro de los cinco días siguientes para que lo complete; si pasan
+        dos meses sin respuesta suya, entendemos que desistió. Cuando necesitamos más
+        tiempo, se lo informamos y resolvemos dentro de los
+        {' '}{PLAZOS.reclamoProrrogaDias} días hábiles siguientes.
+      </p>
+      <p>
+        Si no queda conforme con nuestra respuesta, puede presentar su queja ante la
+        <strong> Superintendencia de Industria y Comercio</strong>. La ley exige haber
+        agotado antes el trámite con nosotros.
+      </p>
+    </section>
+
+    <section class="legal-sec" id="encargados">
+      <h2><span>Encargados y transferencia internacional</span></h2>
+      <p>
+        Para operar usamos proveedores de tecnología que procesan sus datos por cuenta
+        nuestra y bajo nuestras instrucciones. Sus servidores están fuera de Colombia,
+        así que hay transferencia internacional de datos y usted tiene derecho a saber
+        exactamente hacia dónde:
+      </p>
+      <div class="legal-table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th>Proveedor</th>
+              <th>Para qué</th>
+              <th>País de procesamiento</th>
+            </tr>
+          </thead>
+          <tbody>
+            {ENCARGADOS.map((e) => (
+              <tr>
+                <td>{e.nombre}</td>
+                <td>{e.rol.es}</td>
+                <td>{e.pais.es}</td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+      <p>
+        La autorización que usted otorga en nuestros formularios cubre de forma expresa
+        esta transferencia. No vendemos sus datos personales, ni los cedemos a terceros
+        con fines publicitarios.
+      </p>
+      <p>
+        Cuando la autoridad ambiental, tributaria o judicial nos requiere información en
+        ejercicio de sus competencias, la entregamos. Eso no es una cesión comercial: es
+        una obligación legal.
+      </p>
+    </section>
+
+    <section class="legal-sec" id="seguridad">
+      <h2><span>Seguridad de la información</span></h2>
+      <p>
+        Aplicamos medidas técnicas y administrativas razonables para proteger sus datos:
+        cifrado en tránsito en todo el sitio, acceso al panel interno restringido por
+        usuario y sesión, y registro de los cambios de estado de cada solicitud.
+      </p>
+      <p>
+        Ninguna medida es infalible. Si ocurre un incidente que afecte sus datos
+        personales, lo informamos a la Superintendencia de Industria y Comercio y a los
+        titulares afectados, en los términos que exige la norma.
+      </p>
+    </section>
+
+    <section class="legal-sec" id="conservacion">
+      <h2><span>Conservación y supresión</span></h2>
+      <p>
+        Conservamos sus datos mientras exista una finalidad que lo justifique. En
+        concreto:
+      </p>
+      <ul>
+        <li>
+          Solicitudes que no derivan en contratación: hasta dos años, para retomar la
+          conversación si usted vuelve.
+        </li>
+        <li>
+          Datos de clientes y soportes de recolección: por el término que exigen las
+          normas ambientales, contables y tributarias, que puede llegar a diez años.
+        </li>
+        <li>
+          Prueba de la autorización: mientras conservemos el dato al que se refiere, y
+          después el tiempo necesario para poder acreditarla.
+        </li>
+      </ul>
+      <p>Cumplido el plazo, suprimimos o anonimizamos la información.</p>
+    </section>
+
+    <section class="legal-sec" id="sensibles">
+      <h2><span>Datos sensibles y de menores</span></h2>
+      <p>
+        No pedimos datos sensibles en este sitio. Si en algún trámite específico llegaran
+        a ser necesarios, se lo advertimos, le explicamos que no está obligado a
+        entregarlos y pedimos autorización aparte.
+      </p>
+      <p>
+        Nuestros servicios no están dirigidos a menores de edad y no recolectamos sus
+        datos de manera intencional. Si detectamos que recibimos datos de un menor sin
+        autorización de quien ejerce la patria potestad, los suprimimos.
+      </p>
+    </section>
+
+    <section class="legal-sec" id="cookies">
+      <h2><span>Cookies</span></h2>
+      <p>
+        Este sitio no usa cookies publicitarias ni de analítica de terceros. La única
+        cookie que instalamos es la de sesión del panel interno, y es estrictamente
+        necesaria para que ese panel funcione. El detalle está en la
+        <a href={LEGAL_PATHS.es.cookies}> Política de cookies</a>.
+      </p>
+    </section>
+
+    <section class="legal-sec" id="vigencia">
+      <h2><span>Vigencia y cambios</span></h2>
+      <p>
+        Esta política corresponde a la versión {POLITICA_VERSION} y rige desde la fecha
+        indicada al inicio. Si la modificamos en algo sustancial, publicamos la nueva
+        versión aquí con su fecha, y cuando el cambio afecte las finalidades o los
+        destinatarios de los datos, pedimos autorización nueva antes de aplicarlo.
+      </p>
+      <p>
+        Las bases de datos que administramos tienen vigencia indefinida, sin perjuicio
+        de los plazos de conservación del numeral 10.
+      </p>
+    </section>
+  </LegalDoc>
+
+  <SiteFooter />
+</Layout>
