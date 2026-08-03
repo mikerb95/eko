@@ -1,6 +1,8 @@
 ---
 import LayoutEn from '../../layouts/LayoutEn.astro'
 import { yearsActive, yearsSpelled } from '../../lib/brand'
+import { Image, getImage } from 'astro:assets'
+import { imagen } from '../../lib/imagenes'
 import SiteFooter from '../../components/SiteFooter.astro'
 
 const team = [
@@ -85,6 +87,30 @@ const allies = [
   { name: "Codechocó", desc: "Regional technical cooperation" },
   { name: "Univ. Antonio Nariño", desc: "Environmental education and recycling" },
 ]
+
+/*
+ * El póster del vídeo pesaba 616 KB, más que ninguna otra imagen del sitio, y
+ * es lo primero que se ve en esta página. `getImage` devuelve la ruta ya
+ * optimizada, que es lo que necesita el atributo `poster` (una URL, no un
+ * elemento).
+ */
+const poster = await getImage({
+  src: imagen('banner-solar-poster.jpg'),
+  width: 1600,
+  format: 'webp',
+})
+
+/*
+ * El póster del vídeo pesaba 616 KB, más que ninguna otra imagen del sitio, y
+ * es lo primero que se ve en esta página. `getImage` devuelve la ruta ya
+ * optimizada, que es lo que necesita el atributo `poster` (una URL, no un
+ * elemento).
+ */
+const poster = await getImage({
+  src: imagen('banner-solar-poster.jpg'),
+  width: 1600,
+  format: 'webp',
+})
 ---
 
 <LayoutEn activePath="/en/about">
@@ -104,7 +130,7 @@ const allies = [
     <figure class="qs-hero reveal" style="margin-top:48px">
       <video
         src="/videos/banner-solar.mp4"
-        poster="/images/quienes-somos/banner-solar-poster.jpg"
+        poster={poster.src}
         autoplay
         muted
         loop
@@ -152,7 +178,14 @@ const allies = [
     </div>
 
     <figure class="qs-wide reveal" style="margin-bottom: clamp(28px, 4vw, 52px)">
-      <img src="/images/quienes-somos/equipo-estrategas.jpg" alt="Ekosolv team working on sustainability strategies" loading="lazy" />
+      <Image
+        src={imagen("equipo-estrategas.jpg")}
+        alt="Ekosolv team working on sustainability strategies"
+        widths={[800, 1200, 1600]}
+        sizes="(max-width: 1200px) 92vw, 1200px"
+        loading="lazy"
+        decoding="async"
+      />
     </figure>
 
     <div class="process reveal">
@@ -200,7 +233,14 @@ const allies = [
         <div style="background:var(--paper-warm); padding:clamp(28px,3vw,44px); display:flex; flex-direction:column; gap:20px; transition: background .3s ease;"
              class="team-card">
           <div class="team-photo" style={`--ring:${m.accent}`}>
-            <img src={m.photo} alt={m.name} loading="lazy" />
+            <Image
+              src={imagen(m.photo)}
+              alt={m.name}
+              widths={[200, 400, 600]}
+              sizes="(max-width: 700px) 90vw, (max-width: 1100px) 45vw, 22vw"
+              loading="lazy"
+              decoding="async"
+            />
             <span class="team-badge" style={`background:${m.accent}`}>{m.initial}</span>
           </div>
           <div>
@@ -233,7 +273,14 @@ const allies = [
       {milestones.map(h => (
         <article class="hito-card">
           <div class="hito-img">
-            <img src={h.img} alt={h.title} loading="lazy" />
+            <Image
+              src={imagen(h.img)}
+              alt={h.title}
+              widths={[400, 800, 1200]}
+              sizes="(max-width: 700px) 90vw, 32vw"
+              loading="lazy"
+              decoding="async"
+            />
             <span class="hito-year">{h.year}</span>
           </div>
           <div class="hito-body">
