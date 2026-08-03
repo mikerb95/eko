@@ -122,9 +122,19 @@ empleado que la hizo.
 ### Roles del panel
 
 `admin`, `operaciones`, `logistica`, `consultor`, `lectura`. La autorización se
-resuelve en `src/middleware.ts`: lectura para cualquier sesión válida; escrituras
-de recolecciones para admin/operaciones/logística; de contenido para
-admin/consultor; de usuarios solo para admin.
+resuelve en `src/middleware.ts`: lectura para cualquier sesión válida, con las
+escrituras repartidas por prefijo.
+
+| Recurso | Quién puede escribir |
+|---|---|
+| `/api/admin/recolecciones` | admin, operaciones, logistica |
+| `/api/admin/contactos` | admin, operaciones, consultor |
+| `/api/admin/posts`, `/api/admin/normativas` | admin, consultor |
+| `/api/admin/users` | solo admin (también en lectura: expone datos sensibles) |
+| `/api/admin/zoho` | solo admin (escribe en un sistema externo) |
+
+Las páginas de `/docs` también exigen rol admin: son documentos internos, no
+parte del sitio público.
 
 ## Integraciones
 
