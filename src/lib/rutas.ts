@@ -60,6 +60,9 @@ export const HREFLANG_PAIRS: Array<{ es: string; en: string }> = [
   { es: '/agenda-una-recoleccion', en: '/en/schedule-a-collection' },
   { es: '/blog', en: '/en/blog' },
   { es: '/contacto', en: '/en/contact' },
+  { es: '/politica-de-tratamiento-de-datos', en: '/en/data-processing-policy' },
+  { es: '/terminos-de-servicio', en: '/en/terms-of-service' },
+  { es: '/politica-de-cookies', en: '/en/cookie-policy' },
 ]
 
 /** Devuelve las dos rutas equivalentes de una página, o null si no hay par. */
