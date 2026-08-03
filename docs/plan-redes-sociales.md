@@ -127,7 +127,7 @@ La consecuencia práctica: **una imagen OG por artículo sirve para las tres red
 
 | Fase | Entrega | Depende de | Valor |
 |---|---|---|---|
-| **0. Presencia y compartir** | Columna de redes en el footer, botones de compartir reales en el artículo, imagen OG por post | Nada externo | Se puede hacer hoy mismo |
+| **0. Presencia y compartir** | Columna de redes en el footer, botones de compartir reales en el artículo, imagen OG por post | Nada externo | **Hecho (2026-08-03)**; los perfiles quedan inertes hasta pegar las URLs reales |
 | **1. Difusión manual desde el panel** | `src/lib/social.ts` + botón "Difundir a redes" en el artículo, con vista previa por red | Bloqueadores §3 resueltos | Fin de la digitación triple |
 | **2. Compositor propio** | Publicación suelta desde el panel, sin pasar por el blog, y difusión de normativas del radar | Fase 1 | Ekonsulting publica alertas normativas sin depender de escribir un artículo |
 | **3. Programación y "Síguenos"** | Fecha programada delegada al calendario de Zoho, sección de últimas publicaciones en el sitio leída de `social_posts` | Fase 2 | El sitio deja de verse estático |
