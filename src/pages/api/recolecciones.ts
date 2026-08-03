@@ -85,6 +85,9 @@ export const POST: APIRoute = async (context) => {
       source: 'web',
       consent_version: POLITICA_VERSION,
       consent_ip: ip,
+      // Casilla opcional y aparte de la autorización de tratamiento: es otra
+      // finalidad. Si no llega, el correo no entra a ninguna lista de difusión.
+      marketing: consentGranted(b.marketing),
     })
     // Encolar para Zoho es una escritura a la misma DB y no lanza: se espera.
     // Que quede en la bandeja es lo que garantiza que el lead no se pierda
