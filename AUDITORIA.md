@@ -99,7 +99,8 @@ No es solo un problema de disponibilidad del panel. `POST /api/recolecciones` y 
 
 - [x] Fail-hard en producción si faltan `AUTH_SECRET` / `ADMIN_USERNAME` / `ADMIN_PASSWORD` (`src/lib/auth.ts`, función `requireEnv`)
 - [x] Sacar `.vercel/output` del repo y añadir `.vercel/` a `.gitignore`
-- [x] `npm audit fix` — resueltas vite (NTLMv2/fs.deny) y tar (file smuggling). Quedan 5 vulnerabilidades (1 low, 4 high) que requieren `--force` (upgrade breaking de `astro` y `@astrojs/vercel` a v11 por `esbuild`/`path-to-regexp`); no aplicado, pendiente de decisión.
+- [x] `npm audit fix` — resueltas vite (NTLMv2/fs.deny) y tar (file smuggling) en julio.
+- [ ] **Volver a correr `npm audit fix`** — hay 6 avisos abiertos al 2026-08-03 (`brace-expansion`, `fast-uri`, `tar` de nuevo, y `path-to-regexp`). Los tres primeros se arreglan sin breaking changes; `path-to-regexp` no, ver hallazgo 3. **No usar `--force`**: hoy propone bajar `@astrojs/vercel` a la 8.0.4.
 - [x] Actualizar Node local a ≥22.12 (instalado Node 24.18.0 LTS vía `nvm`; añadido `.nvmrc` al repo fijando `24`). `astro check` (0 errores) y `astro build` corren correctamente.
 - [x] Eliminar lockfile no utilizado (`bun.lock`, se mantiene `package-lock.json`)
 - [x] Rate limiting en `/api/admin/login` (`src/lib/rateLimit.ts`, aplicado en `src/pages/api/admin/login.ts`): máximo 5 intentos por IP cada 10 minutos, responde `429` con `Retry-After`. Limitador en memoria por instancia de función (no requiere infraestructura externa); con Fluid Compute la reutilización de instancias lo hace efectivo contra fuerza bruta desde un mismo origen, aunque no es una defensa distribuida perfecta entre instancias concurrentes. Probado manualmente: 6º intento devuelve 429.
