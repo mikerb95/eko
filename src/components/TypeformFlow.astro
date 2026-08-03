@@ -780,6 +780,11 @@ const selectedValues = (f: Extract<TFField, { type: 'choice' }>) =>
       }
     }
 
+    // Al marcar la autorización se limpia el aviso que la pedía.
+    flow.querySelectorAll('.tf-check').forEach((el) => {
+      el.addEventListener('change', () => clearError())
+    })
+
     nextBtn.addEventListener('click', next)
     backBtn.addEventListener('click', () => goTo(current - 1))
 
