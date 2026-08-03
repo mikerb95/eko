@@ -20,6 +20,15 @@ export interface Post {
   title: string
   lede: string
   sections: Section[]
+  /**
+   * Imagen de portada para compartir (Open Graph), 1200×630, en /public/og/.
+   * Vacía = se usa la portada genérica del sitio (`Layout.astro`).
+   *
+   * Es lo que se ve cuando el artículo se comparte en LinkedIn, Facebook o
+   * WhatsApp, y la base de la Fase 1 de docs/plan-redes-sociales.md: Instagram
+   * exige imagen en toda publicación, así que sin esto no hay difusión posible.
+   */
+  image?: string
 }
 
 export interface Normativa {
@@ -64,6 +73,7 @@ async function ensureSchema(): Promise<void> {
       title TEXT NOT NULL DEFAULT '',
       lede TEXT NOT NULL DEFAULT '',
       sections TEXT NOT NULL DEFAULT '[]',
+      image TEXT NOT NULL DEFAULT '',
       updated_at TEXT NOT NULL DEFAULT ''
     )`)
     await db.execute(`CREATE TABLE IF NOT EXISTS normativas (
