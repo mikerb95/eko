@@ -239,6 +239,6 @@ async function assertNotLastAdmin(id: number): Promise<void> {
   const target = await client().execute({ sql: `SELECT role, active FROM users WHERE id = ?`, args: [id] })
   const t: any = target.rows[0]
   if (t && t.role === 'admin' && Number(t.active) === 1 && Number(res.rows[0].n) === 0) {
-    throw new Error('No puedes eliminar o degradar al último administrador activo')
+    throw new UserError('No puedes eliminar o degradar al último administrador activo')
   }
 }
