@@ -34,20 +34,22 @@ Si `AUTH_SECRET`, `ADMIN_USERNAME` o `ADMIN_PASSWORD` no están configuradas com
 **Recomendación:** `git rm -r --cached .vercel` y añadir `.vercel/` al `.gitignore` (actualmente `dist/` sí está ignorado pero `.vercel/` no).
 
 ### 3. Vulnerabilidades en dependencias
-**Estado al 2026-08-03: parcialmente resuelto, 6 vulnerabilidades abiertas (1 moderate, 5 high).**
+**Estado al 2026-08-03: `npm audit fix` aplicado. Quedan 3 avisos abiertos (high), todos de la misma cadena de `path-to-regexp`.**
 
 En el corte original eran 10 (1 low, 3 moderate, 6 high). Las de vite (NTLMv2 hash disclosure y bypass de `server.fs.deny`) se resolvieron con `npm audit fix`. Desde entonces el proyecto subió a Astro 7 y `@astrojs/vercel` 11, y aparecieron avisos nuevos:
 
-| Paquete | Severidad | Problema | Arreglo |
+| Paquete | Severidad | Problema | Estado |
 |---|---|---|---|
-| `brace-expansion` | high | DoS por expansión sin límite (OOM) | `npm audit fix` |
-| `fast-uri` | high | Confusión de host por backslash en el *authority* | `npm audit fix` |
-| `path-to-regexp` 4.0.0–6.2.2 | high | ReDoS por backtracking, vía `@vercel/routing-utils` | ver abajo |
-| `tar` ≤7.5.20 | moderate | Recursión no controlada, DoS por stack overflow | `npm audit fix` |
+| `brace-expansion` | high | DoS por expansión sin límite (OOM) | ✅ resuelto (5.0.7 → 5.0.9) |
+| `fast-uri` | high | Confusión de host por backslash en el *authority* | ✅ resuelto (3.1.3 → 3.1.5) |
+| `tar` | moderate | Recursión no controlada, DoS por stack overflow | ✅ resuelto (7.5.19 → 7.5.22) |
+| `path-to-regexp` 4.0.0–6.2.2 | high | ReDoS por backtracking, vía `@vercel/routing-utils` | ⚠️ abierto, ver abajo |
+
+`npm audit fix` se corrió el 2026-08-03 y cerró los tres primeros. Solo movió versiones de parche (`@astrojs/vercel` 11.0.3 → 11.0.4, dentro del rango de `package.json`, que no cambió). Verificado después: `astro check` con 0 errores y `astro build` completo, con las cabeceras de seguridad inyectadas correctamente en el Build Output.
 
 **Corrección importante sobre el corte anterior:** ahí se dijo que `path-to-regexp` se resolvía subiendo a `@astrojs/vercel@11`. Es falso. El proyecto ya está en la 11.0.3 y el aviso sigue: lo que `npm audit fix --force` propone hoy es **bajar** a `@astrojs/vercel@8.0.4`, un downgrade de dos majors. No conviene hacerlo. El vector, además, es el enrutado de la plataforma, no código propio.
 
-**Recomendación:** correr `npm audit fix` (resuelve tres de los cuatro sin breaking changes) y dejar `path-to-regexp` esperando a que `@vercel/routing-utils` publique la corrección aguas arriba. No aplicar `--force`.
+**Recomendación:** ya no queda nada que hacer sin romper algo. `path-to-regexp` se queda esperando a que `@vercel/routing-utils` publique la corrección aguas arriba; conviene revisarlo cada tanto. **No aplicar `--force`**, que sigue proponiendo el downgrade a la 8.0.4.
 
 ### 4. Node.js local incompatible
 **Estado: resuelto (2026-07-07).** Node 24.18.0 LTS instalado y `.nvmrc` fijando `24` en el repo.
@@ -151,7 +153,7 @@ Se añadió una segunda ruta al Build Output que aplica `Cache-Control: no-store
 - [x] Fail-hard en producción si faltan `AUTH_SECRET` / `ADMIN_USERNAME` / `ADMIN_PASSWORD` (`src/lib/auth.ts`, función `requireEnv`)
 - [x] Sacar `.vercel/output` del repo y añadir `.vercel/` a `.gitignore`
 - [x] `npm audit fix` — resueltas vite (NTLMv2/fs.deny) y tar (file smuggling) en julio.
-- [ ] **Volver a correr `npm audit fix`** — hay 6 avisos abiertos al 2026-08-03 (`brace-expansion`, `fast-uri`, `tar` de nuevo, y `path-to-regexp`). Los tres primeros se arreglan sin breaking changes; `path-to-regexp` no, ver hallazgo 3. **No usar `--force`**: hoy propone bajar `@astrojs/vercel` a la 8.0.4.
+- [x] `npm audit fix` (2026-08-03) — cerrados `brace-expansion`, `fast-uri` y `tar`. Quedan 3 avisos de la cadena de `path-to-regexp`, sin arreglo hacia adelante por ahora (hallazgo 3). **No usar `--force`**: propone bajar `@astrojs/vercel` a la 8.0.4.
 - [x] Actualizar Node local a ≥22.12 (instalado Node 24.18.0 LTS vía `nvm`; añadido `.nvmrc` al repo fijando `24`). `astro check` (0 errores) y `astro build` corren correctamente.
 - [x] Eliminar lockfile no utilizado (`bun.lock`, se mantiene `package-lock.json`)
 - [x] Rate limiting en `/api/admin/login` (`src/lib/rateLimit.ts`, aplicado en `src/pages/api/admin/login.ts`): máximo 5 intentos por IP cada 10 minutos, responde `429` con `Retry-After`. Limitador en memoria por instancia de función (no requiere infraestructura externa); con Fluid Compute la reutilización de instancias lo hace efectivo contra fuerza bruta desde un mismo origen, aunque no es una defensa distribuida perfecta entre instancias concurrentes. Probado manualmente: 6º intento devuelve 429.
