@@ -2,9 +2,15 @@
 
 > Objetivo: que el contenido que ya se produce en el sitio (artículos del blog, radar normativo) llegue a Instagram, Facebook y LinkedIn sin digitación doble, y que el sitio muestre esa actividad de vuelta. La vía elegida es **Zoho Social**, coherente con el principio de `plan-zoho.md`: Zoho es el transporte y el calendario editorial, la web sigue siendo la fuente del contenido.
 
+## Estado de avance
+
+| Fecha | Avance |
+|---|---|
+| 2026-08-03 | **Fase 0 implementada**: `src/lib/redes.ts` (perfiles con guarda de verificación y constructores de enlaces de compartir), columna "Síguenos" en el footer bajo el logo con paridad ES/EN, botones de compartir reales en el artículo (LinkedIn, Facebook, WhatsApp, correo y copiar enlace) que reemplazan los `href="#"` muertos, y **columna `image` en la tabla `posts`** con migración idempotente (`addColumnIfMissing` en `cms.ts`), campo en el panel, validación de ruta interna en `POST /api/admin/posts` y conexión a `ogImage` en `blog/[slug].astro`. Verificado: migración probada contra una base con el esquema viejo (añade una vez, no-op la segunda, filas existentes quedan en `''`); guardado real desde el panel con imagen válida y con URL externa (esta última se descarta como se diseñó); `astro check` sin errores y build completo. **Los tres perfiles siguen en `activo: false`**: en producción el bloque del footer no se emite hasta que alguien pegue las URLs reales. |
+
 ## 1. Estado actual (línea base)
 
-Lo que hay hoy en el repo, verificado:
+Lo que había en el repo antes de la Fase 0:
 
 | Aspecto | Estado |
 |---|---|
