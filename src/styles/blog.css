@@ -239,8 +239,13 @@
 /* Cinco acciones ya no caben en una línea en móvil: envuelven. */
 .pf-share { display: flex; gap: 12px 20px; align-items: center; flex-wrap: wrap; }
 .pf-share .l { font-family: var(--font-mono); font-size: 11px; letter-spacing: 0.08em; text-transform: uppercase; color: var(--mute); }
-.pf-share a { font-size: 14px; color: var(--ink); position: relative; }
-.pf-share a::after {
+/* "Copiar enlace" es un <button> porque no navega a ninguna parte, pero se lee
+   igual que los demás: mismo tamaño, mismo subrayado que crece al pasar. */
+.pf-share a,
+.pf-share .pf-copy { font-size: 14px; color: var(--ink); position: relative; }
+.pf-share .pf-copy { background: none; border: 0; padding: 0; font: inherit; cursor: pointer; }
+.pf-share a::after,
+.pf-share .pf-copy::after {
   content: ""; position: absolute; left: 0; right: 0; bottom: -3px; height: 1px;
   background: currentColor; transform-origin: right; transform: scaleX(0);
   transition: transform .3s cubic-bezier(.2,.7,.2,1);
