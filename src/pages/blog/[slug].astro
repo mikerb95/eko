@@ -15,7 +15,17 @@ const related = allPosts.filter(p => p.slug !== post.slug).slice(0, 3)
 const compartir = enlacesCompartir(`/blog/${post.slug}`, post.title)
 ---
 
-<Layout title={`${post.title} — Eko`} description={post.lede} activePath="/blog" path={`/blog/${post.slug}`}>
+{/*
+  `ogImage` con la portada del artículo. Sin ella, `Layout.astro` cae en la
+  portada genérica del sitio y todos los artículos compartidos se ven iguales.
+*/}
+<Layout
+  title={`${post.title} — Eko`}
+  description={post.lede}
+  activePath="/blog"
+  path={`/blog/${post.slug}`}
+  ogImage={post.image || undefined}
+>
   <section class="page-head wrap">
     <div class="page-strip">
       <a class="l ulink" href="/blog">← Diario</a>
