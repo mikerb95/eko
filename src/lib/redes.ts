@@ -47,8 +47,8 @@ export const perfiles: Perfil[] = [
     red: 'linkedin',
     label: 'LinkedIn',
     handle: '',
-    url: 'https://www.linkedin.com/company/ekosolv',
-    activo: true,
+    url: '', // https://www.linkedin.com/company/…  (página de empresa, no perfil personal)
+    activo: false,
   },
   {
     red: 'instagram',
