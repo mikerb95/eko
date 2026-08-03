@@ -19,8 +19,14 @@ import { readFile } from 'node:fs/promises'
 const url = process.env.DATABASE_URL
 const authToken = process.env.DATABASE_AUTH_TOKEN
 
-if (!url || url.startsWith('file:')) {
+// El guardia es contra el fallback silencioso: si alguien corre esto sin
+// cargar el .env, DATABASE_URL queda vacía y sembraríamos el archivo local
+// creyendo que tocamos producción. `--local` es la salida explícita, para
+// probar el script contra un SQLite de archivo.
+const permitirLocal = process.argv.includes('--local')
+if (!url || (url.startsWith('file:') && !permitirLocal)) {
   console.error('DATABASE_URL no apunta a una base remota. Aborto para no sembrar el archivo local por error.')
+  console.error('Si eso es justo lo que quieres, pasa --local.')
   process.exit(1)
 }
 
