@@ -361,6 +361,7 @@ function openPost(post) {
   pf.accent.value = post?.accent || 'deep'
   pf.featured.checked = !!post?.featured
   pf.lede.value = post?.lede || ''
+  pf.image.value = post?.image || ''
   ;(post?.sections || [{ type: 'p' }]).forEach((s) => addSection(s.type || 'p', s))
   openDrawer('#post-drawer')
 }
