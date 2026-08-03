@@ -73,9 +73,10 @@ export const POST: APIRoute = async ({ request }) => {
     const id = await upsertPost(post)
     return json({ ok: true, id, slug: post.slug })
   } catch (e: any) {
-    const msg = String(e?.message || e)
-    if (msg.includes('UNIQUE')) return json({ error: 'Ya existe un artículo con ese slug' }, 409)
-    return json({ error: msg }, 500)
+    if (String(e?.message || e).includes('UNIQUE')) {
+      return json({ error: 'Ya existe un artículo con ese slug' }, 409)
+    }
+    return fail('posts', e)
   }
 }
 

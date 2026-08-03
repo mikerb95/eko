@@ -52,9 +52,10 @@ export const POST: APIRoute = async ({ request, locals }) => {
     const id = await upsertUser(u)
     return json({ ok: true, id })
   } catch (e: any) {
-    const msg = String(e?.message || e)
-    if (msg.includes('UNIQUE')) return json({ error: 'Ese usuario ya existe' }, 400)
-    return json({ error: msg }, 500)
+    if (String(e?.message || e).includes('UNIQUE')) {
+      return json({ error: 'Ese usuario ya existe' }, 400)
+    }
+    return fail('users', e)
   }
 }
 
