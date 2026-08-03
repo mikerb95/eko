@@ -153,6 +153,24 @@ export const CONSENT_HTML = {
   en: `I authorise ${RESPONSABLE.razonSocial} to process my personal data for the purposes set out in the <a href="${LEGAL_PATHS.en.politica}" target="_blank" rel="noopener">Data processing policy</a>, including its transfer to our providers outside Colombia. I am aware of my rights as a data subject.`,
 } as const
 
+/**
+ * Texto de la casilla de comunicaciones comerciales (Zoho Campaigns).
+ *
+ * Va aparte de `CONSENT_HTML` a propósito. Responder una cotización y mandar
+ * boletines son finalidades distintas: la primera es necesaria para atender lo
+ * que el titular pidió, la segunda no. Meter a alguien a una lista de difusión
+ * con la autorización que dio para que le respondieran es justo lo que la SIC
+ * entiende por finalidad no autorizada.
+ *
+ * Por eso esta casilla es opcional, va desmarcada y se registra por separado
+ * (`marketing_at` en `contacts` y `orders`). Si no se marca, el correo no sale
+ * del sitio hacia Campaigns.
+ */
+export const MARKETING_HTML = {
+  es: `Quiero recibir por correo novedades normativas y contenidos de ${RESPONSABLE.razonSocial}. Es opcional y puedo darme de baja en cualquier envío.`,
+  en: `I would like to receive regulatory updates and content from ${RESPONSABLE.razonSocial} by email. This is optional and I can unsubscribe from any message.`,
+} as const
+
 /** Aviso de privacidad corto, para mostrar junto al checkbox. */
 export const AVISO_PRIVACIDAD = {
   es: `Responsable: ${RESPONSABLE.razonSocial}, NIT ${RESPONSABLE.nit}. Canal de atención al titular: ${RESPONSABLE.correo}.`,
