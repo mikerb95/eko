@@ -229,6 +229,7 @@ export async function createOrder(input: NewOrderInput): Promise<Order> {
           input.waste_type ?? '', input.estimated_quantity ?? '',
           input.message ?? '', input.source ?? 'web',
           ts, input.consent_version ?? '', input.consent_ip ?? '',
+          input.marketing ? ts : '',
           ts, ts,
         ],
       })
