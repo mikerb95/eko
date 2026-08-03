@@ -196,10 +196,11 @@ const iconos: Record<string, string> = {
       <div>
         <h5>{t.legal}</h5>
         {/*
-          Los enlaces con href === null aún no tienen documento redactado
-          (pregunta abierta 3.c). Se muestran atenuados y sin <a>: un enlace
-          legal roto es peor que un texto sin enlace — la Política de
-          Tratamiento es obligación de la Ley 1581 de 2012.
+          Los enlaces con href === null aún no tienen documento redactado: se
+          muestran atenuados y sin <a>, porque un enlace legal roto es peor que
+          un texto sin enlace. Las rutas salen de `LEGAL_PATHS` en
+          src/lib/legal.ts; hoy el único pendiente es el Código de ética, que es
+          un documento de la compañía y no podemos redactarlo por ella.
         */}
         <ul>
           {t.legalLinks.map((l) =>
