@@ -117,19 +117,22 @@ export interface NewContactInput {
   source?: string
   consent_version?: string
   consent_ip?: string
+  /** ¿Marcó la casilla opcional de comunicaciones comerciales? */
+  marketing?: boolean
 }
 
 export async function createContact(input: NewContactInput): Promise<Contact> {
   await ensureSchema()
   const ts = now()
   const res = await client().execute({
-    sql: `INSERT INTO contacts (name,email,company,phone,sector,service_lines,message,source,status,consent_at,consent_version,consent_ip,created_at,updated_at)
-          VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?)`,
+    sql: `INSERT INTO contacts (name,email,company,phone,sector,service_lines,message,source,status,consent_at,consent_version,consent_ip,marketing_at,created_at,updated_at)
+          VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)`,
     args: [
       input.name, input.email, input.company ?? '', input.phone ?? '',
       input.sector ?? '', input.service_lines ?? '', input.message ?? '',
       input.source ?? 'web', 'nuevo',
       ts, input.consent_version ?? '', input.consent_ip ?? '',
+      input.marketing ? ts : '',
       ts, ts,
     ],
   })
