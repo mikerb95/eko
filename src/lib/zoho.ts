@@ -205,6 +205,60 @@ export async function upsertLead(lead: ZohoLead): Promise<string> {
   return String(id)
 }
 
+// --------------------------------------------------------------- Campaigns
+
+/**
+ * Suscribe un correo a la lista de Zoho Campaigns.
+ *
+ * La API de Campaigns es de otra época que la del CRM y conviene tenerlo
+ * presente al leer esto:
+ *
+ *   - Los parámetros van en la query, incluido `contactinfo`, que es un JSON
+ *     codificado dentro de la URL. No hay cuerpo en el POST.
+ *   - Responde 200 casi siempre, incluso cuando falla; el veredicto real está
+ *     en `status`/`code` del cuerpo, igual que en el endpoint de OAuth.
+ *   - No devuelve un id de suscriptor. Por eso lo que se guarda en `zoho_id` es
+ *     la lista de destino, que es la información útil para auditar después.
+ *
+ * Si la lista está en doble opt-in (lo recomendable), esto no suscribe: manda
+ * el correo de confirmación y el titular remata desde ahí. Que la fila quede
+ * `sincronizado` significa "Campaigns lo recibió", no "está recibiendo correos".
+ */
+async function subscribeToList(sub: ZohoSubscriber): Promise<string> {
+  const listkey = env('ZOHO_CAMPAIGNS_LISTKEY')
+  if (!listkey) throw new Error('ZOHO_CAMPAIGNS_LISTKEY no está configurado')
+  if (!sub['Contact Email']) throw new Error('suscriptor sin Contact Email')
+
+  // Campaigns descarta los campos vacíos igual que los que no reconoce, pero
+  // mandarlos alarga una URL que ya lleva un JSON dentro. Se limpian antes.
+  const info = Object.fromEntries(
+    Object.entries(sub).filter(([, v]) => String(v ?? '').trim()),
+  )
+
+  const params = new URLSearchParams({
+    resfmt: 'JSON',
+    listkey,
+    contactinfo: JSON.stringify(info),
+  })
+
+  const { status, body } = await call(
+    `https://campaigns.zoho.${dc()}/api/v1.1/json/listsubscribe?${params}`,
+    { method: 'POST' },
+  )
+
+  if (status >= 400 || body?.status === 'error') {
+    throw new Error(`suscripción falló (${status}): ${campaignsError(body)}`)
+  }
+  return `list:${listkey}`
+}
+
+/** Mensaje legible de un error de Campaigns, que no usa el formato del CRM. */
+function campaignsError(body: any): string {
+  if (!body) return 'sin respuesta'
+  const code = body.code ? `${body.code}: ` : ''
+  return `${code}${body.message || JSON.stringify(body).slice(0, 300)}`
+}
+
 // ------------------------------------------------------------------ Encolado
 //
 // Lo que llaman los endpoints públicos. Se encola siempre, haya o no
