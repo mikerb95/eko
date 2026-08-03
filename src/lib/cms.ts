@@ -98,20 +98,28 @@ async function ensureSchema(): Promise<void> {
 /**
  * `ALTER TABLE ... ADD COLUMN` idempotente.
  *
- * SQLite no tiene `ADD COLUMN IF NOT EXISTS`, así que se consulta el esquema
- * antes. Se ejecuta en cada arranque: tiene que ser barato y no fallar nunca
- * si la columna ya está.
+ * SQLite no tiene `ADD COLUMN IF NOT EXISTS`, así que se intenta y se ignora el
+ * único error esperable: que la columna ya exista. Deliberadamente NO se
+ * consulta antes con `PRAGMA table_info`, por dos razones:
+ *
+ *  - Añadía una dependencia más sobre el comportamiento del driver remoto
+ *    (Turso por HTTP) que solo se podía verificar en producción. Si el PRAGMA
+ *    fallara, la columna no se crearía y todo guardado de artículo reventaría
+ *    con "no such column".
+ *  - No elimina la carrera igualmente: entre el PRAGMA y el ALTER puede entrar
+ *    otra instancia, así que el `catch` de "duplicate column" hace falta de
+ *    todos modos. Con él basta.
+ *
+ * Se ejecuta en cada arranque: tiene que ser barato y no fallar nunca.
  */
 async function addColumnIfMissing(db: Client, table: string, column: string, decl: string): Promise<void> {
   try {
-    const info = await db.execute(`PRAGMA table_info(${table})`)
-    if (info.rows.some((r: any) => r.name === column)) return
     await db.execute(`ALTER TABLE ${table} ADD COLUMN ${column} ${decl}`)
     console.log(`[cms] columna añadida: ${table}.${column}`)
   } catch (e) {
-    // Si dos instancias arrancan a la vez, la segunda ve "duplicate column".
-    // No es un error: la migración ya la hizo la otra.
-    const msg = String((e as Error)?.message || e)
+    // "duplicate column name" = la columna ya está. Es el camino normal en
+    // todos los arranques después del primero.
+    const msg = String((e as Error)?.message || e).toLowerCase()
     if (!msg.includes('duplicate column')) {
       console.error(`[cms] no se pudo añadir ${table}.${column}:`, msg)
     }
