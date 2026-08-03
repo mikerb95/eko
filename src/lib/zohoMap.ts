@@ -108,6 +108,47 @@ export function orderToLead(order: Order): ZohoLead {
   }
 }
 
+// --------------------------------------------------------------- Campaigns
+
+/**
+ * Suscriptor de una lista de Zoho Campaigns.
+ *
+ * Ojo con las llaves: Campaigns identifica los campos por su **etiqueta con
+ * espacios** (`Contact Email`, `First Name`), no por un api_name como el CRM.
+ * `Contact Email` es el único obligatorio y el único que existe siempre; los
+ * demás solo se guardan si la lista tiene esos campos definidos, y Campaigns
+ * ignora en silencio los que no reconoce. Si comercial agrega campos propios a
+ * la lista, se añaden aquí con su etiqueta exacta.
+ */
+export interface ZohoSubscriber {
+  'Contact Email': string
+  [field: string]: any
+}
+
+/** Mensaje del formulario de contacto → suscriptor de Campaigns. */
+export function contactToSubscriber(contact: Contact): ZohoSubscriber {
+  const { first, last } = splitName(contact.name)
+  return {
+    'Contact Email': contact.email,
+    'First Name': first,
+    'Last Name': last,
+    'Company Name': contact.company,
+    'Phone': contact.phone,
+  }
+}
+
+/** Solicitud de recolección → suscriptor de Campaigns. */
+export function orderToSubscriber(order: Order): ZohoSubscriber {
+  const who = `${order.first_name} ${order.last_name}`.trim()
+  return {
+    'Contact Email': order.email,
+    'First Name': order.first_name,
+    'Last Name': order.last_name.trim() || who || 'Sin nombre',
+    'Company Name': order.company,
+    'Phone': order.phone,
+  }
+}
+
 // ------------------------------------------------------------------- Books
 //
 // Zoho Books entra en escena al cerrar la orden (kilos reales, certificado,
