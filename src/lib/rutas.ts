@@ -29,6 +29,9 @@ export const rutasEs: Ruta[] = [
   { path: '/agenda-una-recoleccion', titulo: 'Agenda una recolección', descripcion: 'Programa el retiro de equipos obsoletos con transporte certificado y certificado de disposición final.' },
   { path: '/blog', titulo: 'Diario', descripcion: 'Artículos sobre economía circular, normativa ambiental y sostenibilidad empresarial.' },
   { path: '/contacto', titulo: 'Contacto', descripcion: 'Agenda un diagnóstico de 45 minutos, sin costo y confidencial.' },
+  { path: '/politica-de-tratamiento-de-datos', titulo: 'Política de tratamiento de datos personales', descripcion: 'Finalidades, derechos del titular, canal de atención y transferencia internacional, conforme a la Ley 1581 de 2012.' },
+  { path: '/terminos-de-servicio', titulo: 'Términos de servicio', descripcion: 'Condiciones de uso del sitio y del canal de solicitudes de recolección y consultoría.' },
+  { path: '/politica-de-cookies', titulo: 'Política de cookies', descripcion: 'Inventario de cookies del sitio: solo una cookie técnica de sesión, sin analítica de terceros ni rastreo.' },
 ]
 
 /*
