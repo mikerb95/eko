@@ -145,6 +145,9 @@ Hola [Nombre],
 
 Gracias por el espacio de ayer. Como quedamos, acá va la información de la oferta.
 
+Te la mando solo a ti. Al equipo le envié por aparte el detalle de alcance, sin valores, para que
+puedan revisar el contenido y los insumos que se necesitan de su lado.
+
 La separé en dos alcances para que puedas escoger hasta dónde quieres llegar, sin tener que
 comprometerte con todo de una vez.
 
