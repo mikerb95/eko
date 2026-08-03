@@ -15,8 +15,9 @@ cierre del alcance completo.
 
 > **Cuidado al enviar:** el link B no puede ir en el correo grupal. Los dos documentos se ven
 > parecidos porque comparten identidad visual, así que verifica el ID del enlace antes de pegarlo.
-> El documento A termina diciendo explícitamente que lo económico se envía por separado a gerencia,
-> lo cual además es útil: le da al gerente la excusa natural para manejar el número él.
+> El documento A no menciona en ninguna parte que exista una propuesta económica aparte: anunciarlo
+> invita justo a la pregunta que se quiere evitar. Si alguien del grupo pregunta por costos, se
+> responde hablado, no por escrito.
 
 ---
 
@@ -172,9 +173,10 @@ Un detalle que vale la pena mirar: en el mes 25 la mensualidad baja, porque la c
 pagada. Queda en $315.000 o $615.000 según el alcance.
 
 Si te decides por el alcance completo, va incluida sin costo una capacitación en inteligencia
-artificial para el equipo. Son seis sesiones, cuatro virtuales y dos presenciales, sobre el
-ecosistema de Claude aplicado a lo que ustedes hacen todos los días: informes, revisión de
-normativa, análisis de documentos. Su valor comercial es de $3.200.000.
+artificial para el equipo. Son siete horas de formación, repartidas en dos sesiones virtuales de
+dos horas y una presencial de tres, sobre el ecosistema de Claude aplicado a lo que ustedes hacen
+todos los días: informes, revisión de normativa, análisis de documentos. Su valor comercial es de
+$3.200.000.
 
 Acá está el detalle completo, con la comparación de los dos alcances, las condiciones y cuatro
 formas de ajustar el valor mensual si hace falta:
