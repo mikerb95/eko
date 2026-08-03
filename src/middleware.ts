@@ -34,6 +34,8 @@ const WRITE_RULES: Array<{ prefix: string; roles: string[] }> = [
   { prefix: '/api/admin/contactos', roles: ['admin', 'operaciones', 'consultor'] },
   { prefix: '/api/admin/posts', roles: ['admin', 'consultor'] },
   { prefix: '/api/admin/normativas', roles: ['admin', 'consultor'] },
+  // La sincronización con Zoho escribe en un sistema externo: solo admin.
+  { prefix: '/api/admin/zoho', roles: ['admin'] },
 ]
 
 function canWrite(pathname: string, role: string): boolean {
