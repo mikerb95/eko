@@ -105,11 +105,14 @@ async function ensureSchema(): Promise<void> {
       assigned_to TEXT NOT NULL DEFAULT '',
       scheduled_at TEXT NOT NULL DEFAULT '',
       internal_notes TEXT NOT NULL DEFAULT '',
+      consent_at TEXT NOT NULL DEFAULT '',
+      consent_version TEXT NOT NULL DEFAULT '',
+      consent_ip TEXT NOT NULL DEFAULT '',
       created_at TEXT NOT NULL DEFAULT '',
       updated_at TEXT NOT NULL DEFAULT ''
     )`)
     // Migración idempotente para bases ya existentes sin estas columnas.
-    for (const col of ['waste_type', 'estimated_quantity']) {
+    for (const col of ['waste_type', 'estimated_quantity', 'consent_at', 'consent_version', 'consent_ip']) {
       try {
         await db.execute(`ALTER TABLE orders ADD COLUMN ${col} TEXT NOT NULL DEFAULT ''`)
       } catch (e: any) {
