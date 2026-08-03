@@ -103,21 +103,60 @@ export function sitioWeb(lang: Lang = 'es') {
   }
 }
 
-/** Una línea de servicio. Se usa en las cuatro páginas EKO*. */
-export function servicio(opciones: {
-  nombre: string
-  descripcion: string
-  path: string
-  tipo?: string
-}) {
+/**
+ * Las cuatro líneas de servicio, por ruta. El `serviceType` es lo que se
+ * busca de verdad; el nombre de la marca ("EKORAEE") no lo busca nadie que
+ * todavía no conozca a Ekosolv.
+ */
+const SERVICIOS: Record<string, { es: string; en: string }> = {
+  ekonsulting: {
+    es: 'Consultoría ambiental y cumplimiento normativo ANLA',
+    en: 'Environmental consulting and ANLA regulatory compliance',
+  },
+  ekoraee: {
+    es: 'Gestión de residuos de aparatos eléctricos y electrónicos (RAEE)',
+    en: 'Waste electrical and electronic equipment (WEEE) management',
+  },
+  ekopartner: {
+    es: 'Operación de sistemas de recolección posconsumo',
+    en: 'Operation of post-consumer collection systems',
+  },
+  ekotrading: {
+    es: 'Compra y venta de activos tecnológicos en economía circular',
+    en: 'Circular economy trading of IT assets',
+  },
+}
+
+/**
+ * Nodo `Service` de una página de línea de servicio, o null si la ruta no lo
+ * es. Vive aquí y lo emite el layout, en vez de que cada página lo pase a
+ * mano: son cuatro páginas por idioma y el patrón de este repositorio es que
+ * un dato repetido acaba desincronizado.
+ */
+export function servicioDeRuta(
+  path: string,
+  nombre: string,
+  descripcion: string,
+  lang: Lang = 'es',
+) {
+  const clave = path.replace(/^\/(en\/)?/, '')
+  const tipo = SERVICIOS[clave]
+  if (!tipo) return null
+
   return {
     '@type': 'Service',
-    name: opciones.nombre,
-    description: opciones.descripcion,
-    url: url(opciones.path),
-    serviceType: opciones.tipo ?? opciones.nombre,
+    name: nombre,
+    description: descripcion,
+    url: url(path),
+    serviceType: tipo[lang],
     provider: { '@id': ORG_ID },
     areaServed: { '@type': 'Country', name: 'Colombia' },
+    audience: {
+      '@type': 'BusinessAudience',
+      name: lang === 'en'
+        ? 'Technology importers, producers, and operators in Colombia'
+        : 'Importadores, productores y operadores de tecnología en Colombia',
+    },
   }
 }
 
