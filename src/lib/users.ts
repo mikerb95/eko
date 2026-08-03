@@ -25,9 +25,6 @@ export interface User {
   updated_at?: string
 }
 
-let _db: Client | null = null
-let _ready: Promise<void> | null = null
-
 // La conexión y el esquema viven en `db.ts`, compartidos por todos los módulos.
 const client = cliente
 const ensureSchema = asegurarEsquema
