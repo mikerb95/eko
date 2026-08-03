@@ -3,11 +3,19 @@ import "../styles/global.css"
 import "../styles/blog.css"
 import { ClientRouter } from 'astro:transitions'
 import Nav from '../components/Nav.astro'
+import SchemaOrg from '../components/SchemaOrg.astro'
 import { SITE_URL, url } from '../lib/site'
-import { hreflangFor } from '../lib/rutas'
+import { hreflangFor, rutasEn, seoDe } from '../lib/rutas'
+import { migas, organizacion, sitioWeb } from '../lib/schema'
 
 interface Props {
+  /**
+   * Only for pages whose title cannot be known in advance. Everything else
+   * comes from `seoDe(path)`, which reads the route inventory. See the note in
+   * `src/lib/rutas.ts`.
+   */
   title?: string
+  /** Same as `title`: the exception, not the rule. */
   description?: string
   activePath?: string
   /** Canonical path for this page. Defaults to activePath. */
@@ -17,20 +25,43 @@ interface Props {
    * The home card is generated with `node scripts/og/generar.mjs`.
    */
   ogImage?: string
+  /** Page-specific JSON-LD nodes, added to the organisation and the site. */
+  nodosSchema?: unknown[]
 }
 
 const {
-  title = "Ekosolv — Environmental Consulting ANLA",
-  description = "We help importers, producers, and tech operators in Colombia build their environmental management plans, licenses, and reports.",
+  title,
+  description,
   activePath = "/en",
   path = activePath,
   ogImage = "/og/portada-en.jpg",
+  nodosSchema = [],
 } = Astro.props
+
+const seo = seoDe(path)
+const pageTitle = title ?? seo?.titulo ?? 'Ekosolv — Environmental Consulting ANLA'
+const pageDescription =
+  description ??
+  seo?.descripcion ??
+  'We help importers, producers, and tech operators in Colombia build their environmental management plans, licenses, and reports.'
 
 const canonical = url(path)
 const ogImageUrl = ogImage.startsWith('http') ? ogImage : `${SITE_URL}${ogImage}`
 const ogImageType = ogImageUrl.endsWith('.png') ? 'image/png' : 'image/jpeg'
 const alt = hreflangFor(path)
+
+const rutaActual = rutasEn.find((r) => r.path === path)
+const nodos = [
+  organizacion('en'),
+  sitioWeb('en'),
+  rutaActual && path !== '/en'
+    ? migas([
+        { nombre: 'Home', path: '/en' },
+        { nombre: rutaActual.titulo, path: rutaActual.path },
+      ])
+    : null,
+  ...nodosSchema,
+].filter(Boolean)
 ---
 
 <!DOCTYPE html>
