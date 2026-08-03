@@ -60,6 +60,12 @@ export const POST: APIRoute = async (context) => {
   if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
     return json({ error: 'Email inválido' }, 400)
   }
+  // Sin autorización no se guarda nada. La validación del cliente es cortesía;
+  // esta es la que cuenta, porque el endpoint es público y cualquiera puede
+  // hacer POST sin pasar por el formulario.
+  if (!consentGranted(b.consent)) {
+    return json({ error: 'Falta la autorización de tratamiento de datos personales.' }, 400)
+  }
 
   try {
     const order = await createOrder({
