@@ -72,7 +72,7 @@ async function ensureSchema(): Promise<void> {
     // Migración aditiva idempotente: `CREATE TABLE IF NOT EXISTS` no toca una
     // tabla que ya existe, así que las bases anteriores a la autorización de
     // datos necesitan las columnas por separado.
-    for (const col of ['consent_at', 'consent_version', 'consent_ip']) {
+    for (const col of ['consent_at', 'consent_version', 'consent_ip', 'marketing_at']) {
       try {
         await client().execute(`ALTER TABLE contacts ADD COLUMN ${col} TEXT NOT NULL DEFAULT ''`)
       } catch (e: any) {
