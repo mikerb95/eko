@@ -103,7 +103,11 @@ No es solo un problema de disponibilidad del panel. `POST /api/recolecciones` y 
 - `src/middleware.ts` protege correctamente todas las rutas `/admin` y `/api/admin`; los endpoints del CMS (`posts.ts`, `normativas.ts`) no quedan expuestos sin sesión.
 - Implementación de sesión sólida: HMAC-SHA256, comparación timing-safe (`timingSafeEqual`), expiración de 8h, cookies `HttpOnly`, `SameSite=Lax` y `Secure` en producción.
 - `.env`, `.env.production` y las bases de datos locales (`data/*.db`) están correctamente ignorados en `.gitignore`.
-- No hay secretos reales (solo defaults documentados) en el historial de git.
+- El middleware también exige rol admin para `/docs` y `/oportunidades2630`, que son documentos internos servidos desde el mismo dominio.
+- Cabeceras de seguridad (CSP, HSTS, `X-Frame-Options`, `Permissions-Policy`) aplicadas a todas las respuestas desde el Build Output (`astro.config.mjs`).
+- Honeypot y rate limiting en los dos formularios públicos.
+
+**Ya no aplica:** el corte original decía que no había secretos reales en el historial de git. Dejó de ser cierto con la credencial fija del hallazgo 8, que ya está commiteada.
 
 ## Acciones pendientes
 
