@@ -11,6 +11,7 @@
  *   ZOHO_REFRESH_TOKEN                   — se genera una vez, no expira
  *   ZOHO_DC                              — datacenter de la cuenta: com, eu, in...
  *   ZOHO_BOOKS_ORG_ID                    — solo si se usa Books
+ *   ZOHO_CAMPAIGNS_LISTKEY               — solo si se usa Campaigns
  * Si falta cualquiera de las cuatro primeras, todo esto queda en no-op: las
  * solicitudes se siguen encolando y el día que aparezcan las credenciales se
  * drena lo acumulado. Nada se pierde en el intervalo.
