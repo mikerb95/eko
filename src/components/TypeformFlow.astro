@@ -35,6 +35,10 @@ export type TFField =
        * Casilla de autorización de tratamiento de datos (Ley 1581 de 2012).
        * Nunca se renderiza premarcada: la autorización tiene que ser un acto
        * del titular, y una casilla marcada por defecto no es autorización.
+       *
+       * Con `required: false` sirve también para las casillas opcionales, como
+       * la de comunicaciones comerciales: se envía si el titular la marca y no
+       * bloquea el paso si no.
        */
       type: 'consent'
       name: string

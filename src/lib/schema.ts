@@ -21,7 +21,7 @@
  * escritos a mano aquí: si una cifra aparece en dos sitios, se desincroniza.
  */
 
-import { SITE_ADDRESS, SITE_LEGAL_NAME, SITE_NAME, SITE_TAGLINE, SITE_URL, url } from './site'
+import { SITE_ADDRESS, SITE_LEGAL_NAME, SITE_NAME, SITE_NIT, SITE_TAGLINE, SITE_URL, url } from './site'
 import { FOUNDED_YEAR } from './brand'
 import { perfilesVisibles } from './redes'
 
@@ -71,7 +71,7 @@ export function organizacion(lang: Lang = 'es') {
     areaServed: { '@type': 'Country', name: 'Colombia' },
     // El NIT es el identificador fiscal colombiano. `taxID` es el campo que
     // schema.org reserva para esto; no existe uno específico para el NIT.
-    taxID: '900.659.506-9',
+    taxID: SITE_NIT,
     knowsLanguage: ['es-CO', 'en'],
     /*
      * `sameAs` solo sale cuando hay perfiles verificados. Hoy los tres están
