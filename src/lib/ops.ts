@@ -196,6 +196,8 @@ export interface NewOrderInput {
   estimated_quantity?: string
   message?: string
   source?: string
+  consent_version?: string
+  consent_ip?: string
 }
 
 export async function createOrder(input: NewOrderInput): Promise<Order> {
