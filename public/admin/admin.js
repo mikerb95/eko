@@ -373,7 +373,8 @@ pf.addEventListener('submit', async (e) => {
     id: pf.id.value || undefined,
     title: pf.title.value, slug: pf.slug.value, category: pf.category.value,
     date: pf.date.value, readtime: pf.readtime.value, accent: pf.accent.value,
-    featured: pf.featured.checked, lede: pf.lede.value, sections: collectSections(),
+    featured: pf.featured.checked, lede: pf.lede.value, image: pf.image.value,
+    sections: collectSections(),
   }
   const res = await fetch('/api/admin/posts', { method: 'POST', headers: { 'content-type': 'application/json' }, body: JSON.stringify(payload) })
   const j = await res.json()
