@@ -67,6 +67,7 @@ const steps: TFStep[] = [
     subtitle: 'Entre más detalle, mejor preparamos la sesión.',
     fields: [
       { type: 'textarea', name: 'message', label: 'Cuéntanos más', placeholder: 'Contexto de la obligación, tipo de residuos, volúmenes estimados, vencimientos próximos…' },
+      { type: 'consent', name: 'consent', html: CONSENT_HTML.es, notice: AVISO_PRIVACIDAD.es },
     ],
   },
 ]
