@@ -1,7 +1,7 @@
 # Oportunidad comercial: Ekosolv (cliente directo)
 
 **Fecha de verificación:** 2026-07-21
-**Objetivo:** cold call a Ekosolv (www.ekosolv.com) ofreciendo el nuevo sitio (este repo, Astro + Storyblok) como reemplazo del Wix actual.
+**Objetivo:** cold call a Ekosolv (www.ekosolv.com) ofreciendo el nuevo sitio (este repo: Astro, con CMS y panel de operaciones propios) como reemplazo del Wix actual.
 
 > Nota: esto es una gestión distinta a `oportunidad_lito.md` (ahí Ekosolv es el "aliado/beneficiario" frente a un competidor). Aquí Ekosolv es el prospecto directo.
 
@@ -59,7 +59,7 @@ Una empresa que gestiona RAEE y residuos peligrosos vive de la credibilidad norm
 1. **Gancho de reconocimiento** (no ataque): "Vi la web de Ekosolv, se nota cuidado en la marca y el mensaje ESG. Los felicito por eso."
 2. **Problema específico y verificable**: "Noté que en 'Quiénes somos' hablan de 12 años de trayectoria pero no hay ni una cifra de toneladas gestionadas ni certificaciones visibles — y en su sector eso es lo primero que un comprador corporativo o una entidad pública busca antes de firmar."
 3. **Segundo problema, bilingüe**: "También vi que la versión en inglés está a medio traducir — para alguien evaluando Ekosolv desde afuera, eso comunica lo contrario de lo que su negocio vende: rigor."
-4. **Puente a la oferta**: "Ya construí una versión nueva del sitio sobre una arquitectura más rápida y con panel de administración propio (Astro + Storyblok), pensada específicamente para resolver esto: fichas por línea de negocio (EKONSULTING vs EKORAEE, que tienen compradores distintos), sección de impacto con cifras reales, certificaciones y licencias visibles, paridad ES/EN real, y un blog con cadencia planeada."
+4. **Puente a la oferta**: "Ya construí una versión nueva del sitio sobre una arquitectura más rápida y con panel de administración propio, sin depender de un CMS de terceros, pensada específicamente para resolver esto: fichas por línea de negocio (EKONSULTING vs EKORAEE, que tienen compradores distintos), sección de impacto con cifras reales, certificaciones y licencias visibles, paridad ES/EN real, y un blog con cadencia planeada."
 5. **Cierre suave**: proponer una demo de 15 minutos mostrando el nuevo sitio en vivo, sin compromiso.
 
 ## 4. Objeciones esperadas
