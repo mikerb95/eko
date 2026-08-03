@@ -271,6 +271,7 @@ function renderPosts() {
         <div class="meta">
           <span class="pill ${esc(p.accent)}">${esc(p.category)}</span>
           ${p.featured ? '<span class="pill feat">Destacado</span>' : ''}
+          ${p.image ? '' : '<span class="pill warn">Sin imagen</span>'}
           <span>${esc(p.date)}</span><span>·</span><span>${esc(p.readtime)}</span>
           <span>·</span><span>/blog/${esc(p.slug)}</span>
         </div>
