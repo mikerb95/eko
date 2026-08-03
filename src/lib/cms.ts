@@ -133,6 +133,7 @@ function rowToPost(r: any): Post {
     title: r.title,
     lede: r.lede,
     sections: safeParse(r.sections, []),
+    image: r.image || '',
   }
 }
 function rowToNormativa(r: any): Normativa {
