@@ -103,9 +103,21 @@ const compartir = enlacesCompartir(`/blog/${post.slug}`, post.title)
   <SiteFooter />
 
   <script>
-    // Prevent default on share links (no real share API wired)
-    document.querySelectorAll(".pf-share a").forEach(a => {
-      a.addEventListener("click", e => e.preventDefault());
-    });
+    // Los enlaces de compartir ya funcionan solos. Lo único que necesita JS es
+    // copiar al portapapeles, y degrada a selección manual si el navegador lo
+    // niega (contexto no seguro o permiso denegado).
+    const boton = document.querySelector<HTMLButtonElement>('.pf-copy')
+    boton?.addEventListener('click', async () => {
+      const enlace = boton.dataset.copiar
+      if (!enlace) return
+      const original = boton.textContent
+      try {
+        await navigator.clipboard.writeText(enlace)
+        boton.textContent = 'Copiado'
+      } catch {
+        boton.textContent = enlace
+      }
+      setTimeout(() => { boton.textContent = original }, 2000)
+    })
   </script>
 </Layout>
