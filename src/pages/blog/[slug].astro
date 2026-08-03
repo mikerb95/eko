@@ -4,6 +4,7 @@ import Layout from '../../layouts/Layout.astro'
 import { getPosts, getPostBySlug } from '../../lib/cms'
 import SiteFooter from '../../components/SiteFooter.astro'
 import { enlacesCompartir } from '../../lib/redes'
+import { articulo, fechaISO, migas } from '../../lib/schema'
 
 const { slug } = Astro.params
 const post = slug ? await getPostBySlug(slug) : null
@@ -17,14 +18,34 @@ const compartir = enlacesCompartir(`/blog/${post.slug}`, post.title)
 // Portada propia del artículo para Open Graph. Sin ella, `Layout.astro` cae en
 // la portada genérica y todos los artículos compartidos se ven iguales.
 const ogImage = post.image || undefined
+
+/*
+ * Este es el único sitio del sitio público que arma su propio título: el del
+ * artículo no se puede tener de antemano en `src/lib/rutas.ts`. La marca va
+ * como «Ekosolv» y no como «Eko», que es lo que decía antes: firmar con dos
+ * nombres distintos parte la señal de marca en las búsquedas que más
+ * convierten, las que ya traen el nombre de la empresa escrito.
+ */
+const publicada = fechaISO(post.date) ?? undefined
 ---
 
 <Layout
-  title={`${post.title} — Eko`}
+  title={`${post.title} · Ekosolv`}
   description={post.lede}
   activePath="/blog"
   path={`/blog/${post.slug}`}
   ogImage={ogImage}
+  ogType="article"
+  publishedTime={publicada}
+  section={post.category}
+  nodosSchema={[
+    articulo(post),
+    migas([
+      { nombre: 'Inicio', path: '/' },
+      { nombre: 'Diario', path: '/blog' },
+      { nombre: post.title, path: `/blog/${post.slug}` },
+    ]),
+  ]}
 >
   <section class="page-head wrap">
     <div class="page-strip">

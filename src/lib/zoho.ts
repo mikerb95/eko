@@ -1,5 +1,5 @@
 /**
- * Cliente de Zoho (CRM y Books) y drenaje de la bandeja de salida.
+ * Cliente de Zoho (CRM, Campaigns y Books) y drenaje de la bandeja de salida.
  *
  * Misma regla de oro que `email.ts`: **esto nunca puede tumbar una solicitud**.
  * Ninguna función expuesta aquí lanza en el camino de un formulario público; el
