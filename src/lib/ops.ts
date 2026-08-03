@@ -209,15 +209,17 @@ export async function createOrder(input: NewOrderInput): Promise<Order> {
     const consecutive = await nextConsecutive(db)
     try {
       const res = await db.execute({
-        sql: `INSERT INTO orders (consecutive,status,first_name,last_name,email,phone,company,country,address,address2,city,postal_code,waste_type,estimated_quantity,message,source,created_at,updated_at)
-              VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)`,
+        sql: `INSERT INTO orders (consecutive,status,first_name,last_name,email,phone,company,country,address,address2,city,postal_code,waste_type,estimated_quantity,message,source,consent_at,consent_version,consent_ip,created_at,updated_at)
+              VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)`,
         args: [
           consecutive, 'solicitada',
           input.first_name, input.last_name, input.email, input.phone,
           input.company ?? '', input.country ?? 'Colombia',
           input.address, input.address2 ?? '', input.city, input.postal_code ?? '',
           input.waste_type ?? '', input.estimated_quantity ?? '',
-          input.message ?? '', input.source ?? 'web', ts, ts,
+          input.message ?? '', input.source ?? 'web',
+          ts, input.consent_version ?? '', input.consent_ip ?? '',
+          ts, ts,
         ],
       })
       const id = Number(res.lastInsertRowid)
