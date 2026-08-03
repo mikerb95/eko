@@ -17,6 +17,15 @@ export interface Contact {
   message: string
   source: string
   status: ContactStatus
+  /**
+   * Prueba de la autorización de tratamiento (Ley 1581 de 2012, art. 9).
+   * `consent_at` es el momento exacto en que el titular marcó la casilla y
+   * `consent_version` la versión del texto que aceptó. Sin las dos no hay forma
+   * de acreditar ante la SIC *qué* autorizó, solo que autorizó algo.
+   */
+  consent_at: string
+  consent_version: string
+  consent_ip: string
   created_at?: string
   updated_at?: string
 }
