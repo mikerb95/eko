@@ -2,6 +2,7 @@ import type { APIRoute } from 'astro'
 import { createSession, SESSION_COOKIE } from '../../../lib/auth'
 import { verifyLogin } from '../../../lib/users'
 import { checkRateLimit, clientIp, resetRateLimit } from '../../../lib/rateLimit'
+import { json } from '../../../lib/apiError'
 
 export const prerender = false
 
