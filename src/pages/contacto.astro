@@ -3,7 +3,7 @@ import Layout from '../layouts/Layout.astro'
 import SiteFooter from '../components/SiteFooter.astro'
 import TypeformFlow from '../components/TypeformFlow.astro'
 import type { TFStep } from '../components/TypeformFlow.astro'
-import { CONSENT_HTML, AVISO_PRIVACIDAD } from '../lib/legal'
+import { CONSENT_HTML, MARKETING_HTML, AVISO_PRIVACIDAD } from '../lib/legal'
 
 const steps: TFStep[] = [
   {
@@ -67,7 +67,10 @@ const steps: TFStep[] = [
     subtitle: 'Entre más detalle, mejor preparamos la sesión.',
     fields: [
       { type: 'textarea', name: 'message', label: 'Cuéntanos más', placeholder: 'Contexto de la obligación, tipo de residuos, volúmenes estimados, vencimientos próximos…' },
-      { type: 'consent', name: 'consent', html: CONSENT_HTML.es, notice: AVISO_PRIVACIDAD.es },
+      { type: 'consent', name: 'consent', html: CONSENT_HTML.es },
+      // Opcional y desmarcada: alimenta la lista de Zoho Campaigns, que es una
+      // finalidad distinta de responder la solicitud (ver `MARKETING_HTML`).
+      { type: 'consent', name: 'marketing', html: MARKETING_HTML.es, required: false, notice: AVISO_PRIVACIDAD.es },
     ],
   },
 ]
