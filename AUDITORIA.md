@@ -97,6 +97,43 @@ No es solo un problema de disponibilidad del panel. `POST /api/recolecciones` y 
 
 **Recomendación:** provisionar Turso siguiendo `infra_deploy.md` antes de dirigir tráfico real al sitio.
 
+### 10. El repositorio es público con la credencial fija adentro
+**abierto, crítico. Le toca a Mike.**
+
+`github.com/mikerb95/eko` es un repositorio **público**. Combinado con el hallazgo 8, eso significa que la credencial del panel es legible por cualquiera en internet. Verificado el 2026-08-03 contra producción: `POST https://ekosolv.vercel.app/api/admin/login` con `admin` / la contraseña del código responde **200** y entrega una cookie de sesión válida.
+
+Es el hallazgo 8 pero con el factor de exposición al máximo: no hace falta acceso al repo, basta con encontrarlo.
+
+**Recomendación:** poner el repositorio en privado hoy mismo. Es lo único que corta la exposición sin depender de provisionar nada. Después, en orden: reemplazar el literal por un valor leído de `ADMIN_PASSWORD` en Vercel (mismo parche, sin secreto commiteado), provisionar Turso, remover el parche y rotar.
+
+### 11. Mensajes de error crudos hacia el cliente
+`src/pages/api/admin/login.ts` y los seis endpoints de `/api/admin` · **Estado: resuelto (2026-08-03).**
+
+El login devolvía al cliente `'No se pudo validar el acceso: ' + e.message`, y el resto de endpoints `json({ error: String(e?.message || e) }, 500)`. Con la base caída eso entrega textualmente `ConnectionFailed("Unable to open connection to local database ./data/cms.db: 14")`: revela el motor, la ruta del archivo y que el sistema está degradado, que es justo el reconocimiento que busca un atacante.
+
+Se agregó `src/lib/apiError.ts` con `fail()`, que registra el stack completo en el log del servidor y responde una frase genérica, y con `UserError` para los errores de negocio cuyo mensaje sí está escrito para una persona ("No puedes eliminar al último administrador activo"), que se siguen mostrando tal cual. Verificado con la base apuntando a una ruta inexistente: el cliente recibe "No se pudo validar el acceso", el log del servidor conserva el `ConnectionFailed` completo. Se añadió también registro de los intentos de login fallidos, que antes no quedaban en ninguna parte.
+
+### 12. CSRF: `checkOrigin` de Astro no cubre `application/json`
+`src/middleware.ts` · **Estado: resuelto (2026-08-03).**
+
+`security.checkOrigin` viene activo por defecto, pero leyendo su implementación (`node_modules/astro/dist/core/app/origin-check.js:12-21`) solo rechaza peticiones cruzadas cuando el `content-type` es de formulario. Todo el panel habla `application/json`, así que para este proyecto ese chequeo no validaba nada y la única defensa era `SameSite=Lax`.
+
+Se agregó una comprobación en el middleware para métodos no seguros bajo `/api/`: se rechaza con 403 si `Sec-Fetch-Site` es `cross-site` o si el `Origin` declarado no coincide con el del sitio. Un cliente sin navegador (el `curl` con el que hoy se opera la bandeja de Zoho) no manda ninguno de los dos y sigue funcionando, que es correcto: sin cookies de por medio no hay CSRF que montar.
+
+### 13. Rutas internas protegidas por lista exacta
+`src/middleware.ts` · **Estado: resuelto (2026-08-03).**
+
+`PROTECTED_DOC_PATHS` era un `Set` de cuatro rutas exactas. Cualquier página nueva bajo `/docs` quedaba pública sin que nadie lo notara, y el modo del sitio agrava el olvido: con `output: 'static'`, una página sin `export const prerender = false` la sirve Vercel como HTML plano y el middleware ni se ejecuta.
+
+Cambiado a comparación por prefijo (`/docs`, `/oportunidades2630`). Verificado: `/docs/pagina-que-no-existe` ahora redirige al login en vez de responder 404 público.
+
+### 14. Cabeceras de caché e indexación en zonas con sesión
+`astro.config.mjs` · **Estado: resuelto (2026-08-03).**
+
+`/admin` respondía `cache-control: public, max-age=0, must-revalidate`, que autoriza a cachés intermedias a guardar HTML renderizado con datos de una sesión. Y la única señal contra la indexación era `robots.txt`, que es una petición y no un control: no impide que una URL interna termine indexada si alguien la enlaza.
+
+Se añadió una segunda ruta al Build Output que aplica `Cache-Control: no-store` y `X-Robots-Tag: noindex, nofollow, noarchive` sobre `/admin`, `/docs`, `/oportunidades2630` y `/api/admin`.
+
 ## Aspectos correctos
 
 - `git fsck --full` sin corrupción; working tree limpio y sincronizado con el historial.
@@ -119,8 +156,15 @@ No es solo un problema de disponibilidad del panel. `POST /api/recolecciones` y 
 - [x] Eliminar lockfile no utilizado (`bun.lock`, se mantiene `package-lock.json`)
 - [x] Rate limiting en `/api/admin/login` (`src/lib/rateLimit.ts`, aplicado en `src/pages/api/admin/login.ts`): máximo 5 intentos por IP cada 10 minutos, responde `429` con `Retry-After`. Limitador en memoria por instancia de función (no requiere infraestructura externa); con Fluid Compute la reutilización de instancias lo hace efectivo contra fuerza bruta desde un mismo origen, aunque no es una defensa distribuida perfecta entre instancias concurrentes. Probado manualmente: 6º intento devuelve 429.
 
+- [ ] **Poner el repositorio en privado** (hallazgo 10). Es lo más urgente de toda esta lista y no depende de nada.
 - [ ] **Provisionar la base en producción** (hallazgo 9). Es el bloqueador raíz: mientras no exista, el sitio pierde las solicitudes que recibe.
 - [ ] **Remover la credencial fija de `src/lib/users.ts` y rotar la contraseña** (hallazgo 8). Depende de lo anterior.
+- [x] Sanear los mensajes de error de la API (hallazgo 11, `src/lib/apiError.ts`)
+- [x] Chequeo de `Origin` para escrituras en `/api/` (hallazgo 12)
+- [x] Rutas internas protegidas por prefijo en vez de lista exacta (hallazgo 13)
+- [x] `no-store` y `noindex` en las zonas con sesión (hallazgo 14)
 - [ ] Mover el limitador de peticiones a Redis compartido antes de que el panel tenga usuarios reales del cliente (ver `infra_deploy.md`).
+- [ ] **Reglas de rate limiting en el WAF de Vercel** sobre `/api/admin/login`, `/api/contacto` y `/api/recolecciones`. El limitador propio es en memoria por instancia, así que con varias instancias concurrentes el presupuesto de intentos se multiplica. Una regla de plataforma es global y no depende del runtime. Sumar BotID en los dos formularios públicos, que hoy solo tienen honeypot.
+- [ ] **Invalidación de sesiones.** Desactivar o degradar a un usuario en el panel no anula su cookie: sigue entrando hasta 8 horas. Se resuelve con una versión de token en el payload, o revalidando el usuario contra la base en el middleware.
 
 **Importante:** antes de desplegar, confirma que `AUTH_SECRET` esté configurada en las variables de entorno del proyecto en Vercel (producción); de lo contrario el arranque falla con "Missing required environment variable". `ADMIN_USERNAME` y `ADMIN_PASSWORD` ya no hacen falta en producción: solo siembran el primer administrador si la tabla `users` está vacía, y en producción los usuarios se crean desde la pestaña Usuarios del panel.
