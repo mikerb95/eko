@@ -1,3 +1,5 @@
+import type { Client } from '@libsql/client'
+import type { Client } from '@libsql/client'
 import { asegurarEsquema, cliente } from './db'
 
 // Operaciones: órdenes de recolección RAEE (Fase 1 del panel operativo).
