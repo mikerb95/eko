@@ -28,19 +28,29 @@ recortar alcance, y es el argumento visual central de la pieza gráfica.
 
 ### Por qué estos números en el mercado colombiano
 
+> **Decisión de Mike (2026-08-03):** los precios se fijaron en la mitad de la referencia de mercado
+> que se calculó primero. Lo que sigue deja constancia de dónde queda la oferta contra el mercado,
+> para no perder de vista qué se está cediendo.
+
 - Un sitio corporativo bilingüe de esta factura, hecho a la medida y no sobre plantilla, se cotiza
-  hoy entre $8M y $18M en agencias medianas de Bogotá y Medellín. $12M queda en la mitad y es
-  defendible mostrando el sitio ya construido.
+  hoy entre $8M y $18M en agencias medianas de Bogotá y Medellín. Los **$6.000.000** de esta oferta
+  quedan por debajo del piso del mercado. Argumento de venta: es una entrada agresiva a cambio del
+  compromiso de 24 meses.
 - Un módulo administrativo con CRM propio, integración a Zoho, tableros y controles de seguridad
-  arranca en $25M y sube rápido. $26M adicionales es una cifra conservadora para lo que implica.
-- La mensualidad de $565.000 (≈USD 140) está dentro de lo que una empresa de este tamaño ya paga
-  por servicios digitales sueltos. La de $1.405.000 (≈USD 350) es una decisión de gerencia, no de
-  presupuesto operativo, y por eso necesita las palancas de flexibilidad.
-- Hosting real de este sitio cuesta bastante menos de $290.000. El margen ahí cubre despliegues,
-  monitoreo y el riesgo de picos de tráfico. No conviene bajarlo: es el rubro que sostiene la
-  relación cuando termina la amortización.
-- Soporte a $85.000/hora efectiva en el plan básico y $65.000/hora en el ampliado. La hora suelta
-  fuera de cupo se cobra $95.000, que es lo que hace que convenga estar en el plan.
+  arranca en $25M en el mercado local. Los **$13.000.000** adicionales de esta oferta son cerca de
+  la mitad. Es el rubro donde más se está cediendo y también el de mayor esfuerzo real.
+- La mensualidad de $565.000 (≈USD 140) es una decisión de presupuesto operativo, no de gerencia.
+  Eso baja mucho la barrera de aprobación y es la mayor ventaja de este ajuste. La de $1.405.000
+  (≈USD 350) sigue siendo aprobable sin comité.
+- Operación en $145.000 y $225.000: el hosting real cuesta menos, pero el margen ahí es delgado.
+  **Este es el rubro que no conviene bajar más**, porque es el único que sigue entrando después
+  del mes 24 y es lo que sostiene la relación en el largo plazo.
+- Soporte a $42.500/hora efectiva en el plan básico y $32.500/hora en el ampliado. La hora suelta
+  fuera de cupo se cobra $48.000, que es lo que hace que convenga estar en el plan.
+- **Punto de atención:** a estas tarifas el soporte ampliado (12 h a $32.500) queda por debajo de
+  una tarifa profesional de desarrollo en Bogotá. Si el gerente toma el alcance completo, hay que
+  cuidar que la bolsa de 12 horas no se convierta en consultoría abierta. Las horas no acumulables
+  y el registro de consumo son la protección.
 
 ### Palancas de negociación (en orden de qué ceder primero)
 
