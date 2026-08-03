@@ -1,0 +1,223 @@
+---
+import Layout from '../layouts/Layout.astro'
+import SiteFooter from '../components/SiteFooter.astro'
+import LegalDoc from '../components/LegalDoc.astro'
+import type { LegalSection } from '../components/LegalDoc.astro'
+import { RESPONSABLE, POLITICA_VERSION, POLITICA_VIGENCIA, LEGAL_PATHS } from '../lib/legal'
+
+const secciones: LegalSection[] = [
+  { id: 'identificacion', titulo: 'Quién presta el servicio' },
+  { id: 'objeto', titulo: 'Objeto y alcance del sitio' },
+  { id: 'solicitudes', titulo: 'Solicitudes por el sitio' },
+  { id: 'contratacion', titulo: 'Contratación de servicios' },
+  { id: 'obligaciones-cliente', titulo: 'Obligaciones de quien solicita' },
+  { id: 'contenido', titulo: 'Contenido informativo' },
+  { id: 'propiedad', titulo: 'Propiedad intelectual' },
+  { id: 'disponibilidad', titulo: 'Disponibilidad del sitio' },
+  { id: 'datos', titulo: 'Datos personales' },
+  { id: 'ley', titulo: 'Ley aplicable y controversias' },
+  { id: 'cambios', titulo: 'Cambios' },
+]
+---
+
+<Layout
+  title="Términos de servicio — Ekosolv"
+  description="Términos y condiciones de uso del sitio web de Ekosolv S.A.S. y del canal de solicitudes de recolección y consultoría ambiental."
+  activePath="/terminos-de-servicio"
+>
+  <LegalDoc
+    eyebrow="Legal · Términos"
+    eyebrowRight="Ley 1480 de 2011 · Ley 527 de 1999"
+    titulo="Términos de"
+    tituloEm="servicio"
+    intro="Las reglas de uso de este sitio y de las solicitudes que usted envía por aquí. Lo importante en una línea: el sitio es un canal de contacto y agendamiento, no un carrito de compras, y nada de lo que publicamos reemplaza una asesoría formal."
+    version={POLITICA_VERSION}
+    vigencia={POLITICA_VIGENCIA}
+    secciones={secciones}
+  >
+    <section class="legal-sec" id="identificacion">
+      <h2><span>Quién presta el servicio</span></h2>
+      <p>
+        Este sitio pertenece a <strong>{RESPONSABLE.razonSocial}</strong>, sociedad
+        comercial colombiana con NIT {RESPONSABLE.nit} y domicilio en
+        {' '}{RESPONSABLE.direccion}.
+      </p>
+      <div class="legal-table-wrap">
+        <table>
+          <tbody>
+            <tr>
+              <td>Teléfono</td>
+              <td><a href={RESPONSABLE.telefonoHref}>{RESPONSABLE.telefono}</a></td>
+            </tr>
+            <tr>
+              <td>Correo</td>
+              <td><a href={`mailto:${RESPONSABLE.correo}`}>{RESPONSABLE.correo}</a></td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+      <p>
+        Nuestras licencias, registros y autorizaciones ambientales, con número de
+        resolución y entidad expedidora, están publicadas en
+        <a href="/licencias"> Licencias y autorizaciones</a>.
+      </p>
+    </section>
+
+    <section class="legal-sec" id="objeto">
+      <h2><span>Objeto y alcance del sitio</span></h2>
+      <p>El sitio cumple tres funciones y ninguna más:</p>
+      <ol>
+        <li>Informar sobre nuestras líneas de servicio y sobre el marco normativo ambiental colombiano.</li>
+        <li>Recibir solicitudes de contacto y de agendamiento de recolecciones.</li>
+        <li>Publicar nuestras habilitaciones para que puedan verificarse sin pedirlas.</li>
+      </ol>
+      <p>
+        Aquí no hay venta en línea, ni pagos, ni perfeccionamiento de contratos. Usar el
+        sitio implica aceptar estos términos; si no está de acuerdo con ellos, la vía es
+        no usarlo.
+      </p>
+    </section>
+
+    <section class="legal-sec" id="solicitudes">
+      <h2><span>Solicitudes por el sitio</span></h2>
+      <p>
+        Cuando usted envía el formulario de contacto o de agendamiento, recibimos una
+        <strong>solicitud</strong>, no una orden en firme. Nuestra respuesta confirma si
+        podemos atenderla, en qué condiciones y en qué fechas.
+      </p>
+      <p>
+        Las solicitudes de recolección reciben un radicado con el formato REC-AAAA-NNNN.
+        Ese número identifica el trámite y sirve para hacerle seguimiento con nosotros,
+        pero por sí solo no confirma la recolección ni compromete una fecha.
+      </p>
+      <p>
+        Los tiempos de respuesta que anunciamos en el sitio son compromisos de servicio
+        en días hábiles colombianos, no plazos contractuales.
+      </p>
+    </section>
+
+    <section class="legal-sec" id="contratacion">
+      <h2><span>Contratación de servicios</span></h2>
+      <p>
+        Las condiciones de cada servicio, incluidos alcance, precios, plazos,
+        responsabilidades y entregables, se acuerdan por escrito en la propuesta, el
+        contrato u orden de servicio que se firme para el caso concreto. Ese documento
+        prevalece sobre cualquier cosa que diga esta página.
+      </p>
+      <p>
+        El sitio no publica tarifas. Cualquier valor que aparezca en el contenido
+        informativo es una referencia general y no constituye oferta.
+      </p>
+    </section>
+
+    <section class="legal-sec" id="obligaciones-cliente">
+      <h2><span>Obligaciones de quien solicita</span></h2>
+      <p>Al enviarnos una solicitud usted se compromete a:</p>
+      <ul>
+        <li>Dar información veraz, completa y actualizada, en especial la dirección de recolección y el tipo de residuo.</li>
+        <li>
+          Declarar correctamente la naturaleza de los residuos. Un residuo peligroso
+          declarado como ordinario pone en riesgo al personal de recolección y compromete
+          la trazabilidad ambiental de ambas partes.
+        </li>
+        <li>Contar con la facultad para disponer de los equipos o residuos cuyo retiro solicita.</li>
+        <li>
+          Borrar o autorizar el borrado de la información almacenada en los equipos antes
+          del retiro, o pactarlo expresamente con nosotros como parte del servicio.
+        </li>
+        <li>No usar el sitio para enviar contenido ilícito, publicidad no solicitada ni intentos de saturar los formularios.</li>
+      </ul>
+      <p>
+        Para proteger los formularios limitamos la cantidad de envíos por dirección IP en
+        una misma ventana de tiempo. Si le aparece ese aviso y su solicitud es legítima,
+        escríbanos por WhatsApp o por correo.
+      </p>
+    </section>
+
+    <section class="legal-sec" id="contenido">
+      <h2><span>Contenido informativo</span></h2>
+      <p>
+        Las secciones de normativa, el diario y los materiales de referencia se publican
+        con fines informativos. Los preparamos con cuidado y citamos la norma vigente al
+        momento de publicar, pero la regulación ambiental colombiana cambia y el
+        contenido puede quedar desactualizado.
+      </p>
+      <p>
+        <strong>Nada de lo publicado en este sitio constituye asesoría legal, técnica ni
+        ambiental para un caso concreto</strong>, ni reemplaza el concepto de la
+        autoridad competente. Las decisiones de cumplimiento de su organización deben
+        apoyarse en una asesoría formal, que es justamente lo que prestamos por contrato.
+      </p>
+    </section>
+
+    <section class="legal-sec" id="propiedad">
+      <h2><span>Propiedad intelectual</span></h2>
+      <p>
+        Las marcas EKOSOLV, EKONSULTING, EKORAEE, EKOPARTNER y EKOTRADING, junto con los
+        logotipos y signos distintivos, pertenecen a {RESPONSABLE.razonSocial} y no
+        pueden usarse sin autorización escrita.
+      </p>
+      <p>
+        Los textos, imágenes y materiales publicados están protegidos por la Ley 23 de
+        1982 y las normas que la modifican. Se permite citarlos con mención de la fuente
+        y enlace a la página original; no se permite reproducirlos de forma sustancial ni
+        con fines comerciales sin autorización previa.
+      </p>
+      <p>
+        El diseño y el código fuente del sitio tienen su propia titularidad, indicada en
+        el pie de página.
+      </p>
+    </section>
+
+    <section class="legal-sec" id="disponibilidad">
+      <h2><span>Disponibilidad del sitio</span></h2>
+      <p>
+        Procuramos que el sitio esté disponible de forma continua, sin garantizar
+        operación ininterrumpida. Puede haber suspensiones por mantenimiento, por fallas
+        de los proveedores de infraestructura o por causas fuera de nuestro control.
+      </p>
+      <p>
+        Si un formulario falla, el canal alterno siempre está abierto:
+        <a href={RESPONSABLE.telefonoHref}> {RESPONSABLE.telefono}</a> o
+        <a href={`mailto:${RESPONSABLE.correo}`}> {RESPONSABLE.correo}</a>. Una
+        solicitud que no llegó por falla técnica no se entiende recibida.
+      </p>
+    </section>
+
+    <section class="legal-sec" id="datos">
+      <h2><span>Datos personales</span></h2>
+      <p>
+        El tratamiento de los datos que usted nos entrega se rige por la
+        <a href={LEGAL_PATHS.es.politica}> Política de tratamiento de datos personales</a>,
+        conforme a la Ley 1581 de 2012. Las cookies del sitio están detalladas en la
+        <a href={LEGAL_PATHS.es.cookies}> Política de cookies</a>.
+      </p>
+    </section>
+
+    <section class="legal-sec" id="ley">
+      <h2><span>Ley aplicable y controversias</span></h2>
+      <p>
+        Estos términos se rigen por la ley colombiana. La validez de las comunicaciones y
+        de los mensajes de datos enviados por el sitio se rige por la Ley 527 de 1999.
+      </p>
+      <p>
+        Las controversias que no se resuelvan de forma directa se someterán a los jueces
+        de la República de Colombia, con sede en Bogotá D.C. Antes de acudir a esa vía
+        preferimos que nos escriba: la mayoría de los desacuerdos se resuelven en un
+        correo.
+      </p>
+    </section>
+
+    <section class="legal-sec" id="cambios">
+      <h2><span>Cambios</span></h2>
+      <p>
+        Podemos actualizar estos términos. La versión vigente es la que esté publicada
+        aquí, con su número y fecha al inicio del documento. Los cambios no afectan las
+        solicitudes ya radicadas ni los contratos ya firmados, que se rigen por lo
+        pactado en su momento. Versión actual: {POLITICA_VERSION}.
+      </p>
+    </section>
+  </LegalDoc>
+
+  <SiteFooter />
+</Layout>
