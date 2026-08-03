@@ -61,6 +61,10 @@ export function booksConfigured(): boolean {
   return zohoConfigured() && Boolean(env('ZOHO_BOOKS_ORG_ID'))
 }
 
+export function campaignsConfigured(): boolean {
+  return zohoConfigured() && Boolean(env('ZOHO_CAMPAIGNS_LISTKEY'))
+}
+
 // ------------------------------------------------------------------- OAuth
 
 let _token: { value: string; expiresAt: number } | null = null
