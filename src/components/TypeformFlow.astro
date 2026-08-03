@@ -658,7 +658,7 @@ const selectedValues = (f: Extract<TFField, { type: 'choice' }>) =>
       clearError()
       if (focus) {
         const target = steps[current].querySelector(
-          '.tf-input, .tf-choice',
+          '.tf-input, .tf-choice, .tf-check',
         ) as HTMLElement | null
         // Evita saltos de scroll bruscos en móvil enfocando sin desplazar.
         target?.focus({ preventScroll: true })
