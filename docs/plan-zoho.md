@@ -27,7 +27,14 @@ La preparación ya está implementada y verificada end-to-end en local. **Falta 
 | Panel de la bandeja | `src/pages/api/admin/zoho.ts` | `GET` estado, `POST` sync/retry/discard; solo rol admin |
 | Variables de entorno | `.env.example` | Documentadas con el procedimiento del self-client |
 
-El punto clave: **los leads se acumulan desde hoy**. El día que existan las credenciales se drena la bandeja y entra todo lo recibido en el intervalo, sin digitar nada a mano.
+El punto clave del diseño: **los leads se acumulan solos**. El día que existan las
+credenciales se drena la bandeja y entra todo lo recibido en el intervalo, sin digitar
+nada a mano.
+
+**Salvedad, al 2026-08-03:** eso vale donde hay base de datos, es decir en local. En
+producción no hay `DATABASE_URL`, así que la bandeja todavía no está acumulando nada y
+las solicitudes que llegan al sitio se pierden. La red de seguridad empieza a operar
+cuando se provisione Turso, no antes (ver `pendientes.md`, "Bloqueadores en producción").
 
 - El panel admin (`src/pages/admin`) sigue gestionando el ciclo de vida de la orden (`GET/PATCH /api/admin/recolecciones`) con bitácora de eventos (`order_events`).
 - No hay todavía UI en el panel para la bandeja: hoy se opera contra `/api/admin/zoho` directamente.
@@ -67,7 +74,7 @@ El punto clave: **los leads se acumulan desde hoy**. El día que existan las cre
   ZOHO_REFRESH_TOKEN=
   ZOHO_DC=com          # dominio del datacenter de la cuenta (.com, .eu, .in...)
   ```
-- Llamadas a `https://www.zohoapis.{ZOHO_DC}/crm/v6/Leads` (crear lead), `/Deals` (actualizar), etc.
+- Llamadas a `https://www.zohoapis.{ZOHO_DC}/crm/v8/Leads` (crear lead), `/Deals` (actualizar), etc. La versión está en `CRM_VERSION` (`src/lib/zoho.ts:37`); Books usa `v3`.
 - Se dispara desde `createOrder()` y `updateOrder()` en `src/lib/ops.ts` (fire-and-forget, sin bloquear la respuesta al usuario si Zoho falla).
 
 ### Camino B — Zoho Flow (bajo código)
@@ -79,7 +86,7 @@ El punto clave: **los leads se acumulan desde hoy**. El día que existan las cre
 
 ## 5. Riesgos y decisiones pendientes
 
-- **Duplicados**: si un cliente ya existe en Zoho, ¿el lead nuevo se crea igual o se busca por email/teléfono primero? → usar búsqueda por email antes de crear (`GET /crm/v6/Leads/search?email=...`).
+- **Duplicados**: si un cliente ya existe en Zoho, ¿el lead nuevo se crea igual o se busca por email/teléfono primero? → usar búsqueda por email antes de crear (`GET /crm/v8/Leads/search?email=...`). Implementado en `findLeadByEmail()`.
 - **Fallo de Zoho no debe romper el formulario público**: la creación del lead en Zoho debe ser asíncrona/best-effort; si Zoho está caído, la orden se guarda igual en la web y se reintenta o se loguea el fallo.
 - **Región del datacenter**: confirmar con la cuenta de Zoho actual si es `.com`, `.eu`, etc. antes de codear el cliente.
 - **Alcance de credenciales**: el self-client de Zoho debe pedir solo los scopes necesarios (`ZohoCRM.modules.leads.CREATE,READ`, `ZohoCRM.modules.deals.ALL` si aplica), no acceso total a la cuenta.

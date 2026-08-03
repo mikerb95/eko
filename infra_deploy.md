@@ -159,6 +159,21 @@ con:
 node -e "console.log(require('crypto').randomBytes(32).toString('base64url'))"
 ```
 
+Y, cuando existan las credenciales del self-client de Zoho (no cuestan nada aparte, van
+con la cuenta que Ekosolv ya tiene):
+
+```
+ZOHO_CLIENT_ID=
+ZOHO_CLIENT_SECRET=
+ZOHO_REFRESH_TOKEN=
+ZOHO_DC=com
+ZOHO_BOOKS_ORG_ID=      # solo si se aborda Zoho Books
+```
+
+Sin ellas la integración queda en no-op y los leads se acumulan en la bandeja
+`zoho_outbox` para drenarlos después. El procedimiento de obtención está en
+`.env.example`; el estado, en `docs/plan-zoho.md`.
+
 `ADMIN_USERNAME` y `ADMIN_PASSWORD` son **solo para desarrollo local**. En producción
 los usuarios se crean desde la pestaña Usuarios del panel, con su rol. Una credencial
 en variables de entorno no se puede rotar ni auditar por usuario.
@@ -199,8 +214,15 @@ Es legal bajo la Ley 1581 de 2012, pero exige:
 
 ## Antes de entregar
 
+Los dos primeros no son preparativos de entrega sino una falla en curso: hoy el
+proyecto en producción no tiene base, así que el sitio pierde las solicitudes que
+recibe y el panel responde 500 (ver `pendientes.md` y `AUDITORIA.md` hallazgo 9).
+
 - [ ] Contratar Vercel Pro y mover el proyecto fuera de Hobby
-- [ ] Crear la base en Turso Developer, región `aws-us-east-1`
+- [ ] Crear la base en Turso Developer, región `aws-us-east-1`, y cargar
+      `DATABASE_URL` y `DATABASE_AUTH_TOKEN` en el proyecto
+- [ ] Remover la credencial fija de `src/lib/users.ts` y rotar la contraseña, una
+      vez que exista la base
 - [ ] Fijar la región de funciones de Vercel en `iad1`
 - [ ] Verificar el dominio en Resend con SPF, DKIM y DMARC
 - [ ] Probar la entrega de avisos contra Gmail y Outlook corporativo
