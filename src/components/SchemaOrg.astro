@@ -1,0 +1,28 @@
+---
+/**
+ * Bloque de datos estructurados (JSON-LD) de la página.
+ *
+ * Los layouts lo montan siempre con `Organization` + `WebSite`, y cada página
+ * puede añadir sus propios nodos (un `Service`, un `BlogPosting`) por la prop
+ * `nodos`. Todo sale en un único `@graph`; ver `src/lib/schema.ts`.
+ */
+
+import { grafo } from '../lib/schema'
+
+interface Props {
+  nodos: unknown[]
+}
+
+const { nodos } = Astro.props
+
+/*
+ * `</script>` dentro de una cadena del JSON cerraría la etiqueta antes de
+ * tiempo y convertiría el resto del documento en HTML ejecutable. Escapar `<`
+ * a `<` lo evita sin romper el JSON, que interpreta la secuencia como el
+ * mismo carácter. Es la vía recomendada por la especificación de JSON-LD, y
+ * hace falta porque los títulos de los artículos vienen del panel.
+ */
+const json = JSON.stringify(grafo(nodos)).replace(/</g, '\\u003c')
+---
+
+<script type="application/ld+json" is:inline set:html={json} />
