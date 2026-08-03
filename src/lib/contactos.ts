@@ -26,6 +26,13 @@ export interface Contact {
   consent_at: string
   consent_version: string
   consent_ip: string
+  /**
+   * Momento en que el titular marcó la casilla *opcional* de comunicaciones
+   * comerciales. Vacío significa que no la marcó, que es el caso por defecto.
+   * Es lo que decide si el correo se encola hacia Zoho Campaigns, y la prueba
+   * de que la suscripción la pidió él y no se la inventó el sitio.
+   */
+  marketing_at: string
   created_at?: string
   updated_at?: string
 }
