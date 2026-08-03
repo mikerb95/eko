@@ -15,6 +15,9 @@
 ### Fixed
 - **`addColumnIfMissing()`** ahora tolera el error de columna duplicada en vez de fallar: dos instancias arrancando a la vez ya no rompen la migración.
 
+### Security
+- **`npm audit fix`**: cerrados los avisos de `brace-expansion` (DoS por expansión sin límite), `fast-uri` (confusión de host) y `tar` (DoS por recursión). Solo bumps de parche, `package.json` sin cambios. Quedan 3 avisos de la cadena `path-to-regexp` → `@vercel/routing-utils` → `@astrojs/vercel`, que no tienen arreglo hacia adelante: `--force` propone bajar dos majors. Ver `AUDITORIA.md` hallazgo 3.
+
 ### Known issues
 - **No hay base de datos en producción**: el proyecto en Vercel no tiene `DATABASE_URL` y el fallback `file:./data/cms.db` no se puede abrir en la función. Las pestañas de datos del panel responden 500. Se agregó una credencial fija en `src/lib/users.ts`, comprobada antes de tocar la base, como parche para poder entrar; hay que removerla y rotar la contraseña cuando exista la base. Ver `pendientes.md`.
 
