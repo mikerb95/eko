@@ -105,4 +105,8 @@ No es solo un problema de disponibilidad del panel. `POST /api/recolecciones` y 
 - [x] Eliminar lockfile no utilizado (`bun.lock`, se mantiene `package-lock.json`)
 - [x] Rate limiting en `/api/admin/login` (`src/lib/rateLimit.ts`, aplicado en `src/pages/api/admin/login.ts`): máximo 5 intentos por IP cada 10 minutos, responde `429` con `Retry-After`. Limitador en memoria por instancia de función (no requiere infraestructura externa); con Fluid Compute la reutilización de instancias lo hace efectivo contra fuerza bruta desde un mismo origen, aunque no es una defensa distribuida perfecta entre instancias concurrentes. Probado manualmente: 6º intento devuelve 429.
 
-**Importante:** antes de desplegar, confirma que `AUTH_SECRET`, `ADMIN_USERNAME` y `ADMIN_PASSWORD` estén configuradas en las variables de entorno del proyecto en Vercel (producción) — de lo contrario el login de `/admin` fallará con "Missing required environment variable".
+- [ ] **Provisionar la base en producción** (hallazgo 9). Es el bloqueador raíz: mientras no exista, el sitio pierde las solicitudes que recibe.
+- [ ] **Remover la credencial fija de `src/lib/users.ts` y rotar la contraseña** (hallazgo 8). Depende de lo anterior.
+- [ ] Mover el limitador de peticiones a Redis compartido antes de que el panel tenga usuarios reales del cliente (ver `infra_deploy.md`).
+
+**Importante:** antes de desplegar, confirma que `AUTH_SECRET` esté configurada en las variables de entorno del proyecto en Vercel (producción); de lo contrario el arranque falla con "Missing required environment variable". `ADMIN_USERNAME` y `ADMIN_PASSWORD` ya no hacen falta en producción: solo siembran el primer administrador si la tabla `users` está vacía, y en producción los usuarios se crean desde la pestaña Usuarios del panel.
