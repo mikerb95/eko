@@ -656,6 +656,16 @@ h3 { font-size: 22px; }
 .foot-cols h5 { font-family: var(--font-mono); font-size: 12.5px; letter-spacing: 0.1em; text-transform: uppercase; color: color-mix(in oklab, #fff 55%, transparent); margin-bottom: 16px; }
 .foot-cols ul { list-style: none; display: flex; flex-direction: column; gap: 8px; font-size: 16px; color: color-mix(in oklab, #fff 85%, transparent); }
 .foot-cols a:hover { color: var(--aqua); }
+/* Perfiles sociales: van bajo el logo, en la primera columna, porque la
+   retícula de .foot-cols ya está llena (2fr + 4 columnas). */
+.foot-social { margin-top: 28px; }
+.foot-social h5 { margin-bottom: 12px; }
+.foot-social ul { flex-direction: row; gap: 14px; }
+.foot-social li { display: flex; }
+.foot-social a { display: flex; color: color-mix(in oklab, #fff 75%, transparent); transition: color 0.2s ease; }
+/* Perfil aún sin confirmar: se ve el icono apagado, pero no simula ser un
+   enlace. Solo aparece en local (ver src/lib/redes.ts). */
+.foot-social li[data-pending] { color: color-mix(in oklab, #fff 28%, transparent); cursor: help; }
 .foot-bottom {
   display: flex; justify-content: space-between; align-items: center; font-family: var(--font-mono); font-size: 12px; letter-spacing: 0.05em;
   color: color-mix(in oklab, #fff 50%, transparent); margin-top: 56px;
