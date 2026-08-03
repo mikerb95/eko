@@ -83,6 +83,8 @@ export const POST: APIRoute = async (context) => {
       estimated_quantity: field(b, 'estimated_quantity', 100),
       message: field(b, 'message', MAX),
       source: 'web',
+      consent_version: POLITICA_VERSION,
+      consent_ip: ip,
     })
     // Encolar para Zoho es una escritura a la misma DB y no lanza: se espera.
     // Que quede en la bandeja es lo que garantiza que el lead no se pierda
