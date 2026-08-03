@@ -86,8 +86,36 @@ async function ensureSchema(): Promise<void> {
       tags TEXT NOT NULL DEFAULT '[]',
       updated_at TEXT NOT NULL DEFAULT ''
     )`)
+
+    // Migraciones aditivas. `CREATE TABLE IF NOT EXISTS` no toca una tabla que
+    // ya existe, así que las columnas nuevas hay que añadirlas aparte o las
+    // bases ya desplegadas se quedan sin ellas.
+    await addColumnIfMissing(db, 'posts', 'image', `TEXT NOT NULL DEFAULT ''`)
   })()
   return _ready
+}
+
+/**
+ * `ALTER TABLE ... ADD COLUMN` idempotente.
+ *
+ * SQLite no tiene `ADD COLUMN IF NOT EXISTS`, así que se consulta el esquema
+ * antes. Se ejecuta en cada arranque: tiene que ser barato y no fallar nunca
+ * si la columna ya está.
+ */
+async function addColumnIfMissing(db: Client, table: string, column: string, decl: string): Promise<void> {
+  try {
+    const info = await db.execute(`PRAGMA table_info(${table})`)
+    if (info.rows.some((r: any) => r.name === column)) return
+    await db.execute(`ALTER TABLE ${table} ADD COLUMN ${column} ${decl}`)
+    console.log(`[cms] columna añadida: ${table}.${column}`)
+  } catch (e) {
+    // Si dos instancias arrancan a la vez, la segunda ve "duplicate column".
+    // No es un error: la migración ya la hizo la otra.
+    const msg = String((e as Error)?.message || e)
+    if (!msg.includes('duplicate column')) {
+      console.error(`[cms] no se pudo añadir ${table}.${column}:`, msg)
+    }
+  }
 }
 
 const now = () => new Date().toISOString()
