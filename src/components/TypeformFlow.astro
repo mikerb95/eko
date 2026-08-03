@@ -628,6 +628,7 @@ const selectedValues = (f: Extract<TFField, { type: 'choice' }>) =>
       continue: flow.dataset.tContinue || 'Continuar',
       required: flow.dataset.tRequired || 'Completa este campo para continuar.',
       email: flow.dataset.tEmail || 'Escribe un correo válido.',
+      consent: flow.dataset.tConsent || 'Necesitamos tu autorización para tratar tus datos.',
       sending: flow.dataset.tSending || 'Enviando…',
       submitError: flow.dataset.tSubmitError || 'No se pudo enviar la solicitud.',
       netError: flow.dataset.tNetError || 'Error de red. Intenta de nuevo o escríbenos por WhatsApp.',
