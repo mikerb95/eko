@@ -42,6 +42,20 @@ const SECURITY_HEADERS = {
   'Permissions-Policy': 'camera=(), microphone=(), geolocation=(), browsing-topics=()',
 }
 
+// Zonas privadas: el panel, la API del panel y las páginas internas del
+// proyecto. Todo lo que hay detrás de una sesión.
+//
+// `no-store` porque hoy responden `public, max-age=0, must-revalidate`, que
+// autoriza a cachés intermedias a guardar HTML con datos de una sesión ajena.
+// `noindex` porque `robots.txt` es una petición, no un control: pide no rastrear
+// pero no impide que la URL termine indexada si alguien la enlaza.
+const PRIVATE_PATHS = '/(admin|docs|oportunidades2630|api/admin)(/.*)?'
+
+const PRIVATE_HEADERS = {
+  'Cache-Control': 'no-store, max-age=0, must-revalidate',
+  'X-Robots-Tag': 'noindex, nofollow, noarchive',
+}
+
 /** Integración que añade las cabeceras de seguridad al Build Output de Vercel. */
 function securityHeaders() {
   return {
@@ -52,8 +66,13 @@ function securityHeaders() {
         try {
           const config = JSON.parse(readFileSync(path, 'utf-8'))
           config.routes = config.routes ?? []
-          // Ruta al inicio, con `continue: true` para no interrumpir el enrutado.
-          config.routes.unshift({ src: '/(.*)', headers: SECURITY_HEADERS, continue: true })
+          // Rutas al inicio, con `continue: true` para no interrumpir el
+          // enrutado. La de zonas privadas va después de la general para que su
+          // `Cache-Control` sea el que quede.
+          config.routes.unshift(
+            { src: '/(.*)', headers: SECURITY_HEADERS, continue: true },
+            { src: PRIVATE_PATHS, headers: PRIVATE_HEADERS, continue: true },
+          )
           writeFileSync(path, JSON.stringify(config, null, 2))
           console.log('[ekosolv-security-headers] cabeceras inyectadas en config.json')
         } catch (e) {
