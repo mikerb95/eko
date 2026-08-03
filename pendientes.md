@@ -25,7 +25,9 @@ Lista viva de cosas que faltan por resolver en el sitio: activos por entregar (d
 
 ## Zoho (CRM y Books)
 
-El código está construido y probado end-to-end en local (ver `docs/plan-zoho.md` §2). **Los leads ya se están acumulando en la tabla `zoho_outbox` desde el 3 de agosto de 2026**: cada mensaje de contacto y cada solicitud de recolección deja una fila pendiente. El día que existan las credenciales se drena la bandeja y entra todo lo recibido en el intervalo, sin digitar nada a mano. Lo que sigue es lo único que falta.
+El código está construido y probado end-to-end en local (ver `docs/plan-zoho.md` §2). El diseño es que cada mensaje de contacto y cada solicitud de recolección deje una fila pendiente en `zoho_outbox`, para que el día que existan las credenciales se drene la bandeja y entre todo lo recibido en el intervalo, sin digitar nada a mano.
+
+**Ojo con un supuesto que no se cumple todavía:** eso solo pasa donde hay base de datos, o sea en local. En producción no hay, así que **hoy no se está acumulando nada** y lo que llegue por el sitio se pierde. La red de seguridad de la bandeja empieza a funcionar el día que se provisione Turso, no antes. Ver "Bloqueadores en producción".
 
 ### Bloquea la conexión (le toca a Mike / gerencia)
 
