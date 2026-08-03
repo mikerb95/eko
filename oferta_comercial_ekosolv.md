@@ -6,7 +6,17 @@
 única a 24 meses (construcción amortizada + operación + soporte) y usar la capacitación en IA como
 cierre del alcance completo.
 
-**Pieza gráfica publicada:** https://claude.ai/code/artifact/3e541f60-a018-4ff7-b1d1-abfca303129b
+## Dos envíos distintos, dos links distintos
+
+| | Para quién | Contiene precios | Link |
+|---|---|---|---|
+| **A. Alcance** | Correo al grupo, incluye personas sin alcance financiero | No | https://claude.ai/code/artifact/ba4411f5-0a4d-4e24-8f25-940fa1352d34 |
+| **B. Propuesta económica** | Solo gerencia, correo aparte | Sí | https://claude.ai/code/artifact/3e541f60-a018-4ff7-b1d1-abfca303129b |
+
+> **Cuidado al enviar:** el link B no puede ir en el correo grupal. Los dos documentos se ven
+> parecidos porque comparten identidad visual, así que verificá el ID del enlace antes de pegarlo.
+> El documento A termina diciendo explícitamente que lo económico se envía por separado a gerencia,
+> lo cual además es útil: le da al gerente la excusa natural para manejar el número él.
 
 ---
 

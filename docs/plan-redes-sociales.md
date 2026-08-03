@@ -159,6 +159,9 @@ Cada fase se despliega y se usa de verdad antes de empezar la siguiente, misma r
 
 ## 9. Siguiente paso concreto
 
-1. **Verificar los tres bloqueadores de cuenta** (§3.1 a §3.3): perfiles existentes, Instagram en modo Business vinculado a la página de Facebook, y plan de Zoho Social con API. Es una revisión de media hora en las consolas, no es desarrollo.
-2. **Ejecutar la Fase 0 en paralelo**, que no depende de nada de lo anterior: footer, botones de compartir e imagen OG por artículo.
-3. Solo entonces crear el self-client de Zoho y empezar `src/lib/social.ts`.
+La Fase 0 ya está hecha, así que lo que queda no es desarrollo sino decisiones y verificaciones:
+
+1. **Pegar las URLs de los tres perfiles en `src/lib/redes.ts` y ponerlos en `activo: true`.** Hasta que eso pase, el bloque del footer no existe en producción. Si algún perfil no existe todavía, crearlo es parte del trabajo.
+2. **Verificar los tres bloqueadores de cuenta** (§3.1 a §3.3): perfiles reales, Instagram en modo Business vinculado a la página de Facebook, y plan de Zoho Social con acceso a la API. Es una revisión de media hora en las consolas.
+3. **Producir las imágenes 1200×630 de los artículos existentes** y cargarlas desde el panel. El panel ya marca con una etiqueta "Sin imagen" los que faltan, así que la lista de trabajo se ve sola.
+4. Solo entonces crear el self-client de Zoho y empezar `src/lib/social.ts` (Fase 1).
