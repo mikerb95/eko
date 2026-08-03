@@ -82,13 +82,15 @@ El hallazgo original decía que `src/lib/auth.ts` comparaba la contraseña direc
 ## Hallazgos posteriores
 
 ### 8. Credencial fija en el código del login
-`src/lib/users.ts:151-152` · **abierto, crítico**
+`src/lib/users.ts:151-152` · **abierto, aceptado como temporal (decisión de Mike, 2026-08-03)**
 
 Hay usuario y contraseña en texto plano (`HARDCODED_USER` / `HARDCODED_PASSWORD`), comprobados **antes** de consultar la base. Se agregó a propósito el 3 de agosto como parche de acceso: en producción no hay `DATABASE_URL` y el fallback a archivo no se puede abrir en la función, así que sin esto el login falla con `ConnectionFailed 14` antes de poder comprobar nada.
 
 Es un parche consciente, no un descuido, pero deja el panel abierto a cualquiera que lea el repositorio, y ya quedó en el historial de git: removerlo no basta, hay que rotar también la contraseña.
 
-**Recomendación:** provisionar la base en producción (bloqueador raíz, ver `pendientes.md`), remover las dos constantes y rotar la contraseña. No desplegar para el cliente con esto puesto.
+**Decisión:** se mantiene mientras dure la fase de pruebas. El destino es que toda la autenticación vaya contra la base, y este literal desaparece con ella: no es una solución que se piense conservar.
+
+**Condición de salida:** al provisionar Turso (hallazgo 9), remover las dos constantes y rotar la contraseña. Lo segundo no es opcional aunque se remueva el código, porque el valor ya está en el historial de git. No entregarle el sitio al cliente con esto puesto.
 
 ### 9. Sin base de datos en producción
 **abierto, alto**
@@ -100,13 +102,17 @@ No es solo un problema de disponibilidad del panel. `POST /api/recolecciones` y 
 **Recomendación:** provisionar Turso siguiendo `infra_deploy.md` antes de dirigir tráfico real al sitio.
 
 ### 10. El repositorio es público con la credencial fija adentro
-**abierto, crítico. Le toca a Mike.**
+**abierto, aceptado como temporal (decisión de Mike, 2026-08-03). Le toca a Mike.**
 
 `github.com/mikerb95/eko` es un repositorio **público**. Combinado con el hallazgo 8, eso significa que la credencial del panel es legible por cualquiera en internet. Verificado el 2026-08-03 contra producción: `POST https://ekosolv.vercel.app/api/admin/login` con `admin` / la contraseña del código responde **200** y entrega una cookie de sesión válida.
 
 Es el hallazgo 8 pero con el factor de exposición al máximo: no hace falta acceso al repo, basta con encontrarlo.
 
-**Recomendación:** poner el repositorio en privado hoy mismo. Es lo único que corta la exposición sin depender de provisionar nada. Después, en orden: reemplazar el literal por un valor leído de `ADMIN_PASSWORD` en Vercel (mismo parche, sin secreto commiteado), provisionar Turso, remover el parche y rotar.
+**Decisión:** se acepta mientras el sitio esté en pruebas y no tenga datos reales de clientes. El razonamiento del hallazgo 8 aplica igual aquí.
+
+**Lo que conviene tener presente:** que la credencial sea de pruebas explica el literal en el código, pero el despliegue de `ekosolv.vercel.app` es alcanzable desde internet y hoy acepta ese login. Mientras el panel no tenga datos reales, lo que se arriesga es un entorno de pruebas. Deja de ser cierto en el momento en que se provisione la base y empiecen a entrar solicitudes de clientes: ahí los datos personales entran en juego y esto pasa a ser un incidente, no un pendiente.
+
+**Opción de bajo costo, si se quiere cortar la exposición sin esperar a nada:** leer la contraseña de `ADMIN_PASSWORD` en Vercel en vez del literal. Es el mismo parche y sigue funcionando con la base caída, pero sin secreto commiteado en un repo público.
 
 ### 11. Mensajes de error crudos hacia el cliente
 `src/pages/api/admin/login.ts` y los seis endpoints de `/api/admin` · **Estado: resuelto (2026-08-03).**
