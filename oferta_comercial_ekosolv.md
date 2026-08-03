@@ -138,7 +138,7 @@ Mike
 - [ ] **Definir el alcance real de la integración con Zoho** antes de firmar. Zoho CRM, Books y Desk
       son productos distintos y el esfuerzo cambia. Preguntar cuál usan y con qué plan.
 - [ ] **Ambiente de pruebas separado** implica una segunda base de datos. Está costeado dentro de los
-      $450.000 de operación del alcance 2.
+      $225.000 de operación del alcance 2, que quedan justos. Verificar el costo real antes de firmar.
 - [ ] **Pendientes del sitio** que siguen abiertos en `pendientes.md` y que él va a notar en la demo:
       licencias reales sin cargar, dominio sin decidir, correos de notificación sin definir.
 - [ ] **Doble factor y registro de auditoría transversal no existen hoy.** Están vendidos dentro del
