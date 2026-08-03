@@ -72,6 +72,28 @@ const canonical = url(path)
 const ogImageUrl = ogImage.startsWith('http') ? ogImage : `${SITE_URL}${ogImage}`
 const ogImageType = ogImageUrl.endsWith('.png') ? 'image/png' : 'image/jpeg'
 const alt = hreflangFor(path)
+
+/*
+ * Grafo de datos estructurados. Las páginas internas del proyecto llevan
+ * `noindex`, así que no tiene sentido gastarles migas ni describirlas: se
+ * quedan con la organización y el sitio, que sirven de contexto igual.
+ *
+ * Las migas usan el título corto del inventario ("Casos", "Servicios"), no el
+ * `<title>` completo, porque en el resultado de búsqueda se muestran como una
+ * ruta y "Casos de cumplimiento ambiental empresarial · Ekosolv" no cabe.
+ */
+const rutaActual = rutasEs.find((r) => r.path === path)
+const nodos = [
+  organizacion('es'),
+  sitioWeb('es'),
+  !noindex && rutaActual && path !== '/'
+    ? migas([
+        { nombre: 'Inicio', path: '/' },
+        { nombre: rutaActual.titulo, path: rutaActual.path },
+      ])
+    : null,
+  ...nodosSchema,
+].filter(Boolean)
 ---
 
 <!DOCTYPE html>
