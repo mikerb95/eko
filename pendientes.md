@@ -7,6 +7,8 @@ Lista viva de cosas que faltan por resolver en el sitio: activos por entregar (d
 - [ ] **Licencias ambientales (PDF)** — para mostrar certificaciones/avales reales en el footer (idea tomada de ATICA). Nadie las ha subido a `public/` todavía.
 - [ ] **Testimonios reales de clientes** — con autorización de uso, para reemplazar/reforzar `/casos`.
 - [ ] **Logos de clientes reales** — con autorización de marca, para reponer la sección "Clientes" retirada (ver `docs/plan-competitivo-lito.md`, Fase 3).
+- [ ] **URLs de los perfiles de redes sociales** — `src/lib/redes.ts` tiene los tres (LinkedIn, Instagram, Facebook) con `activo: false` y URL vacía. Hasta que alguien pegue las URLs reales y las active, la columna "Síguenos" del footer no se emite en producción. Ver `docs/plan-redes-sociales.md`.
+- [ ] **Imágenes 1200×630 de los artículos del blog** — la columna `posts.image` ya existe y el panel marca "Sin imagen" los que faltan. Sin ellas, todo artículo compartido en LinkedIn o WhatsApp muestra la misma portada genérica, y la difusión a Instagram (Fase 1) es imposible porque exige imagen.
 
 ## Decisiones abiertas
 
