@@ -67,7 +67,9 @@ export const POST: APIRoute = async (context) => {
     await queueContactAsLead(contact)
     // El aviso al equipo no condiciona la respuesta: el mensaje ya está
     // guardado. Va diferido para no cobrarle al visitante la latencia de Resend.
-    defer('email contacto', notifyNewContact(contact))
+    // (`await` sobre defer es gratis en Vercel: entrega la promesa al runtime y
+    // vuelve de inmediato. Fuera de Vercel sí espera, como hasta ahora.)
+    await defer('email contacto', notifyNewContact(contact))
     return json({ ok: true })
   } catch (e: any) {
     console.error('[contacto] createContact failed:', e?.message || e)

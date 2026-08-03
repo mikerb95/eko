@@ -203,7 +203,7 @@ Mike
 
 ---
 
-## 3. Riesgos a resolver antes de que él diga que sí
+## 4. Riesgos a resolver antes de que él diga que sí
 
 - [ ] **La publicación a redes sociales no está construida todavía.** El panel hoy administra blog,
       normativas, contactos, recolecciones y usuarios. La conexión con redes está prometida en el
