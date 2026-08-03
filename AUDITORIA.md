@@ -30,13 +30,20 @@ Si `AUTH_SECRET`, `ADMIN_USERNAME` o `ADMIN_PASSWORD` no están configuradas com
 **Recomendación:** `git rm -r --cached .vercel` y añadir `.vercel/` al `.gitignore` (actualmente `dist/` sí está ignorado pero `.vercel/` no).
 
 ### 3. Vulnerabilidades en dependencias
-`npm audit`: 10 vulnerabilidades (1 low, 3 moderate, 6 high).
+**Estado al 2026-08-03: parcialmente resuelto, 6 vulnerabilidades abiertas (1 moderate, 5 high).**
 
-- **vite 7.0.0–7.3.3** (high): NTLMv2 hash disclosure vía UNC path en Windows; bypass de `server.fs.deny`. Solo afecta entornos Windows/dev.
-- **path-to-regexp** vía `@vercel/routing-utils` / `@astrojs/vercel` (high): ReDoS por regex vulnerable a backtracking. Requiere subir a `@astrojs/vercel@11` (breaking change).
-- **tar ≤7.5.15** (moderate): file smuggling por interpretación diferencial de headers PAX/GNU long-name.
+En el corte original eran 10 (1 low, 3 moderate, 6 high). Las de vite (NTLMv2 hash disclosure y bypass de `server.fs.deny`) se resolvieron con `npm audit fix`. Desde entonces el proyecto subió a Astro 7 y `@astrojs/vercel` 11, y aparecieron avisos nuevos:
 
-**Recomendación:** `npm audit fix` resuelve vite y tar sin breaking changes. `path-to-regexp` requiere evaluar el upgrade a `@astrojs/vercel@11`.
+| Paquete | Severidad | Problema | Arreglo |
+|---|---|---|---|
+| `brace-expansion` | high | DoS por expansión sin límite (OOM) | `npm audit fix` |
+| `fast-uri` | high | Confusión de host por backslash en el *authority* | `npm audit fix` |
+| `path-to-regexp` 4.0.0–6.2.2 | high | ReDoS por backtracking, vía `@vercel/routing-utils` | ver abajo |
+| `tar` ≤7.5.20 | moderate | Recursión no controlada, DoS por stack overflow | `npm audit fix` |
+
+**Corrección importante sobre el corte anterior:** ahí se dijo que `path-to-regexp` se resolvía subiendo a `@astrojs/vercel@11`. Es falso. El proyecto ya está en la 11.0.3 y el aviso sigue: lo que `npm audit fix --force` propone hoy es **bajar** a `@astrojs/vercel@8.0.4`, un downgrade de dos majors. No conviene hacerlo. El vector, además, es el enrutado de la plataforma, no código propio.
+
+**Recomendación:** correr `npm audit fix` (resuelve tres de los cuatro sin breaking changes) y dejar `path-to-regexp` esperando a que `@vercel/routing-utils` publique la corrección aguas arriba. No aplicar `--force`.
 
 ### 4. Node.js local incompatible
 Node v20.20.1 instalado; Astro 6 exige `>=22.12.0`. `astro check` y `astro build` no ejecutan localmente. El deploy en Vercel probablemente funciona porque usa Node 24, pero localmente impide verificar tipos y build antes de commitear/desplegar.
@@ -56,9 +63,29 @@ El endpoint de login no limita intentos, permitiendo fuerza bruta contra la cont
 **Recomendación:** regla de rate limiting en Vercel WAF sobre `/api/admin/login`.
 
 ### 7. Contraseña en texto plano
-`src/lib/auth.ts` compara la contraseña directamente contra la variable de entorno, sin hash.
+**Estado: resuelto (2026-07-06).**
 
-**Recomendación:** aceptable para un solo usuario admin; considerar hash (bcrypt/scrypt) si se agregan más usuarios.
+El hallazgo original decía que `src/lib/auth.ts` comparaba la contraseña directamente contra la variable de entorno, sin hash. Ya no aplica: las credenciales se movieron a la tabla `users` y `src/lib/users.ts` usa PBKDF2-SHA256 con salt por usuario vía WebCrypto (`hashPassword` / `verifyPassword`). `ADMIN_USERNAME` y `ADMIN_PASSWORD` solo siembran el primer administrador si la tabla está vacía.
+
+## Hallazgos posteriores
+
+### 8. Credencial fija en el código del login
+`src/lib/users.ts:151-152` · **abierto, crítico**
+
+Hay usuario y contraseña en texto plano (`HARDCODED_USER` / `HARDCODED_PASSWORD`), comprobados **antes** de consultar la base. Se agregó a propósito el 3 de agosto como parche de acceso: en producción no hay `DATABASE_URL` y el fallback a archivo no se puede abrir en la función, así que sin esto el login falla con `ConnectionFailed 14` antes de poder comprobar nada.
+
+Es un parche consciente, no un descuido, pero deja el panel abierto a cualquiera que lea el repositorio, y ya quedó en el historial de git: removerlo no basta, hay que rotar también la contraseña.
+
+**Recomendación:** provisionar la base en producción (bloqueador raíz, ver `pendientes.md`), remover las dos constantes y rotar la contraseña. No desplegar para el cliente con esto puesto.
+
+### 9. Sin base de datos en producción
+**abierto, alto**
+
+El proyecto en Vercel no tiene `DATABASE_URL` ni `DATABASE_AUTH_TOKEN`. Verificado el 2026-08-03: `/api/admin/recolecciones`, `/api/admin/contactos` y `/api/admin/users` responden 500.
+
+No es solo un problema de disponibilidad del panel. `POST /api/recolecciones` y `POST /api/contacto` escriben en esa misma base antes de responder (`src/pages/api/recolecciones.ts:63-88`): sin base, la escritura lanza, el visitante recibe un 500 con el mensaje de error y **la solicitud se pierde entera**. Tampoco se encola nada en `zoho_outbox`, que vive en la misma base.
+
+**Recomendación:** provisionar Turso siguiendo `infra_deploy.md` antes de dirigir tráfico real al sitio.
 
 ## Aspectos correctos
 
