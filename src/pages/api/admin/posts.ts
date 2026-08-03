@@ -1,4 +1,5 @@
 import type { APIRoute } from 'astro'
+import { json, fail } from '../../../lib/apiError'
 import { upsertPost, deletePost, type Post, type Section } from '../../../lib/cms'
 
 export const prerender = false
@@ -83,8 +84,4 @@ export const DELETE: APIRoute = async ({ url }) => {
   if (!id) return json({ error: 'id requerido' }, 400)
   await deletePost(id)
   return json({ ok: true })
-}
-
-function json(data: unknown, status = 200) {
-  return new Response(JSON.stringify(data), { status, headers: { 'content-type': 'application/json' } })
 }

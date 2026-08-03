@@ -1,4 +1,5 @@
 import type { APIRoute } from 'astro'
+import { json, fail } from '../../../lib/apiError'
 import { syncPending, zohoConfigured, booksConfigured } from '../../../lib/zoho'
 import {
   listOutbox,
@@ -34,7 +35,7 @@ export const GET: APIRoute = async ({ url }) => {
       conteos: await outboxStats(),
     })
   } catch (e: any) {
-    return json({ error: String(e?.message || e) }, 500)
+    return fail('zoho', e)
   }
 }
 
@@ -72,10 +73,6 @@ export const POST: APIRoute = async ({ request }) => {
     }
     return json({ error: 'Acción no reconocida' }, 400)
   } catch (e: any) {
-    return json({ error: String(e?.message || e) }, 500)
+    return fail('zoho', e)
   }
-}
-
-function json(data: unknown, status = 200) {
-  return new Response(JSON.stringify(data), { status, headers: { 'content-type': 'application/json' } })
 }

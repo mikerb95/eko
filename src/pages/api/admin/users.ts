@@ -1,4 +1,5 @@
 import type { APIRoute } from 'astro'
+import { json, fail } from '../../../lib/apiError'
 import { listUsers, upsertUser, deleteUser, ROLES, type Role, type UserInput } from '../../../lib/users'
 
 export const prerender = false
@@ -8,7 +9,7 @@ export const GET: APIRoute = async () => {
     const users = await listUsers()
     return json({ users })
   } catch (e: any) {
-    return json({ error: String(e?.message || e) }, 500)
+    return fail('users', e)
   }
 }
 
@@ -66,10 +67,6 @@ export const DELETE: APIRoute = async ({ url, locals }) => {
     await deleteUser(id)
     return json({ ok: true })
   } catch (e: any) {
-    return json({ error: String(e?.message || e) }, 400)
+    return fail('users', e)
   }
-}
-
-function json(data: unknown, status = 200) {
-  return new Response(JSON.stringify(data), { status, headers: { 'content-type': 'application/json' } })
 }

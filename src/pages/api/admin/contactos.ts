@@ -1,4 +1,5 @@
 import type { APIRoute } from 'astro'
+import { json, fail } from '../../../lib/apiError'
 import { listContacts, updateContactStatus, CONTACT_STATUSES, type ContactStatus } from '../../../lib/contactos'
 
 export const prerender = false
@@ -9,7 +10,7 @@ export const GET: APIRoute = async ({ url }) => {
     const contacts = await listContacts(status)
     return json({ contacts })
   } catch (e: any) {
-    return json({ error: String(e?.message || e) }, 500)
+    return fail('contactos', e)
   }
 }
 
@@ -32,10 +33,6 @@ export const PATCH: APIRoute = async ({ request, url }) => {
     if (!contact) return json({ error: 'Contacto no encontrado' }, 404)
     return json({ ok: true, contact })
   } catch (e: any) {
-    return json({ error: String(e?.message || e) }, 500)
+    return fail('contactos', e)
   }
-}
-
-function json(data: unknown, status = 200) {
-  return new Response(JSON.stringify(data), { status, headers: { 'content-type': 'application/json' } })
 }

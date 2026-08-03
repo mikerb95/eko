@@ -1,4 +1,5 @@
 import type { APIRoute } from 'astro'
+import { json, fail } from '../../../lib/apiError'
 import { listOrders, getOrderById, getOrderEvents, updateOrder, ORDER_STATUSES, type OrderUpdate, type OrderStatus } from '../../../lib/ops'
 
 export const prerender = false
@@ -16,7 +17,7 @@ export const GET: APIRoute = async ({ url }) => {
     const orders = await listOrders(status)
     return json({ orders })
   } catch (e: any) {
-    return json({ error: String(e?.message || e) }, 500)
+    return fail('recolecciones', e)
   }
 }
 
@@ -47,10 +48,6 @@ export const PATCH: APIRoute = async ({ request, url, locals }) => {
     if (!order) return json({ error: 'Orden no encontrada' }, 404)
     return json({ ok: true, order })
   } catch (e: any) {
-    return json({ error: String(e?.message || e) }, 500)
+    return fail('recolecciones', e)
   }
-}
-
-function json(data: unknown, status = 200) {
-  return new Response(JSON.stringify(data), { status, headers: { 'content-type': 'application/json' } })
 }

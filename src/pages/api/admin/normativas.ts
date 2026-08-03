@@ -1,4 +1,5 @@
 import type { APIRoute } from 'astro'
+import { json, fail } from '../../../lib/apiError'
 import { upsertNormativa, deleteNormativa, type Normativa } from '../../../lib/cms'
 
 export const prerender = false
@@ -33,7 +34,7 @@ export const POST: APIRoute = async ({ request }) => {
     const id = await upsertNormativa(n)
     return json({ ok: true, id })
   } catch (e: any) {
-    return json({ error: String(e?.message || e) }, 500)
+    return fail('normativas', e)
   }
 }
 
@@ -42,8 +43,4 @@ export const DELETE: APIRoute = async ({ url }) => {
   if (!id) return json({ error: 'id requerido' }, 400)
   await deleteNormativa(id)
   return json({ ok: true })
-}
-
-function json(data: unknown, status = 200) {
-  return new Response(JSON.stringify(data), { status, headers: { 'content-type': 'application/json' } })
 }
