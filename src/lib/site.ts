@@ -27,5 +27,26 @@ export const SITE_TAGLINE = {
   en: 'Environmental consulting specialized in ANLA compliance, ESG, and circular economy for the technology sector in Colombia.',
 } as const
 
+/**
+ * Datos de contacto de la sede, en piezas separadas.
+ *
+ * `src/lib/legal.ts` tiene la misma dirección en una sola cadena, y esa se
+ * queda como está: es el texto que se muestra dentro de un documento legal y
+ * cambiarlo movería la versión de la política. Esta versión desarmada existe
+ * porque el `PostalAddress` de schema.org exige cada campo por separado, y
+ * partir la cadena con expresiones regulares en tiempo de render sería frágil.
+ *
+ * Si cambia la sede, hay que tocar los dos sitios.
+ */
+export const SITE_ADDRESS = {
+  edificio: 'Edif. RPTV',
+  calle: 'Carrera 15 #31B-33',
+  ciudad: 'Bogotá',
+  region: 'Bogotá D.C.',
+  pais: 'CO',
+  telefono: '+573212712773',
+  correo: 'info@ekosolv.com',
+} as const
+
 export const url = (path = '/'): string =>
   `${SITE_URL}${path.startsWith('/') ? path : `/${path}`}`
