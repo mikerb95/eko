@@ -77,9 +77,14 @@ export const POST: APIRoute = async (context) => {
       message: field(b, 'message', MAX),
       source: 'web',
     })
+    // Encolar para Zoho es una escritura a la misma DB y no lanza: se espera.
+    // Que quede en la bandeja es lo que garantiza que el lead no se pierda
+    // aunque Zoho todavía no esté conectado (src/lib/zohoOutbox.ts).
+    await queueOrderAsLead(order)
     // El aviso al equipo no condiciona la respuesta: la orden ya está guardada.
-    // notifyNewOrder no lanza; devuelve { sent:false } y lo deja en el log.
-    await notifyNewOrder(order)
+    // Va diferido para no cobrarle al visitante la latencia de Resend; en Vercel
+    // `defer` entrega la promesa al runtime y vuelve de inmediato.
+    await defer('email recolección', notifyNewOrder(order))
     return json({ ok: true, consecutive: order.consecutive })
   } catch (e: any) {
     console.error('[recolecciones] createOrder failed:', e?.message || e)
