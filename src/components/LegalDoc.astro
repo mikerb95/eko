@@ -1,0 +1,296 @@
+---
+/**
+ * Shell de los documentos legales (política de tratamiento, términos,
+ * cookies).
+ *
+ * Existe por dos razones. La primera es no repetir seis veces el mismo CSS
+ * entre las versiones es y en. La segunda es que un documento legal se cita:
+ * cada sección lleva `id` y número estable, para que un contrato o una
+ * respuesta a la SIC pueda decir «numeral 4 de la política» y el enlace lleve
+ * exactamente allí.
+ */
+
+export interface LegalSection {
+  id: string
+  titulo: string
+}
+
+interface Props {
+  eyebrow: string
+  eyebrowRight?: string
+  titulo: string
+  tituloEm?: string
+  intro: string
+  version: string
+  vigencia: string
+  secciones: LegalSection[]
+  lang?: 'es' | 'en'
+}
+
+const {
+  eyebrow,
+  eyebrowRight,
+  titulo,
+  tituloEm,
+  intro,
+  version,
+  vigencia,
+  secciones,
+  lang = 'es',
+} = Astro.props
+
+const T = {
+  es: { version: 'Versión', vigencia: 'Vigente desde', indice: 'Contenido' },
+  en: { version: 'Version', vigencia: 'In force since', indice: 'Contents' },
+}[lang]
+
+const locale = lang === 'es' ? 'es-CO' : 'en-GB'
+const vigenciaLegible = new Date(`${vigencia}T00:00:00`).toLocaleDateString(locale, {
+  year: 'numeric',
+  month: 'long',
+  day: 'numeric',
+})
+
+const pad = (n: number) => String(n).padStart(2, '0')
+---
+
+<section class="page-head wrap">
+  <div class="page-strip">
+    <div class="l">{eyebrow}</div>
+    {eyebrowRight && <div class="l">{eyebrowRight}</div>}
+  </div>
+  <h1 class="display reveal" style="margin-top:40px">
+    {titulo}{tituloEm && <> <em>{tituloEm}</em></>}.
+  </h1>
+  <p class="lede reveal" style="margin-top:32px; max-width:62ch">{intro}</p>
+  <dl class="legal-meta reveal">
+    <div>
+      <dt>{T.version}</dt>
+      <dd>{version}</dd>
+    </div>
+    <div>
+      <dt>{T.vigencia}</dt>
+      <dd><time datetime={vigencia}>{vigenciaLegible}</time></dd>
+    </div>
+  </dl>
+</section>
+
+<section class="section wrap legal-body" style="padding-top:0">
+  <nav class="legal-toc reveal" aria-label={T.indice}>
+    <h2 class="legal-toc-title">{T.indice}</h2>
+    <ol>
+      {secciones.map((s, i) => (
+        <li>
+          <a href={`#${s.id}`}>
+            <span class="legal-toc-num">{pad(i + 1)}</span>
+            {s.titulo}
+          </a>
+        </li>
+      ))}
+    </ol>
+  </nav>
+
+  <div class="legal-content reveal">
+    <slot />
+  </div>
+</section>
+
+<style>
+  .legal-meta {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 34px;
+    margin-top: 36px;
+    padding-top: 24px;
+    border-top: 1px solid var(--line);
+    max-width: 62ch;
+  }
+  .legal-meta dt {
+    font-family: var(--font-mono);
+    font-size: 11px;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--mute);
+  }
+  .legal-meta dd {
+    margin: 6px 0 0;
+    font-size: 15px;
+    color: var(--ink);
+  }
+
+  .legal-body {
+    display: grid;
+    grid-template-columns: 240px 1fr;
+    gap: clamp(40px, 6vw, 88px);
+    align-items: start;
+  }
+  @media (max-width: 900px) {
+    .legal-body { grid-template-columns: 1fr; gap: 44px; }
+  }
+
+  /* Índice lateral */
+  .legal-toc { position: sticky; top: 110px; }
+  @media (max-width: 900px) {
+    .legal-toc {
+      position: static;
+      padding: 24px 26px;
+      border-radius: var(--r-md);
+      background: var(--paper-warm);
+    }
+  }
+  .legal-toc-title {
+    font-family: var(--font-mono);
+    font-size: 11px;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--mute);
+    margin: 0 0 18px;
+  }
+  .legal-toc ol { list-style: none; margin: 0; padding: 0; display: grid; gap: 11px; }
+  .legal-toc a {
+    display: grid;
+    grid-template-columns: 26px 1fr;
+    gap: 4px;
+    font-size: 13.5px;
+    line-height: 1.45;
+    color: var(--ink-2);
+    text-decoration: none;
+    transition: color .18s ease;
+  }
+  .legal-toc a:hover { color: var(--deep); }
+  .legal-toc-num {
+    font-family: var(--font-mono);
+    font-size: 11px;
+    color: var(--mute);
+    padding-top: 2px;
+  }
+  .legal-toc a:hover .legal-toc-num { color: var(--deep); }
+
+  /* Cuerpo del documento */
+  .legal-content { max-width: 68ch; counter-reset: legal-sec; }
+
+  .legal-content :global(.legal-sec) {
+    counter-increment: legal-sec;
+    padding-top: clamp(38px, 5vw, 56px);
+    /* Compensa el header fijo cuando se salta desde el índice. */
+    scroll-margin-top: 96px;
+  }
+  .legal-content :global(.legal-sec:first-child) { padding-top: 0; }
+
+  .legal-content :global(.legal-sec > h2) {
+    display: grid;
+    grid-template-columns: auto 1fr;
+    gap: 14px;
+    align-items: baseline;
+    font-family: var(--font-display);
+    font-size: clamp(23px, 2.6vw, 30px);
+    line-height: 1.15;
+    letter-spacing: -0.018em;
+    color: var(--ink);
+    margin: 0 0 20px;
+  }
+  .legal-content :global(.legal-sec > h2::before) {
+    content: counter(legal-sec, decimal-leading-zero);
+    font-family: var(--font-mono);
+    font-size: 12px;
+    letter-spacing: 0.08em;
+    color: var(--forest);
+    transform: translateY(-2px);
+  }
+
+  .legal-content :global(h3) {
+    font-size: 16px;
+    font-weight: 500;
+    color: var(--ink);
+    margin: 30px 0 12px;
+  }
+
+  .legal-content :global(p) {
+    font-size: 16px;
+    line-height: 1.68;
+    color: var(--ink-2);
+    margin: 0 0 16px;
+  }
+  .legal-content :global(a) {
+    color: var(--deep);
+    text-decoration: underline;
+    text-underline-offset: 2px;
+  }
+  .legal-content :global(strong) { color: var(--ink); font-weight: 500; }
+
+  .legal-content :global(ul),
+  .legal-content :global(ol) {
+    margin: 0 0 18px;
+    padding-left: 0;
+    list-style: none;
+    display: grid;
+    gap: 11px;
+  }
+  .legal-content :global(li) {
+    position: relative;
+    padding-left: 22px;
+    font-size: 15.5px;
+    line-height: 1.62;
+    color: var(--ink-2);
+  }
+  .legal-content :global(ul > li::before) {
+    content: '';
+    position: absolute;
+    left: 2px;
+    top: 9px;
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: var(--forest);
+  }
+  .legal-content :global(ol) { counter-reset: legal-item; }
+  .legal-content :global(ol > li) { counter-increment: legal-item; }
+  .legal-content :global(ol > li::before) {
+    content: counter(legal-item) '.';
+    position: absolute;
+    left: 0;
+    top: 0;
+    font-family: var(--font-mono);
+    font-size: 12px;
+    color: var(--forest);
+  }
+
+  /* Tabla de encargados / cookies */
+  .legal-content :global(.legal-table-wrap) { overflow-x: auto; margin: 0 0 20px; }
+  .legal-content :global(table) {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 14.5px;
+    min-width: 480px;
+  }
+  .legal-content :global(th) {
+    text-align: left;
+    font-family: var(--font-mono);
+    font-size: 10.5px;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--mute);
+    font-weight: 400;
+    padding: 0 16px 12px 0;
+    border-bottom: 1px solid var(--line-2);
+    white-space: nowrap;
+  }
+  .legal-content :global(td) {
+    padding: 14px 16px 14px 0;
+    border-bottom: 1px solid var(--line);
+    color: var(--ink-2);
+    line-height: 1.5;
+    vertical-align: top;
+  }
+  .legal-content :global(td:first-child) { color: var(--ink); }
+
+  /* Bloque destacado, para avisos que el titular no debería pasar por alto. */
+  .legal-content :global(.legal-note) {
+    padding: 22px 24px;
+    border-radius: var(--r-md);
+    background: color-mix(in oklab, var(--forest) 7%, var(--paper-warm));
+    margin: 0 0 20px;
+  }
+  .legal-content :global(.legal-note p:last-child) { margin-bottom: 0; }
+  .legal-content :global(.legal-note p) { font-size: 15px; }
+</style>
