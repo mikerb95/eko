@@ -15,6 +15,8 @@ Integridad del repositorio git, gestión de secretos, dependencias, autenticaci�
 
 La integridad del repositorio git es correcta (`git fsck` limpio, working tree limpio). Se encontraron 4 problemas serios: credenciales por defecto embebidas en el código de autenticación, artefactos de build versionados en git, vulnerabilidades en dependencias, y un Node.js local incompatible que impide compilar.
 
+**Al 2026-08-03**, los cuatro del corte original están cerrados, pero hay dos hallazgos nuevos que bloquean la entrega: no existe base de datos en producción (hallazgo 9) y se agregó una credencial fija en el código del login como parche para esa falta (hallazgo 8). Las dependencias volvieron a acumular avisos (hallazgo 3).
+
 ## Hallazgos críticos
 
 ### 1. Credenciales y secreto de sesión con fallback inseguro
