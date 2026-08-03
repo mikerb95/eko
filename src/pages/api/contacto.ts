@@ -1,7 +1,7 @@
 import type { APIRoute } from 'astro'
 import { createContact } from '../../lib/contactos'
 import { notifyNewContact } from '../../lib/email'
-import { queueContactAsLead } from '../../lib/zoho'
+import { queueContactAsLead, queueContactAsSubscriber } from '../../lib/zoho'
 import { defer } from '../../lib/defer'
 import { checkRateLimit, clientIp } from '../../lib/rateLimit'
 import { consentGranted, POLITICA_VERSION } from '../../lib/legal'
