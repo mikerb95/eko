@@ -436,3 +436,178 @@ const fuentes = [
 
   <SiteFooter headline={`¿Hablamos de<br>la <em>fase 1</em>?`} />
 </Layout>
+
+<style>
+  /* ── Perfil: las cuatro líneas de negocio ────────────────────────────── */
+  .lines {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 1px;
+    background: var(--line);
+    border: 1px solid var(--line);
+    border-radius: var(--r-lg);
+    overflow: hidden;
+  }
+  .line {
+    background: var(--paper);
+    padding: clamp(20px, 2vw, 28px);
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    transition: background .3s ease;
+  }
+  /* El acento entra como punto junto al nombre y tinte de fondo en hover.
+     Nada de franja lateral: ver preferencia de diseño del proyecto. */
+  .line-name {
+    font-family: var(--font-mono);
+    font-size: 12.5px;
+    letter-spacing: 0.08em;
+    display: flex;
+    align-items: center;
+    gap: 9px;
+  }
+  .line-name::before {
+    content: "";
+    width: 7px;
+    height: 7px;
+    border-radius: 50%;
+    background: var(--line-2);
+    transition: transform .3s cubic-bezier(.2,.7,.2,1);
+  }
+  .line[data-accent="forest"] .line-name::before { background: var(--forest); }
+  .line[data-accent="deep"]   .line-name::before { background: var(--deep); }
+  .line[data-accent="clay"]   .line-name::before { background: var(--clay-2); }
+  .line[data-accent="aqua"]   .line-name::before { background: var(--aqua); }
+  .line:hover .line-name::before { transform: scale(1.5); }
+  .line[data-accent="forest"]:hover { background: color-mix(in oklab, var(--forest) 6%, #fff); }
+  .line[data-accent="deep"]:hover   { background: color-mix(in oklab, var(--deep) 6%, #fff); }
+  .line[data-accent="clay"]:hover   { background: color-mix(in oklab, var(--clay-2) 6%, #fff); }
+  .line[data-accent="aqua"]:hover   { background: color-mix(in oklab, var(--aqua) 6%, #fff); }
+
+  .line-role {
+    font-family: var(--font-display);
+    font-size: 21px;
+    line-height: 1.12;
+    letter-spacing: -0.015em;
+  }
+  .line p {
+    color: var(--ink-2);
+    font-size: 14.5px;
+    line-height: 1.55;
+  }
+  .line-foot {
+    margin-top: auto;
+    padding-top: 16px;
+    border-top: 1px solid var(--line);
+    display: grid;
+    gap: 8px;
+  }
+  .line-cap { font-size: 14px; line-height: 1.4; }
+  .line-op {
+    font-family: var(--font-mono);
+    font-size: 11.5px;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: var(--mute);
+  }
+
+  /* ── Capacidad transversal ───────────────────────────────────────────── */
+  .caps {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: clamp(20px, 3vw, 48px);
+    margin-top: clamp(28px, 3vw, 44px);
+  }
+  .caps .v {
+    font-family: var(--font-display);
+    font-size: clamp(30px, 3.4vw, 44px);
+    letter-spacing: -0.02em;
+    line-height: 1;
+  }
+  .caps .v small {
+    font-size: .38em;
+    font-style: italic;
+    color: var(--clay-ink);
+    margin-left: 5px;
+    vertical-align: top;
+  }
+  .caps .l {
+    font-size: 14px;
+    line-height: 1.5;
+    color: var(--ink-2);
+    margin-top: 12px;
+    padding-top: 12px;
+    border-top: 1px solid var(--line);
+    max-width: 30ch;
+  }
+
+  /* ── Encaje oportunidad · capacidad ──────────────────────────────────── */
+  .fit { border-top: 1px solid var(--line); }
+  .fit-row {
+    display: grid;
+    grid-template-columns: 220px 1fr 1fr;
+    gap: clamp(20px, 3vw, 48px);
+    padding: clamp(24px, 3vw, 36px) 0;
+    border-bottom: 1px solid var(--line);
+  }
+  .fit-op .code {
+    font-family: var(--font-mono);
+    font-size: 13px;
+    color: var(--clay-ink);
+    letter-spacing: 0.05em;
+  }
+  .fit-op .chips { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 14px; }
+  .chip {
+    font-family: var(--font-mono);
+    font-size: 11px;
+    letter-spacing: 0.05em;
+    padding: 5px 10px;
+    border-radius: 999px;
+    background: var(--paper-warm);
+    border: 1px solid var(--line);
+  }
+  .fit-col .lbl {
+    font-family: var(--font-mono);
+    font-size: 11.5px;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--mute);
+    margin-bottom: 10px;
+  }
+  .fit-col p { color: var(--ink-2); font-size: 15px; line-height: 1.55; max-width: 46ch; }
+  .fit-col.is-gap .lbl { color: var(--clay-ink); }
+  .fit-cubre {
+    display: inline-flex;
+    margin-top: 14px;
+    font-family: var(--font-mono);
+    font-size: 11.5px;
+    letter-spacing: 0.05em;
+    padding: 6px 12px;
+    border-radius: 999px;
+    color: var(--deep);
+    background: color-mix(in oklab, var(--deep) 8%, #fff);
+  }
+  .fit-note {
+    margin-top: clamp(22px, 2.5vw, 32px);
+    color: var(--mute);
+    font-size: 14px;
+    line-height: 1.6;
+    max-width: 72ch;
+  }
+  .fit-note code {
+    font-family: var(--font-mono);
+    font-size: 12.5px;
+    padding: 2px 6px;
+    border-radius: 5px;
+    background: var(--paper-warm);
+    border: 1px solid var(--line);
+  }
+
+  @media (max-width: 1000px) {
+    .lines, .caps { grid-template-columns: repeat(2, 1fr); }
+    .fit-row { grid-template-columns: 1fr; }
+  }
+  @media (max-width: 620px) {
+    .lines, .caps { grid-template-columns: 1fr; }
+  }
+</style>
