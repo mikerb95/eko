@@ -17,14 +17,14 @@ recortar alcance, y es el argumento visual central de la pieza gráfica.
 
 | Componente | Qué es | Alcance 1 | Alcance 1+2 |
 |---|---|---|---|
-| Construcción | Valor de crear la plataforma, dividido en 24 cuotas | $500.000/mes | $1.580.000/mes |
-| Operación | Servidores, SSL, despliegues, backups, monitoreo | $290.000/mes | $450.000/mes |
-| Soporte | Bolsa de horas, L a V 8am–5pm, respuesta ≤24 h | $340.000/mes (4 h) | $780.000/mes (12 h) |
-| **Total** | | **$1.130.000/mes** | **$2.810.000/mes** |
+| Construcción | Valor de crear la plataforma, dividido en 24 cuotas | $250.000/mes | $790.000/mes |
+| Operación | Servidores, SSL, despliegues, backups, monitoreo | $145.000/mes | $225.000/mes |
+| Soporte | Bolsa de horas, L a V 8am–5pm, respuesta ≤24 h | $170.000/mes (4 h) | $390.000/mes (12 h) |
+| **Total** | | **$565.000/mes** | **$1.405.000/mes** |
 
-- Valor de construcción implícito: **$12.000.000** (sitio) y **$38.000.000** (sitio + plataforma).
-- Total del contrato a 24 meses: **$27.120.000** y **$67.440.000**.
-- Desde el mes 25 la mensualidad baja a **$630.000** y **$1.230.000** (desaparece la construcción).
+- Valor de construcción implícito: **$6.000.000** (sitio) y **$19.000.000** (sitio + plataforma).
+- Total del contrato a 24 meses: **$13.560.000** y **$33.720.000**.
+- Desde el mes 25 la mensualidad baja a **$315.000** y **$615.000** (desaparece la construcción).
 
 ### Por qué estos números en el mercado colombiano
 
@@ -33,8 +33,8 @@ recortar alcance, y es el argumento visual central de la pieza gráfica.
   defendible mostrando el sitio ya construido.
 - Un módulo administrativo con CRM propio, integración a Zoho, tableros y controles de seguridad
   arranca en $25M y sube rápido. $26M adicionales es una cifra conservadora para lo que implica.
-- La mensualidad de $1.130.000 (≈USD 280) está dentro de lo que una empresa de este tamaño ya paga
-  por servicios digitales sueltos. La de $2.810.000 (≈USD 700) es una decisión de gerencia, no de
+- La mensualidad de $565.000 (≈USD 140) está dentro de lo que una empresa de este tamaño ya paga
+  por servicios digitales sueltos. La de $1.405.000 (≈USD 350) es una decisión de gerencia, no de
   presupuesto operativo, y por eso necesita las palancas de flexibilidad.
 - Hosting real de este sitio cuesta bastante menos de $290.000. El margen ahí cubre despliegues,
   monitoreo y el riesgo de picos de tráfico. No conviene bajarlo: es el rubro que sostiene la
@@ -44,8 +44,8 @@ recortar alcance, y es el argumento visual central de la pieza gráfica.
 
 ### Palancas de negociación (en orden de qué ceder primero)
 
-1. **Plazo a 36 meses.** $965.000 y $2.290.000. Cede margen de tiempo, no de plata.
-2. **Anticipo del 30%.** $980.000 y $2.340.000, con $3.600.000 o $11.400.000 de caja al inicio.
+1. **Plazo a 36 meses.** $482.000 y $1.143.000. Cede margen de tiempo, no de plata.
+2. **Anticipo del 30%.** $490.000 y $1.170.000, con $1.800.000 o $5.700.000 de caja al inicio.
    Esta es la mejor para ti si necesitas liquidez.
 3. **Fases.** Arrancar con el alcance 1 y activar la plataforma después. Es la salida natural si
    dice que sí pero se asusta con el número grande.
@@ -72,13 +72,13 @@ comprometerte con todo de una vez.
 **Alcance 1. Sitio y contenido.** El sitio completo en español e inglés, con página propia para cada
 línea de negocio, la agenda de recolección en línea y un panel donde ustedes publican el blog, las
 normativas y las redes sociales sin depender de nadie.
-**$1.130.000 al mes.**
+**$565.000 al mes.**
 
 **Alcance 2. Plataforma completa.** Todo lo anterior más la administración del negocio adentro:
 gestión de clientes con historial y documentos, integración con Zoho para no digitar dos veces,
 tableros de control, y la capa de seguridad de la información que corresponde (roles y permisos,
 doble factor, registro de auditoría y copias cifradas).
-**$2.810.000 al mes.**
+**$1.405.000 al mes.**
 
 En los dos casos es una sola mensualidad a 24 meses que ya incluye tres cosas: la construcción de la
 plataforma repartida en cuotas, la operación en servidores con backups y monitoreo, y el soporte con
@@ -87,12 +87,12 @@ respuesta al incidente dentro de las 24 horas siguientes al reporte, de lunes a 
 Ekosolv, como debe ser.
 
 Un detalle que vale la pena mirar: en el mes 25 la mensualidad baja, porque la construcción ya quedó
-pagada. Queda en $630.000 o $1.230.000 según el alcance.
+pagada. Queda en $315.000 o $615.000 según el alcance.
 
 Si te decides por el alcance completo, va incluida sin costo una capacitación en inteligencia
 artificial para el equipo. Son seis sesiones, cuatro virtuales y dos presenciales, sobre el
 ecosistema de Claude aplicado a lo que ustedes hacen todos los días: informes, revisión de
-normativa, análisis de documentos. Su valor comercial es de $6.400.000.
+normativa, análisis de documentos. Su valor comercial es de $3.200.000.
 
 Acá está el detalle completo, con la comparación de los dos alcances, las condiciones y cuatro
 formas de ajustar el valor mensual si hace falta:
