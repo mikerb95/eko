@@ -20,7 +20,7 @@ La integridad del repositorio git es correcta (`git fsck` limpio, working tree l
 ## Hallazgos críticos
 
 ### 1. Credenciales y secreto de sesión con fallback inseguro
-`src/lib/auth.ts:12-18`
+`src/lib/auth.ts:12-18` · **Estado: resuelto (2026-07-05).** `requireEnv()` lanza en producción si falta `AUTH_SECRET`, y las credenciales salieron de `auth.ts` hacia la tabla `users` (ver hallazgo 7). El texto original se conserva abajo.
 
 Si `AUTH_SECRET`, `ADMIN_USERNAME` o `ADMIN_PASSWORD` no están configuradas como variables de entorno, producción usa por defecto `admin` / `ekosolv2026` y el secreto HMAC `dev-insecure-secret-change-me`. Con esos valores cualquiera puede entrar a `/admin` o forjar cookies de sesión válidas. Los valores están además documentados en `.env.example` y embebidos en los artefactos de build versionados (ver hallazgo 2), por lo que son públicos para cualquiera con acceso al repo.
 
