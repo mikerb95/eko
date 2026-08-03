@@ -1,4 +1,4 @@
-import { createClient, type Client } from '@libsql/client'
+import { asegurarEsquema, cliente } from './db'
 
 // Mensajes del formulario de contacto público. Misma DB libSQL/Turso que el
 // CMS y las órdenes, con su propio módulo y tabla.
@@ -37,51 +37,9 @@ export interface Contact {
   updated_at?: string
 }
 
-let _db: Client | null = null
-let _ready: Promise<void> | null = null
-
-function client(): Client {
-  if (_db) return _db
-  const url = import.meta.env.DATABASE_URL || process.env.DATABASE_URL || 'file:./data/cms.db'
-  const authToken = import.meta.env.DATABASE_AUTH_TOKEN || process.env.DATABASE_AUTH_TOKEN
-  _db = createClient({ url, authToken })
-  return _db
-}
-
-async function ensureSchema(): Promise<void> {
-  if (_ready) return _ready
-  _ready = (async () => {
-    await client().execute(`CREATE TABLE IF NOT EXISTS contacts (
-      id INTEGER PRIMARY KEY AUTOINCREMENT,
-      name TEXT NOT NULL DEFAULT '',
-      email TEXT NOT NULL DEFAULT '',
-      company TEXT NOT NULL DEFAULT '',
-      phone TEXT NOT NULL DEFAULT '',
-      sector TEXT NOT NULL DEFAULT '',
-      service_lines TEXT NOT NULL DEFAULT '',
-      message TEXT NOT NULL DEFAULT '',
-      source TEXT NOT NULL DEFAULT 'web',
-      status TEXT NOT NULL DEFAULT 'nuevo',
-      consent_at TEXT NOT NULL DEFAULT '',
-      consent_version TEXT NOT NULL DEFAULT '',
-      consent_ip TEXT NOT NULL DEFAULT '',
-      marketing_at TEXT NOT NULL DEFAULT '',
-      created_at TEXT NOT NULL DEFAULT '',
-      updated_at TEXT NOT NULL DEFAULT ''
-    )`)
-    // Migración aditiva idempotente: `CREATE TABLE IF NOT EXISTS` no toca una
-    // tabla que ya existe, así que las bases anteriores a la autorización de
-    // datos necesitan las columnas por separado.
-    for (const col of ['consent_at', 'consent_version', 'consent_ip', 'marketing_at']) {
-      try {
-        await client().execute(`ALTER TABLE contacts ADD COLUMN ${col} TEXT NOT NULL DEFAULT ''`)
-      } catch (e: any) {
-        if (!String(e?.message || '').includes('duplicate column')) throw e
-      }
-    }
-  })()
-  return _ready
-}
+// La conexión y el esquema viven en `db.ts`, compartidos por todos los módulos.
+const client = cliente
+const ensureSchema = asegurarEsquema
 
 const now = () => new Date().toISOString()
 

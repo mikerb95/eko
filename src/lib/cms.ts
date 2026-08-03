@@ -1,4 +1,4 @@
-import { createClient, type Client } from '@libsql/client'
+import { asegurarEsquema, cliente, dbEsRemota, dbUrl } from './db'
 import seedPosts from '../data/blog-posts.json'
 import seedNormativas from '../data/normativas.json'
 
@@ -48,74 +48,6 @@ const ensureSchema = asegurarEsquema
 
 function getDbUrl(): string | null {
   return dbEsRemota() ? dbUrl() : null
-}
-
-async function ensureSchema(): Promise<void> {
-  if (_ready) return _ready
-  _ready = (async () => {
-    const db = client()
-    await db.execute(`CREATE TABLE IF NOT EXISTS posts (
-      id INTEGER PRIMARY KEY AUTOINCREMENT,
-      slug TEXT UNIQUE NOT NULL,
-      category TEXT NOT NULL DEFAULT '',
-      date TEXT NOT NULL DEFAULT '',
-      readtime TEXT NOT NULL DEFAULT '',
-      accent TEXT NOT NULL DEFAULT 'deep',
-      featured INTEGER NOT NULL DEFAULT 0,
-      title TEXT NOT NULL DEFAULT '',
-      lede TEXT NOT NULL DEFAULT '',
-      sections TEXT NOT NULL DEFAULT '[]',
-      image TEXT NOT NULL DEFAULT '',
-      updated_at TEXT NOT NULL DEFAULT ''
-    )`)
-    await db.execute(`CREATE TABLE IF NOT EXISTS normativas (
-      id INTEGER PRIMARY KEY AUTOINCREMENT,
-      col INTEGER NOT NULL DEFAULT 1,
-      position INTEGER NOT NULL DEFAULT 0,
-      code TEXT NOT NULL DEFAULT '',
-      title TEXT NOT NULL DEFAULT '',
-      body TEXT NOT NULL DEFAULT '',
-      tags TEXT NOT NULL DEFAULT '[]',
-      updated_at TEXT NOT NULL DEFAULT ''
-    )`)
-
-    // Migraciones aditivas. `CREATE TABLE IF NOT EXISTS` no toca una tabla que
-    // ya existe, así que las columnas nuevas hay que añadirlas aparte o las
-    // bases ya desplegadas se quedan sin ellas.
-    await addColumnIfMissing(db, 'posts', 'image', `TEXT NOT NULL DEFAULT ''`)
-  })()
-  return _ready
-}
-
-/**
- * `ALTER TABLE ... ADD COLUMN` idempotente.
- *
- * SQLite no tiene `ADD COLUMN IF NOT EXISTS`, así que se intenta y se ignora el
- * único error esperable: que la columna ya exista. Deliberadamente NO se
- * consulta antes con `PRAGMA table_info`, por dos razones:
- *
- *  - Añadía una dependencia más sobre el comportamiento del driver remoto
- *    (Turso por HTTP) que solo se podía verificar en producción. Si el PRAGMA
- *    fallara, la columna no se crearía y todo guardado de artículo reventaría
- *    con "no such column".
- *  - No elimina la carrera igualmente: entre el PRAGMA y el ALTER puede entrar
- *    otra instancia, así que el `catch` de "duplicate column" hace falta de
- *    todos modos. Con él basta.
- *
- * Se ejecuta en cada arranque: tiene que ser barato y no fallar nunca.
- */
-async function addColumnIfMissing(db: Client, table: string, column: string, decl: string): Promise<void> {
-  try {
-    await db.execute(`ALTER TABLE ${table} ADD COLUMN ${column} ${decl}`)
-    console.log(`[cms] columna añadida: ${table}.${column}`)
-  } catch (e) {
-    // "duplicate column name" = la columna ya está. Es el camino normal en
-    // todos los arranques después del primero.
-    const msg = String((e as Error)?.message || e).toLowerCase()
-    if (!msg.includes('duplicate column')) {
-      console.error(`[cms] no se pudo añadir ${table}.${column}:`, msg)
-    }
-  }
 }
 
 const now = () => new Date().toISOString()

@@ -1,4 +1,4 @@
-import { createClient, type Client } from '@libsql/client'
+import { asegurarEsquema, cliente } from './db'
 
 // Operaciones: órdenes de recolección RAEE (Fase 1 del panel operativo).
 // Comparte la misma DB Turso/libSQL que el CMS pero con su propio módulo.
@@ -75,69 +75,9 @@ export interface OrderEvent {
   at: string
 }
 
-let _db: Client | null = null
-let _ready: Promise<void> | null = null
-
-function client(): Client {
-  if (_db) return _db
-  const url = import.meta.env.DATABASE_URL || process.env.DATABASE_URL || 'file:./data/cms.db'
-  const authToken = import.meta.env.DATABASE_AUTH_TOKEN || process.env.DATABASE_AUTH_TOKEN
-  _db = createClient({ url, authToken })
-  return _db
-}
-
-async function ensureSchema(): Promise<void> {
-  if (_ready) return _ready
-  _ready = (async () => {
-    const db = client()
-    await db.execute(`CREATE TABLE IF NOT EXISTS orders (
-      id INTEGER PRIMARY KEY AUTOINCREMENT,
-      consecutive TEXT UNIQUE NOT NULL,
-      status TEXT NOT NULL DEFAULT 'solicitada',
-      first_name TEXT NOT NULL DEFAULT '',
-      last_name TEXT NOT NULL DEFAULT '',
-      email TEXT NOT NULL DEFAULT '',
-      phone TEXT NOT NULL DEFAULT '',
-      company TEXT NOT NULL DEFAULT '',
-      country TEXT NOT NULL DEFAULT '',
-      address TEXT NOT NULL DEFAULT '',
-      address2 TEXT NOT NULL DEFAULT '',
-      city TEXT NOT NULL DEFAULT '',
-      postal_code TEXT NOT NULL DEFAULT '',
-      waste_type TEXT NOT NULL DEFAULT '',
-      estimated_quantity TEXT NOT NULL DEFAULT '',
-      message TEXT NOT NULL DEFAULT '',
-      source TEXT NOT NULL DEFAULT 'web',
-      assigned_to TEXT NOT NULL DEFAULT '',
-      scheduled_at TEXT NOT NULL DEFAULT '',
-      internal_notes TEXT NOT NULL DEFAULT '',
-      consent_at TEXT NOT NULL DEFAULT '',
-      consent_version TEXT NOT NULL DEFAULT '',
-      consent_ip TEXT NOT NULL DEFAULT '',
-      marketing_at TEXT NOT NULL DEFAULT '',
-      created_at TEXT NOT NULL DEFAULT '',
-      updated_at TEXT NOT NULL DEFAULT ''
-    )`)
-    // Migración idempotente para bases ya existentes sin estas columnas.
-    for (const col of ['waste_type', 'estimated_quantity', 'consent_at', 'consent_version', 'consent_ip', 'marketing_at']) {
-      try {
-        await db.execute(`ALTER TABLE orders ADD COLUMN ${col} TEXT NOT NULL DEFAULT ''`)
-      } catch (e: any) {
-        if (!String(e?.message || '').includes('duplicate column')) throw e
-      }
-    }
-    await db.execute(`CREATE TABLE IF NOT EXISTS order_events (
-      id INTEGER PRIMARY KEY AUTOINCREMENT,
-      order_id INTEGER NOT NULL,
-      user TEXT NOT NULL DEFAULT '',
-      from_status TEXT NOT NULL DEFAULT '',
-      to_status TEXT NOT NULL DEFAULT '',
-      note TEXT NOT NULL DEFAULT '',
-      at TEXT NOT NULL DEFAULT ''
-    )`)
-  })()
-  return _ready
-}
+// La conexión y el esquema viven en `db.ts`, compartidos por todos los módulos.
+const client = cliente
+const ensureSchema = asegurarEsquema
 
 const now = () => new Date().toISOString()
 

@@ -15,7 +15,7 @@
  * reejecución: encolar dos veces el mismo contacto no crea dos leads.
  */
 
-import { createClient, type Client } from '@libsql/client'
+import { asegurarEsquema, cliente } from './db'
 
 /**
  * Qué se va a crear del otro lado. `crm_lead` y `campaigns_subscriber` están
@@ -56,43 +56,9 @@ export interface OutboxItem {
   updated_at: string
 }
 
-let _db: Client | null = null
-let _ready: Promise<void> | null = null
-
-function client(): Client {
-  if (_db) return _db
-  const url = import.meta.env.DATABASE_URL || process.env.DATABASE_URL || 'file:./data/cms.db'
-  const authToken = import.meta.env.DATABASE_AUTH_TOKEN || process.env.DATABASE_AUTH_TOKEN
-  _db = createClient({ url, authToken })
-  return _db
-}
-
-async function ensureSchema(): Promise<void> {
-  if (_ready) return _ready
-  _ready = (async () => {
-    const db = client()
-    await db.execute(`CREATE TABLE IF NOT EXISTS zoho_outbox (
-      id INTEGER PRIMARY KEY AUTOINCREMENT,
-      entity TEXT NOT NULL,
-      ref_type TEXT NOT NULL DEFAULT '',
-      ref_id INTEGER NOT NULL DEFAULT 0,
-      payload TEXT NOT NULL DEFAULT '{}',
-      status TEXT NOT NULL DEFAULT 'pendiente',
-      attempts INTEGER NOT NULL DEFAULT 0,
-      last_error TEXT NOT NULL DEFAULT '',
-      zoho_id TEXT NOT NULL DEFAULT '',
-      created_at TEXT NOT NULL DEFAULT '',
-      updated_at TEXT NOT NULL DEFAULT ''
-    )`)
-    await db.execute(
-      `CREATE UNIQUE INDEX IF NOT EXISTS zoho_outbox_unico ON zoho_outbox (entity, ref_type, ref_id)`,
-    )
-    await db.execute(
-      `CREATE INDEX IF NOT EXISTS zoho_outbox_estado ON zoho_outbox (status, id)`,
-    )
-  })()
-  return _ready
-}
+// La conexión y el esquema viven en `db.ts`, compartidos por todos los módulos.
+const client = cliente
+const ensureSchema = asegurarEsquema
 
 const now = () => new Date().toISOString()
 

@@ -1,4 +1,4 @@
-import { createClient, type Client } from '@libsql/client'
+import { asegurarEsquema, cliente } from './db'
 import { UserError } from './apiError'
 
 // Usuarios del panel: credenciales hasheadas (PBKDF2 via WebCrypto, sin deps)
@@ -28,34 +28,13 @@ export interface User {
 let _db: Client | null = null
 let _ready: Promise<void> | null = null
 
+// La conexión y el esquema viven en `db.ts`, compartidos por todos los módulos.
+const client = cliente
+const ensureSchema = asegurarEsquema
+
+/** Lee de `import.meta.env` (Astro) o `process.env` (runtime de node). */
 function env(key: string, fallback = ''): string {
-  return (import.meta.env as any)[key] || (process.env as any)[key] || fallback
-}
-
-function client(): Client {
-  if (_db) return _db
-  const url = env('DATABASE_URL', 'file:./data/cms.db')
-  const authToken = env('DATABASE_AUTH_TOKEN') || undefined
-  _db = createClient({ url, authToken })
-  return _db
-}
-
-async function ensureSchema(): Promise<void> {
-  if (_ready) return _ready
-  _ready = (async () => {
-    const db = client()
-    await db.execute(`CREATE TABLE IF NOT EXISTS users (
-      id INTEGER PRIMARY KEY AUTOINCREMENT,
-      username TEXT UNIQUE NOT NULL,
-      name TEXT NOT NULL DEFAULT '',
-      role TEXT NOT NULL DEFAULT 'lectura',
-      pass_hash TEXT NOT NULL DEFAULT '',
-      active INTEGER NOT NULL DEFAULT 1,
-      created_at TEXT NOT NULL DEFAULT '',
-      updated_at TEXT NOT NULL DEFAULT ''
-    )`)
-  })()
-  return _ready
+  return (import.meta.env as any)?.[key] || (process.env as any)?.[key] || fallback
 }
 
 const now = () => new Date().toISOString()

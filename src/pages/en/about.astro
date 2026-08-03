@@ -99,18 +99,6 @@ const poster = await getImage({
   width: 1600,
   format: 'webp',
 })
-
-/*
- * El póster del vídeo pesaba 616 KB, más que ninguna otra imagen del sitio, y
- * es lo primero que se ve en esta página. `getImage` devuelve la ruta ya
- * optimizada, que es lo que necesita el atributo `poster` (una URL, no un
- * elemento).
- */
-const poster = await getImage({
-  src: imagen('banner-solar-poster.jpg'),
-  width: 1600,
-  format: 'webp',
-})
 ---
 
 <LayoutEn activePath="/en/about">
