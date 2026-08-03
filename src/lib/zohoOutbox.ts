@@ -17,8 +17,16 @@
 
 import { createClient, type Client } from '@libsql/client'
 
-/** Qué se va a crear del otro lado. Solo `crm_lead` está implementado hoy. */
-export const OUTBOX_ENTITIES = ['crm_lead', 'books_contact', 'books_invoice'] as const
+/**
+ * Qué se va a crear del otro lado. `crm_lead` y `campaigns_subscriber` están
+ * implementados; las dos de Books esperan el mapeo (ver el final de `zohoMap.ts`).
+ */
+export const OUTBOX_ENTITIES = [
+  'crm_lead',
+  'campaigns_subscriber',
+  'books_contact',
+  'books_invoice',
+] as const
 export type OutboxEntity = (typeof OUTBOX_ENTITIES)[number]
 
 export const OUTBOX_STATUSES = ['pendiente', 'sincronizado', 'fallido', 'descartado'] as const
