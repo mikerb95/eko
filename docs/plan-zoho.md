@@ -87,7 +87,18 @@ El punto clave: **los leads se acumulan desde hoy**. El día que existan las cre
 
 ## 6. Siguiente paso concreto
 
-1. Confirmar con el equipo comercial: ¿qué campo de Zoho CRM debe llenar cada campo del formulario de recolecciones? ¿Lead o Deal directo?
-2. Crear el self-client en Zoho API Console y generar el refresh token.
-3. Implementar `src/lib/zoho.ts` + hook en `createOrder()` (Camino A, caso "nuevo lead").
-4. Verificar end-to-end con una solicitud real antes de tocar los flujos de vuelta (Zoho → web).
+Se eligió el **Camino A** y ya está construido (§2). Lo que queda:
+
+1. **Crear el self-client** en https://api-console.zoho.com y generar el refresh token con los scopes mínimos. El procedimiento exacto está en `.env.example`.
+2. **Confirmar el datacenter** de la cuenta (`ZOHO_DC`) y cargar las cuatro variables en Vercel (`vercel env add`).
+3. **Drenar** con `POST /api/admin/zoho {"action":"sync"}` y revisar en Zoho que los leads acumulados llegaron bien.
+4. **Ajustar el mapeo** en `src/lib/zohoMap.ts` con lo que diga comercial. Mientras no haya campos personalizados confirmados, sector, líneas de interés, tipo de residuo y consecutivo van en `Description`, que no pierde información y es reversible.
+5. **Automatizar el drenaje** una vez validado el paso 3: un cron de Vercel cada 15 minutos contra el endpoint, o llamar a `syncPending()` diferido tras cada envío. Se dejó manual a propósito para que el primer contacto con Zoho sea observado.
+6. **Definir Books** con administración (facturación al cerrar la orden). Las preguntas abiertas están al final de `src/lib/zohoMap.ts`.
+
+### Decisiones ya tomadas en la implementación
+
+- **Lead, no Deal.** La orden operativa vive en la web; duplicarla como negocio en Zoho crearía dos maestros del mismo dato. El Deal lo abre comercial cuando decide que hay negocio.
+- **Deduplicación por email** antes de crear (`findLeadByEmail`), más manejo de `DUPLICATE_DATA` por si dos envíos corren en paralelo.
+- **Fallo de credenciales corta el drenaje** en vez de quemar los 5 intentos de cada fila por el mismo motivo.
+- **Zoho responde HTTP 200 con `{error: ...}`** en el endpoint de OAuth. Verificado en pruebas: mirar solo el status no basta, y el cliente lo contempla.
