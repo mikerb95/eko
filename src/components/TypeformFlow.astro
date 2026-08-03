@@ -785,6 +785,13 @@ const selectedValues = (f: Extract<TFField, { type: 'choice' }>) =>
       el.addEventListener('change', () => clearError())
     })
 
+    // El texto de la casilla vive dentro del <label>, así que abrir la política
+    // marcaría la casilla de rebote. Un titular no puede autorizar por el simple
+    // hecho de ir a leer qué está autorizando.
+    flow.querySelectorAll('.tf-consent-text a').forEach((a) => {
+      a.addEventListener('click', (e) => e.stopPropagation())
+    })
+
     nextBtn.addEventListener('click', next)
     backBtn.addEventListener('click', () => goTo(current - 1))
 
