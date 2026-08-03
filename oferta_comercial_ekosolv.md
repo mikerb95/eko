@@ -14,7 +14,7 @@ cierre del alcance completo.
 | **B. Propuesta económica** | Solo gerencia, correo aparte | Sí | https://claude.ai/code/artifact/3e541f60-a018-4ff7-b1d1-abfca303129b |
 
 > **Cuidado al enviar:** el link B no puede ir en el correo grupal. Los dos documentos se ven
-> parecidos porque comparten identidad visual, así que verificá el ID del enlace antes de pegarlo.
+> parecidos porque comparten identidad visual, así que verifica el ID del enlace antes de pegarlo.
 > El documento A termina diciendo explícitamente que lo económico se envía por separado a gerencia,
 > lo cual además es útil: le da al gerente la excusa natural para manejar el número él.
 
