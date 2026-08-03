@@ -1,0 +1,321 @@
+---
+import LayoutEn from '../../layouts/LayoutEn.astro'
+import SiteFooter from '../../components/SiteFooter.astro'
+import LegalDoc from '../../components/LegalDoc.astro'
+import type { LegalSection } from '../../components/LegalDoc.astro'
+import {
+  RESPONSABLE,
+  FINALIDADES,
+  ENCARGADOS,
+  DERECHOS,
+  PLAZOS,
+  POLITICA_VERSION,
+  POLITICA_VIGENCIA,
+  LEGAL_PATHS,
+} from '../../lib/legal'
+
+const secciones: LegalSection[] = [
+  { id: 'controller', titulo: 'Data controller' },
+  { id: 'scope', titulo: 'Scope' },
+  { id: 'data', titulo: 'Data we collect' },
+  { id: 'purposes', titulo: 'Purposes' },
+  { id: 'authorisation', titulo: 'Data subject authorisation' },
+  { id: 'rights', titulo: 'Data subject rights' },
+  { id: 'procedure', titulo: 'Enquiries and complaints' },
+  { id: 'processors', titulo: 'Processors and international transfer' },
+  { id: 'security', titulo: 'Information security' },
+  { id: 'retention', titulo: 'Retention and deletion' },
+  { id: 'sensitive', titulo: 'Sensitive data and minors' },
+  { id: 'cookies', titulo: 'Cookies' },
+  { id: 'validity', titulo: 'Validity and changes' },
+]
+---
+
+<LayoutEn
+  title="Personal data processing policy — Ekosolv"
+  description="Ekosolv S.A.S. personal data processing policy under Colombian Law 1581 of 2012 and Decree 1074 of 2015: purposes, data subject rights, contact channel, and international transfer."
+  activePath="/en/data-processing-policy"
+>
+  <LegalDoc
+    lang="en"
+    eyebrow="Legal · Data protection"
+    eyebrowRight="Law 1581 of 2012"
+    titulo="Personal data"
+    tituloEm="processing policy"
+    intro="What data we collect when you write to us or book a collection, what we use it for, who else processes it, and how you can ask us to correct or delete it. Written to be read, not to shield us."
+    version={POLITICA_VERSION}
+    vigencia={POLITICA_VIGENCIA}
+    secciones={secciones}
+  >
+    <section class="legal-sec" id="controller">
+      <h2><span>Data controller</span></h2>
+      <p>
+        The controller of your personal data is <strong>{RESPONSABLE.razonSocial}</strong>,
+        a Colombian company registered under tax ID (NIT) {RESPONSABLE.nit}.
+      </p>
+      <div class="legal-table-wrap">
+        <table>
+          <tbody>
+            <tr>
+              <td>Registered address</td>
+              <td>{RESPONSABLE.direccion}</td>
+            </tr>
+            <tr>
+              <td>Phone</td>
+              <td><a href={RESPONSABLE.telefonoHref}>{RESPONSABLE.telefono}</a></td>
+            </tr>
+            <tr>
+              <td>Data subject contact channel</td>
+              <td><a href={`mailto:${RESPONSABLE.correo}`}>{RESPONSABLE.correo}</a></td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+      <p>
+        Any request about your personal data is handled through the address above. No
+        special form is required, and you do not have to justify your reasons.
+      </p>
+    </section>
+
+    <section class="legal-sec" id="scope">
+      <h2><span>Scope</span></h2>
+      <p>
+        This policy covers personal data collected through this website, by email, by
+        WhatsApp, by phone, and in the course of our commercial relationships with
+        clients and suppliers. It is governed by Colombian
+        <strong> Law 1581 of 2012</strong>, <strong>Decree 1074 of 2015</strong>, and
+        related data protection rules.
+      </p>
+      <p>
+        Our services are aimed at companies. Even so, the data of the individuals acting
+        on behalf of those companies is personal data and receives exactly the treatment
+        described here.
+      </p>
+    </section>
+
+    <section class="legal-sec" id="data">
+      <h2><span>Data we collect</span></h2>
+      <p>We only ask for what we need to handle the request. What each form collects:</p>
+      <h3>Contact form</h3>
+      <ul>
+        <li>Name.</li>
+        <li>Work email address.</li>
+        <li>Phone number, if you choose to give it.</li>
+        <li>Company and sector.</li>
+        <li>Service lines of interest and the message you write.</li>
+      </ul>
+      <h3>Collection booking form</h3>
+      <ul>
+        <li>First and last name.</li>
+        <li>Email address and phone number.</li>
+        <li>Company and country.</li>
+        <li>
+          <strong>Address, city, and postal code</strong> of the site where the waste is,
+          since without it there is no collection to arrange.
+        </li>
+        <li>Waste type, estimated quantity, and any details you add.</li>
+      </ul>
+      <h3>In both cases</h3>
+      <ul>
+        <li>
+          The date and time you authorised the processing, the version of this policy you
+          accepted, and the IP address you did it from. That is not curiosity: the law
+          requires us to keep proof of the authorisation.
+        </li>
+      </ul>
+      <p>
+        We do not buy databases, and we do not collect data from sources you are unaware
+        of.
+      </p>
+    </section>
+
+    <section class="legal-sec" id="purposes">
+      <h2><span>Purposes</span></h2>
+      <p>We process your personal data in order to:</p>
+      <ul>
+        {FINALIDADES.en.map((f) => <li>{f}</li>)}
+      </ul>
+      <p>
+        This list is closed. If we ever need to use your data for something not listed
+        here, we will ask you separately, with a new authorisation.
+      </p>
+    </section>
+
+    <section class="legal-sec" id="authorisation">
+      <h2><span>Data subject authorisation</span></h2>
+      <p>
+        Before collecting your data we ask for prior, express, and informed
+        authorisation, through a checkbox you tick yourself. It is never pre-ticked, and
+        the form will not submit unless you tick it.
+      </p>
+      <p>
+        We store the date, time, and version of the text you accepted, so we can evidence
+        not only <em>that</em> you authorised but <em>what</em> you authorised. If you
+        want a copy of your authorisation, ask through the contact channel and we will
+        send it.
+      </p>
+      <div class="legal-note">
+        <p>
+          You may withdraw your authorisation at any time by writing to us. Withdrawal
+          does not apply where a legal or contractual duty requires us to keep the data,
+          such as the records of a collection already performed, which form part of the
+          environmental traceability the authority may require from us.
+        </p>
+      </div>
+    </section>
+
+    <section class="legal-sec" id="rights">
+      <h2><span>Data subject rights</span></h2>
+      <p>As the subject of your personal data, you have the right to:</p>
+      <ul>
+        {DERECHOS.en.map((d) => <li>{d}</li>)}
+      </ul>
+      <p>
+        These rights may be exercised by the data subject, their successors, their legal
+        representative or attorney, or a third party authorised by law.
+      </p>
+    </section>
+
+    <section class="legal-sec" id="procedure">
+      <h2><span>Enquiries and complaints</span></h2>
+      <p>
+        Write to <a href={`mailto:${RESPONSABLE.correo}`}>{RESPONSABLE.correo}</a> with
+        your name, an email or phone number, and what you need. Telling us exactly which
+        data you want corrected or deleted lets us resolve it faster.
+      </p>
+      <h3>Enquiries</h3>
+      <p>
+        We reply within a maximum of <strong>{PLAZOS.consultaDias} business days</strong>.
+        If we cannot, we explain why and resolve it within the following
+        {' '}{PLAZOS.consultaProrrogaDias} business days.
+      </p>
+      <h3>Complaints</h3>
+      <p>
+        We reply within a maximum of <strong>{PLAZOS.reclamoDias} business days</strong>
+        counted from the day after receipt. If the complaint is incomplete we tell you
+        within five days so you can complete it; if two months pass without a reply from
+        you, we treat it as withdrawn. Where we need more time, we tell you and resolve
+        within the following {PLAZOS.reclamoProrrogaDias} business days.
+      </p>
+      <p>
+        If you are not satisfied with our answer, you may file a complaint with the
+        <strong> Colombian Superintendency of Industry and Commerce</strong>. The law
+        requires exhausting the process with us first.
+      </p>
+    </section>
+
+    <section class="legal-sec" id="processors">
+      <h2><span>Processors and international transfer</span></h2>
+      <p>
+        To operate we use technology providers that process your data on our behalf and
+        under our instructions. Their servers are outside Colombia, so an international
+        transfer of data takes place and you are entitled to know exactly where to:
+      </p>
+      <div class="legal-table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th>Provider</th>
+              <th>Purpose</th>
+              <th>Processing country</th>
+            </tr>
+          </thead>
+          <tbody>
+            {ENCARGADOS.map((e) => (
+              <tr>
+                <td>{e.nombre}</td>
+                <td>{e.rol.en}</td>
+                <td>{e.pais.en}</td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+      <p>
+        The authorisation you grant in our forms expressly covers this transfer. We do
+        not sell your personal data, and we do not pass it to third parties for
+        advertising purposes.
+      </p>
+      <p>
+        Where an environmental, tax, or judicial authority requires information from us
+        within its powers, we provide it. That is not a commercial disclosure: it is a
+        legal obligation.
+      </p>
+    </section>
+
+    <section class="legal-sec" id="security">
+      <h2><span>Information security</span></h2>
+      <p>
+        We apply reasonable technical and administrative measures to protect your data:
+        encryption in transit across the whole site, access to the internal panel
+        restricted per user and session, and a log of every status change on each
+        request.
+      </p>
+      <p>
+        No measure is infallible. If an incident affects your personal data, we report it
+        to the Superintendency of Industry and Commerce and to the affected data subjects,
+        as the rules require.
+      </p>
+    </section>
+
+    <section class="legal-sec" id="retention">
+      <h2><span>Retention and deletion</span></h2>
+      <p>We keep your data for as long as a purpose justifies it. Specifically:</p>
+      <ul>
+        <li>
+          Requests that do not lead to a contract: up to two years, so we can pick the
+          conversation back up if you return.
+        </li>
+        <li>
+          Client data and collection records: for the term required by environmental,
+          accounting, and tax rules, which can reach ten years.
+        </li>
+        <li>
+          Proof of authorisation: for as long as we keep the data it refers to, and
+          afterwards for as long as needed to evidence it.
+        </li>
+      </ul>
+      <p>Once the term expires, we delete or anonymise the information.</p>
+    </section>
+
+    <section class="legal-sec" id="sensitive">
+      <h2><span>Sensitive data and minors</span></h2>
+      <p>
+        We do not request sensitive data on this site. If a specific procedure ever made
+        it necessary, we would tell you, explain that you are not obliged to provide it,
+        and request separate authorisation.
+      </p>
+      <p>
+        Our services are not aimed at minors and we do not intentionally collect their
+        data. If we find that we have received a minor's data without authorisation from
+        whoever holds parental authority, we delete it.
+      </p>
+    </section>
+
+    <section class="legal-sec" id="cookies">
+      <h2><span>Cookies</span></h2>
+      <p>
+        This site uses no advertising cookies and no third-party analytics. The only
+        cookie we set is the internal panel's session cookie, and it is strictly
+        necessary for that panel to work. Details in the
+        <a href={LEGAL_PATHS.en.cookies}> Cookie policy</a>.
+      </p>
+    </section>
+
+    <section class="legal-sec" id="validity">
+      <h2><span>Validity and changes</span></h2>
+      <p>
+        This is version {POLITICA_VERSION} of the policy and it applies from the date
+        shown at the top. If we change it substantially we publish the new version here
+        with its date, and where the change affects the purposes or the recipients of the
+        data, we request a new authorisation before applying it.
+      </p>
+      <p>
+        The databases we administer have indefinite validity, without prejudice to the
+        retention terms in section 10.
+      </p>
+    </section>
+  </LegalDoc>
+
+  <SiteFooter lang="en" />
+</LayoutEn>
