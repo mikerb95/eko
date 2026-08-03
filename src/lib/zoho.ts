@@ -339,6 +339,8 @@ export interface SyncResult {
   reason?: string
   synced: number
   failed: number
+  /** Filas que se dejaron para después sin gastarles un intento. */
+  skipped: number
   /** Filas que seguían pendientes al empezar este drenaje. */
   attempted: number
 }
