@@ -85,4 +85,7 @@ export const rutasEn: Ruta[] = [
   { path: '/en/schedule-a-collection', titulo: 'Schedule a collection', descripcion: 'Arrange removal of obsolete equipment with certified transport and final disposal certificate.' },
   { path: '/en/blog', titulo: 'Journal', descripcion: 'Articles on circular economy, environmental regulation, and corporate sustainability.' },
   { path: '/en/contact', titulo: 'Contact', descripcion: 'Book a 45-minute diagnostic, free and confidential.' },
+  { path: '/en/data-processing-policy', titulo: 'Personal data processing policy', descripcion: 'Purposes, data subject rights, contact channel, and international transfer under Colombian Law 1581 of 2012.' },
+  { path: '/en/terms-of-service', titulo: 'Terms of service', descripcion: 'Conditions of use for the site and for the collection and consulting request channel.' },
+  { path: '/en/cookie-policy', titulo: 'Cookie policy', descripcion: 'Cookie inventory: one technical session cookie only, no third-party analytics and no tracking.' },
 ]
