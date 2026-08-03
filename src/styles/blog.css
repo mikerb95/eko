@@ -236,7 +236,8 @@
   margin-top: 40px;
 }
 @media (max-width: 700px) { .post-foot { grid-template-columns: 1fr; } }
-.pf-share { display: flex; gap: 20px; align-items: center; }
+/* Cinco acciones ya no caben en una línea en móvil: envuelven. */
+.pf-share { display: flex; gap: 12px 20px; align-items: center; flex-wrap: wrap; }
 .pf-share .l { font-family: var(--font-mono); font-size: 11px; letter-spacing: 0.08em; text-transform: uppercase; color: var(--mute); }
 .pf-share a { font-size: 14px; color: var(--ink); position: relative; }
 .pf-share a::after {
