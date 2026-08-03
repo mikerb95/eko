@@ -365,7 +365,16 @@ export async function syncPending(limit = 25): Promise<SyncResult> {
 
   let synced = 0
   let failed = 0
+  let skipped = 0
   for (const item of items) {
+    // Campaigns puede llegar después que el CRM. Mientras no haya listkey, sus
+    // filas se saltan sin gastar intentos: quemarles los cinco reintentos por
+    // una variable que todavía no existe las dejaría en `fallido` y habría que
+    // reencolarlas a mano el día que se configure.
+    if (item.entity === 'campaigns_subscriber' && !campaignsConfigured()) {
+      skipped++
+      continue
+    }
     try {
       const id = await push(item)
       await markSynced(item.id, id)
