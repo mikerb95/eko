@@ -1,0 +1,125 @@
+---
+import LayoutEn from '../../layouts/LayoutEn.astro'
+import SiteFooter from '../../components/SiteFooter.astro'
+import LegalDoc from '../../components/LegalDoc.astro'
+import type { LegalSection } from '../../components/LegalDoc.astro'
+import { RESPONSABLE, POLITICA_VERSION, POLITICA_VIGENCIA, LEGAL_PATHS } from '../../lib/legal'
+
+const secciones: LegalSection[] = [
+  { id: 'what-we-use', titulo: 'What we use and what we do not' },
+  { id: 'inventory', titulo: 'Cookie inventory' },
+  { id: 'no-banner', titulo: 'Why there is no banner' },
+  { id: 'control', titulo: 'How to control them' },
+  { id: 'changes', titulo: 'Changes' },
+]
+---
+
+<LayoutEn
+  title="Cookie policy — Ekosolv"
+  description="Which cookies the Ekosolv S.A.S. site uses. Just one technical session cookie for the internal panel: no third-party analytics, no advertising pixels, no tracking."
+  activePath="/en/cookie-policy"
+>
+  <LegalDoc
+    lang="en"
+    eyebrow="Legal · Cookies"
+    eyebrowRight="One cookie, and it is technical"
+    titulo="Cookie"
+    tituloEm="policy"
+    intro="The short version: this site does not track you. There is no Google Analytics, no Meta pixel, no heatmaps, no third-party tags. The only cookie that exists is the one keeping our internal panel session open."
+    version={POLITICA_VERSION}
+    vigencia={POLITICA_VIGENCIA}
+    secciones={secciones}
+  >
+    <section class="legal-sec" id="what-we-use">
+      <h2><span>What we use and what we do not</span></h2>
+      <p>
+        A cookie is a small file a site stores in your browser. Some are necessary for the
+        site to work; others exist to profile whoever is browsing. We only use the first
+        kind.
+      </p>
+      <h3>We do not use</h3>
+      <ul>
+        <li>Third-party analytics cookies, including Google Analytics.</li>
+        <li>Advertising pixels or tags from any social network.</li>
+        <li>Session recording or heatmap tools.</li>
+        <li>Profiling or behavioural advertising cookies.</li>
+      </ul>
+      <p>
+        We also embed no videos, maps, or web fonts from external servers, which is the
+        usual way a site ends up installing third-party cookies without noticing.
+      </p>
+    </section>
+
+    <section class="legal-sec" id="inventory">
+      <h2><span>Cookie inventory</span></h2>
+      <div class="legal-table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th>Cookie</th>
+              <th>Type</th>
+              <th>Purpose</th>
+              <th>Duration</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>Internal panel session</td>
+              <td>Technical, first-party</td>
+              <td>
+                Keeps the Ekosolv team member signed in to the administration panel. It
+                is cryptographically signed and cannot be read from JavaScript.
+              </td>
+              <td>8 hours</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+      <div class="legal-note">
+        <p>
+          That cookie is not set if you are only browsing the public site. It appears only
+          when signing in to the internal panel, which is for the Ekosolv team.
+        </p>
+      </div>
+    </section>
+
+    <section class="legal-sec" id="no-banner">
+      <h2><span>Why there is no banner</span></h2>
+      <p>
+        Because there is nothing to consent to. A cookie notice exists to request
+        authorisation before installing non-essential cookies, and cookies strictly
+        necessary to provide the service are exempt from that consent.
+      </p>
+      <p>
+        If we ever decide to add analytics, we will publish the updated policy first and
+        request your consent before installing anything. Until then, a banner would be
+        decorative paperwork.
+      </p>
+    </section>
+
+    <section class="legal-sec" id="control">
+      <h2><span>How to control them</span></h2>
+      <p>
+        Every browser lets you view, block, and delete cookies from its privacy settings.
+        Blocking the session cookie prevents signing in to the internal panel, but has no
+        effect on browsing the public site.
+      </p>
+      <p>
+        For the personal data we do collect, when you write to us or book a collection,
+        see the
+        <a href={LEGAL_PATHS.en.politica}> Personal data processing policy</a>.
+      </p>
+    </section>
+
+    <section class="legal-sec" id="changes">
+      <h2><span>Changes</span></h2>
+      <p>
+        If the cookies used by the site change, we update the inventory on this page with
+        its date. Questions:
+        <a href={`mailto:${RESPONSABLE.correo}`}>{RESPONSABLE.correo}</a>.
+      </p>
+    </section>
+  </LegalDoc>
+
+  <SiteFooter lang="en" />
+</LayoutEn>
