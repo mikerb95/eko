@@ -27,6 +27,8 @@ Si `AUTH_SECRET`, `ADMIN_USERNAME` o `ADMIN_PASSWORD` no están configuradas com
 **Recomendación:** en producción, lanzar un error en el arranque si estas variables no están definidas en vez de usar un fallback. Verificar que estén configuradas en las variables de entorno del proyecto en Vercel.
 
 ### 2. `.vercel/output/` versionado en git
+**Estado: resuelto (2026-07-05).** Sacado del repo y `.vercel/` añadido al `.gitignore`.
+
 ~90 archivos de build (~50 MB), incluyendo los chunks compilados de `src/lib/auth.ts` con los defaults inseguros del hallazgo 1.
 
 **Recomendación:** `git rm -r --cached .vercel` y añadir `.vercel/` al `.gitignore` (actualmente `dist/` sí está ignorado pero `.vercel/` no).
@@ -48,6 +50,8 @@ En el corte original eran 10 (1 low, 3 moderate, 6 high). Las de vite (NTLMv2 ha
 **Recomendación:** correr `npm audit fix` (resuelve tres de los cuatro sin breaking changes) y dejar `path-to-regexp` esperando a que `@vercel/routing-utils` publique la corrección aguas arriba. No aplicar `--force`.
 
 ### 4. Node.js local incompatible
+**Estado: resuelto (2026-07-07).** Node 24.18.0 LTS instalado y `.nvmrc` fijando `24` en el repo.
+
 Node v20.20.1 instalado; Astro 6 exige `>=22.12.0`. `astro check` y `astro build` no ejecutan localmente. El deploy en Vercel probablemente funciona porque usa Node 24, pero localmente impide verificar tipos y build antes de commitear/desplegar.
 
 **Recomendación:** actualizar Node local a ≥22.12 (o 24 LTS).
@@ -55,11 +59,15 @@ Node v20.20.1 instalado; Astro 6 exige `>=22.12.0`. `astro check` y `astro build
 ## Hallazgos medios
 
 ### 5. Doble lockfile
+**Estado: resuelto (2026-07-07).** Eliminado `bun.lock`; se mantiene `package-lock.json`.
+
 Coexisten `bun.lock` (abril, desactualizado) y `package-lock.json` (junio). Puede causar instalaciones inconsistentes según el gestor de paquetes usado.
 
 **Recomendación:** eliminar el lockfile del gestor que no se use activamente.
 
 ### 6. Sin rate limiting en `/api/admin/login`
+**Estado: resuelto (2026-07-07).** `src/lib/rateLimit.ts`, 5 intentos por IP cada 10 minutos. Ver la nota sobre Redis en las acciones pendientes.
+
 El endpoint de login no limita intentos, permitiendo fuerza bruta contra la contraseña del admin.
 
 **Recomendación:** regla de rate limiting en Vercel WAF sobre `/api/admin/login`.
