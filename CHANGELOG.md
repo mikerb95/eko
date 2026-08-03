@@ -2,6 +2,19 @@
 
 ## 2026-08-03
 
+### SEO
+- **Auditoría completa** (`AUDITORIA_SEO.md`): 14 hallazgos priorizados sobre las 24 páginas construidas y el árbol de `src/`. Los cuatro de prioridad alta quedaron cerrados en este mismo día; el documento lleva el estado de cada uno.
+- **Datos estructurados JSON-LD** (`src/lib/schema.ts`, `src/components/SchemaOrg.astro`): el sitio no emitía ni un bloque. Ahora cada página lleva un `@graph` con `Organization` + `ProfessionalService` (razón social, NIT, dirección de la sede, teléfono, correo, año de fundación), `WebSite`, `BreadcrumbList`, y las páginas de línea de servicio añaden su `Service` con `serviceType` buscable. Los artículos del blog emiten `BlogPosting` con `datePublished`. Todo se construye desde las fuentes únicas que ya existían: nada de datos escritos a mano.
+- **Título y descripción por página, en el inventario de rutas** (`src/lib/rutas.ts`): doce de veinticuatro páginas compartían la misma meta description por caer en el texto por defecto del layout, `/contacto` y `/servicios` incluidas. Ahora cada ruta trae los suyos, con longitud dentro de lo que Google muestra, y los layouts los leen por `path`. Las 32 páginas públicas quedaron con descripción única.
+- **Marca unificada**: `/casos`, `/normativas`, `/blog` y los artículos firmaban el título como «Eko». Todo el sitio dice «Ekosolv».
+- **Imágenes optimizadas** (`src/assets/quienes-somos/`, `src/lib/imagenes.ts`): las doce imágenes de `/quienes-somos` y `/en/about` se servían como JPEG original de hasta 616 KB, sin WebP, sin `srcset` y, diez de las doce, sin `width` ni `height` (salto de maquetación al cargar). Migradas a `astro:assets`: la carga de imágenes de la página baja de 1.647 KB a 200 KB en móvil y a 1.061 KB en escritorio, con las dimensiones ya resueltas.
+- **`article:published_time` y `article:section`** en los artículos, con `og:type="article"` en vez de `website`. La fecha se traduce a ISO desde la cadena en español que guarda el CMS (`fechaISO`); si algún día no la reconoce, omite el campo en vez de inventarlo.
+- **`twitter:image` en `Layout.astro`**: estaba en `LayoutEn` y faltaba en el layout español.
+
+### Fixed
+- **`robots.txt` ya no bloquea lo que lleva `noindex`**: `/admin`, `/docs` y `/oportunidades2630` estaban con `Disallow` *y* con `X-Robots-Tag: noindex`. Las dos cosas juntas se anulan, porque un rastreador que no puede descargar la URL nunca lee la cabecera, y el pie enlaza esas rutas desde todas las páginas públicas. Ahora son rastreables y el `noindex` sí se aplica. El control de acceso sigue siendo el middleware, que es donde siempre estuvo.
+- **`addColumnIfMissing()`** ahora tolera el error de columna duplicada en vez de fallar: dos instancias arrancando a la vez ya no rompen la migración.
+
 ### Added
 - **Integración con Zoho CRM** (`src/lib/zoho.ts`, `zohoMap.ts`, `zohoOutbox.ts`): cliente OAuth con refresh token que resuelve el access token solo, CRM v8 y Books v3. Cada mensaje de contacto y cada solicitud de recolección se encola como `crm_lead` en la tabla `zoho_outbox` en el momento de entrar, con estados (`pendiente`/`sincronizado`/`fallido`/`descartado`) y hasta 5 intentos. El drenaje se dispara desde `POST /api/admin/zoho {"action":"sync"}`, deduplicando por email antes de crear el lead. Mientras no existan credenciales la integración queda en no-op y la bandeja acumula: nada se pierde en el intervalo. Detalle en `docs/plan-zoho.md`.
 - **Endpoint de la bandeja** `/api/admin/zoho`: `GET` de estado y `POST` con `sync`, `retry` y `discard`. Solo rol admin, porque escribe en un sistema externo.
@@ -11,9 +24,6 @@
 - **Cabeceras propias para las zonas privadas** (`astro.config.mjs`): `/admin`, `/api/admin`, `/docs` y `/oportunidades2630` responden con `Cache-Control: no-store` y `X-Robots-Tag: noindex, nofollow, noarchive`. Antes respondían `public, max-age=0, must-revalidate`, que autoriza a una caché intermedia a guardar HTML con datos de una sesión ajena; y `robots.txt` es una petición, no un control: no impide que una URL termine indexada si alguien la enlaza.
 - **`infra_deploy.md`**: qué hay que contratar para producción (Vercel Pro, Turso, Resend, dominio), con costos consultados, límites de cada plan, escenario multicliente, habeas data y checklist previo a la entrega.
 - **`oferta_comercial_ekosolv.md`**: alcances, precios y plantilla de correo de la propuesta.
-
-### Fixed
-- **`addColumnIfMissing()`** ahora tolera el error de columna duplicada en vez de fallar: dos instancias arrancando a la vez ya no rompen la migración.
 
 ### Security
 - **`npm audit fix`**: cerrados los avisos de `brace-expansion` (DoS por expansión sin límite), `fast-uri` (confusión de host) y `tar` (DoS por recursión). Solo bumps de parche, `package.json` sin cambios. Quedan 3 avisos de la cadena `path-to-regexp` → `@vercel/routing-utils` → `@astrojs/vercel`, que no tienen arreglo hacia adelante: `--force` propone bajar dos majors. Ver `AUDITORIA.md` hallazgo 3.

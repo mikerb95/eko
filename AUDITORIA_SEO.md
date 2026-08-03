@@ -3,6 +3,8 @@
 Fecha: 3 de agosto de 2026
 Alcance: `src/` completo más el build de `dist/client/` (24 páginas HTML estáticas, 13 rutas ES, 13 EN, 12 artículos de blog).
 
+**Estado: los cuatro hallazgos P0 quedaron cerrados el mismo día.** Cada uno lleva su nota de cierre abajo. Los P1 y P2 siguen abiertos.
+
 ---
 
 ## Lo que ya está bien
@@ -24,7 +26,7 @@ Lo que sigue son los huecos.
 
 ## P0 — Impacto alto, arreglar primero
 
-### 1. Cero datos estructurados en todo el sitio
+### 1. Cero datos estructurados en todo el sitio · RESUELTO
 
 `grep -rn "application/ld+json\|schema.org" src/` devuelve **cero resultados**.
 
@@ -42,7 +44,9 @@ Sin esto no hay panel de conocimiento, no hay rich results en el blog, y los bus
 
 Recomendación: un componente `<SchemaOrg />` en ambos layouts que emita `Organization` + `WebSite` en todas las páginas, y que acepte un bloque adicional por página (`Service`, `BlogPosting`, `BreadcrumbList`).
 
-### 2. Doce de veinticuatro páginas comparten la misma meta description
+> **Cerrado.** `src/lib/schema.ts` y `src/components/SchemaOrg.astro`. Las 30 páginas construidas emiten un `@graph` único con `Organization` + `ProfessionalService` (razón social, NIT, dirección, teléfono, correo, año de fundación), `WebSite` y `BreadcrumbList`; las ocho páginas de línea añaden su `Service` y los artículos su `BlogPosting` con `datePublished`. Un solo `@graph` en vez de bloques sueltos, para que los `@id` se resuelvan entre sí. `sameAs` se omite mientras los perfiles sociales sigan sin verificar en `redes.ts`.
+
+### 2. Doce de veinticuatro páginas comparten la misma meta description · RESUELTO
 
 Medido sobre el HTML construido. Estas páginas no pasan `description` al layout y caen en el texto por defecto de `Layout.astro:29` y `LayoutEn.astro:23`:
 
@@ -56,7 +60,9 @@ Las doce responden literalmente: *"Acompañamos a importadores, productores y op
 
 Lo irónico es que **las descripciones buenas ya están escritas**: `src/lib/rutas.ts` tiene una por ruta, en ES y EN, y solo se usan para `llms.txt`. Basta con que los layouts las consulten por `path` cuando no reciban `description` explícita.
 
-### 3. El pie enlaza las páginas privadas desde todas las páginas públicas
+> **Cerrado.** Cada ruta de `src/lib/rutas.ts` gana un campo `seo` con título y descripción propios, y los layouts los leen con `seoDe(path)`. Las descripciones de `llms.txt` se quedan como estaban: ese formato pide una línea corta, y fundir los dos usos habría empeorado uno de los dos. Se quitaron los `title` y `description` en línea de 32 páginas; solo los artículos del blog siguen pasando el suyo, que es el único que no se puede saber de antemano. Verificado sobre el build: 30 páginas, 30 descripciones distintas.
+
+### 3. El pie enlaza las páginas privadas desde todas las páginas públicas · RESUELTO
 
 Cada una de las 24 páginas públicas emite estos enlaces:
 
@@ -72,7 +78,9 @@ Son las mismas rutas que `robots.txt` bloquea (`src/pages/robots.txt.ts`) y que 
 
 Recomendación: mostrar la columna "Proyecto" del pie solo con sesión activa, o `rel="nofollow"` como mínimo. Y decidir uno de los dos mecanismos: si se quiere `noindex` efectivo, hay que **quitar** el `Disallow` de `robots.txt` para que el rastreador pueda leer la cabecera.
 
-### 4. Imágenes sin optimizar, con impacto directo en Core Web Vitals
+> **Cerrado por la vía del `noindex`.** Los enlaces del pie ya llevaban `rel="nofollow"` (`SiteFooter.astro:242`), así que lo que faltaba era resolver el conflicto: `robots.txt` ya no bloquea `/admin`, `/docs` ni `/oportunidades2630`. Ahora el rastreador entra, lee `X-Robots-Tag: noindex, nofollow, noarchive` y las excluye de verdad. Quien no tenga sesión sigue recibiendo la redirección al login: el control de acceso nunca fue el `robots.txt`. `/api/` se queda bloqueado, porque ahí no hay HTML que indexar ni enlaces que resolver.
+
+### 4. Imágenes sin optimizar, con impacto directo en Core Web Vitals · RESUELTO
 
 `grep -rn "astro:assets" src/` devuelve **cero**. Las 12 imágenes del sitio son `<img>` crudo apuntando a `/public`:
 
@@ -88,6 +96,17 @@ hero-banner.jpg            219 KB
 Tres millones de bytes de imágenes servidas como JPEG original, sin WebP ni AVIF, sin `srcset`, en tamaño de escritorio para móviles. Además, solo 2 de 12 `<img>` declaran `width`/`height`, así que el resto provoca CLS al cargar.
 
 El adapter de Vercel ya está instalado y `astro.config.mjs` ya tiene bloque `image`. Migrar a `<Image />` de `astro:assets` en `quienes-somos.astro` y `en/about.astro` resuelve formato, `srcset` y dimensiones de una vez. El póster de 616 KB merece además una pasada de compresión manual.
+
+> **Cerrado.** Las doce imágenes usadas se movieron de `public/images/quienes-somos/` a `src/assets/quienes-somos/`, que es lo único que Astro puede optimizar, y `src/lib/imagenes.ts` las resuelve por nombre para que los arreglos de datos de las páginas sigan legibles. El póster del vídeo pasa por `getImage()` en vez de servirse como JPEG de 616 KB. Medido sobre el build de `/quienes-somos`:
+>
+> | | Antes | Ahora |
+> |---|---|---|
+> | Móvil | 1.647 KB | **200 KB** (12 %) |
+> | Escritorio | 1.647 KB | **1.061 KB** (64 %) |
+> | `width`/`height` | 2 de 12 | **13 de 13** |
+> | `srcset` | ninguna | **11 de 11** |
+>
+> Quedan tres archivos huérfanos en `public/images/quienes-somos/` que no referencia ninguna página: `hero-banner.jpg`, `banner-solar.jpg` y `aliado-barranquilla.jpg`, unos 850 KB que se despliegan sin que nadie los pida. No los borré porque puede que estén reservados para algo; conviene decidirlo.
 
 ---
 
