@@ -3,11 +3,19 @@ import "../styles/global.css"
 import "../styles/blog.css"
 import { ClientRouter } from 'astro:transitions'
 import Nav from '../components/Nav.astro'
+import SchemaOrg from '../components/SchemaOrg.astro'
 import { SITE_URL, url } from '../lib/site'
-import { hreflangFor } from '../lib/rutas'
+import { hreflangFor, rutasEs, seoDe } from '../lib/rutas'
+import { migas, organizacion, sitioWeb } from '../lib/schema'
 
 interface Props {
+  /**
+   * Solo para páginas cuyo título no se puede saber de antemano: hoy, los
+   * artículos del blog. El resto lo toma de `seoDe(path)`, que lee el
+   * inventario de rutas. Ver la nota en `src/lib/rutas.ts`.
+   */
   title?: string
+  /** Igual que `title`: la excepción, no la regla. */
   description?: string
   activePath?: string
   /** Ruta canónica de esta página. Por defecto usa activePath. */
@@ -22,16 +30,31 @@ interface Props {
    * proyecto, que vive en el sitio pero no es contenido comercial.
    */
   noindex?: boolean
+  /**
+   * Nodos JSON-LD propios de la página (un `Service`, un `BlogPosting`). Se
+   * suman a la organización y al sitio, que van en todas.
+   */
+  nodosSchema?: unknown[]
 }
 
 const {
-  title = "Eko — Consultoría ambiental ANLA",
-  description = "Acompañamos a importadores, productores y operadores de tecnología en Colombia a construir sus planes de gestión ambiental, licencias y reportes.",
+  title,
+  description,
   activePath = "/",
   path = activePath,
   ogImage = "/og/portada.jpg",
   noindex = false,
+  nodosSchema = [],
 } = Astro.props
+
+// Título y descripción del inventario de rutas. Los textos por defecto solo
+// aplican a páginas que no están en él, como las internas del proyecto.
+const seo = seoDe(path)
+const pageTitle = title ?? seo?.titulo ?? 'Ekosolv — Consultoría ambiental ANLA'
+const pageDescription =
+  description ??
+  seo?.descripcion ??
+  'Acompañamos a importadores, productores y operadores de tecnología en Colombia a construir sus planes de gestión ambiental, licencias y reportes.'
 
 /*
  * Un solo meta robots por página. Se combinan las directivas de indexación con
