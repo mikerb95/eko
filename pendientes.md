@@ -13,6 +13,7 @@ Lista viva de cosas que faltan por resolver en el sitio: activos por entregar (d
 ## Decisiones abiertas
 
 - [ ] **Dominio definitivo del sitio** — `src/lib/site.ts` asume `ekosolv.com` pero la gerencia no ha decidido. Bloquea además el provisionamiento de Resend (el Marketplace exige un dominio de envío verificable por DNS).
+- [ ] **¿El plan de Zoho Social contratado incluye la API de publicación?** — no viene en los planes de entrada. Es el bloqueador principal de la Fase 1 de `docs/plan-redes-sociales.md`; si no lo incluye, la difusión automática no se construye y el equipo publica a mano desde Zoho Social.
 - [ ] **Correos internos para los avisos** — a qué buzones de Ekosolv deben llegar las nuevas recolecciones y contactos (van en `NOTIFY_EMAIL`, no en el código).
 
 ## Deuda técnica
