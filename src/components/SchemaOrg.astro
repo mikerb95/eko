@@ -18,9 +18,9 @@ const { nodos } = Astro.props
 /*
  * `</script>` dentro de una cadena del JSON cerraría la etiqueta antes de
  * tiempo y convertiría el resto del documento en HTML ejecutable. Escapar `<`
- * a `<` lo evita sin romper el JSON, que interpreta la secuencia como el
- * mismo carácter. Es la vía recomendada por la especificación de JSON-LD, y
- * hace falta porque los títulos de los artículos vienen del panel.
+ * como secuencia unicode lo evita sin romper el JSON, que la interpreta como
+ * el mismo carácter. Hace falta porque los títulos y los ledes de los
+ * artículos vienen del panel, es decir, de texto que alguien escribe.
  */
 const json = JSON.stringify(grafo(nodos)).replace(/</g, '\\u003c')
 ---
