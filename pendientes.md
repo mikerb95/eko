@@ -62,6 +62,46 @@ El código está construido y probado end-to-end en local (ver `docs/plan-zoho.m
 - [ ] **`seedIfEmpty()` solo siembra si la tabla está vacía** (`src/lib/cms.ts:116`) — agregar un post a `src/data/blog-posts.json` no lo publica en una base ya sembrada; hay que cargarlo por `/admin`. Conviene documentarlo o dar un comando de sincronización, porque invita al error.
 - [x] ~~`AUDITORIA.md` hallazgo #7 hay que reescribirlo, no cerrarlo~~ — hecho el 2026-08-03. El #7 quedó cerrado sobre el hash (PBKDF2-SHA256 con salt por usuario) y la credencial en texto plano se separó como hallazgo 8, que es lo que sigue abierto. Se agregó además el hallazgo 9 por la base de producción.
 
+## Cumplimiento normativo (Ley 1581 de 2012)
+
+Implementado el 2026-08-03: casilla de autorización en los cuatro formularios,
+validación en servidor en `/api/contacto` y `/api/recolecciones`, prueba de la
+autorización en base (`consent_at`, `consent_version`, `consent_ip`), y las
+páginas de política de tratamiento, términos de servicio y política de cookies
+en español e inglés. Textos centralizados en `src/lib/legal.ts`.
+
+Lo que falta y no se puede resolver desde el código:
+
+- [ ] **Revisión jurídica de los tres documentos** — están redactados sobre el marco
+  legal aplicable y sobre lo que el código hace de verdad, pero los redactó el
+  equipo técnico, no un abogado. Antes de publicar en el dominio definitivo deben
+  pasar por el área jurídica de Ekosolv, en especial los plazos de conservación
+  del numeral 10 de la política y las obligaciones del cliente en los términos.
+- [ ] **Correo de atención al titular** — hoy `RESPONSABLE.correo` en
+  `src/lib/legal.ts` apunta a `info@ekosolv.com`, que es el único buzón
+  verificado. Lo correcto es uno dedicado (`protecciondedatos@ekosolv.com` o
+  similar) con alguien responsable de responder en los plazos legales: 10 días
+  hábiles para consultas, 15 para reclamos.
+- [ ] **Inscripción en el RNBD ante la SIC** — obligatoria para sociedades con
+  activos totales superiores a 100.000 UVT. Hay que mirar los estados financieros
+  de Ekosolv para saber si aplica. Si aplica y no está inscrita, es incumplimiento
+  independiente de todo lo demás.
+- [ ] **Manual interno de políticas y procedimientos** — documento interno, no va
+  en el sitio, pero la SIC lo pide en inspección. Falta redactarlo y que la
+  gerencia lo adopte formalmente.
+- [ ] **Código de ética** — es el único enlace del footer que sigue sin documento
+  (`LEGAL_PATHS.*.etica === null`). Es un documento de la compañía y no podemos
+  redactarlo por ella.
+- [ ] **Cláusulas de transferencia internacional con los encargados** — Zoho,
+  Resend, Vercel y Turso procesan en Estados Unidos e India, y ninguno de los dos
+  países está en la lista de nivel adecuado de la Circular Externa 005 de 2017 de
+  la SIC. La autorización del titular ya cubre la transferencia, que es la vía más
+  simple, pero conviene revisar los DPA de cada proveedor y archivarlos.
+- [ ] **Migrar los datos capturados antes de esta fecha** — los registros
+  anteriores quedaron con `consent_at` vacío, porque se recolectaron sin pedir
+  autorización. Si esa base se va a seguir usando para contacto comercial, hay que
+  pedir autorización retroactiva a esos titulares o suprimir los registros.
+
 ## Otros pendientes
 
 - (agregar aquí)
