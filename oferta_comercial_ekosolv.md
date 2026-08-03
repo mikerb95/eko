@@ -191,9 +191,10 @@ Mike
 
 ---
 
-### Notas de envío
+### Notas de envío del correo B
 
 - Reemplazar `[Nombre]`, `[LINK]`, `[correo]` y `[celular]`.
+- **Enviar sin copia a nadie más.** Acá `[LINK]` es el económico (`3e541f60...`).
 - Enviar en HTML simple, sin adjuntos pesados. El link hace el trabajo de la pieza gráfica.
 - Si prefiere PDF: abrir el link, imprimir a PDF. La página tiene estilos de impresión.
 - El cierre pide fecha, no permiso. No cambiar por "¿te interesaría?".

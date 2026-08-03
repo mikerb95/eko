@@ -61,9 +61,13 @@ export const POST: APIRoute = async (context) => {
       message: field(b, 'message', MAX),
       source: 'web',
     })
-    // El aviso al equipo no condiciona la respuesta: el mensaje ya está guardado.
-    // notifyNewContact no lanza; devuelve { sent:false } y lo deja en el log.
-    await notifyNewContact(contact)
+    // Encolar para Zoho es una escritura a la misma DB y no lanza: se espera.
+    // Que quede en la bandeja es lo que garantiza que el lead no se pierda
+    // aunque Zoho todavía no esté conectado (src/lib/zohoOutbox.ts).
+    await queueContactAsLead(contact)
+    // El aviso al equipo no condiciona la respuesta: el mensaje ya está
+    // guardado. Va diferido para no cobrarle al visitante la latencia de Resend.
+    defer('email contacto', notifyNewContact(contact))
     return json({ ok: true })
   } catch (e: any) {
     console.error('[contacto] createContact failed:', e?.message || e)
