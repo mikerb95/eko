@@ -229,16 +229,16 @@ export async function getPostById(id: number): Promise<Post | null> {
 export async function upsertPost(p: Post): Promise<number> {
   await ensureSchema()
   const db = client()
-  const args = [p.slug, p.category, p.date, p.readtime, p.accent, p.featured ? 1 : 0, p.title, p.lede, JSON.stringify(p.sections ?? []), now()]
+  const args = [p.slug, p.category, p.date, p.readtime, p.accent, p.featured ? 1 : 0, p.title, p.lede, JSON.stringify(p.sections ?? []), p.image ?? '', now()]
   if (p.id) {
     await db.execute({
-      sql: `UPDATE posts SET slug=?,category=?,date=?,readtime=?,accent=?,featured=?,title=?,lede=?,sections=?,updated_at=? WHERE id=?`,
+      sql: `UPDATE posts SET slug=?,category=?,date=?,readtime=?,accent=?,featured=?,title=?,lede=?,sections=?,image=?,updated_at=? WHERE id=?`,
       args: [...args, p.id],
     })
     return p.id
   }
   const res = await db.execute({
-    sql: `INSERT INTO posts (slug,category,date,readtime,accent,featured,title,lede,sections,updated_at) VALUES (?,?,?,?,?,?,?,?,?,?)`,
+    sql: `INSERT INTO posts (slug,category,date,readtime,accent,featured,title,lede,sections,image,updated_at) VALUES (?,?,?,?,?,?,?,?,?,?,?)`,
     args,
   })
   return Number(res.lastInsertRowid)
