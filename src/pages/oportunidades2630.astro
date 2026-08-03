@@ -295,6 +295,79 @@ const fuentes = [
   <section class="section wrap">
     <div class="section-head reveal">
       <div>
+        <div class="eyebrow">Perfil y capacidad instalada</div>
+        <h2>Cuatro líneas que ya <em>operan</em><br>sobre el marco vigente.</h2>
+      </div>
+      <div class="meta">
+        Las tres oportunidades anteriores son del sector entero. Lo que sigue es la traducción a Ekosolv: qué línea de negocio atiende cada una, con qué capacidad instalada se sostiene hoy y qué hay que construir para capturarla.
+      </div>
+    </div>
+
+    <div class="lines reveal">
+      {lineas.map(l => (
+        <article class="line" data-accent={l.accent}>
+          <div class="line-name">{l.code}</div>
+          <div class="line-role">{l.role}</div>
+          <p>{l.body}</p>
+          <div class="line-foot">
+            <div class="line-cap">{l.cap}</div>
+            <div class="line-op">{l.atiende}</div>
+          </div>
+        </article>
+      ))}
+    </div>
+
+    <div class="caps reveal">
+      {capacidades.map(c => (
+        <div class="cap">
+          <div class="v">{c.v}{c.u && <small>{c.u}</small>}</div>
+          <div class="l">{c.l}</div>
+        </div>
+      ))}
+    </div>
+  </section>
+
+  <section class="section wrap">
+    <div class="section-head reveal">
+      <div>
+        <div class="eyebrow">Encaje oportunidad · capacidad</div>
+        <h2>Dónde alcanza lo que hay<br>y dónde <em>falta</em> construir.</h2>
+      </div>
+      <div class="meta">
+        Ninguna de las tres oportunidades se captura solo con la operación actual. En las tres, la pieza faltante es la misma: convertir la operación en datos verificables por un tercero.
+      </div>
+    </div>
+
+    <div class="fit reveal">
+      {encaje.map(e => (
+        <article class="fit-row">
+          <div class="fit-op">
+            <div class="code">{e.op}</div>
+            <div class="chips">
+              {e.lineas.map(n => <span class="chip">{n}</span>)}
+            </div>
+          </div>
+          <div class="fit-col">
+            <div class="lbl">Capacidad instalada</div>
+            <p>{e.tiene}</p>
+          </div>
+          <div class="fit-col is-gap">
+            <div class="lbl">Brecha</div>
+            <p>{e.brecha}</p>
+            <div class="fit-cubre">{e.cubre}</div>
+          </div>
+        </article>
+      ))}
+    </div>
+
+    <p class="fit-note reveal">
+      Nota interna: licencias, certificaciones y testimonios siguen sin publicarse en el sitio, retenidos por la guarda de <code>src/lib/credenciales.ts</code>. Para sostener el argumento de cumplimiento demostrable frente a un prospecto, esos documentos son el primer activo por cargar.
+    </p>
+  </section>
+
+  <section class="section wrap">
+    <div class="section-head reveal">
+      <div>
         <div class="eyebrow">La respuesta desde el software</div>
         <h2>Plataforma de <em>trazabilidad</em> y<br>cumplimiento posconsumo.</h2>
       </div>
