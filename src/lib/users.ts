@@ -1,4 +1,5 @@
 import { createClient, type Client } from '@libsql/client'
+import { UserError } from './apiError'
 
 // Usuarios del panel: credenciales hasheadas (PBKDF2 via WebCrypto, sin deps)
 // y roles para autorización en el middleware.
