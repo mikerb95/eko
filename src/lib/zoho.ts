@@ -322,6 +322,8 @@ async function push(item: OutboxItem): Promise<string> {
     case 'crm_lead':
       if (!item.payload?.Last_Name) throw new Error('payload sin Last_Name')
       return upsertLead(item.payload as ZohoLead)
+    case 'campaigns_subscriber':
+      return subscribeToList(item.payload as ZohoSubscriber)
     case 'books_contact':
     case 'books_invoice':
       // Ver la nota final de `zohoMap.ts`: el mapeo de Books está pendiente de
