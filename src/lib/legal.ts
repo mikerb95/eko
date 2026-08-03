@@ -92,7 +92,10 @@ export const FINALIDADES = {
 export const ENCARGADOS = [
   {
     nombre: 'Zoho Corporation',
-    rol: { es: 'CRM y facturación', en: 'CRM and invoicing' },
+    rol: {
+      es: 'CRM, facturación y envío de comunicaciones comerciales',
+      en: 'CRM, invoicing, and commercial email delivery',
+    },
     pais: { es: 'India / Estados Unidos', en: 'India / United States' },
   },
   {
