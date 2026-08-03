@@ -110,6 +110,9 @@ textarea { resize: vertical; }
 .pill.forest { background: color-mix(in oklab, var(--forest) 16%, transparent); color: #2f7a42; }
 .pill.clay { background: color-mix(in oklab, var(--clay) 18%, transparent); color: #a5660a; }
 .pill.feat { background: #fff4d6; color: #9a6b00; }
+/* Artículo sin imagen para compartir: se ve genérico en LinkedIn y no se puede
+   difundir a Instagram (docs/plan-redes-sociales.md). */
+.pill.warn { background: color-mix(in oklab, #d97706 12%, transparent); color: #a5560a; }
 .row-actions { display: flex; gap: 6px; }
 .icon-btn {
   font-family: inherit; font-size: 12.5px; cursor: pointer; border: 1px solid var(--line);
