@@ -671,6 +671,16 @@ const selectedValues = (f: Extract<TFField, { type: 'choice' }>) =>
         step.querySelectorAll('[data-required="true"]'),
       ) as (HTMLInputElement | HTMLTextAreaElement)[]
       for (const el of inputs) {
+        // La casilla de autorización se valida por `checked`, no por `value`:
+        // un checkbox nativo trae value="on" aunque esté sin marcar.
+        if (el.dataset.consent === 'true') {
+          if (!(el as HTMLInputElement).checked) {
+            showError(t.consent)
+            el.focus()
+            return false
+          }
+          continue
+        }
         if (!el.value.trim()) {
           showError(t.required)
           ;(el.closest('.tf-choices')
