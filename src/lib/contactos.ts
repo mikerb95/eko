@@ -65,6 +65,7 @@ async function ensureSchema(): Promise<void> {
       consent_at TEXT NOT NULL DEFAULT '',
       consent_version TEXT NOT NULL DEFAULT '',
       consent_ip TEXT NOT NULL DEFAULT '',
+      marketing_at TEXT NOT NULL DEFAULT '',
       created_at TEXT NOT NULL DEFAULT '',
       updated_at TEXT NOT NULL DEFAULT ''
     )`)
