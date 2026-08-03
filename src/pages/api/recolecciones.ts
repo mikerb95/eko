@@ -4,6 +4,7 @@ import { notifyNewOrder } from '../../lib/email'
 import { queueOrderAsLead } from '../../lib/zoho'
 import { defer } from '../../lib/defer'
 import { checkRateLimit, clientIp } from '../../lib/rateLimit'
+import { consentGranted, POLITICA_VERSION } from '../../lib/legal'
 
 export const prerender = false
 
