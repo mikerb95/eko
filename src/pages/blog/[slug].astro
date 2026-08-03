@@ -13,6 +13,10 @@ const allPosts = await getPosts()
 const related = allPosts.filter(p => p.slug !== post.slug).slice(0, 3)
 
 const compartir = enlacesCompartir(`/blog/${post.slug}`, post.title)
+
+// Portada propia del artículo para Open Graph. Sin ella, `Layout.astro` cae en
+// la portada genérica y todos los artículos compartidos se ven iguales.
+const ogImage = post.image || undefined
 ---
 
 <Layout
@@ -20,7 +24,7 @@ const compartir = enlacesCompartir(`/blog/${post.slug}`, post.title)
   description={post.lede}
   activePath="/blog"
   path={`/blog/${post.slug}`}
-  ogImage={post.image || undefined}
+  ogImage={ogImage}
 >
   <section class="page-head wrap">
     <div class="page-strip">
