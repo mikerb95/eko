@@ -108,6 +108,12 @@ async function hashPassword(password) {
 }
 
 async function sembrarAdmin() {
+  // `--sin-admin` para crear el esquema sin decidir todavía la credencial. El
+  // panel sigue entrando por la cuenta fija de `users.ts` mientras tanto.
+  if (process.argv.includes('--sin-admin')) {
+    console.log('usuarios: omitido por --sin-admin')
+    return
+  }
   const { rows: [{ n }] } = await db.execute('SELECT COUNT(*) AS n FROM users')
   if (Number(n) > 0) {
     console.log(`usuarios: ${n} ya existentes, no se crea la cuenta inicial`)

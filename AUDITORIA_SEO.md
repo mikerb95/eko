@@ -189,16 +189,18 @@ Sin `google-site-verification`, sin `@vercel/analytics`, sin Speed Insights. No 
 
 ## Orden de ejecución sugerido
 
-| # | Acción | Esfuerzo | Retorno |
+| # | Acción | Retorno | Estado |
 |---|---|---|---|
-| 1 | Descripciones únicas desde `rutas.ts` | 1 h | Alto |
-| 2 | JSON-LD `Organization` + `LocalBusiness` | 2 h | Alto |
-| 3 | Títulos reescritos y marca unificada en Ekosolv | 1 h | Alto |
-| 4 | Sacar las páginas privadas del pie público | 30 min | Alto |
-| 5 | Migrar imágenes a `astro:assets` | 3 h | Alto (CWV) |
-| 6 | `lastmod` y sitemap dinámico | 2 h | Medio |
-| 7 | `BlogPosting` con fecha ISO | 3 h | Medio |
-| 8 | Página 404 y `trailingSlash` | 1 h | Bajo |
-| 9 | Search Console y analítica | 30 min | Habilitante |
+| 1 | Descripciones únicas desde `rutas.ts` | Alto | ✅ Hecho |
+| 2 | JSON-LD `Organization` + `LocalBusiness` | Alto | ✅ Hecho |
+| 3 | Títulos reescritos y marca unificada en Ekosolv | Alto | ✅ Hecho |
+| 4 | Resolver el conflicto `Disallow` + `noindex` | Alto | ✅ Hecho |
+| 5 | Migrar imágenes a `astro:assets` | Alto (CWV) | ✅ Hecho |
+| 6 | `BlogPosting` con fecha ISO | Medio | ✅ Hecho (con la salvedad del punto 11) |
+| 7 | `lastmod` y sitemap que vea los posts del CMS | Medio | Pendiente — P1 #6 y #8 |
+| 8 | Decidir qué pasa con `/en/blog` | Medio | Pendiente — P1 #7 |
+| 9 | H1 con keywords | Medio | Pendiente — P1 #9 |
+| 10 | Página 404 y `trailingSlash` | Bajo | Pendiente — P2 #12 y #13 |
+| 11 | Search Console y analítica | Habilitante | Pendiente — P2 #14 |
 
-Los puntos 1 a 4 suman unas cuatro horas y medias y cubren la mayor parte del impacto.
+Los puntos 7 y 8 son los siguientes con retorno real: el sitemap que no ve los artículos nuevos es lo que está frenando la indexación del blog, y `/en/blog` es una decisión de negocio antes que técnica.
