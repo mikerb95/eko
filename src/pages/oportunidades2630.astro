@@ -62,6 +62,68 @@ const oportunidades = [
   },
 ]
 
+const lineas = [
+  {
+    code: "EKORAEE", accent: "forest",
+    role: "Gestión de residuos electrónicos",
+    body: `Recolección, transporte, almacenamiento y disposición certificada de RAEE, con campañas de recolección y logística inversa. Es la única línea con operación física y por tanto la que fija la capacidad logística real.`,
+    cap: `${tonnesManaged('es')} toneladas gestionadas desde ${FOUNDED_YEAR}`,
+    atiende: "Oportunidad 03",
+  },
+  {
+    code: "EKONSULTING", accent: "deep",
+    role: "Cumplimiento y licenciamiento",
+    body: "Licenciamiento ambiental, estudios, Informes de Cumplimiento Ambiental, operación de sistemas de recolección y acompañamiento ESG. Se presta de forma remota en todo el país, así que crece sin abrir sedes.",
+    cap: `${stats.approvalRate}% de radicaciones aprobadas ante la ANLA · sin dependencia geográfica`,
+    atiende: "Oportunidades 01 y 02",
+  },
+  {
+    code: "EKOTRADING", accent: "clay",
+    role: "Economía circular de activos IT",
+    body: "Compra y venta de activos tecnológicos con valorización de equipo aún útil. Es la línea que convierte el residuo en ingreso y la que más se beneficia de la rotación de parque tecnológico empresarial.",
+    cap: "Canal de valorización y reventa en operación",
+    atiende: "Oportunidad 03",
+  },
+  {
+    code: "EKOPARTNER", accent: "aqua",
+    role: "Sistema colectivo de envases y empaques",
+    body: "Sistema Colectivo de Recolección de Envases y Empaques avalado por la Resolución 1407 de 2018 (modificada por la 1342 de 2020), en operación desde 2021. Aporta la experiencia de reportar a la autoridad en nombre de terceros.",
+    cap: "52 toneladas de empaques en su primer año",
+    atiende: "Oportunidad 02",
+  },
+]
+
+const capacidades = [
+  { v: String(yearsActive), u: "años", l: `Operando desde ${FOUNDED_YEAR}, con presencia en Bogotá` },
+  { v: String(stats.serviceLines), u: "", l: "Líneas integradas bajo una misma marca y un mismo cliente" },
+  { v: "2014", u: "", l: "Participación en el lanzamiento de la estrategia REP+ de la ANLA" },
+  { v: "2024", u: "", l: "COP16 y campaña posconsumo con MinAmbiente en Quibdó e Istmina" },
+]
+
+const encaje = [
+  {
+    op: "01 · LICENCIAMIENTO",
+    lineas: ["EKONSULTING"],
+    tiene: "Trayectoria de radicación ante la ANLA y equipo de consultoría remoto, que atiende proyectos en cualquier región sin costo logístico.",
+    brecha: "La capacidad es humana y no escala sola. Absorber una ola de trámites exige plantillas de estudio e informes generados desde datos, no redactados desde cero.",
+    cubre: "Reportería automática · Fase 3",
+  },
+  {
+    op: "02 · ESG PRIVADO",
+    lineas: ["EKONSULTING", "EKOPARTNER"],
+    tiene: "Experiencia reportando a la autoridad en nombre de terceros a través del sistema colectivo, que es exactamente la mecánica que pedirán inversionistas y casas matrices.",
+    brecha: "Hoy la evidencia sale en PDF y Excel. Un auditor externo no puede verificarla por su cuenta, y ese es justamente el requisito que impone CSRD y CBAM.",
+    cubre: "Portal ESG · Fase 2",
+  },
+  {
+    op: "03 · VOLUMEN RAEE",
+    lineas: ["EKORAEE", "EKOTRADING"],
+    tiene: "Operación física en marcha con más de una década de historial y un canal de valorización que ya recupera valor del equipo aprovechable.",
+    brecha: "Falta trazabilidad por unidad y borrado certificado de datos. Sin eso, las empresas grandes no entregan sus equipos y el volumen extra se va a la competencia.",
+    cubre: "Cadena de custodia · Fase 1 · Módulo ITAD · Fase 2",
+  },
+]
+
 const modulos = [
   {
     n: "01", code: "CUSTODIA",
