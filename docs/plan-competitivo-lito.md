@@ -19,9 +19,13 @@
 
 ## Contexto técnico relevante
 
-La home real es **`src/pages/index.astro`**, markup de Astro escrito a mano. `src/data/pages/home.json` y todo `src/storyblok/` son **residuo de la plantilla original** (`astro-storyblok-finance-starter`) y solo los consume `src/pages/[...slug].astro`. Los cambios de contenido de este plan se hacen en los `.astro`, no en el JSON.
+La home real es **`src/pages/index.astro`**, markup de Astro escrito a mano, y los cambios de contenido de este plan se hacen ahí.
 
-**Secciones actuales de la home:** hero → Líneas de servicio (01) → EKORUTA (02) → Por los números → Clientes (03) → footer.
+> Actualizado el 2026-08-03: `src/data/pages/home.json`, `src/storyblok/` y `src/pages/[...slug].astro` eran residuo de la plantilla original (`astro-storyblok-finance-starter`) y **ya se eliminaron** (commit `fe6271e`). No queda acoplamiento a ningún CMS de terceros.
+
+**Secciones actuales de la home** (al 2026-08-03): hero con estadísticas → Líneas de servicio (01) → Metodología (02) → Por qué Ekosolv (03) → Por los números → Testimonios (04) → Clientes (05) → footer.
+
+Testimonios y Clientes se renderizan solo si `src/lib/credenciales.ts` entrega contenido marcado como autorizado, así que en producción hoy no aparecen: siguen esperando los activos reales (ver `pendientes.md`).
 
 ---
 
@@ -41,9 +45,9 @@ Se encontró además que `/en/about` tenía **"12 years" escrito a mano** y ya d
 
 **0.3 — `AUDITORIA.md` está desactualizado.** Verificado uno por uno: `auth.ts` ya lanza error en producción en vez de usar fallback; las credenciales viven en la tabla `users`; `/api/admin/login.ts` ya usa `checkRateLimit`; `.vercel/` y `data/*.db` están ignorados y sin rastrear; `bun.lock` ya no existe.
 
-> ⚠️ **Pendiente real:** 5 vulnerabilidades de npm (4 altas). `path-to-regexp` vía `@vercel/routing-utils` exige subir a **`@astrojs/vercel@11`**, que es un cambio incompatible. No se aplicó: debe probarse en un preview de Vercel antes de tocar producción.
+> ⚠️ **Pendiente real (corregido el 2026-08-03):** hoy son 6 vulnerabilidades de npm (5 altas, 1 moderada). Tres se arreglan con `npm audit fix`, sin nada incompatible. La de `path-to-regexp` vía `@vercel/routing-utils` **no se resuelve subiendo a `@astrojs/vercel@11`**, como decía esta nota: el proyecto ya está en la 11.0.3 y el aviso sigue. Lo que `--force` propone hoy es *bajar* a la 8.0.4. Hay que esperar la corrección aguas arriba. Ver `AUDITORIA.md` hallazgo 3.
 
-**Pregunta abierta 0.a** — ¿Los archivos de `src/storyblok/` y `src/data/pages/*.json` se eliminan o se conservan? Hoy son peso muerto que confunde. Recomiendo eliminarlos si `[...slug].astro` no sirve ninguna ruta en producción; verificar primero.
+**Pregunta abierta 0.a — resuelta (2026-08-03).** Se eliminaron `src/storyblok/`, `src/data/pages/*.json` y `[...slug].astro` en el commit `fe6271e`. No queda peso muerto de la plantilla.
 
 **Nota de repositorio** — El repo **auto-commitea cada edición**. Además, `.gitignore:33` contiene `oportunidad_lito.md`, por lo que ese documento **no está en git**: existe solo en disco local. Decidir si es intencional.
 
