@@ -206,6 +206,8 @@ export interface NewOrderInput {
   source?: string
   consent_version?: string
   consent_ip?: string
+  /** ¿Marcó la casilla opcional de comunicaciones comerciales? */
+  marketing?: boolean
 }
 
 export async function createOrder(input: NewOrderInput): Promise<Order> {
