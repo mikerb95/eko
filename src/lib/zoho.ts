@@ -354,7 +354,7 @@ export interface SyncResult {
  */
 export async function syncPending(limit = 25): Promise<SyncResult> {
   if (!zohoConfigured()) {
-    return { ran: false, reason: 'not_configured', synced: 0, failed: 0, attempted: 0 }
+    return { ran: false, reason: 'not_configured', synced: 0, failed: 0, skipped: 0, attempted: 0 }
   }
 
   let items: OutboxItem[]
@@ -362,7 +362,7 @@ export async function syncPending(limit = 25): Promise<SyncResult> {
     items = await pendingItems(limit)
   } catch (e: any) {
     console.error('[zoho] no se pudo leer la bandeja:', e?.message || e)
-    return { ran: false, reason: 'db_error', synced: 0, failed: 0, attempted: 0 }
+    return { ran: false, reason: 'db_error', synced: 0, failed: 0, skipped: 0, attempted: 0 }
   }
 
   let synced = 0
