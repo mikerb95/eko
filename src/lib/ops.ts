@@ -47,6 +47,14 @@ export interface Order {
   assigned_to: string
   scheduled_at: string
   internal_notes: string
+  /**
+   * Prueba de la autorización de tratamiento (Ley 1581 de 2012, art. 9).
+   * Ver el mismo bloque en `src/lib/contactos.ts`: la versión del texto es la
+   * mitad que importa, porque acredita qué finalidades aceptó el titular.
+   */
+  consent_at: string
+  consent_version: string
+  consent_ip: string
   created_at?: string
   updated_at?: string
 }
