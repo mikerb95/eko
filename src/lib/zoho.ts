@@ -393,5 +393,5 @@ export async function syncPending(limit = 25): Promise<SyncResult> {
     }
   }
 
-  return { ran: true, synced, failed, attempted: items.length }
+  return { ran: true, synced, failed, skipped, attempted: items.length }
 }
