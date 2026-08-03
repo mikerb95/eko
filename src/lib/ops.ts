@@ -156,6 +156,9 @@ function rowToOrder(r: any): Order {
     assigned_to: r.assigned_to,
     scheduled_at: r.scheduled_at,
     internal_notes: r.internal_notes,
+    consent_at: r.consent_at ?? '',
+    consent_version: r.consent_version ?? '',
+    consent_ip: r.consent_ip ?? '',
     created_at: r.created_at,
     updated_at: r.updated_at,
   }
