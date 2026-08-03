@@ -92,6 +92,9 @@ const nodos = [
         { nombre: rutaActual.titulo, path: rutaActual.path },
       ])
     : null,
+  rutaActual
+    ? servicioDeRuta(rutaActual.path, rutaActual.titulo, rutaActual.descripcion, 'es')
+    : null,
   ...nodosSchema,
 ].filter(Boolean)
 ---
