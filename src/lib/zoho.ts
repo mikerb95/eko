@@ -286,6 +286,34 @@ export async function queueOrderAsLead(order: Order): Promise<void> {
   })
 }
 
+/**
+ * Encola el correo para la lista de Campaigns. No lanza.
+ *
+ * El filtro por `marketing_at` está aquí y no en los endpoints a propósito: es
+ * la única puerta hacia la lista de difusión, y dejarla en un solo sitio hace
+ * que sea revisable de un vistazo. Sin casilla marcada no hay fila, y sin fila
+ * el correo nunca sale del sitio.
+ */
+export async function queueContactAsSubscriber(contact: Contact): Promise<void> {
+  if (!contact.id || !contact.marketing_at) return
+  await enqueue({
+    entity: 'campaigns_subscriber',
+    ref_type: 'contact',
+    ref_id: contact.id,
+    payload: contactToSubscriber(contact),
+  })
+}
+
+export async function queueOrderAsSubscriber(order: Order): Promise<void> {
+  if (!order.id || !order.marketing_at) return
+  await enqueue({
+    entity: 'campaigns_subscriber',
+    ref_type: 'order',
+    ref_id: order.id,
+    payload: orderToSubscriber(order),
+  })
+}
+
 // ------------------------------------------------------------------ Drenaje
 
 /** Manda una fila de la bandeja a Zoho y devuelve el id creado. */

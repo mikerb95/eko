@@ -6,7 +6,7 @@ import Nav from '../components/Nav.astro'
 import SchemaOrg from '../components/SchemaOrg.astro'
 import { SITE_URL, url } from '../lib/site'
 import { hreflangFor, rutasEn, seoDe } from '../lib/rutas'
-import { migas, organizacion, sitioWeb } from '../lib/schema'
+import { migas, organizacion, servicioDeRuta, sitioWeb } from '../lib/schema'
 
 interface Props {
   /**
@@ -59,6 +59,9 @@ const nodos = [
         { nombre: 'Home', path: '/en' },
         { nombre: rutaActual.titulo, path: rutaActual.path },
       ])
+    : null,
+  rutaActual
+    ? servicioDeRuta(rutaActual.path, rutaActual.titulo, rutaActual.descripcion, 'en')
     : null,
   ...nodosSchema,
 ].filter(Boolean)
