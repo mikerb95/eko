@@ -435,6 +435,68 @@ const selectedValues = (f: Extract<TFField, { type: 'choice' }>) =>
   }
   .tf-choice[aria-pressed='true'] .tf-choice-check { opacity: 1; transform: scale(1); }
 
+  /* Casilla de autorización de datos */
+  .tf-consent { display: flex; flex-direction: column; gap: 14px; }
+  .tf-consent-row {
+    display: grid;
+    grid-template-columns: auto 1fr;
+    align-items: start;
+    gap: 14px;
+    padding: 18px 20px;
+    border-radius: var(--r-md);
+    border: 1.5px solid var(--tf-line);
+    background: color-mix(in oklab, var(--paper-warm) 60%, transparent);
+    cursor: pointer;
+    transition: border-color .18s ease, background .18s ease;
+  }
+  .tf-consent-row:hover { border-color: color-mix(in oklab, var(--deep) 45%, var(--tf-line)); }
+  .tf-consent-row:has(.tf-check:checked) {
+    border-color: var(--deep);
+    background: color-mix(in oklab, var(--deep) 7%, #fff);
+  }
+  .tf-consent-row:has(.tf-check:focus-visible) { outline: 2px solid var(--deep); outline-offset: 2px; }
+  .tf-check {
+    appearance: none;
+    flex: none;
+    width: 22px;
+    height: 22px;
+    margin-top: 1px;
+    border-radius: 6px;
+    border: 1.5px solid var(--tf-line);
+    background: #fff;
+    display: grid;
+    place-items: center;
+    cursor: pointer;
+    transition: all .18s ease;
+  }
+  .tf-check:checked { background: var(--deep); border-color: var(--deep); }
+  .tf-check:checked::after {
+    content: '';
+    width: 11px;
+    height: 6px;
+    border-left: 2px solid #fff;
+    border-bottom: 2px solid #fff;
+    transform: translateY(-1px) rotate(-45deg);
+  }
+  .tf-consent-text {
+    font-size: 14.5px;
+    line-height: 1.55;
+    color: var(--ink-2);
+  }
+  .tf-consent-text :global(a) {
+    color: var(--deep);
+    font-weight: 500;
+    text-decoration: underline;
+    text-underline-offset: 2px;
+  }
+  .tf-consent-notice {
+    font-family: var(--font-mono);
+    font-size: 11.5px;
+    line-height: 1.6;
+    color: var(--mute);
+    margin: 0;
+  }
+
   .tf-hp { position: absolute; left: -9999px; height: 0; width: 0; opacity: 0; }
 
   .tf-error {
