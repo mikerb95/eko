@@ -1,6 +1,6 @@
 import type { APIRoute } from 'astro'
 import { json, fail } from '../../../lib/apiError'
-import { syncPending, zohoConfigured, booksConfigured } from '../../../lib/zoho'
+import { syncPending, zohoConfigured, booksConfigured, campaignsConfigured } from '../../../lib/zoho'
 import {
   listOutbox,
   outboxStats,
