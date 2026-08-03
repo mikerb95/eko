@@ -10,6 +10,11 @@ Lista viva de cosas que faltan por resolver en el sitio: activos por entregar (d
 - [ ] **URLs de los perfiles de redes sociales** — `src/lib/redes.ts` tiene los tres (LinkedIn, Instagram, Facebook) con `activo: false` y URL vacía. Hasta que alguien pegue las URLs reales y las active, la columna "Síguenos" del footer no se emite en producción. Ver `docs/plan-redes-sociales.md`.
 - [ ] **Imágenes 1200×630 de los artículos del blog** — la columna `posts.image` ya existe y el panel marca "Sin imagen" los que faltan. Sin ellas, todo artículo compartido en LinkedIn o WhatsApp muestra la misma portada genérica, y la difusión a Instagram (Fase 1) es imposible porque exige imagen.
 
+## Bloqueadores en producción
+
+- [ ] **No hay base de datos en producción** — el proyecto en Vercel no tiene `DATABASE_URL` ni `DATABASE_AUTH_TOKEN`, y el fallback `file:./data/cms.db` (`src/lib/users.ts:36`, `src/lib/cms.ts`) no puede abrirse en la función: el archivo no va en el bundle y el filesystem es de solo lectura. Verificado el 2026-08-03: `/api/admin/recolecciones`, `/api/admin/contactos` y `/api/admin/users` devuelven 500 `ConnectionFailed(... cms.db: 14)`. Se entra al panel pero ninguna pestaña de datos carga. Hay que provisionar libsql/Turso y migrar el esquema. **Bloquea de hecho casi todo lo demás de este archivo**: las imágenes del blog, el flujo editorial y los avisos por correo pasan todos por esta base.
+- [ ] **Quitar la credencial hardcodeada del login** — `src/lib/users.ts:151-152` tiene usuario y contraseña en texto plano, comprobados antes de tocar la base. Se agregó como parche para poder entrar con la base caída; ya está en el historial de git, así que al removerla hay que rotar también la contraseña. Depende del punto anterior: hasta que exista la base no hay otra forma de entrar.
+
 ## Decisiones abiertas
 
 - [ ] **Dominio definitivo del sitio** — `src/lib/site.ts` asume `ekosolv.com` pero la gerencia no ha decidido. Bloquea además el provisionamiento de Resend (el Marketplace exige un dominio de envío verificable por DNS).
