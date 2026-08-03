@@ -15,6 +15,18 @@ function slugify(s: string): string {
     .slice(0, 80)
 }
 
+/**
+ * Ruta de la imagen de portada. Solo se aceptan rutas internas ("/og/algo.jpg"):
+ * una URL externa acabaría en la etiqueta og:image, que es contenido que el
+ * sitio afirma como propio, y además rompería la CSP `img-src 'self'`.
+ */
+function cleanImage(raw: any): string {
+  const v = String(raw ?? '').trim()
+  if (!v) return ''
+  if (!v.startsWith('/') || v.startsWith('//')) return ''
+  return v
+}
+
 function cleanSections(raw: any): Section[] {
   if (!Array.isArray(raw)) return []
   const out: Section[] = []
