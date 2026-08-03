@@ -180,6 +180,24 @@ const selectedValues = (f: Extract<TFField, { type: 'choice' }>) =>
                   )
                 }
 
+                if (f.type === 'consent') {
+                  return (
+                    <div class="tf-consent">
+                      <label class="tf-consent-row">
+                        <input
+                          class="tf-check"
+                          type="checkbox"
+                          name={f.name}
+                          data-consent="true"
+                          data-required={f.required === false ? 'false' : 'true'}
+                        />
+                        <span class="tf-consent-text" set:html={f.html} />
+                      </label>
+                      {f.notice && <p class="tf-consent-notice">{f.notice}</p>}
+                    </div>
+                  )
+                }
+
                 if (f.type === 'textarea') {
                   return (
                     <label class="tf-field">
