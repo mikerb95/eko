@@ -216,7 +216,7 @@ export async function upsertUser(u: UserInput): Promise<number> {
     }
     return u.id
   }
-  if (!u.password) throw new Error('La contraseña es obligatoria para un usuario nuevo')
+  if (!u.password) throw new UserError('La contraseña es obligatoria para un usuario nuevo')
   const res = await db.execute({
     sql: 'INSERT INTO users (username,name,role,pass_hash,active,created_at,updated_at) VALUES (?,?,?,?,?,?,?)',
     args: [username, u.name, u.role, await hashPassword(u.password), u.active ? 1 : 0, ts, ts],
