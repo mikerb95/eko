@@ -55,9 +55,22 @@ async function ensureSchema(): Promise<void> {
       message TEXT NOT NULL DEFAULT '',
       source TEXT NOT NULL DEFAULT 'web',
       status TEXT NOT NULL DEFAULT 'nuevo',
+      consent_at TEXT NOT NULL DEFAULT '',
+      consent_version TEXT NOT NULL DEFAULT '',
+      consent_ip TEXT NOT NULL DEFAULT '',
       created_at TEXT NOT NULL DEFAULT '',
       updated_at TEXT NOT NULL DEFAULT ''
     )`)
+    // Migración aditiva idempotente: `CREATE TABLE IF NOT EXISTS` no toca una
+    // tabla que ya existe, así que las bases anteriores a la autorización de
+    // datos necesitan las columnas por separado.
+    for (const col of ['consent_at', 'consent_version', 'consent_ip']) {
+      try {
+        await client().execute(`ALTER TABLE contacts ADD COLUMN ${col} TEXT NOT NULL DEFAULT ''`)
+      } catch (e: any) {
+        if (!String(e?.message || '').includes('duplicate column')) throw e
+      }
+    }
   })()
   return _ready
 }
