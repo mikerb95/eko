@@ -8,6 +8,7 @@
 - **`defer()`** (`src/lib/defer.ts`): permite responderle al visitante sin esperar el aviso por correo ni el encolado, aprovechando que la función sigue viva después de la respuesta.
 - **Perfiles y enlaces de redes sociales** (`src/lib/redes.ts`): columna "Síguenos" en el footer y botones de compartir en los artículos del blog (con copiar enlace). Los perfiles solo se emiten cuando tienen URL real y están marcados como activos, así que en producción no aparecen enlaces rotos. Plan en `docs/plan-redes-sociales.md`.
 - **Imagen por artículo para compartir**: columna `posts.image` (migración aditiva), campo en el panel con validación de ruta interna, aviso "Sin imagen" en el listado y `ogImage` en el layout del post, para que cada artículo compartido no muestre la portada genérica.
+- **Cabeceras propias para las zonas privadas** (`astro.config.mjs`): `/admin`, `/api/admin`, `/docs` y `/oportunidades2630` responden con `Cache-Control: no-store` y `X-Robots-Tag: noindex, nofollow, noarchive`. Antes respondían `public, max-age=0, must-revalidate`, que autoriza a una caché intermedia a guardar HTML con datos de una sesión ajena; y `robots.txt` es una petición, no un control: no impide que una URL termine indexada si alguien la enlaza.
 - **`infra_deploy.md`**: qué hay que contratar para producción (Vercel Pro, Turso, Resend, dominio), con costos consultados, límites de cada plan, escenario multicliente, habeas data y checklist previo a la entrega.
 - **`oferta_comercial_ekosolv.md`**: alcances, precios y plantilla de correo de la propuesta.
 

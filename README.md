@@ -155,6 +155,10 @@ parte del sitio público.
   Build Output de Vercel desde `astro.config.mjs`. Se hace ahí porque, con esa
   API del adapter, un `vercel.json` con `headers` se ignora y el middleware de
   Astro no corre para las páginas prerenderizadas.
+- Las zonas privadas (`/admin`, `/api/admin`, `/docs`, `/oportunidades2630`) llevan
+  además `Cache-Control: no-store` y `X-Robots-Tag: noindex, nofollow, noarchive`.
+  Lo primero evita que una caché intermedia guarde HTML con datos de una sesión
+  ajena; lo segundo porque `robots.txt` es una petición, no un control.
 - Sesión HMAC-SHA256 con comparación *timing-safe* y expiración de 8 h.
 - Rate limiting de 5 intentos por IP cada 10 minutos en `/api/admin/login`.
 - Honeypot en los formularios públicos.
