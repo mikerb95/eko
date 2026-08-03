@@ -1,0 +1,221 @@
+---
+import LayoutEn from '../../layouts/LayoutEn.astro'
+import SiteFooter from '../../components/SiteFooter.astro'
+import LegalDoc from '../../components/LegalDoc.astro'
+import type { LegalSection } from '../../components/LegalDoc.astro'
+import { RESPONSABLE, POLITICA_VERSION, POLITICA_VIGENCIA, LEGAL_PATHS } from '../../lib/legal'
+
+const secciones: LegalSection[] = [
+  { id: 'provider', titulo: 'Who provides the service' },
+  { id: 'purpose', titulo: 'Purpose and scope of the site' },
+  { id: 'requests', titulo: 'Requests through the site' },
+  { id: 'engagement', titulo: 'Engaging our services' },
+  { id: 'obligations', titulo: 'Obligations of the requester' },
+  { id: 'content', titulo: 'Informational content' },
+  { id: 'ip', titulo: 'Intellectual property' },
+  { id: 'availability', titulo: 'Site availability' },
+  { id: 'data', titulo: 'Personal data' },
+  { id: 'law', titulo: 'Governing law and disputes' },
+  { id: 'changes', titulo: 'Changes' },
+]
+---
+
+<LayoutEn
+  title="Terms of service — Ekosolv"
+  description="Terms and conditions of use for the Ekosolv S.A.S. website and for the collection and environmental consulting request channel."
+  activePath="/en/terms-of-service"
+>
+  <LegalDoc
+    lang="en"
+    eyebrow="Legal · Terms"
+    eyebrowRight="Law 1480 of 2011 · Law 527 of 1999"
+    titulo="Terms of"
+    tituloEm="service"
+    intro="The rules for using this site and the requests you send through it. The essential point in one line: the site is a contact and booking channel, not a shopping cart, and nothing we publish replaces formal advice."
+    version={POLITICA_VERSION}
+    vigencia={POLITICA_VIGENCIA}
+    secciones={secciones}
+  >
+    <section class="legal-sec" id="provider">
+      <h2><span>Who provides the service</span></h2>
+      <p>
+        This site belongs to <strong>{RESPONSABLE.razonSocial}</strong>, a Colombian
+        commercial company with tax ID (NIT) {RESPONSABLE.nit}, registered at
+        {' '}{RESPONSABLE.direccion}.
+      </p>
+      <div class="legal-table-wrap">
+        <table>
+          <tbody>
+            <tr>
+              <td>Phone</td>
+              <td><a href={RESPONSABLE.telefonoHref}>{RESPONSABLE.telefono}</a></td>
+            </tr>
+            <tr>
+              <td>Email</td>
+              <td><a href={`mailto:${RESPONSABLE.correo}`}>{RESPONSABLE.correo}</a></td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+      <p>
+        Our environmental licences, registrations, and authorisations, with resolution
+        number and issuing authority, are published under
+        <a href="/en/licenses"> Licences and authorisations</a>.
+      </p>
+    </section>
+
+    <section class="legal-sec" id="purpose">
+      <h2><span>Purpose and scope of the site</span></h2>
+      <p>The site serves three functions and no others:</p>
+      <ol>
+        <li>Providing information about our service lines and about the Colombian environmental regulatory framework.</li>
+        <li>Receiving contact requests and collection bookings.</li>
+        <li>Publishing our authorisations so they can be verified without having to ask.</li>
+      </ol>
+      <p>
+        There is no online sale here, no payments, and no conclusion of contracts. Using
+        the site means accepting these terms; if you disagree with them, the answer is not
+        to use it.
+      </p>
+    </section>
+
+    <section class="legal-sec" id="requests">
+      <h2><span>Requests through the site</span></h2>
+      <p>
+        When you submit the contact or booking form, what we receive is a
+        <strong> request</strong>, not a firm order. Our reply confirms whether we can
+        handle it, on what terms, and on what dates.
+      </p>
+      <p>
+        Collection requests receive a reference in the format REC-YYYY-NNNN. That number
+        identifies the case and lets you follow it up with us, but on its own it neither
+        confirms the collection nor commits a date.
+      </p>
+      <p>
+        The response times announced on the site are service commitments in Colombian
+        business days, not contractual deadlines.
+      </p>
+    </section>
+
+    <section class="legal-sec" id="engagement">
+      <h2><span>Engaging our services</span></h2>
+      <p>
+        The terms of each service, including scope, prices, deadlines, liabilities, and
+        deliverables, are agreed in writing in the proposal, contract, or service order
+        signed for the specific case. That document prevails over anything this page says.
+      </p>
+      <p>
+        The site publishes no rates. Any figure appearing in informational content is a
+        general reference and does not constitute an offer.
+      </p>
+    </section>
+
+    <section class="legal-sec" id="obligations">
+      <h2><span>Obligations of the requester</span></h2>
+      <p>By sending us a request you undertake to:</p>
+      <ul>
+        <li>Provide truthful, complete, and current information, especially the collection address and the waste type.</li>
+        <li>
+          Declare the nature of the waste correctly. Hazardous waste declared as ordinary
+          puts the collection crew at risk and compromises the environmental traceability
+          of both parties.
+        </li>
+        <li>Hold the authority to dispose of the equipment or waste whose removal you request.</li>
+        <li>
+          Delete, or authorise the deletion of, the information stored on the equipment
+          before removal, or expressly agree it with us as part of the service.
+        </li>
+        <li>Not use the site to send unlawful content, unsolicited advertising, or attempts to flood the forms.</li>
+      </ul>
+      <p>
+        To protect the forms we limit how many submissions come from one IP address within
+        a given window. If you see that notice and your request is legitimate, write to us
+        by WhatsApp or email.
+      </p>
+    </section>
+
+    <section class="legal-sec" id="content">
+      <h2><span>Informational content</span></h2>
+      <p>
+        The regulatory sections, the journal, and the reference materials are published for
+        information. We prepare them carefully and cite the rule in force at the time of
+        publication, but Colombian environmental regulation changes and content can become
+        outdated.
+      </p>
+      <p>
+        <strong>Nothing published on this site constitutes legal, technical, or
+        environmental advice for a specific case</strong>, nor does it replace an opinion
+        from the competent authority. Your organisation's compliance decisions should rest
+        on formal advice, which is precisely what we provide under contract.
+      </p>
+    </section>
+
+    <section class="legal-sec" id="ip">
+      <h2><span>Intellectual property</span></h2>
+      <p>
+        The trademarks EKOSOLV, EKONSULTING, EKORAEE, EKOPARTNER, and EKOTRADING, together
+        with the logos and distinctive signs, belong to {RESPONSABLE.razonSocial} and may
+        not be used without written authorisation.
+      </p>
+      <p>
+        The texts, images, and materials published are protected by Colombian Law 23 of
+        1982 and its amendments. Quoting them with attribution and a link to the original
+        page is allowed; reproducing them substantially or for commercial purposes without
+        prior authorisation is not.
+      </p>
+      <p>
+        The site's design and source code have their own ownership, stated in the footer.
+      </p>
+    </section>
+
+    <section class="legal-sec" id="availability">
+      <h2><span>Site availability</span></h2>
+      <p>
+        We aim to keep the site continuously available, without guaranteeing uninterrupted
+        operation. There may be outages for maintenance, for infrastructure provider
+        failures, or for causes beyond our control.
+      </p>
+      <p>
+        If a form fails, the alternative channel is always open:
+        <a href={RESPONSABLE.telefonoHref}> {RESPONSABLE.telefono}</a> or
+        <a href={`mailto:${RESPONSABLE.correo}`}> {RESPONSABLE.correo}</a>. A request that
+        did not arrive due to a technical failure is not deemed received.
+      </p>
+    </section>
+
+    <section class="legal-sec" id="data">
+      <h2><span>Personal data</span></h2>
+      <p>
+        Processing of the data you provide is governed by the
+        <a href={LEGAL_PATHS.en.politica}> Personal data processing policy</a>, under
+        Colombian Law 1581 of 2012. The site's cookies are detailed in the
+        <a href={LEGAL_PATHS.en.cookies}> Cookie policy</a>.
+      </p>
+    </section>
+
+    <section class="legal-sec" id="law">
+      <h2><span>Governing law and disputes</span></h2>
+      <p>
+        These terms are governed by Colombian law. The validity of communications and data
+        messages sent through the site is governed by Law 527 of 1999.
+      </p>
+      <p>
+        Disputes not resolved directly will be submitted to the courts of the Republic of
+        Colombia, sitting in Bogotá D.C. Before going down that road we would rather you
+        wrote to us: most disagreements get resolved in one email.
+      </p>
+    </section>
+
+    <section class="legal-sec" id="changes">
+      <h2><span>Changes</span></h2>
+      <p>
+        We may update these terms. The version in force is the one published here, with its
+        number and date at the top of the document. Changes do not affect requests already
+        filed or contracts already signed, which remain governed by what was agreed at the
+        time. Current version: {POLITICA_VERSION}.
+      </p>
+    </section>
+  </LegalDoc>
+
+  <SiteFooter lang="en" />
+</LayoutEn>

@@ -13,6 +13,7 @@
  */
 
 import { perfilesFooter } from '../lib/redes'
+import { LEGAL_PATHS } from '../lib/legal'
 
 interface Props {
   lang?: 'es' | 'en'
@@ -42,9 +43,10 @@ const t = es
       ],
       legalLinks: [
         { label: 'Licencias y autorizaciones', href: '/licencias' },
-        { label: 'Política de tratamiento', href: null },
-        { label: 'Términos de servicio', href: null },
-        { label: 'Código de ética', href: null },
+        { label: 'Política de tratamiento de datos', href: LEGAL_PATHS.es.politica },
+        { label: 'Términos de servicio', href: LEGAL_PATHS.es.terminos },
+        { label: 'Política de cookies', href: LEGAL_PATHS.es.cookies },
+        { label: 'Código de ética', href: LEGAL_PATHS.es.etica },
       ],
       servicesLinks: [
         { label: 'EKONSULTING', href: '/ekonsulting' },
@@ -83,9 +85,10 @@ const t = es
       ],
       legalLinks: [
         { label: 'Licences and authorisations', href: '/en/licenses' },
-        { label: 'Data processing policy', href: null },
-        { label: 'Terms of service', href: null },
-        { label: 'Code of ethics', href: null },
+        { label: 'Data processing policy', href: LEGAL_PATHS.en.politica },
+        { label: 'Terms of service', href: LEGAL_PATHS.en.terminos },
+        { label: 'Cookie policy', href: LEGAL_PATHS.en.cookies },
+        { label: 'Code of ethics', href: LEGAL_PATHS.en.etica },
       ],
       servicesLinks: [
         { label: 'EKONSULTING', href: '/en/ekonsulting' },
