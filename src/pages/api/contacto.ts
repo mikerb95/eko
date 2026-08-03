@@ -78,6 +78,8 @@ export const POST: APIRoute = async (context) => {
     // Que quede en la bandeja es lo que garantiza que el lead no se pierda
     // aunque Zoho todavía no esté conectado (src/lib/zohoOutbox.ts).
     await queueContactAsLead(contact)
+    // Solo hace algo si el titular marcó la casilla de comunicaciones.
+    await queueContactAsSubscriber(contact)
     // El aviso al equipo no condiciona la respuesta: el mensaje ya está
     // guardado. Va diferido para no cobrarle al visitante la latencia de Resend.
     // (`await` sobre defer es gratis en Vercel: entrega la promesa al runtime y
