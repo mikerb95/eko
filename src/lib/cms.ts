@@ -42,20 +42,12 @@ export interface Normativa {
 }
 
 // ---------- Client ----------
-let _db: Client | null = null
-let _ready: Promise<void> | null = null
+// La conexión y el esquema viven en `db.ts`, compartidos por todos los módulos.
+const client = cliente
+const ensureSchema = asegurarEsquema
 
 function getDbUrl(): string | null {
-  const url = import.meta.env.DATABASE_URL || process.env.DATABASE_URL
-  return url && !url.startsWith('file:') ? url : null
-}
-
-function client(): Client {
-  if (_db) return _db
-  const url = import.meta.env.DATABASE_URL || process.env.DATABASE_URL || 'file:./data/cms.db'
-  const authToken = import.meta.env.DATABASE_AUTH_TOKEN || process.env.DATABASE_AUTH_TOKEN
-  _db = createClient({ url, authToken })
-  return _db
+  return dbEsRemota() ? dbUrl() : null
 }
 
 async function ensureSchema(): Promise<void> {
