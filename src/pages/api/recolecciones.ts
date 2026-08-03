@@ -1,6 +1,8 @@
 import type { APIRoute } from 'astro'
 import { createOrder } from '../../lib/ops'
 import { notifyNewOrder } from '../../lib/email'
+import { queueOrderAsLead } from '../../lib/zoho'
+import { defer } from '../../lib/defer'
 import { checkRateLimit, clientIp } from '../../lib/rateLimit'
 
 export const prerender = false
