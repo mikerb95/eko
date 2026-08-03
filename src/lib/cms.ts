@@ -161,9 +161,9 @@ export async function seedIfEmpty(): Promise<{ posts: number; normativas: number
   if (Number(pCount.rows[0].n) === 0) {
     for (const p of seedPosts as Post[]) {
       await db.execute({
-        sql: `INSERT INTO posts (slug,category,date,readtime,accent,featured,title,lede,sections,updated_at)
-              VALUES (?,?,?,?,?,?,?,?,?,?)`,
-        args: [p.slug, p.category, p.date, p.readtime, p.accent, p.featured ? 1 : 0, p.title, p.lede, JSON.stringify(p.sections), now()],
+        sql: `INSERT INTO posts (slug,category,date,readtime,accent,featured,title,lede,sections,image,updated_at)
+              VALUES (?,?,?,?,?,?,?,?,?,?,?)`,
+        args: [p.slug, p.category, p.date, p.readtime, p.accent, p.featured ? 1 : 0, p.title, p.lede, JSON.stringify(p.sections), p.image ?? '', now()],
       })
       posts++
     }
