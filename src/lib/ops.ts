@@ -55,6 +55,12 @@ export interface Order {
   consent_at: string
   consent_version: string
   consent_ip: string
+  /**
+   * Casilla opcional de comunicaciones comerciales. Igual que en `contacts`:
+   * vacío es lo normal, y solo con fecha se encola el correo hacia Zoho
+   * Campaigns.
+   */
+  marketing_at: string
   created_at?: string
   updated_at?: string
 }
