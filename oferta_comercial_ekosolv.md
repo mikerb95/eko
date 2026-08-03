@@ -76,7 +76,66 @@ del saldo de construcción. Sin eso, la amortización te deja expuesto.
 
 ---
 
-## 2. Correo para enviar
+## 2. Correo A: al grupo, sin cifras
+
+> Este es el que va con copia a todo el mundo. No menciona un solo peso. Su trabajo es que el
+> equipo entienda el alcance y opine sobre el contenido, no sobre el precio.
+
+**Asunto:** Ekosolv: alcance de la propuesta de sitio web y plataforma de administración
+
+---
+
+Buenos días a todos,
+
+Siguiendo la conversación con [Nombre del gerente], comparto el detalle de lo que contempla la
+propuesta para el sitio web de Ekosolv y la plataforma de administración.
+
+La dividí en dos alcances, para que la decisión no sea de todo o nada.
+
+**Alcance 1. Sitio y contenido.** El sitio completo en español e inglés, con página propia para cada
+línea de negocio, porque el cliente que busca consultoría y el que necesita recolección de
+electrónicos no necesitan el mismo argumento. Incluye la sección donde por fin quedan visibles las
+licencias ambientales y las cifras de impacto, la agenda de recolección en línea, y un panel para
+que el equipo publique el blog, las normativas y las redes sin depender de nadie. Este alcance ya
+está construido y funcionando.
+
+**Alcance 2. Plataforma de administración.** Lleva la operación adentro de la misma plataforma:
+gestión de clientes con historial y documentos, integración con Zoho para no digitar dos veces,
+tableros de control, y la capa de seguridad de la información que corresponde cuando se manejan
+datos de clientes: usuarios con roles, doble factor, registro de auditoría y copias cifradas. Se
+entrega por fases, cada una aprobada antes de pasar a la siguiente.
+
+En este documento está el detalle completo, la comparación capacidad por capacidad, el cronograma de
+implementación y lo que se necesita de parte de Ekosolv para arrancar:
+
+[LINK A]
+
+Les pido en especial que revisen dos cosas. Primero, la sección de insumos: hay documentos y
+accesos que solo ustedes tienen y de los que depende el cronograma. Y segundo, si falta alguna
+capacidad que el día a día del área necesite y que no esté contemplada, este es el momento de
+decirlo.
+
+Quedo atento a comentarios.
+
+Mike
+[correo] · [celular]
+
+---
+
+### Notas de envío del correo A
+
+- Reemplazar `[Nombre del gerente]`, `[LINK A]`, `[correo]` y `[celular]`.
+- **Verificar que el link sea el de alcance** (`ba4411f5...`) y no el económico (`3e541f60...`).
+- No mencionar plazo de contrato ni duración de la mensualidad. En este correo "24 meses" es un
+  dato financiero, no de alcance.
+- El cierre pide revisión, no aprobación. Convierte al equipo en aliado del proyecto en vez de
+  jurado, y las respuestas que lleguen sirven de insumo para la reunión con gerencia.
+- Si alguien pregunta por costos en la cadena de respuestas, la salida es una línea: "la propuesta
+  económica la está revisando gerencia". No dar cifras por correo grupal.
+
+---
+
+## 3. Correo B: solo a gerencia, con cifras
 
 **Asunto:** Propuesta Ekosolv: sitio web y plataforma de administración
 
