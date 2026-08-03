@@ -166,6 +166,7 @@ function rowToOrder(r: any): Order {
     consent_at: r.consent_at ?? '',
     consent_version: r.consent_version ?? '',
     consent_ip: r.consent_ip ?? '',
+    marketing_at: r.marketing_at ?? '',
     created_at: r.created_at,
     updated_at: r.updated_at,
   }
