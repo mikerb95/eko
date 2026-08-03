@@ -102,6 +102,8 @@ export function enlacesCompartir(path: string, title: string) {
   const cuerpo = encodeURIComponent(`${title}\n\n${siteUrl(path)}`)
 
   return {
+    /** URL canónica absoluta, la misma que se comparte. Para "copiar enlace". */
+    url: siteUrl(path),
     linkedin: `https://www.linkedin.com/sharing/share-offsite/?url=${u}`,
     facebook: `https://www.facebook.com/sharer/sharer.php?u=${u}`,
     whatsapp: `https://wa.me/?text=${t}%20${u}`,
