@@ -32,6 +32,7 @@ export const GET: APIRoute = async ({ url }) => {
     return json({
       configurado: zohoConfigured(),
       books: booksConfigured(),
+      campaigns: campaignsConfigured(),
       conteos: await outboxStats(),
     })
   } catch (e: any) {
