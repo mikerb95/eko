@@ -14,11 +14,23 @@
 
 Si un dato no encaja claramente en una fila, no se sincroniza todavía — se añade cuando haya un caso de uso concreto.
 
-## 2. Estado actual (línea base)
+## 2. Estado actual (agosto 2026)
 
-- El formulario público de recolecciones ya persiste en la tabla `orders` vía `POST /api/recolecciones` → `createOrder()` (`src/lib/ops.ts`). Hoy esto **no toca Zoho para nada**.
-- El panel admin (`src/pages/admin`) gestiona el ciclo de vida de la orden (`GET/PATCH /api/admin/recolecciones`) con bitácora de eventos (`order_events`).
-- No existe hoy ningún cliente Zoho, credencial OAuth, ni webhook configurado en el repo.
+La preparación ya está implementada y verificada end-to-end en local. **Falta únicamente generar las credenciales en Zoho.**
+
+| Pieza | Archivo | Estado |
+|---|---|---|
+| Bandeja de salida (`zoho_outbox`) | `src/lib/zohoOutbox.ts` | Funcionando: cada contacto y cada recolección se encola desde ya |
+| Cliente OAuth + CRM + Books | `src/lib/zoho.ts` | Escrito; en no-op mientras falten credenciales |
+| Mapa de campos | `src/lib/zohoMap.ts` | Leads listo; Books pendiente de definición con administración |
+| Enganche en formularios | `src/pages/api/contacto.ts`, `api/recolecciones.ts` | Encolan y difieren el email con `src/lib/defer.ts` |
+| Panel de la bandeja | `src/pages/api/admin/zoho.ts` | `GET` estado, `POST` sync/retry/discard; solo rol admin |
+| Variables de entorno | `.env.example` | Documentadas con el procedimiento del self-client |
+
+El punto clave: **los leads se acumulan desde hoy**. El día que existan las credenciales se drena la bandeja y entra todo lo recibido en el intervalo, sin digitar nada a mano.
+
+- El panel admin (`src/pages/admin`) sigue gestionando el ciclo de vida de la orden (`GET/PATCH /api/admin/recolecciones`) con bitácora de eventos (`order_events`).
+- No hay todavía UI en el panel para la bandeja: hoy se opera contra `/api/admin/zoho` directamente.
 
 ## 3. Automatizaciones posibles (por dirección)
 
