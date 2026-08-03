@@ -90,6 +90,8 @@ Una fila por red porque el resultado es independiente: LinkedIn puede salir bien
 
 ## 5. Cliente Zoho Social
 
+> **Nota (2026-08-03): esta sección quedó desactualizada el mismo día en que se escribió.** El cliente Zoho ya existe: `src/lib/zoho.ts` resuelve OAuth y el refresh del access token, y `src/lib/zohoOutbox.ts` implementa una bandeja de salida con reintentos e índice único para que reencolar no duplique. La Fase 1 **debe reusar ambos**, no construir una tubería paralela: publicar sería un `socialFetch` junto a `crmFetch`/`booksFetch`, y una entidad más en `zoho_outbox` en lugar de las tablas `social_posts`/`social_targets` de §4. El detalle se reescribe cuando se sepa si el plan contratado incluye la API de publicación (§3.3), porque esa respuesta cambia el diseño entero.
+
 Reutiliza la mecánica de OAuth ya diseñada en `plan-zoho.md` §4 (Camino A): un self-client en Zoho API Console, refresh token generado una vez, access token que se renueva solo cada hora.
 
 Variables nuevas en `.env.example`:
