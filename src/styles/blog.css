@@ -250,7 +250,8 @@
   background: currentColor; transform-origin: right; transform: scaleX(0);
   transition: transform .3s cubic-bezier(.2,.7,.2,1);
 }
-.pf-share a:hover::after { transform: scaleX(1); transform-origin: left; }
+.pf-share a:hover::after,
+.pf-share .pf-copy:hover::after { transform: scaleX(1); transform-origin: left; }
 .pf-next {
   display: inline-flex; align-items: center; gap: 16px;
   padding: 16px 24px; border-radius: 999px;
