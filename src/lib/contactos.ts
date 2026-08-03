@@ -89,6 +89,9 @@ function rowToContact(r: any): Contact {
     message: r.message,
     source: r.source,
     status: (CONTACT_STATUSES as readonly string[]).includes(r.status) ? r.status : 'nuevo',
+    consent_at: r.consent_at ?? '',
+    consent_version: r.consent_version ?? '',
+    consent_ip: r.consent_ip ?? '',
     created_at: r.created_at,
     updated_at: r.updated_at,
   }
