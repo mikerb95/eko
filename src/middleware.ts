@@ -4,19 +4,23 @@ import { SESSION_COOKIE, verifySession } from './lib/auth'
 const PUBLIC_ADMIN_PATHS = new Set(['/admin/login'])
 const PUBLIC_API_PATHS = new Set(['/api/admin/login'])
 
-// Páginas internas del proyecto (las cuatro del pie de página, columna
-// "Proyecto"). No son parte del sitio público: exigen sesión igual que /admin.
+// Páginas internas del proyecto (las del pie de página, columna "Proyecto").
+// No son parte del sitio público: exigen sesión igual que /admin.
+//
+// Se comparan por PREFIJO, no por ruta exacta: una lista exacta deja pública
+// cualquier página nueva que alguien agregue bajo /docs, y ese olvido no se ve
+// hasta que el contenido ya está indexado.
 //
 // Para que esto se aplique de verdad, cada una lleva `export const prerender =
 // false`. El sitio es `output: 'static'` y el middleware no corre sobre páginas
 // prerenderizadas: si se dejan estáticas, Vercel las sirve como HTML plano y la
 // comprobación de sesión nunca se ejecuta.
-const PROTECTED_DOC_PATHS = new Set([
-  '/docs',
-  '/docs/radar',
-  '/docs/kanban',
-  '/oportunidades2630',
-])
+const PROTECTED_DOC_PREFIXES = ['/docs', '/oportunidades2630']
+
+function isProtectedDoc(pathname: string): boolean {
+  const p = normalize(pathname)
+  return PROTECTED_DOC_PREFIXES.some((prefix) => p === prefix || p.startsWith(prefix + '/'))
+}
 
 /** Roles con acceso a las páginas internas. Ampliar aquí si hace falta. */
 const DOC_ROLES = ['admin']
