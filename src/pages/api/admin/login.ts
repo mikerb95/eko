@@ -36,9 +36,13 @@ export const POST: APIRoute = async (context) => {
   try {
     user = await verifyLogin(String(username ?? ''), String(password ?? ''))
   } catch (e: any) {
-    return json({ error: 'No se pudo validar el acceso: ' + String(e?.message || e) }, 500)
+    // El mensaje original (p. ej. `ConnectionFailed(... cms.db: 14)`) delata el
+    // motor de base, la ruta del archivo y que está caída. Solo va al log.
+    console.error('[login] verifyLogin falló:', e?.stack || e?.message || e)
+    return json({ error: 'No se pudo validar el acceso. Intenta de nuevo en un momento.' }, 500)
   }
   if (!user) {
+    console.warn(`[login] intento fallido usuario="${String(username ?? '').slice(0, 60)}" ip=${ip}`)
     return json({ error: 'Usuario o contraseña incorrectos' }, 401)
   }
   resetRateLimit(rateLimitKey)
