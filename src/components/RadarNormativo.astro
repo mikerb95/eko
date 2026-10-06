@@ -1,0 +1,206 @@
+---
+/**
+ * Radar normativo de la portada. Pieza central del hero: un radar que barre y
+ * enciende la ficha de cada norma cuando el haz pasa por ella. Hay un punto por
+ * norma vigilada (el total coincide con la cifra "normativas bajo seguimiento"),
+ * y las tres con ficha llevan rótulo.
+ *
+ * El HTML es el estado final y quieto: haz detenido, fichas legibles con su
+ * estado. El barrido lo monta `src/scripts/motion/radar.ts`.
+ */
+import { blipsRadar, polar } from '../lib/radarGeom'
+
+interface Ficha {
+  code: string
+  title: string
+  tags: string[]
+}
+
+interface Props {
+  fichas: Ficha[]
+  total: number
+  href: string
+  textos: {
+    rotulo: string
+    estado: string
+    pie: string
+  }
+}
+
+const { fichas, total, href, textos } = Astro.props
+const blips = blipsRadar(total, fichas.length)
+
+/** "RES 1297 · 2010" → "1297": el rótulo corto que va junto al punto. */
+const corto = (code: string) => code.split(/\s+/)[1] ?? code
+const anillos = [0.33, 0.66, 1]
+const marcas = Array.from({ length: 36 }, (_, i) => i * 10)
+---
+
+<div class="hero-visual radar" data-radar>
+  <div class="hv-head">
+    <div class="label"><span class="pulse"></span>{textos.rotulo}</div>
+  </div>
+
+  <div class="rd-cuerpo">
+    <div class="rd-pantalla" data-radar-pantalla aria-hidden="true">
+      <div class="rd-haz" data-radar-haz></div>
+      <svg viewBox="-112 -112 224 224" class="rd-svg">
+        {anillos.map((r) => <circle class="rd-anillo" r={r * 100} />)}
+        <line class="rd-eje" x1="-100" y1="0" x2="100" y2="0" />
+        <line class="rd-eje" x1="0" y1="-100" x2="0" y2="100" />
+        {marcas.map((a) => {
+          const largo = a % 90 === 0 ? 0.9 : 0.95
+          const p1 = polar(a, largo)
+          const p2 = polar(a, 1)
+          return <line class="rd-marca" x1={p1.x} y1={p1.y} x2={p2.x} y2={p2.y} />
+        })}
+        {blips.map((b, i) => {
+          const p = polar(b.angulo, b.radio)
+          const ficha = b.destacado !== null ? fichas[b.destacado] : null
+          return (
+            <g
+              class:list={['rd-blip', { 'rd-blip-dest': ficha }]}
+              data-radar-blip={i}
+              data-angulo={b.angulo}
+              data-ficha={b.destacado ?? undefined}
+              transform={`translate(${p.x} ${p.y})`}
+            >
+              <circle class="rd-onda" r="3" />
+              <circle class="rd-punto" r={ficha ? 3.2 : 2} />
+              {ficha && (
+                <text class="rd-rotulo" x={p.x >= 0 ? 7 : -7} y="3" text-anchor={p.x >= 0 ? 'start' : 'end'}>
+                  {corto(ficha.code)}
+                </text>
+              )}
+            </g>
+          )
+        })}
+        <circle class="rd-centro" r="2.4" />
+      </svg>
+    </div>
+
+    <div class="rd-fichas">
+      {fichas.map((n, i) => (
+        <a class="hv-item rd-ficha" href={href} data-radar-ficha={i}>
+          <div class="rd-ficha-top">
+            <div class="hv-code">{n.code}</div>
+            <span class="rd-estado"><i></i>{textos.estado}</span>
+          </div>
+          <div class="hv-title">{n.title}</div>
+          <div class="hv-tags">{n.tags.slice(0, 3).join(' · ')}</div>
+        </a>
+      ))}
+    </div>
+  </div>
+
+  <a class="hv-foot" href={href}>
+    {textos.pie}
+    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+      <path d="M5 12h14M13 6l6 6-6 6" />
+    </svg>
+  </a>
+</div>
+
+<style is:global>
+  /* El radar reutiliza .hero-visual, .hv-* y .label de global.css; aquí solo va lo suyo. */
+  .rd-cuerpo {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr);
+    gap: clamp(16px, 3vw, 40px);
+    align-items: center;
+    padding-top: clamp(18px, 2vw, 24px);
+  }
+  @media (min-width: 900px) {
+    .rd-cuerpo { grid-template-columns: clamp(240px, 24vw, 300px) minmax(0, 1fr); }
+  }
+
+  .rd-pantalla {
+    --haz: 40deg;
+    position: relative;
+    width: min(100%, 300px);
+    aspect-ratio: 1;
+    justify-self: center;
+    border-radius: 50%;
+    background: radial-gradient(circle, color-mix(in oklab, var(--forest) 16%, transparent) 0%, transparent 70%);
+  }
+  @media (max-width: 899px) {
+    .rd-pantalla { width: min(64vw, 240px); }
+  }
+  /* Haz: un cono con estela, girado con una variable para que el script lo mueva sin calcular matrices. */
+  .rd-haz {
+    position: absolute; inset: 5.4%;
+    border-radius: 50%;
+    transform: rotate(var(--haz));
+    background: conic-gradient(
+      from -64deg,
+      transparent 0deg,
+      color-mix(in oklab, var(--aqua) 4%, transparent) 20deg,
+      color-mix(in oklab, var(--aqua) 34%, transparent) 64deg,
+      transparent 64.5deg
+    );
+  }
+  .rd-haz::after {
+    /* Borde de ataque del haz. */
+    content: ""; position: absolute; left: 50%; top: 0; bottom: 50%;
+    width: 1.5px; margin-left: -0.75px;
+    background: linear-gradient(to top, color-mix(in oklab, var(--aqua) 30%, transparent), var(--aqua));
+    box-shadow: 0 0 10px var(--aqua);
+  }
+  .rd-svg { position: relative; width: 100%; height: 100%; overflow: visible; }
+  .rd-anillo { fill: none; stroke: color-mix(in oklab, #fff 14%, transparent); stroke-width: 0.6; }
+  .rd-eje { stroke: color-mix(in oklab, #fff 9%, transparent); stroke-width: 0.5; }
+  .rd-marca { stroke: color-mix(in oklab, #fff 22%, transparent); stroke-width: 0.6; }
+  .rd-centro { fill: var(--aqua); }
+  .rd-punto { fill: color-mix(in oklab, var(--aqua) 60%, #fff); }
+  .rd-blip { opacity: 0.55; }
+  .rd-blip-dest { opacity: 1; }
+  .rd-blip-dest .rd-punto { fill: var(--aqua); }
+  .rd-onda { fill: none; stroke: var(--aqua); stroke-width: 0.8; opacity: 0; }
+  .rd-rotulo {
+    font-family: var(--font-mono); font-size: 7.5px; letter-spacing: 0.06em;
+    fill: color-mix(in oklab, #fff 78%, transparent);
+  }
+
+  .rd-fichas { display: grid; grid-template-columns: minmax(0, 1fr); }
+  .rd-ficha {
+    border-radius: 14px;
+    transition: background .35s ease;
+  }
+  /* En el radar las fichas van en filas, no en columnas: el divisor es horizontal. */
+  .rd-ficha + .rd-ficha::before {
+    left: 4%; right: 4%; top: 0; bottom: auto; width: auto; height: 1px;
+    background: linear-gradient(to right, transparent, color-mix(in oklab, #fff 14%, transparent) 22%, color-mix(in oklab, #fff 14%, transparent) 78%, transparent);
+  }
+  @media (min-width: 900px) {
+    .rd-ficha {
+      display: grid; grid-template-columns: 170px minmax(0, 1fr) auto;
+      align-items: center; gap: 4px 20px;
+      padding: 18px 20px;
+    }
+    .rd-ficha .hv-tags { margin-top: 0; text-align: right; }
+    .rd-ficha-top { flex-direction: column; align-items: flex-start; gap: 8px; }
+  }
+  .rd-ficha-top { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; }
+  .rd-estado {
+    display: inline-flex; align-items: center; gap: 7px;
+    font-family: var(--font-mono); font-size: 10.5px; letter-spacing: 0.08em; text-transform: uppercase;
+    color: color-mix(in oklab, #fff 55%, transparent);
+    transition: color .35s ease;
+  }
+  .rd-estado i {
+    width: 6px; height: 6px; border-radius: 50%;
+    background: color-mix(in oklab, var(--aqua) 55%, transparent);
+    transition: background .35s ease, box-shadow .35s ease;
+  }
+  /* Encendida: la acaba de tocar el haz, o alguien la está apuntando. */
+  .rd-ficha.is-hit,
+  .rd-ficha:hover,
+  .rd-ficha:focus-visible { background: color-mix(in oklab, var(--aqua) 9%, transparent); }
+  .rd-ficha.is-hit .rd-estado,
+  .rd-ficha:hover .rd-estado,
+  .rd-ficha:focus-visible .rd-estado { color: var(--aqua); }
+  .rd-ficha.is-hit .rd-estado i,
+  .rd-ficha:hover .rd-estado i,
+  .rd-ficha:focus-visible .rd-estado i { background: var(--aqua); box-shadow: 0 0 0 4px color-mix(in oklab, var(--aqua) 22%, transparent); }
+  .rd-ficha:focus-visible { outline: 2px solid var(--aqua); outline-offset: -2px; }
+</style>

@@ -5,6 +5,7 @@ import { FOUNDED_YEAR, stats, tonnesManaged, yearsActive } from '../lib/brand'
 import { clientesVisibles, mostrarPlaceholders, testimoniosVisibles, videoVisible } from '../lib/credenciales'
 import VideoFacade from '../components/VideoFacade.astro'
 import SiteFooter from '../components/SiteFooter.astro'
+import RadarNormativo from '../components/RadarNormativo.astro'
 
 const RADAR_CODES = ['RES 1297 · 2010', 'LEY 1672 · 2013', 'RES 1407 · 2018']
 const radar = RADAR_CODES
@@ -15,15 +16,27 @@ const video = videoVisible('es')
 ---
 
 <Layout activePath="/">
+  {/*
+    Esconde el hero solo durante el primer fotograma, para que la entrada no
+    parpadee. Si el motion no llega a montarse, se suelta a los 3 s: el hero
+    nunca queda invisible. Sin JS o con movimiento reducido no se añade nada.
+  */}
+  <script is:inline>
+    if (!matchMedia('(prefers-reduced-motion: reduce)').matches) {
+      document.documentElement.classList.add('m-ok')
+      setTimeout(() => document.documentElement.classList.remove('m-ok'), 3000)
+    }
+  </script>
+  <div data-portada>
   <section class="hero wrap">
-    <div class="eyebrow reveal">Cumplimiento ANLA · ESG · Economía circular — consultoría en toda Colombia</div>
+    <div class="eyebrow">Cumplimiento ANLA · ESG · Economía circular · consultoría en toda Colombia</div>
 
-    <h1 class="display hero-title reveal">
+    <h1 class="display hero-title">
       Cumplir con la <em>ANLA</em>,<br>
       crecer con <span class="thin">propósito</span>.
     </h1>
 
-    <div class="hero-foot reveal">
+    <div class="hero-foot">
       <div class="lede">
         <p>
           Acompañamos a importadores, productores y operadores de tecnología en Colombia
@@ -51,43 +64,33 @@ const video = videoVisible('es')
       tercera cifra que "normativas auditadas" — es la que usa la competencia.
       PENDIENTE-DATO 2.a: confirmar si las toneladas siguen siendo 1.000+ en 2026.
     */}
-    <div class="hero-stats reveal">
+    <div class="hero-stats">
       <div>
-        <div class="n">{yearsActive}</div>
+        <div class="n" data-odometro>{yearsActive}</div>
         <div class="lbl">Años en operación · desde {FOUNDED_YEAR}</div>
       </div>
       <div>
-        <div class="n">{tonnesManaged('es')}</div>
+        <div class="n" data-odometro>{tonnesManaged('es')}</div>
         <div class="lbl">Toneladas de RAEE gestionadas</div>
       </div>
       <div>
-        <div class="n">{normativas.length}</div>
+        <div class="n" data-odometro>{normativas.length}</div>
         <div class="lbl">Normativas bajo seguimiento activo</div>
       </div>
     </div>
 
-    <div class="hero-visual reveal">
-      <div class="hv-head">
-        <div class="label"><span class="pulse"></span>Radar normativo · marco vigente en Colombia</div>
-      </div>
-      <div class="hv-grid">
-        {radar.map((n) => (
-          <a class="hv-item" href="/normativas">
-            <div class="hv-code">{n.code}</div>
-            <div class="hv-title">{n.title}</div>
-            <div class="hv-tags">{n.tags.slice(0, 3).join(' · ')}</div>
-          </a>
-        ))}
-      </div>
-      <a class="hv-foot" href="/normativas">
-        Ver las {normativas.length} normativas que auditamos
-        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-          <path d="M5 12h14M13 6l6 6-6 6"/>
-        </svg>
-      </a>
-    </div>
+    <RadarNormativo
+      fichas={radar}
+      total={normativas.length}
+      href="/normativas"
+      textos={{
+        rotulo: 'Radar normativo · marco vigente en Colombia',
+        estado: 'En seguimiento',
+        pie: `Ver las ${normativas.length} normativas que auditamos`,
+      }}
+    />
 
-    <div class="sectors reveal" style="margin-top:48px">
+    <div class="sectors" style="margin-top:48px">
       <div class="sector"><span class="d deep"></span>Importadoras de tecnología</div>
       <div class="sector"><span class="d"></span>Ensambladoras y productoras</div>
       <div class="sector"><span class="d aqua"></span>Operadores de telecomunicaciones</div>
@@ -377,5 +380,11 @@ const video = videoVisible('es')
     </section>
   )}
 
+  </div>
+
   <SiteFooter />
 </Layout>
+
+<script>
+  import '../scripts/portada'
+</script>
