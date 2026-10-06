@@ -8,6 +8,7 @@
     "build": "astro build",
     "preview": "astro preview",
     "astro": "astro",
+    "test": "node --test \"src/**/*.test.ts\"",
     "migrate": "node --env-file=.env.local scripts/migrate.mjs"
   },
   "devDependencies": {
