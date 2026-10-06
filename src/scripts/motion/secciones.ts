@@ -3,7 +3,7 @@
  * luz que sigue al cursor y el trazo de la EKORUTA. Cada función devuelve su
  * limpieza; lo que es GSAP lo revierte el contexto de `montarPagina`.
  */
-import { CURVA, ScrollTrigger, SplitText, alEntrar, gsap } from './core'
+import { CURVA, ScrollTrigger, SplitText, alEntrar, gsap, mientrasSeVea } from './core'
 
 /** Titular de sección línea por línea; el antetítulo y la nota lateral entran detrás. */
 export function cabeceras(raiz: HTMLElement): void {
@@ -175,5 +175,39 @@ export function ruta(raiz: HTMLElement): () => void {
     pasos.forEach((p) => delete p.dataset.estado)
     linea.style.removeProperty('top')
     linea.style.removeProperty('height')
+  }
+}
+
+/**
+ * Marquee de normas: el mismo desfile del CSS, pero en GSAP para que acelere
+ * con la velocidad del scroll y vuelva a su paso al detenerse. Fuera de
+ * pantalla se pausa.
+ */
+export function marquee(raiz: HTMLElement): () => void {
+  const caja = raiz.querySelector<HTMLElement>('[data-marquee]')
+  const pista = caja?.querySelector<HTMLElement>('.marquee-track')
+  if (!caja || !pista) return () => {}
+  pista.style.animation = 'none'
+  const desfile = gsap.to(pista, { xPercent: -50, duration: 45, ease: 'none', repeat: -1, paused: true })
+  let calma: gsap.core.Tween | null = null
+  const st = ScrollTrigger.create({
+    trigger: caja,
+    start: 'top bottom',
+    end: 'bottom top',
+    onUpdate: (self) => {
+      const empuje = Math.min(6, 1 + Math.abs(self.getVelocity()) / 300)
+      if (empuje <= desfile.timeScale()) return
+      calma?.kill()
+      desfile.timeScale(empuje)
+      calma = gsap.to(desfile, { timeScale: 1, duration: 1.2, ease: 'power2.out' })
+    },
+  })
+  const soltar = mientrasSeVea(caja, () => desfile.play(), () => desfile.pause())
+  return () => {
+    soltar()
+    st.kill()
+    calma?.kill()
+    desfile.kill()
+    pista.style.removeProperty('animation')
   }
 }
