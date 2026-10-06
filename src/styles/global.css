@@ -1324,3 +1324,9 @@ body.nav-open .whatsapp-fab { opacity: 0; pointer-events: none; }
 /* Nada de lo que entra animado (sellos, escalas iniciales) puede abrir scroll
    horizontal. `clip` y no `hidden`: no crea un contenedor de scroll. */
 [data-portada] { overflow-x: clip; }
+/* En móvil la cabecera de sección va en una columna: a dos columnas el titular
+   quedaba en una franja de 150 px. (Otras páginas tienen el mismo problema.) */
+@media (max-width: 700px) {
+  [data-portada] .section-head { grid-template-columns: minmax(0, 1fr); gap: 16px; }
+  [data-portada] .section-head .meta { justify-self: start; text-align: left; }
+}
