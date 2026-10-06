@@ -141,7 +141,7 @@ export function ruta(raiz: HTMLElement): () => void {
 
   let selloTl: gsap.core.Tween | null = null
   if (sello) {
-    gsap.set(sello, { opacity: 0, scale: 1.5, rotation: -12 })
+    gsap.set(sello, { opacity: 0, scale: 1.25, rotation: -10 })
     selloTl = gsap.to(sello, { opacity: 1, scale: 1, rotation: -3, duration: 0.45, ease: 'back.out(2.2)', paused: true })
   }
 
