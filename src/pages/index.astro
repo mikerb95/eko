@@ -6,6 +6,7 @@ import { clientesVisibles, mostrarPlaceholders, testimoniosVisibles, videoVisibl
 import VideoFacade from '../components/VideoFacade.astro'
 import SiteFooter from '../components/SiteFooter.astro'
 import RadarNormativo from '../components/RadarNormativo.astro'
+import CicloServicio from '../components/CicloServicio.astro'
 
 const RADAR_CODES = ['RES 1297 · 2010', 'LEY 1672 · 2013', 'RES 1407 · 2018']
 const radar = RADAR_CODES
@@ -144,7 +145,7 @@ const video = videoVisible('es')
   </div>
 
   <section class="section wrap">
-    <div class="section-head reveal">
+    <div class="section-head" data-cabecera>
       <div>
         <div class="eyebrow">Líneas de servicio · 01</div>
         <h2>Cuatro líneas. Un solo<br><em>camino sostenible.</em></h2>
@@ -154,44 +155,44 @@ const video = videoVisible('es')
       </div>
     </div>
 
-    <div class="services reveal">
-      <div class="svc big accent-deep">
+    <div class="services reveal" data-luz-rejilla>
+      <a class="svc big accent-deep" href="/ekonsulting">
         <div>
-          <div class="num">EKONSULTING</div>
+          <div class="svc-top"><div class="num">EKONSULTING</div><CicloServicio paso={0} /></div>
           <h3>Asesoría y cumplimiento ante la <em>ANLA</em>.</h3>
           <p>Licenciamiento, auditorías, reportes, planes posconsumo y acompañamiento en procesos sancionatorios. Hablamos el idioma del evaluador y del directivo.</p>
         </div>
         <div class="tag"><span class="bar"></span>ANLA · CAR · VITAL · ESG</div>
-      </div>
-      <div class="svc small accent-forest">
+      </a>
+      <a class="svc small accent-forest" href="/ekoraee">
         <div>
-          <div class="num">EKORAEE</div>
+          <div class="svc-top"><div class="num">EKORAEE</div><CicloServicio paso={1} /></div>
           <h3>Gestión certificada de <em>residuos</em> electrónicos.</h3>
           <p>Recolección, transporte, almacenamiento y certificación de RAEE bajo la Res. 1297 y la Ley 1672.</p>
         </div>
         <div class="tag"><span class="bar"></span>Recolección · Certificación</div>
-      </div>
-      <div class="svc thin">
+      </a>
+      <a class="svc thin" href="/ekopartner">
         <div>
-          <div class="num">EKOPARTNER</div>
+          <div class="svc-top"><div class="num">EKOPARTNER</div><CicloServicio paso={2} /></div>
           <h3>Operación de sistemas de <em>gestión</em> de residuos.</h3>
           <p>Integramos y operamos el sistema completo de recolección y disposición. Solo Colombia.</p>
         </div>
         <div class="tag"><span class="bar"></span>Operación · Colombia</div>
-      </div>
-      <div class="svc wide accent-clay">
+      </a>
+      <a class="svc wide accent-clay" href="/ekotrading">
         <div>
-          <div class="num">EKOTRADING</div>
+          <div class="svc-top"><div class="num">EKOTRADING</div><CicloServicio paso={3} /></div>
           <h3>Compra y venta de tecnología <em>usada u obsoleta</em> en escala.</h3>
-          <p>Cerramos el ciclo de vida de los equipos dentro de un marco de economía circular. Retiro de activos tecnológicos, reacondicionamiento y recolocación al por mayor — con la trazabilidad que exigen los ODS.</p>
+          <p>Cerramos el ciclo de vida de los equipos dentro de un marco de economía circular. Retiro de activos tecnológicos, reacondicionamiento y recolocación al por mayor, con la trazabilidad que exigen los ODS.</p>
         </div>
         <div class="tag"><span class="bar"></span>Economía circular · ODS · Activos IT</div>
-      </div>
+      </a>
     </div>
   </section>
 
   <section class="section wrap">
-    <div class="section-head reveal">
+    <div class="section-head" data-cabecera>
       <div>
         <div class="eyebrow">Metodología · 02</div>
         <h2>La <em>EKORUTA</em>: sostenibilidad paso a paso.</h2>
@@ -201,37 +202,42 @@ const video = videoVisible('es')
       </div>
     </div>
 
-    <div class="process reveal">
-      <div class="process-row">
-        <div class="n">01</div>
+    <div class="process ruta reveal" data-ruta>
+      <div class="ruta-linea" aria-hidden="true"><span class="ruta-progreso"></span></div>
+      <div class="process-row" data-ruta-paso>
+        <div class="n"><span class="ruta-nodo" aria-hidden="true"></span>01</div>
         <h3>Diagnós<em>tico</em></h3>
         <div class="desc">Radiografía completa de obligaciones ANLA activas, brechas ESG y oportunidades de economía circular. Mapeamos riesgo sancionatorio y potencial de valor.</div>
-        <div class="when">Semana 1–2</div>
+        <div class="when">Semana 1-2</div>
       </div>
-      <div class="process-row">
-        <div class="n">02</div>
+      <div class="process-row" data-ruta-paso>
+        <div class="n"><span class="ruta-nodo" aria-hidden="true"></span>02</div>
         <h3>Hoja de <em>ruta</em></h3>
         <div class="desc">Diseñamos el plan regulatorio y ESG integrado, priorizando por exposición sancionatoria, vencimientos y metas ODS aplicables al sector.</div>
-        <div class="when">Semana 2–3</div>
+        <div class="when">Semana 2-3</div>
       </div>
-      <div class="process-row">
-        <div class="n">03</div>
+      <div class="process-row" data-ruta-paso>
+        <div class="n"><span class="ruta-nodo" aria-hidden="true"></span>03</div>
         <h3>Ejecución y <em>radicación</em></h3>
         <div class="desc">Preparación de estudios, cargue en VITAL, operación de recolección RAEE o activación de EKOTRADING según el mandato. Interlocución directa con la autoridad.</div>
-        <div class="when">Semana 3–8</div>
+        <div class="when">Semana 3-8</div>
       </div>
-      <div class="process-row">
-        <div class="n">04</div>
+      <div class="process-row" data-ruta-paso>
+        <div class="n"><span class="ruta-nodo" aria-hidden="true"></span>04</div>
         <h3>Segui<em>miento</em></h3>
         <div class="desc">Respuesta a requerimientos, auditorías internas, reporte ESG trimestral y seguimiento de metas posconsumo. El ciclo no termina con la radicación.</div>
         <div class="when">Continuo</div>
       </div>
-      <div class="process-row">
-        <div class="n">05</div>
+      <div class="process-row" data-ruta-paso>
+        <div class="n"><span class="ruta-nodo" aria-hidden="true"></span>05</div>
         <h3>Cierre y <em>mejora</em></h3>
         <div class="desc">Consolidación del expediente, entrega de informe ESG anual y rediseño del plan para el siguiente ciclo regulatorio con metas más ambiciosas.</div>
         <div class="when">Anual</div>
       </div>
+    </div>
+    <div class="ruta-sello" data-ruta-sello>
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path d="M20 12a8 8 0 1 1-2.34-5.66M20 4v4h-4"/></svg>
+      Ciclo cerrado · vuelve al diagnóstico
     </div>
   </section>
 
@@ -241,7 +247,7 @@ const video = videoVisible('es')
     Ver preguntas abiertas 1.a (tiempo de respuesta real) y 1.b (vigencia de "cero sanciones").
   */}
   <section class="section wrap">
-    <div class="section-head reveal">
+    <div class="section-head" data-cabecera>
       <div>
         <div class="eyebrow">Por qué Ekosolv · 03</div>
         <h2>Menos carga para su equipo,<br>más <em>respaldo</em> ante la autoridad.</h2>
@@ -326,7 +332,7 @@ const video = videoVisible('es')
   */}
   {testimoniosVisibles().length > 0 && (
     <section class="section wrap">
-      <div class="section-head reveal">
+      <div class="section-head" data-cabecera>
         <div>
           <div class="eyebrow">Testimonios · 04</div>
           <h2>Lo que dicen quienes<br>ya <em>cumplieron</em>.</h2>
@@ -357,7 +363,7 @@ const video = videoVisible('es')
 
   {clientesVisibles().length > 0 && (
     <section class="section wrap">
-      <div class="section-head reveal">
+      <div class="section-head" data-cabecera>
         <div>
           <div class="eyebrow">Clientes · 05</div>
           <h2>Compañías que han <em>confiado</em><br>en nosotros.</h2>

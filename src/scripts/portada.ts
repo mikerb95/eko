@@ -9,6 +9,7 @@
 import { CURVA, SplitText, alEntrar, gsap, montarPagina, reducido } from './motion/core'
 import { prepararOdometro } from './motion/odometro'
 import { montarRadar } from './motion/radar'
+import { cabeceras, ciclos, luz, ruta } from './motion/secciones'
 
 montarPagina('[data-portada]', (raiz) => {
   const limpiezas: (() => void)[] = []
@@ -28,8 +29,11 @@ montarPagina('[data-portada]', (raiz) => {
     if (radar) limpiezas.push(montarRadar(radar))
 
     limpiezas.push(cifras(raiz))
+    cabeceras(raiz)
+    limpiezas.push(ciclos(raiz), luz(raiz), ruta(raiz))
   } catch (e) {
     soltarHero()
+    limpiezas.forEach((fn) => fn())
     throw e
   }
 

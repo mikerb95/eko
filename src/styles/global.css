@@ -1268,3 +1268,55 @@ body.nav-open .whatsapp-fab { opacity: 0; pointer-events: none; }
 .odo-fantasma { visibility: hidden; display: block; }
 .odo-tira { position: absolute; inset: 0 0 auto 0; display: flex; flex-direction: column; text-align: center; }
 .odo-tira > span, .odo-sep { display: block; height: 1.1em; }
+
+/* Líneas de servicio: el anillo del ciclo va a la derecha del nombre de la línea. */
+.svc-top { display: flex; align-items: center; justify-content: space-between; gap: 16px; }
+
+/* Luz que sigue al cursor por la rejilla. Un solo listener escribe --fx/--fy en
+   cada carta, así el halo también asoma en las vecinas. */
+[data-luz-rejilla] .svc > * { position: relative; z-index: 1; }
+[data-luz-rejilla] .svc::after {
+  content: ""; position: absolute; inset: 0; pointer-events: none;
+  background: radial-gradient(420px circle at var(--fx, 50%) var(--fy, 50%), color-mix(in oklab, var(--aqua) 16%, transparent), transparent 62%);
+  opacity: 0; transition: opacity .4s ease;
+}
+[data-luz-rejilla] .svc.accent-deep::after {
+  background: radial-gradient(420px circle at var(--fx, 50%) var(--fy, 50%), color-mix(in oklab, var(--aqua) 30%, transparent), transparent 62%);
+}
+[data-luz-rejilla]:hover .svc::after { opacity: 1; }
+.services a.svc:focus-visible { outline: 2px solid var(--forest); outline-offset: -4px; }
+
+/* EKORUTA: un trazo une los cinco pasos y avanza con el scroll. Sin JS no hay
+   trazo y todos los nodos se ven completos. */
+.ruta { position: relative; }
+.ruta .process-row:hover { padding-inline: 0; } /* el nodo no puede salirse del trazo */
+.ruta .n { display: flex; align-items: center; gap: 14px; }
+.ruta-nodo {
+  position: relative; z-index: 1; flex: none;
+  width: 13px; height: 13px; border-radius: 50%;
+  border: 1.5px solid var(--forest); background: var(--forest);
+  box-shadow: 0 0 0 4px var(--paper);
+  transition: background .35s ease, border-color .35s ease, box-shadow .35s ease;
+}
+.ruta-linea { display: none; position: absolute; left: 6px; width: 1px; background: var(--line-2); pointer-events: none; }
+.ruta.is-viva .ruta-linea { display: block; }
+.ruta-progreso { position: absolute; inset: 0; background: var(--forest); transform-origin: top; }
+.ruta .process-row :is(h3, .desc, .when) { transition: opacity .45s ease, color .45s ease; }
+.ruta [data-estado="pendiente"] .ruta-nodo { background: var(--paper); border-color: var(--line-2); }
+.ruta [data-estado="pendiente"] :is(h3, .desc) { opacity: .5; }
+.ruta [data-estado="actual"] .ruta-nodo {
+  background: var(--paper);
+  box-shadow: 0 0 0 4px var(--paper), 0 0 0 8px color-mix(in oklab, var(--aqua) 28%, transparent);
+}
+.ruta [data-estado="actual"] .when { color: var(--forest); }
+@media (max-width: 900px) {
+  .ruta .process-row > :not(.n) { padding-left: 27px; }
+}
+.ruta-sello {
+  display: flex; align-items: center; gap: 10px;
+  width: fit-content; margin: 28px 0 0 auto;
+  padding: 10px 18px; border: 1.5px solid currentColor; border-radius: 999px;
+  font-family: var(--font-mono); font-size: 12.5px; letter-spacing: 0.08em; text-transform: uppercase;
+  color: var(--forest);
+  transform: rotate(-3deg);
+}

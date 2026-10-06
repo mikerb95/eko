@@ -1,0 +1,48 @@
+---
+/**
+ * Anillo de cuatro tramos para las cartas de líneas de servicio de la portada.
+ * Muestra qué momento del ciclo ambiental resuelve cada línea ("cada línea
+ * resuelve un momento distinto del ciclo"): su tramo va resaltado y el punto
+ * descansa en él. Juntas, las cuatro cartas cierran el ciclo.
+ *
+ * Decorativo: el texto de la carta ya dice todo. El punto lo anima
+ * `src/scripts/portada.ts` (recorre el ciclo hasta su tramo al entrar y da la
+ * vuelta completa al apuntar la carta).
+ */
+import { polar } from '../lib/radarGeom'
+
+interface Props {
+  /** Tramo de esta línea, de 0 a 3. */
+  paso: number
+}
+
+const { paso } = Astro.props
+const R = 14
+const HUECO = 9
+
+function arco(desde: number, hasta: number): string {
+  const a = polar(desde, 1, R)
+  const b = polar(hasta, 1, R)
+  return `M ${a.x} ${a.y} A ${R} ${R} 0 0 1 ${b.x} ${b.y}`
+}
+
+const tramos = [0, 1, 2, 3].map((i) => arco(i * 90 + HUECO / 2, (i + 1) * 90 - HUECO / 2))
+const reposo = paso * 90 + 45
+---
+
+<svg class="ciclo" viewBox="-20 -20 40 40" width="48" height="48" aria-hidden="true" data-ciclo={paso}>
+  {tramos.map((d, i) => <path d={d} class:list={['ciclo-tramo', { 'ciclo-propio': i === paso }]} />)}
+  <g class="ciclo-giro" transform={`rotate(${reposo})`} data-reposo={reposo}>
+    <circle cx="0" cy={-R} r="3" class="ciclo-punto" />
+  </g>
+</svg>
+
+<style is:global>
+  .ciclo { flex: none; overflow: visible; }
+  .ciclo-tramo { fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; opacity: 0.22; }
+  .ciclo-propio { opacity: 1; stroke: var(--forest); }
+  .svc.accent-deep .ciclo-propio { stroke: var(--aqua); }
+  .svc.accent-clay .ciclo-propio { stroke: var(--clay-2); }
+  .ciclo-punto { fill: var(--ink); }
+  .svc.accent-deep .ciclo-punto { fill: #fff; }
+</style>

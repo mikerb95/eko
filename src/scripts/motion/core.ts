@@ -37,9 +37,17 @@ export function montarPagina(selector: string, montar: (raiz: HTMLElement) => Li
     if (!raiz || raiz.dataset.motion === 'on') return
     raiz.dataset.motion = 'on'
     let extra: Limpieza | void
-    const ctx = gsap.context(() => {
-      extra = montar(raiz)
-    }, raiz)
+    // El contexto se crea antes de montar: si `montar` lanza, igual hay qué revertir.
+    const ctx = gsap.context(() => {}, raiz)
+    try {
+      ctx.add(() => {
+        extra = montar(raiz)
+      })
+    } catch (e) {
+      ctx.revert()
+      delete raiz.dataset.motion
+      throw e
+    }
     limpiar = () => {
       try { extra?.() } finally {
         ctx.revert()
