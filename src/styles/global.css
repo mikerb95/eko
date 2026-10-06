@@ -1256,3 +1256,15 @@ body.nav-open .whatsapp-fab { opacity: 0; pointer-events: none; }
 }
 .vid-transcript summary:hover { color: var(--ink); }
 .vid-transcript p { margin-top: 16px; color: var(--ink-2); font-size: 16px; line-height: 1.6; max-width: 70ch; }
+
+/* ===== Motion de la portada (src/scripts/portada.ts) ===== */
+/* Solo el primer fotograma: el script quita la clase al montar la entrada, o la
+   suelta el temporizador inline de la página a los 3 s. */
+.m-ok [data-portada] :is(.hero > .eyebrow, .hero-title, .hero-foot, .hero-stats, [data-radar], .sectors) { visibility: hidden; }
+
+/* Odómetro: columnas de 1.1em con la tira 0-9 dos veces. */
+.odo { display: inline-flex; height: 1.1em; line-height: 1.1; margin-block: -0.05em; vertical-align: top; }
+.odo-col { position: relative; display: block; overflow: hidden; height: 1.1em; }
+.odo-fantasma { visibility: hidden; display: block; }
+.odo-tira { position: absolute; inset: 0 0 auto 0; display: flex; flex-direction: column; text-align: center; }
+.odo-tira > span, .odo-sep { display: block; height: 1.1em; }
