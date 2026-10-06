@@ -7,6 +7,7 @@ import VideoFacade from '../components/VideoFacade.astro'
 import SiteFooter from '../components/SiteFooter.astro'
 import RadarNormativo from '../components/RadarNormativo.astro'
 import CicloServicio from '../components/CicloServicio.astro'
+import EscenaBeneficio from '../components/EscenaBeneficio.astro'
 
 const RADAR_CODES = ['RES 1297 · 2010', 'LEY 1672 · 2013', 'RES 1407 · 2018']
 const radar = RADAR_CODES
@@ -14,6 +15,16 @@ const radar = RADAR_CODES
   .filter((n): n is NonNullable<typeof n> => Boolean(n))
 
 const video = videoVisible('es')
+
+// Rótulos de las mini escenas de "Por qué Ekosolv" (EscenaBeneficio.astro).
+const ILUSTRATIVO = 'Ejemplo ilustrativo'
+const escenas = {
+  interlocutor: { licencia: 'Licencia', recoleccion: 'Recolección', certificado: 'Certificado', empresa: 'Su empresa' },
+  redaccion: { documento: 'Respuesta a requerimiento', usted: 'Usted', aprobar: 'Aprobar', radicado: 'Radicado' },
+  trazabilidad: { lote: 'Lote', certificado: 'Certificado', ilustrativo: ILUSTRATIVO },
+  vencimientos: { vencimiento: 'Vencimientos atendidos', expediente: 'Expediente', ilustrativo: ILUSTRATIVO },
+  plazo: { plazo: 'Plazo · 10 días hábiles', respuesta: 'Respuesta enviada', dia1: 'Día 1', dia10: 'Día 10', ilustrativo: ILUSTRATIVO },
+}
 ---
 
 <Layout activePath="/">
@@ -257,12 +268,13 @@ const video = videoVisible('es')
       </div>
     </div>
 
-    <div class="services reveal">
+    <div class="services reveal" data-luz-rejilla>
       <div class="svc third static accent-deep">
         <div>
           <div class="num">01</div>
           <h3>Un solo <em>interlocutor</em> para todo el ciclo.</h3>
           <p>Licenciamiento, recolección, disposición y certificado salen del mismo proveedor. Sin coordinar tres empresas ni conciliar tres formatos.</p>
+          <EscenaBeneficio tipo="interlocutor" t={escenas.interlocutor} />
         </div>
         <div class="tag"><span class="bar"></span>4 líneas integradas</div>
       </div>
@@ -271,6 +283,7 @@ const video = videoVisible('es')
           <div class="num">02</div>
           <h3>Su equipo no <em>redacta</em>.</h3>
           <p>Radicaciones, respuestas a requerimientos y soportes ANLA gestionados de punta a punta. Usted aprueba; nosotros sustentamos ante la autoridad.</p>
+          <EscenaBeneficio tipo="redaccion" t={escenas.redaccion} />
         </div>
         <div class="tag"><span class="bar"></span>ANLA · VITAL</div>
       </div>
@@ -279,6 +292,7 @@ const video = videoVisible('es')
           <div class="num">03</div>
           <h3>Trazabilidad <em>auditable</em>, lote por lote.</h3>
           <p>Cada recolección con su certificado de disposición final, listo para auditoría interna o para el informe de sostenibilidad.</p>
+          <EscenaBeneficio tipo="trazabilidad" t={escenas.trazabilidad} />
         </div>
         <div class="tag"><span class="bar"></span>Certificación · ESG</div>
       </div>
@@ -287,6 +301,7 @@ const video = videoVisible('es')
           <div class="num">04</div>
           <h3>Cero <em>sanciones</em> en firme entre clientes activos.</h3>
           <p>Trabajamos sobre vencimientos y requerimientos antes de que se conviertan en un proceso sancionatorio. La mejor gestión es la que nunca llega a expediente.</p>
+          <EscenaBeneficio tipo="vencimientos" t={escenas.vencimientos} />
         </div>
         <div class="tag"><span class="bar"></span>Riesgo regulatorio</div>
       </div>
@@ -296,6 +311,7 @@ const video = videoVisible('es')
           <div class="num">05</div>
           <h3>Respuesta en <em>días</em>, no en semanas.</h3>
           <p>Estructura liviana y decisiones sin comité. Cuando la autoridad pone un plazo de diez días hábiles, el cronograma no puede depender de la agenda del proveedor.</p>
+          <EscenaBeneficio tipo="plazo" t={escenas.plazo} />
         </div>
         <div class="tag"><span class="bar"></span>Tiempo de respuesta</div>
       </div>

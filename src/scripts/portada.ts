@@ -10,6 +10,7 @@ import { CURVA, SplitText, alEntrar, gsap, montarPagina, reducido } from './moti
 import { prepararOdometro } from './motion/odometro'
 import { montarRadar } from './motion/radar'
 import { cabeceras, ciclos, luz, ruta } from './motion/secciones'
+import { escenas } from './motion/escenas'
 
 montarPagina('[data-portada]', (raiz) => {
   const limpiezas: (() => void)[] = []
@@ -30,7 +31,7 @@ montarPagina('[data-portada]', (raiz) => {
 
     limpiezas.push(cifras(raiz))
     cabeceras(raiz)
-    limpiezas.push(ciclos(raiz), luz(raiz), ruta(raiz))
+    limpiezas.push(ciclos(raiz), luz(raiz), ruta(raiz), escenas(raiz))
   } catch (e) {
     soltarHero()
     limpiezas.forEach((fn) => fn())
