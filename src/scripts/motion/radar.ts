@@ -1,8 +1,10 @@
 /**
  * Barrido del radar normativo (ver RadarNormativo.astro).
  *
- * El haz gira solo; cuando cruza un punto, el punto emite una onda y, si tiene
- * ficha, la ficha se enciende un momento. Dos maneras de tomar el control:
+ * El haz gira solo; cuando cruza un punto, el punto y su número se encienden
+ * y, si tiene ficha, la ficha también, con una línea que va del punto a ella.
+ * Cada vez que el haz pasa por el norte sale un ping desde el centro, y el
+ * encabezado lleva la lectura del azimut. Dos maneras de tomar el control:
  * - Apuntar o enfocar una ficha: el haz va a buscar su punto y se queda ahí.
  *   Nada se mueve bajo el cursor mientras alguien lee la ficha.
  * - Mover el cursor sobre la pantalla del radar: el haz sigue al cursor.
@@ -26,7 +28,13 @@ export function montarRadar(raiz: HTMLElement): () => void {
     angulo: Number(g.dataset.angulo),
     ficha: g.dataset.ficha !== undefined ? Number(g.dataset.ficha) : null,
     onda: g.querySelector<SVGCircleElement>('.rd-onda')!,
+    punto: g.querySelector<SVGCircleElement>('[data-radar-punto]')!,
+    rotulo: raiz.querySelector<HTMLElement>(`[data-radar-rotulo="${g.dataset.radarBlip}"]`),
   }))
+  const ping = raiz.querySelector<SVGCircleElement>('[data-radar-ping]')
+  const az = raiz.querySelector<HTMLElement>('[data-radar-az]')
+  const lienzo = raiz.querySelector<SVGSVGElement>('[data-radar-enlaces]')
+  const enlaces = [...raiz.querySelectorAll<SVGPathElement>('[data-radar-enlace]')]
   const fichas = [...raiz.querySelectorAll<HTMLElement>('[data-radar-ficha]')]
   const apagados = new Map<HTMLElement, number>()
 
@@ -38,8 +46,52 @@ export function montarRadar(raiz: HTMLElement): () => void {
   let objetivoCursor = angulo
   let giro: gsap.core.Tween | null = null
 
-  const pintar = () => haz.style.setProperty('--haz', `${angulo.toFixed(2)}deg`)
+  let lectura = -1
+  const pintar = () => {
+    haz.style.setProperty('--haz', `${angulo.toFixed(2)}deg`)
+    // El texto solo se toca cuando cambia el grado entero, no en cada fotograma.
+    const g = Math.floor(angulo)
+    if (az && g !== lectura) {
+      lectura = g
+      az.textContent = String(g).padStart(3, '0')
+    }
+  }
   pintar()
+
+  /**
+   * Línea del punto a su ficha. Se calcula al momento con las cajas reales,
+   * así sirve para cualquier ancho; si el lienzo está oculto (móvil), no hace nada.
+   */
+  const enlazar = (i: number, quedarse: boolean) => {
+    const path = enlaces[i]
+    const b = blips.find((x) => x.ficha === i)
+    const f = fichas[i]
+    if (!lienzo || !path || !b || !f || lienzo.getClientRects().length === 0) return
+    const base = lienzo.getBoundingClientRect()
+    const p = b.punto.getBoundingClientRect()
+    const r = f.getBoundingClientRect()
+    // Sale justo después del número, a la altura del punto: no tacha el rótulo.
+    const n = b.rotulo?.getBoundingClientRect()
+    const x1 = (n ? n.right + 6 : p.left + p.width / 2) - base.left
+    const y1 = p.top + p.height / 2 - base.top
+    const x2 = r.left - base.left
+    const y2 = r.top + r.height / 2 - base.top
+    const curva = Math.max(40, (x2 - x1) * 0.45)
+    path.setAttribute('d', `M${x1},${y1} C${x1 + curva},${y1} ${x2 - curva},${y2} ${x2},${y2}`)
+    const largo = path.getTotalLength()
+    gsap.killTweensOf(path)
+    const tl = gsap.timeline()
+    tl.fromTo(path, { opacity: 0.9, strokeDasharray: `${largo} ${largo}`, strokeDashoffset: largo }, { strokeDashoffset: 0, duration: 0.45, ease: 'power2.out' })
+      // Dibujada, pasa a punteada: queda como guía sin pesar más que el texto.
+      .set(path, { strokeDasharray: '3 4', strokeDashoffset: 0 })
+    if (!quedarse) tl.to(path, { opacity: 0, duration: 0.6, ease: 'power1.in' }, ENCENDIDO_MS / 1000 - 0.3)
+  }
+  const desenlazar = (i: number) => {
+    const path = enlaces[i]
+    if (!path) return
+    gsap.killTweensOf(path)
+    gsap.to(path, { opacity: 0, duration: 0.3 })
+  }
 
   const encender = (i: number) => {
     const f = fichas[i]
@@ -47,18 +99,27 @@ export function montarRadar(raiz: HTMLElement): () => void {
     f.classList.add('is-hit')
     clearTimeout(apagados.get(f))
     apagados.set(f, window.setTimeout(() => f.classList.remove('is-hit'), ENCENDIDO_MS))
+    if (modo !== 'ficha') enlazar(i, false)
+  }
+
+  const latido = () => {
+    if (!ping) return
+    gsap.fromTo(ping, { attr: { r: 2 }, opacity: 0.55 }, { attr: { r: 100 }, opacity: 0, duration: 2.4, ease: 'power1.out' })
   }
 
   const destello = (b: (typeof blips)[number]) => {
-    gsap.fromTo(b.onda, { attr: { r: 3 }, opacity: 0.9 }, { attr: { r: b.ficha !== null ? 16 : 10 }, opacity: 0, duration: 1.1, ease: 'power2.out' })
+    gsap.fromTo(b.onda, { attr: { r: 1.5 }, opacity: 0.9 }, { attr: { r: b.ficha !== null ? 8 : 5 }, opacity: 0, duration: 1.1, ease: 'power2.out' })
     // Como en un radar de verdad: el punto se enciende al pasar el haz y se va apagando.
+    // El número lo acompaña, pero nunca baja tanto que deje de leerse.
     gsap.fromTo(b.g, { opacity: 1 }, { opacity: b.ficha !== null ? 0.85 : 0.4, duration: 2.6, ease: 'power1.in' })
+    if (b.rotulo) gsap.fromTo(b.rotulo, { opacity: 1 }, { opacity: b.ficha !== null ? 0.9 : 0.55, duration: 2.6, ease: 'power1.in' })
     if (b.ficha !== null) encender(b.ficha)
   }
 
   /** Avanza el haz de `antes` a `angulo` y hace destellar lo que haya cruzado. */
   const avanzar = (antes: number) => {
     for (const b of blips) if (cruzo(antes, angulo, b.angulo)) destello(b)
+    if (cruzo(antes, angulo, 0)) latido()
     pintar()
   }
 
@@ -81,6 +142,7 @@ export function montarRadar(raiz: HTMLElement): () => void {
     if (!b) return
     modo = 'ficha'
     giro?.kill()
+    enlaces.forEach((_, j) => j !== i && desenlazar(j))
     const proxy = { a: angulo }
     const destino = angulo + giroHacia(angulo, b.angulo)
     giro = gsap.to(proxy, {
@@ -92,6 +154,8 @@ export function montarRadar(raiz: HTMLElement): () => void {
         angulo = normalizar(proxy.a)
         avanzar(antes)
       },
+      // Mientras alguien lee la ficha, la línea se queda.
+      onComplete: () => enlazar(i, true),
     })
   }
 
@@ -99,6 +163,7 @@ export function montarRadar(raiz: HTMLElement): () => void {
     giro?.kill()
     giro = null
     modo = 'barrido'
+    enlaces.forEach((_, j) => desenlazar(j))
   }
 
   const limpiezas: (() => void)[] = []
@@ -140,5 +205,9 @@ export function montarRadar(raiz: HTMLElement): () => void {
     apagados.forEach((t) => clearTimeout(t))
     fichas.forEach((f) => f.classList.remove('is-hit'))
     haz.style.removeProperty('--haz')
+    gsap.killTweensOf([...enlaces, ping, ...blips.map((b) => b.rotulo)].filter(Boolean))
+    enlaces.forEach((p) => { p.removeAttribute('style'); p.removeAttribute('d') })
+    // Solo la opacidad: el `style` del rótulo también lleva su posición.
+    blips.forEach((b) => b.rotulo && gsap.set(b.rotulo, { clearProps: 'opacity' }))
   }
 }

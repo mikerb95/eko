@@ -359,13 +359,19 @@ h3 { font-size: 22px; }
   position: relative;
 }
 .hero-title { view-transition-name: hero-title; }
-.hero-foot {
-  margin-top: clamp(24px, 4vw, 40px);
-  display: grid; grid-template-columns: 1.3fr 1fr; gap: clamp(20px, 3vw, 40px);
-  align-items: end;
+/* Hero en dos columnas: titular, lede y CTA a la izquierda; el selector
+   "¿Qué le exige la ANLA?" (ExigeAnla.astro) a la derecha. */
+.hero-grid {
+  display: grid; grid-template-columns: minmax(0, 1fr);
+  gap: clamp(32px, 4vw, 64px); align-items: start;
 }
-/* Sin esto las columnas heredan min-width:auto y la card se sale del viewport. */
-.hero-foot > * { min-width: 0; }
+.hero-main { display: flex; flex-direction: column; gap: clamp(24px, 3vw, 36px); min-width: 0; }
+.hero-title { font-size: clamp(52px, 7.4vw, 112px); text-wrap: balance; }
+@media (min-width: 1080px) {
+  .hero-grid { grid-template-columns: minmax(0, 1.08fr) minmax(0, 1fr); }
+  .hero-title { font-size: clamp(64px, 6.6vw, 104px); }
+  .hero-main .lede { max-width: 46ch; }
+}
 .hero-card {
   background: var(--ink); color: var(--paper);
   border-radius: var(--r-lg);
@@ -392,7 +398,6 @@ h3 { font-size: 22px; }
 }
 .hero-card:hover .arrow { transform: rotate(-45deg) scale(1.05); }
 @media (max-width: 860px) {
-  .hero-foot { grid-template-columns: 1fr; align-items: stretch; }
   .hero-card { padding: 24px; gap: 20px; }
   .hero-card .big { font-size: clamp(28px, 8vw, 40px); }
   .hero-card .arrow { width: 46px; height: 46px; }
@@ -1265,7 +1270,7 @@ body.nav-open .whatsapp-fab { opacity: 0; pointer-events: none; }
 /* ===== Motion de la portada (src/scripts/portada.ts) ===== */
 /* Solo el primer fotograma: el script quita la clase al montar la entrada, o la
    suelta el temporizador inline de la página a los 3 s. */
-.m-ok [data-portada] :is(.hero > .eyebrow, .hero-title, .hero-foot, .hero-stats, [data-radar], .sectors) { visibility: hidden; }
+.m-ok [data-portada] :is(.hero > .eyebrow, .hero-title, .hero-main > :not(.hero-title), [data-exige], .hero-stats, [data-radar]) { visibility: hidden; }
 
 /* Odómetro: columnas de 1.1em con la tira 0-9 dos veces. */
 .odo { display: inline-flex; height: 1.1em; line-height: 1.1; margin-block: -0.05em; vertical-align: top; }

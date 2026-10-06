@@ -13,7 +13,7 @@
  *
  * El HTML es el estado final (todo resuelto). Los bucles los monta
  * `src/scripts/motion/escenas.ts`. Decorativas (`aria-hidden`): el texto de la
- * carta ya dice lo mismo. Las que parecen datos llevan "Ejemplo ilustrativo".
+ * carta ya dice lo mismo.
  */
 
 type Tipo = 'interlocutor' | 'redaccion' | 'trazabilidad' | 'vencimientos' | 'plazo'
@@ -81,7 +81,7 @@ const RESPUESTA = 2
         ))}
         <span class="esc-escaner" data-e="escaner"></span>
       </div>
-      <div class="esc-pie"><span>{t.certificado}</span><span>{t.ilustrativo}</span></div>
+      <div class="esc-pie"><span>{t.certificado}</span></div>
     </div>
   )}
 
@@ -95,7 +95,7 @@ const RESPUESTA = 2
         ))}
         <span class="esc-expediente">{t.expediente}</span>
       </div>
-      <div class="esc-pie"><span>{t.vencimiento}</span><span>{t.ilustrativo}</span></div>
+      <div class="esc-pie"><span>{t.vencimiento}</span></div>
     </div>
   )}
 
@@ -109,7 +109,7 @@ const RESPUESTA = 2
           </span>
         ))}
       </div>
-      <div class="esc-pie"><span>{t.dia1}</span><span>{t.ilustrativo}</span><span>{t.dia10}</span></div>
+      <div class="esc-pie"><span>{t.dia1}</span><span>{t.dia10}</span></div>
     </div>
   )}
 </div>

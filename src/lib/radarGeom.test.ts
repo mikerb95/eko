@@ -1,6 +1,6 @@
 import { test } from 'node:test'
 import assert from 'node:assert/strict'
-import { blipsRadar, cruzo, distanciaAngular, giroHacia, normalizar, polar } from './radarGeom.ts'
+import { ZONA, blipsRadar, choques, cruzo, distanciaAngular, giroHacia, normalizar, polar } from './radarGeom.ts'
 
 test('un punto por norma, con las destacadas primero', () => {
   const b = blipsRadar(10, 3)
@@ -16,10 +16,32 @@ test('los puntos quedan dentro del radar', () => {
   }
 })
 
-test('nunca hay más destacadas que puntos ni que ángulos reservados', () => {
+test('nunca hay más destacadas que puntos', () => {
   assert.equal(blipsRadar(2, 3).length, 2)
-  assert.equal(blipsRadar(10, 9).filter((x) => x.destacado !== null).length, 3)
+  assert.equal(blipsRadar(2, 3).filter((x) => x.destacado !== null).length, 2)
   assert.equal(blipsRadar(0, 3).length, 0)
+})
+
+test('todos los puntos caen en la parte visible del radar', () => {
+  for (const total of [1, 3, 10, 14]) {
+    for (const b of blipsRadar(total, 3)) {
+      const p = polar(b.angulo, b.radio, 1)
+      assert.ok(p.x >= ZONA.xMin - 0.01, `x ${p.x} (${b.angulo}°, ${b.radio})`)
+      assert.ok(p.y >= ZONA.yMin - 0.01 && p.y <= ZONA.yMax + 0.01, `y ${p.y} (${b.angulo}°, ${b.radio})`)
+    }
+  }
+})
+
+test('con las 10 normas, ningún rótulo choca con otro ni tapa un punto', () => {
+  const p = blipsRadar(10, 3).map((b) => polar(b.angulo, b.radio, 1))
+  for (let i = 0; i < p.length; i++) {
+    for (let j = i + 1; j < p.length; j++) assert.equal(choques(p[i], p[j]), 0, `${i} y ${j}`)
+  }
+})
+
+test('las destacadas quedan espaciadas para que el haz las visite a ritmo parejo', () => {
+  const dest = blipsRadar(10, 3).filter((x) => x.destacado !== null).map((x) => x.angulo).sort((a, b) => a - b)
+  for (let i = 1; i < dest.length; i++) assert.ok(dest[i] - dest[i - 1] > 45, dest.join(', '))
 })
 
 test('las normas sin ficha no se pegan a una destacada', () => {

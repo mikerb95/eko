@@ -8,6 +8,8 @@ import SiteFooter from '../../components/SiteFooter.astro'
 import RadarNormativo from '../../components/RadarNormativo.astro'
 import CicloServicio from '../../components/CicloServicio.astro'
 import EscenaBeneficio from '../../components/EscenaBeneficio.astro'
+import ExigeAnla from '../../components/ExigeAnla.astro'
+import normativasEn from '../../data/normativas.en.json'
 
 // English copy of the same three entries surfaced on /en/regulations
 const radar = [
@@ -19,13 +21,12 @@ const radar = [
 const video = videoVisible('en')
 
 // Labels for the "Why Ekosolv" mini scenes (EscenaBeneficio.astro).
-const ILLUSTRATIVE = 'Illustrative example'
 const escenas = {
   interlocutor: { licencia: 'Permit', recoleccion: 'Collection', certificado: 'Certificate', empresa: 'Your company' },
   redaccion: { documento: 'Response to request', usted: 'You', aprobar: 'Approve', radicado: 'Filed' },
-  trazabilidad: { lote: 'Batch', certificado: 'Certified per batch', ilustrativo: ILLUSTRATIVE },
-  vencimientos: { vencimiento: 'Deadlines handled', expediente: 'Case file', ilustrativo: ILLUSTRATIVE },
-  plazo: { plazo: 'Deadline · 10 business days', respuesta: 'Response sent', dia1: 'Day 1', dia10: 'Day 10', ilustrativo: ILLUSTRATIVE },
+  trazabilidad: { lote: 'Batch', certificado: 'Certified per batch' },
+  vencimientos: { vencimiento: 'Deadlines handled', expediente: 'Case file' },
+  plazo: { plazo: 'Deadline · 10 business days', respuesta: 'Response sent', dia1: 'Day 1', dia10: 'Day 10' },
 }
 ---
 
@@ -39,33 +40,56 @@ const escenas = {
   </script>
   <div data-portada>
   <section class="hero wrap">
-    <div class="eyebrow">ANLA Compliance · ESG · Circular Economy · consulting across Colombia</div>
+    <div class="eyebrow">ANLA Compliance · WEEE · ESG · consulting across Colombia</div>
 
-    <h1 class="display hero-title">
-      Comply with <em>ANLA</em>,<br>
-      grow with <span class="thin">purpose</span>.
-    </h1>
+    <div class="hero-grid">
+      <div class="hero-main">
+        <h1 class="display hero-title">
+          Everything you <em>import</em> comes back.
+        </h1>
 
-    <div class="hero-foot">
-      <div class="lede">
-        <p>
-          We support importers, producers, and tech operators in Colombia
-          to comply with ANLA regulations, build their ESG strategy, and make the leap
-          toward the circular economy.
-        </p>
-        <p class="lede-coda">With the rigor the authority demands and the speed that business requires.</p>
+        <div class="lede">
+          <p>
+            And ANLA wants to know how. We support importers, producers, and tech operators
+            in Colombia to comply with environmental regulations, build their ESG strategy,
+            and close the loop on their waste.
+          </p>
+          <p class="lede-coda">With the rigor the authority demands and the speed that business requires.</p>
+        </div>
+
+        <a href="/en/contact" class="hero-card">
+          <div>
+            <div class="big">Schedule a <em>diagnostic</em></div>
+            <div class="sub">45 min · no cost · confidential</div>
+          </div>
+          <div class="arrow">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
+              <path d="M5 12h14M13 6l6 6-6 6"/>
+            </svg>
+          </div>
+        </a>
       </div>
-      <a href="/en/contact" class="hero-card">
-        <div>
-          <div class="big">Schedule a <em>diagnostic</em></div>
-          <div class="sub">45 min · no cost · confidential</div>
-        </div>
-        <div class="arrow">
-          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
-            <path d="M5 12h14M13 6l6 6-6 6"/>
-          </svg>
-        </div>
-      </a>
+
+      <ExigeAnla
+        normas={normativasEn}
+        href="/en/contact"
+        perfiles={{
+          importadora: { label: 'Imports technology', sector: 'Technology importer' },
+          productora: { label: 'Assembles or produces', sector: 'Assembler / producer' },
+          telco: { label: 'Runs telecom', sector: 'Telecommunications' },
+          datacenter: { label: 'Runs a data center', sector: 'Data center / infrastructure' },
+          retail: { label: 'Sells electronics', sector: 'Electronics retail' },
+        }}
+        textos={{
+          rotulo: 'What does ANLA require?',
+          aviso: 'Indicative',
+          pregunta: 'Your company…',
+          aplican: 'regulations apply',
+          aplica: 'Applies to your company.',
+          todas: 'All',
+          cta: 'Review them with an expert',
+        }}
+      />
     </div>
 
     {/*
@@ -90,8 +114,8 @@ const escenas = {
     </div>
 
     <RadarNormativo
+      normas={normativas}
       fichas={radar}
-      total={normativas.length}
       href="/en/regulations"
       textos={{
         rotulo: 'Regulatory radar · framework in force in Colombia',
@@ -99,14 +123,6 @@ const escenas = {
         pie: `See the ${normativas.length} regulations we audit`,
       }}
     />
-
-    <div class="sectors" style="margin-top:48px">
-      <div class="sector"><span class="d deep"></span>Technology importers</div>
-      <div class="sector"><span class="d"></span>Assemblers and producers</div>
-      <div class="sector"><span class="d aqua"></span>Telecommunications operators</div>
-      <div class="sector"><span class="d clay"></span>Data centers &amp; infrastructure</div>
-      <div class="sector"><span class="d"></span>Electronics retail</div>
-    </div>
   </section>
 
   {/*

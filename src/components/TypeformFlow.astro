@@ -756,6 +756,19 @@ const selectedValues = (f: Extract<TFField, { type: 'choice' }>) =>
       })
     })
 
+    // Preselección desde la URL (?sector=…), p. ej. el selector del hero de la
+    // portada. Solo en grupos de opción única y solo si el valor existe tal cual.
+    new URLSearchParams(location.search).forEach((valor, nombre) => {
+      flow.querySelectorAll<HTMLElement>('.tf-choices[data-multiple="false"]').forEach((group) => {
+        if (group.dataset.name !== nombre) return
+        const buttons = Array.from(group.querySelectorAll('.tf-choice')) as HTMLButtonElement[]
+        const elegido = buttons.find((b) => b.dataset.value === valor)
+        if (!elegido) return
+        buttons.forEach((b) => b.setAttribute('aria-pressed', b === elegido ? 'true' : 'false'))
+        ;(group.querySelector('input[type="hidden"]') as HTMLInputElement).value = valor
+      })
+    })
+
     async function submit() {
       const payload = Object.fromEntries(new FormData(form).entries())
       nextBtn.disabled = true

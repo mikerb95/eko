@@ -1,24 +1,31 @@
 ---
 /**
- * Radar normativo de la portada. Pieza central del hero: un radar que barre y
- * enciende la ficha de cada norma cuando el haz pasa por ella. Hay un punto por
- * norma vigilada (el total coincide con la cifra "normativas bajo seguimiento"),
- * y las tres con ficha llevan rótulo.
+ * Radar normativo de la portada. Pieza central del hero: un radar más grande
+ * que la card, que se pierde por el borde izquierdo y por detrás del
+ * encabezado y del pie, de modo que solo se ve cerca del 65 % del disco. En lo
+ * visible está cada norma vigilada como un punto con su número (el total
+ * coincide con la cifra "normativas bajo seguimiento"); las que tienen ficha
+ * se encienden y se enlazan a ella cuando el haz pasa por encima.
  *
- * El HTML es el estado final y quieto: haz detenido, fichas legibles con su
- * estado. El barrido lo monta `src/scripts/motion/radar.ts`.
+ * El HTML es el estado final y quieto: haz detenido, puntos y fichas legibles.
+ * El barrido lo monta `src/scripts/motion/radar.ts`.
  */
 import { blipsRadar, polar } from '../lib/radarGeom'
 
-interface Ficha {
+interface Norma {
   code: string
+}
+
+interface Ficha extends Norma {
   title: string
   tags: string[]
 }
 
 interface Props {
+  /** Todas las normas vigiladas: un punto por cada una. */
+  normas: Norma[]
+  /** Las que llevan ficha al lado del radar (deben estar también en `normas`). */
   fichas: Ficha[]
-  total: number
   href: string
   textos: {
     rotulo: string
@@ -27,56 +34,91 @@ interface Props {
   }
 }
 
-const { fichas, total, href, textos } = Astro.props
-const blips = blipsRadar(total, fichas.length)
+const { normas, fichas, href, textos } = Astro.props
+const blips = blipsRadar(normas.length, fichas.length)
+// Las destacadas toman la norma de su ficha; el resto, las demás normas en orden.
+const sinFicha = normas.filter((n) => !fichas.some((f) => f.code === n.code))
+let siguiente = 0
+const puntos = blips.map((b) => ({
+  ...b,
+  ...polar(b.angulo, b.radio),
+  norma: b.destacado !== null ? fichas[b.destacado] : sinFicha[siguiente++],
+}))
 
-/** "RES 1297 · 2010" → "1297": el rótulo corto que va junto al punto. */
-const corto = (code: string) => code.split(/\s+/)[1] ?? code
-const anillos = [0.33, 0.66, 1]
-const marcas = Array.from({ length: 36 }, (_, i) => i * 10)
+/** "RES 1297 · 2010" → ["1297", "2010"]; "DEC 1076 · Título 5" → ["1076", "Título 5"]. */
+function partes(code: string): [string, string] {
+  const [antes, despues = ''] = code.split('·').map((t) => t.trim())
+  return [antes.split(/\s+/)[1] ?? antes, despues]
+}
+
+/** De coordenadas del viewBox (radio 100 en un lienzo de 224) a % de la pantalla, para los rótulos en HTML. */
+const pct = (v: number) => `${(50 + (v / 224) * 100).toFixed(3)}%`
+
+const anillos = [25, 50, 75]
+const marcas = Array.from({ length: 180 }, (_, i) => i * 2)
+const grados = Array.from({ length: 12 }, (_, i) => i * 30)
 ---
 
 <div class="hero-visual radar" data-radar>
   <div class="hv-head">
     <div class="label"><span class="pulse"></span>{textos.rotulo}</div>
+    <div class="rd-lectura" aria-hidden="true">AZ <span data-radar-az>040</span>°</div>
   </div>
 
   <div class="rd-cuerpo">
-    <div class="rd-pantalla" data-radar-pantalla aria-hidden="true">
-      <div class="rd-haz" data-radar-haz></div>
-      <svg viewBox="-112 -112 224 224" class="rd-svg">
-        {anillos.map((r) => <circle class="rd-anillo" r={r * 100} />)}
-        <line class="rd-eje" x1="-100" y1="0" x2="100" y2="0" />
-        <line class="rd-eje" x1="0" y1="-100" x2="0" y2="100" />
-        {marcas.map((a) => {
-          const largo = a % 90 === 0 ? 0.9 : 0.95
-          const p1 = polar(a, largo)
-          const p2 = polar(a, 1)
-          return <line class="rd-marca" x1={p1.x} y1={p1.y} x2={p2.x} y2={p2.y} />
-        })}
-        {blips.map((b, i) => {
-          const p = polar(b.angulo, b.radio)
-          const ficha = b.destacado !== null ? fichas[b.destacado] : null
-          return (
+    {/* Antes que el campo: la línea pasa por debajo de los números, no encima. */}
+    <svg class="rd-enlaces" data-radar-enlaces aria-hidden="true">
+      {fichas.map((_, i) => <path class="rd-enlace" data-radar-enlace={i} />)}
+    </svg>
+    <div class="rd-campo">
+      <div class="rd-pantalla" data-radar-pantalla aria-hidden="true">
+        <div class="rd-haz" data-radar-haz></div>
+        <svg viewBox="-112 -112 224 224" class="rd-svg">
+          {anillos.map((r) => <circle class="rd-anillo" r={r} />)}
+          <circle class="rd-anillo rd-anillo-guia" r="62.5" />
+          <circle class="rd-borde" r="100" />
+          <line class="rd-eje" x1="-100" y1="0" x2="100" y2="0" />
+          <line class="rd-eje" x1="0" y1="-100" x2="0" y2="100" />
+          <line class="rd-eje rd-eje-diag" x1="-70.7" y1="-70.7" x2="70.7" y2="70.7" />
+          <line class="rd-eje rd-eje-diag" x1="-70.7" y1="70.7" x2="70.7" y2="-70.7" />
+          {marcas.map((a) => {
+            const largo = a % 30 === 0 ? 1.06 : a % 10 === 0 ? 1.04 : 1.02
+            const p1 = polar(a, 1)
+            const p2 = polar(a, largo)
+            return <line class:list={['rd-marca', { 'rd-marca-mayor': a % 30 === 0 }]} x1={p1.x} y1={p1.y} x2={p2.x} y2={p2.y} />
+          })}
+          {grados.map((a) => {
+            const p = polar(a, 1.085)
+            return <text class="rd-grado" x={p.x} y={p.y} text-anchor="middle" dominant-baseline="middle">{String(a).padStart(3, '0')}</text>
+          })}
+          <circle class="rd-ping" data-radar-ping r="0" />
+          {puntos.map((b, i) => (
             <g
-              class:list={['rd-blip', { 'rd-blip-dest': ficha }]}
+              class:list={['rd-blip', { 'rd-blip-dest': b.destacado !== null }]}
               data-radar-blip={i}
               data-angulo={b.angulo}
               data-ficha={b.destacado ?? undefined}
-              transform={`translate(${p.x} ${p.y})`}
+              transform={`translate(${b.x} ${b.y})`}
             >
-              <circle class="rd-onda" r="3" />
-              <circle class="rd-punto" r={ficha ? 3.2 : 2} />
-              {ficha && (
-                <text class="rd-rotulo" x={p.x >= 0 ? 7 : -7} y="3" text-anchor={p.x >= 0 ? 'start' : 'end'}>
-                  {corto(ficha.code)}
-                </text>
-              )}
+              <circle class="rd-onda" r="1.5" />
+              <circle class="rd-punto" data-radar-punto r={b.destacado !== null ? 1.7 : 1.15} />
             </g>
+          ))}
+          <circle class="rd-centro" r="1.4" />
+        </svg>
+        {puntos.map((b, i) => {
+          const [numero, anio] = partes(b.norma?.code ?? '')
+          return (
+            <span
+              class:list={['rd-rotulo', { 'rd-rotulo-dest': b.destacado !== null }]}
+              data-radar-rotulo={i}
+              style={`left:${pct(b.x)};top:${pct(b.y)}`}
+            >
+              <b>{numero}</b>{anio && <small>{anio}</small>}
+            </span>
           )
         })}
-        <circle class="rd-centro" r="2.4" />
-      </svg>
+      </div>
     </div>
 
     <div class="rd-fichas">
@@ -102,66 +144,154 @@ const marcas = Array.from({ length: 36 }, (_, i) => i * 10)
 </div>
 
 <style is:global>
-  /* El radar reutiliza .hero-visual, .hv-* y .label de global.css; aquí solo va lo suyo. */
+  /*
+   * El radar reutiliza .hero-visual, .hv-* y .label de global.css; aquí solo va lo suyo.
+   *
+   * Geometría: --R es el radio del disco. Su centro queda a 0.3R del borde
+   * izquierdo de la card, así que el 35 % del disco cae fuera (o detrás del
+   * encabezado y del pie). La pantalla mide 2.24R porque el viewBox deja aire
+   * alrededor del disco para las marcas y los grados.
+   */
+  .radar {
+    --R: 190px;
+    --pad: clamp(20px, 2.4vw, 28px); /* el padding de .hero-visual */
+  }
+  @media (min-width: 900px) {
+    .radar { --R: clamp(240px, 21vw, 300px); }
+  }
+  /* El encabezado y el pie van por encima del disco, que pasa por detrás. */
+  .radar > .hv-head,
+  .radar > .hv-foot { z-index: 3; }
+  .radar > .hv-head { align-items: center; }
+  .rd-lectura {
+    font-family: var(--font-mono); font-size: 11.5px; letter-spacing: 0.12em;
+    color: color-mix(in oklab, #fff 50%, transparent);
+    font-variant-numeric: tabular-nums;
+  }
+  @media (max-width: 599px) {
+    .rd-lectura { display: none; }
+  }
+  .rd-lectura span { color: var(--aqua); }
+
   .rd-cuerpo {
+    position: relative;
     display: grid;
     grid-template-columns: minmax(0, 1fr);
     gap: clamp(16px, 3vw, 40px);
     align-items: center;
-    padding-top: clamp(18px, 2vw, 24px);
   }
   @media (min-width: 900px) {
-    .rd-cuerpo { grid-template-columns: clamp(240px, 24vw, 300px) minmax(0, 1fr); }
+    .rd-cuerpo { grid-template-columns: calc(var(--R) * 1.42 - var(--pad)) minmax(0, 1fr); }
   }
 
+  /* El campo reserva el sitio del radar; la pantalla se sale de él hacia el borde de la card. */
+  .rd-campo {
+    position: relative;
+    height: calc(var(--R) * 1.6);
+  }
+  @media (min-width: 900px) {
+    .rd-campo { height: auto; align-self: stretch; min-height: calc(var(--R) * 1.3); }
+  }
   .rd-pantalla {
     --haz: 40deg;
-    position: relative;
-    width: min(100%, 300px);
+    position: absolute;
+    top: 50%;
+    left: calc(var(--R) * 0.3 - var(--pad) - var(--R) * 1.12);
+    width: calc(var(--R) * 2.24);
     aspect-ratio: 1;
-    justify-self: center;
+    translate: 0 -50%;
     border-radius: 50%;
-    background: radial-gradient(circle, color-mix(in oklab, var(--forest) 16%, transparent) 0%, transparent 70%);
-  }
-  @media (max-width: 899px) {
-    .rd-pantalla { width: min(64vw, 240px); }
+    background: radial-gradient(circle, color-mix(in oklab, var(--forest) 22%, transparent) 0%, transparent 46%);
+    /*
+     * Lo que queda detrás de la card se desvanece en vez de cortarse en seco:
+     * hacia la izquierda desde el borde (37 %) hasta donde empiezan los puntos,
+     * y arriba y abajo antes de llegar al encabezado y al pie.
+     */
+    -webkit-mask-image:
+      linear-gradient(to right, transparent 36%, #000 48%),
+      linear-gradient(to bottom, transparent 14%, #000 27%, #000 73%, transparent 86%);
+    -webkit-mask-composite: source-in;
+    mask-image:
+      linear-gradient(to right, transparent 36%, #000 48%),
+      linear-gradient(to bottom, transparent 14%, #000 27%, #000 73%, transparent 86%);
+    mask-composite: intersect;
   }
   /* Haz: un cono con estela, girado con una variable para que el script lo mueva sin calcular matrices. */
   .rd-haz {
-    position: absolute; inset: 5.4%;
+    position: absolute; inset: 5.36%;
     border-radius: 50%;
     transform: rotate(var(--haz));
     background: conic-gradient(
-      from -64deg,
+      from -70deg,
       transparent 0deg,
-      color-mix(in oklab, var(--aqua) 4%, transparent) 20deg,
-      color-mix(in oklab, var(--aqua) 34%, transparent) 64deg,
-      transparent 64.5deg
+      color-mix(in oklab, var(--aqua) 3%, transparent) 24deg,
+      color-mix(in oklab, var(--aqua) 30%, transparent) 70deg,
+      transparent 70.4deg
     );
   }
   .rd-haz::after {
     /* Borde de ataque del haz. */
     content: ""; position: absolute; left: 50%; top: 0; bottom: 50%;
     width: 1.5px; margin-left: -0.75px;
-    background: linear-gradient(to top, color-mix(in oklab, var(--aqua) 30%, transparent), var(--aqua));
-    box-shadow: 0 0 10px var(--aqua);
+    background: linear-gradient(to top, color-mix(in oklab, var(--aqua) 20%, transparent), var(--aqua));
+    box-shadow: 0 0 12px var(--aqua);
   }
   .rd-svg { position: relative; width: 100%; height: 100%; overflow: visible; }
-  .rd-anillo { fill: none; stroke: color-mix(in oklab, #fff 14%, transparent); stroke-width: 0.6; }
-  .rd-eje { stroke: color-mix(in oklab, #fff 9%, transparent); stroke-width: 0.5; }
-  .rd-marca { stroke: color-mix(in oklab, #fff 22%, transparent); stroke-width: 0.6; }
+  /* Trazos en píxeles, no en unidades del viewBox: el disco crece, la línea no engorda. */
+  .rd-svg :is(circle, line) { vector-effect: non-scaling-stroke; }
+  .rd-anillo { fill: none; stroke: color-mix(in oklab, #fff 12%, transparent); stroke-width: 1; }
+  .rd-anillo-guia { stroke-dasharray: 2 5; stroke: color-mix(in oklab, #fff 9%, transparent); }
+  .rd-borde { fill: none; stroke: color-mix(in oklab, #fff 24%, transparent); stroke-width: 1; }
+  .rd-eje { stroke: color-mix(in oklab, #fff 8%, transparent); stroke-width: 1; }
+  .rd-eje-diag { stroke-dasharray: 1 6; }
+  .rd-marca { stroke: color-mix(in oklab, #fff 18%, transparent); stroke-width: 1; }
+  .rd-marca-mayor { stroke: color-mix(in oklab, #fff 40%, transparent); }
+  .rd-grado {
+    font-family: var(--font-mono); font-size: 3.6px; letter-spacing: 0.08em;
+    fill: color-mix(in oklab, #fff 38%, transparent);
+  }
+  .rd-ping { fill: none; stroke: var(--aqua); stroke-width: 1; opacity: 0; }
   .rd-centro { fill: var(--aqua); }
-  .rd-punto { fill: color-mix(in oklab, var(--aqua) 60%, #fff); }
-  .rd-blip { opacity: 0.55; }
+  .rd-punto { fill: color-mix(in oklab, var(--aqua) 55%, #fff); }
+  .rd-blip { opacity: 0.6; }
   .rd-blip-dest { opacity: 1; }
-  .rd-blip-dest .rd-punto { fill: var(--aqua); }
-  .rd-onda { fill: none; stroke: var(--aqua); stroke-width: 0.8; opacity: 0; }
+  .rd-blip-dest .rd-punto { fill: var(--aqua); filter: drop-shadow(0 0 2px var(--aqua)); }
+  .rd-onda { fill: none; stroke: var(--aqua); stroke-width: 1; opacity: 0; }
+
+  /*
+   * Rótulos en HTML y no en el SVG: así miden lo mismo en móvil que en
+   * escritorio. Su esquina queda a (7, -9) px del punto, la caja que
+   * `radarGeom.ts` usa para que no choquen.
+   */
   .rd-rotulo {
-    font-family: var(--font-mono); font-size: 7.5px; letter-spacing: 0.06em;
-    fill: color-mix(in oklab, #fff 78%, transparent);
+    position: absolute;
+    display: flex; flex-direction: column; gap: 1px;
+    translate: 7px -9px;
+    font-family: var(--font-mono); line-height: 1.1; white-space: nowrap;
+    opacity: 0.7;
+    pointer-events: none;
+    /* Halo del color de la card: si una línea o un anillo pasan por detrás, el número se sigue leyendo. */
+    text-shadow: 0 0 3px var(--ink), 0 0 8px var(--ink);
+  }
+  .rd-rotulo b { font-weight: 500; font-size: 11.5px; letter-spacing: 0.06em; color: color-mix(in oklab, #fff 85%, transparent); }
+  .rd-rotulo small { font-size: 9px; letter-spacing: 0.08em; color: color-mix(in oklab, #fff 45%, transparent); }
+  .rd-rotulo-dest { opacity: 1; }
+  .rd-rotulo-dest b { color: var(--aqua); }
+
+  /* Enlace punto → ficha: solo en escritorio, donde las fichas están al lado. */
+  .rd-enlaces { display: none; }
+  @media (min-width: 900px) {
+    .rd-enlaces {
+      display: block; position: absolute; inset: 0;
+      width: 100%; height: 100%; overflow: visible; pointer-events: none;
+    }
+  }
+  .rd-enlace {
+    fill: none; stroke: var(--aqua); stroke-width: 1;
+    stroke-dasharray: 3 4; opacity: 0;
   }
 
-  .rd-fichas { display: grid; grid-template-columns: minmax(0, 1fr); }
+  .rd-fichas { position: relative; display: grid; grid-template-columns: minmax(0, 1fr); }
   .rd-ficha {
     border-radius: 14px;
     transition: background .35s ease;
@@ -172,12 +302,14 @@ const marcas = Array.from({ length: 36 }, (_, i) => i * 10)
     background: linear-gradient(to right, transparent, color-mix(in oklab, #fff 14%, transparent) 22%, color-mix(in oklab, #fff 14%, transparent) 78%, transparent);
   }
   @media (min-width: 900px) {
+    .rd-ficha { padding: 18px 20px; }
+  }
+  @media (min-width: 1200px) {
     .rd-ficha {
-      display: grid; grid-template-columns: 170px minmax(0, 1fr) auto;
+      display: grid; grid-template-columns: 160px minmax(0, 1fr) auto;
       align-items: center; gap: 4px 20px;
-      padding: 18px 20px;
     }
-    .rd-ficha .hv-tags { margin-top: 0; text-align: right; }
+    .rd-ficha .hv-tags { margin-top: 0; text-align: right; max-width: 22ch; }
     .rd-ficha-top { flex-direction: column; align-items: flex-start; gap: 8px; }
   }
   .rd-ficha-top { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; }

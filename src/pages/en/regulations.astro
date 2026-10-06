@@ -1,22 +1,10 @@
 ---
 import LayoutEn from '../../layouts/LayoutEn.astro'
 import SiteFooter from '../../components/SiteFooter.astro'
+import normativas from '../../data/normativas.en.json'
 
-const col1 = [
-  { code: "DEC 1076 · 2015", title: "Single Environmental Sector Regulatory Decree", body: "Consolidates most environmental regulations in Colombia. Defines licenses, permits, plans, and competent authorities.", tags: ["MinAmbiente", "Licenses", "ANLA", "CAR"] },
-  { code: "RES 2184 · 2019", title: "Color codes for recyclable waste", body: "National standard for source separation: white (recyclable), black (non-recyclable), green (organic).", tags: ["Separation", "MSW", "Households", "Companies"] },
-  { code: "RES 1297 · 2010", title: "Post-consumer plan for Waste Electrical and Electronic Equipment", body: "Requires producers and importers to submit management, operation, coverage, and target plans.", tags: ["WEEE", "Post-consumer", "Producer", "Importer"] },
-  { code: "LEY 1672 · 2013", title: "WEEE Law", body: "Extended producer responsibility framework. Defines principles, stakeholders, selective collection, and recovery.", tags: ["EPR", "Legal framework"] },
-  { code: "RES 0472 · 2017", title: "Integral management of construction and demolition waste (CDW)", body: "Applies to companies that fit out offices, data centers, or warehouses: management plan, registration, and reporting.", tags: ["CDW", "Construction"] },
-]
-
-const col2 = [
-  { code: "RES 1407 · 2018", title: "Environmental management plan for packaging waste", body: "Obligation for producers and marketers of packaging placed on the Colombian market.", tags: ["Packaging", "EPR", "Marketer"] },
-  { code: "DEC 1076 · Title 5", title: "Use and exploitation of water resources", body: "Water concessions, discharge permits, retributive rates, and water use rates.", tags: ["Water", "Discharges", "Concession"] },
-  { code: "RES 909 · 2008", title: "Allowable emission standards", body: "Applies to stationary sources. Relevant for assemblers, data centers with generators, processes with furnaces.", tags: ["Air", "Emissions", "Stationary sources"] },
-  { code: "RES 0631 · 2015", title: "Maximum limit parameters for point discharges", body: "Defines what can be discharged to a water body or sewage system. Treatment plants, labs, data centers.", tags: ["Discharges", "BOD", "COD"] },
-  { code: "RES 1407 · 2022", title: "Environmental penalty regime (Law 1333)", body: "Establishes the penalty procedure and criteria for determining fines.", tags: ["Penalties", "Procedure"] },
-]
+const col1 = normativas.filter((n) => n.col === 1)
+const col2 = normativas.filter((n) => n.col === 2)
 ---
 
 <LayoutEn activePath="/en/regulations">

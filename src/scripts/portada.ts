@@ -9,6 +9,7 @@
 import { CURVA, SplitText, alEntrar, gsap, montarPagina, reducido } from './motion/core'
 import { prepararOdometro } from './motion/odometro'
 import { montarRadar } from './motion/radar'
+import { montarExige } from './motion/exige'
 import { cabeceras, ciclos, luz, marquee, ruta } from './motion/secciones'
 import { escenas } from './motion/escenas'
 
@@ -25,6 +26,9 @@ montarPagina('[data-portada]', (raiz) => {
   try {
     limpiezas.push(entradaHero(raiz))
     soltarHero()
+
+    const exige = raiz.querySelector<HTMLElement>('[data-exige]')
+    if (exige) limpiezas.push(montarExige(exige))
 
     const radar = raiz.querySelector<HTMLElement>('[data-radar]')
     if (radar) limpiezas.push(montarRadar(radar))
@@ -54,8 +58,17 @@ function entradaHero(raiz: HTMLElement): () => void {
     tl.from(split.words, { yPercent: 115, duration: 1.15, stagger: 0.07, ease: 'expo.out' }, 0.1)
   }
 
-  const resto = raiz.querySelectorAll('.hero-foot > *, .hero-stats, [data-radar], .sectors')
+  const resto = raiz.querySelectorAll('.hero-main > :not(.hero-title)')
   tl.from(resto, { opacity: 0, y: 28, duration: 1, stagger: 0.12, clearProps: 'transform,opacity' }, 0.55)
+
+  // El panel de exigencias entra como una hoja que se apoya, y sus filas se escriben detrás.
+  const exige = raiz.querySelector('[data-exige]')
+  if (exige) {
+    tl.from(exige, { opacity: 0, y: 40, rotate: 1.2, duration: 1.1, clearProps: 'transform,opacity' }, 0.4)
+    tl.from(exige.querySelectorAll('.ex-chip, .ex-norma'), { opacity: 0, x: -10, duration: 0.5, stagger: 0.035, clearProps: 'transform,opacity' }, 0.8)
+  }
+
+  tl.from(raiz.querySelectorAll('.hero-stats, [data-radar]'), { opacity: 0, y: 28, duration: 1, stagger: 0.12, clearProps: 'transform,opacity' }, 0.9)
 
   return () => tl.kill()
 }
