@@ -1,8 +1,9 @@
 /**
  * Odómetro: cada dígito de una cifra rueda hasta su valor, columna por
- * columna. Los separadores ("." "+" "%") quedan quietos. El texto original se
- * conserva en `aria-label` y las columnas van con `aria-hidden`, así un lector
- * de pantalla lee "1.000+" y no "0123456789…".
+ * columna. Los separadores ("." "+" "%") quedan quietos. La cifra original
+ * queda en un texto oculto a la vista y las columnas van con `aria-hidden`, así
+ * un lector de pantalla lee "1.000+" y no "0123456789…". (Un `aria-label` en un
+ * div genérico no sirve: varios lectores lo ignoran.)
  */
 import { gsap } from './core'
 
@@ -25,8 +26,9 @@ export function prepararOdometro(el: HTMLElement, { retraso = 0.07, duracion = 1
   if (!nodo) return { play: () => {}, restaurar: () => {} }
 
   const texto = nodo.textContent!.trim()
-  const ariaPrevio = el.getAttribute('aria-label')
-  el.setAttribute('aria-label', el.textContent!.replace(/\s+/g, ' ').trim())
+  const lectura = document.createElement('span')
+  lectura.className = 'sr-only'
+  lectura.textContent = texto
 
   const caja = document.createElement('span')
   caja.className = 'odo'
@@ -58,7 +60,7 @@ export function prepararOdometro(el: HTMLElement, { retraso = 0.07, duracion = 1
       caja.append(s)
     }
   }
-  nodo.replaceWith(caja)
+  nodo.replaceWith(lectura, caja)
 
   // Cada columna da una vuelta completa y para en su dígito (segunda mitad de la tira).
   columnas.forEach(({ tira, digito }, i) => {
@@ -70,7 +72,7 @@ export function prepararOdometro(el: HTMLElement, { retraso = 0.07, duracion = 1
     restaurar: () => {
       tl.kill()
       if (caja.isConnected) caja.replaceWith(nodo)
-      ariaPrevio === null ? el.removeAttribute('aria-label') : el.setAttribute('aria-label', ariaPrevio)
+      lectura.remove()
     },
   }
 }
