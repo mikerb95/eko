@@ -76,12 +76,12 @@ const RESPUESTA = 2
         {lotes.map((l) => (
           <div class="esc-lote" data-e="lote">
             <span class="esc-lote-nombre">{t.lote} {l}</span>
-            <span class="esc-lote-cert">✓ {t.certificado}</span>
+            <span class="esc-lote-cert">✓</span>
           </div>
         ))}
         <span class="esc-escaner" data-e="escaner"></span>
       </div>
-      <div class="esc-pie">{t.ilustrativo}</div>
+      <div class="esc-pie"><span>{t.certificado}</span><span>{t.ilustrativo}</span></div>
     </div>
   )}
 
@@ -187,11 +187,11 @@ const RESPUESTA = 2
   /* 03 · trazabilidad */
   .esc-lotes { position: relative; display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 6px; }
   .esc-lote {
-    display: grid; gap: 8px; padding: 9px 8px; border-radius: 8px;
+    display: grid; gap: 6px; padding: 9px 6px; border-radius: 8px; min-width: 0;
     border: 1px solid var(--esc-linea); text-align: center;
     transition: border-color .3s ease, background .3s ease;
   }
-  .esc-lote-cert { color: var(--esc-acento); font-size: 9.5px; transition: opacity .3s ease, transform .3s ease; }
+  .esc-lote-cert { color: var(--esc-acento); font-size: 14px; line-height: 1; transition: opacity .3s ease, transform .3s ease; }
   .esc-lote[data-pendiente] { border-style: dashed; }
   .esc-lote[data-pendiente] .esc-lote-cert { opacity: 0; transform: translateY(4px); }
   .esc-lote:not([data-pendiente]) { border-color: color-mix(in oklab, var(--esc-acento) 55%, transparent); background: color-mix(in oklab, var(--esc-acento) 7%, transparent); }
