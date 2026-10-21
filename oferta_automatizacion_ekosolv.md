@@ -290,3 +290,22 @@ Asunto: RE: PROPUESTA AUTOMATIZACIÓN e IA PARA EKOSOLV
 > Un saludo,
 >
 > Mike
+
+## 12. Agente de cumplimiento en el panel (agregado 2026-10-21)
+
+Mike pidió sumar a la Fase 2 un agente dentro del panel de administración (`/admin`, ya contratado en la
+oferta de agosto, así que aquí **solo se cobra el agente**). Apoya en lo importante de la consultoría,
+con reglas tomadas de la norma y validadas por el equipo técnico de Ekosolv.
+
+- **Vigila:** normativa nueva (MinAmbiente, ANLA, CAR), autos y requerimientos en los expedientes de
+  los clientes, revisión de documentos (ICA, PMA, permisos) frente a la norma, y vencimientos.
+- **Acción:** alerta al consultor responsable con resumen, norma aplicable, plazo y acción sugerida.
+  No redacta respuestas ni actúa solo.
+- **Esfuerzo estimado:** unas 130 h (normativa 30, autos 30, documentos 24, vencimientos 8, motor de
+  reglas 16, integración al panel 12, pruebas 10). Fase 2 pasa de 4 a 7 semanas.
+- **Precio a cliente (ya a la mitad):** Fase 1 + 2 con agente **$1.017.500/mes** (antes $727.500), desde
+  el mes 25 **$320.000** (antes $280.000). A precio completo serían unos $12M de construcción más
+  $80.000/mes de operación por el monitoreo diario.
+- **Riesgos:** muchas CAR no publican autos en línea y la ANLA exige credenciales del titular para ver
+  expedientes (cobertura parcial; quedó como condición). Las alertas no reemplazan revisión técnica ni
+  jurídica. Falta la lista de autoridades y expedientes a vigilar.
