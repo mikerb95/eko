@@ -121,6 +121,12 @@ La Fase 2 toma 4 semanas adicionales y puede empezar al terminar la Fase 1 o má
 
 ## 7. Precios (interno, preliminar)
 
+> **2026-10-20: Mike decidió bajar todos los precios a la mitad.** Lo que va al cliente es: Fase 1
+> **$502.500/mes** (desde el mes 25, $210.000) y Fase 1 + 2 **$727.500/mes** (desde el mes 25,
+> $280.000). Las tablas de abajo conservan las cifras completas como referencia. Ojo: a la mitad, la
+> operación queda en unos $90.000/mes (Fase 1), justo para cubrir servidores y el consumo de IA de 60
+> propuestas. Medirlo en el piloto antes de firmar, y no bajar más el tope de propuestas.
+
 Mismo modelo de la oferta de agosto (`oferta_comercial_ekosolv.md`): mensualidad a 24 meses que suma
 construcción amortizada, operación y soporte, sin inversión inicial.
 
@@ -228,7 +234,7 @@ hasta 12 participantes, presencial en la oficina de Ekosolv o virtual.
 | Fechas propuestas | 7 y 14 de noviembre | 7, 14, 21 y 28 de noviembre |
 | Material | Guía y biblioteca de instrucciones | + espacios de trabajo por área y borrador de política de uso de IA |
 | Acompañamiento | 15 días por chat | 30 días por chat |
-| Precio | $2.400.000 | $4.200.000 |
+| Precio | $1.200.000 | $2.100.000 |
 
 Pago 50% al confirmar la fecha y 50% al terminar. Las licencias de IA las paga Ekosolv.
 
@@ -239,7 +245,8 @@ Zoho y correo, casos por área y reglas internas de uso.
 
 ### Precio (interno)
 
-- Esencial: $400.000/h. Completo: $350.000/h, para que el plan largo sea el que conviene.
+- **2026-10-20: Mike bajó todos los precios a la mitad.** Esencial $1.200.000 ($200.000/h), Completo
+  $2.100.000 ($175.000/h). Antes eran $2.400.000 y $4.200.000.
 - Coherente con agosto: allá se declararon 7 h en $3.200.000 (unos $457.000/h) como regalo de cierre.
   Si Mario saca esa comparación, la respuesta es que este programa es a la medida y con material propio.
 - **PENDIENTE** confirmar si Mike factura con IVA. En el doc del cliente no se mencionó IVA.
@@ -263,8 +270,8 @@ Asunto: RE: PROPUESTA AUTOMATIZACIÓN e IA PARA EKOSOLV
 >
 > Para la capacitación armé dos planes, los dos en sábado de 8:00 a 11:00 a. m.:
 >
-> - **Plan Esencial:** 2 sábados de 3 horas (7 y 14 de noviembre), por $2.400.000.
-> - **Plan Completo:** 4 sábados de 3 horas (7, 14, 21 y 28 de noviembre), por $4.200.000. Además
+> - **Plan Esencial:** 2 sábados de 3 horas (7 y 14 de noviembre), por $1.200.000.
+> - **Plan Completo:** 4 sábados de 3 horas (7, 14, 21 y 28 de noviembre), por $2.100.000. Además
 >   del uso diario, deja montados los espacios de trabajo del equipo y unas reglas internas de uso de
 >   IA.
 >
