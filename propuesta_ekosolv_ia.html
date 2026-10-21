@@ -1,0 +1,300 @@
+<title>Propuesta Ekosolv IA</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Geist:wght@300..700&family=Geist+Mono:wght@400;500&family=Instrument+Serif:ital@0;1&display=swap">
+<style>
+  /* Documento de papel: hojas A4 apiladas sobre una mesa gris; en impresión cada hoja es una página. Un solo tema claro a propósito. */
+  :root {
+    --ink: #0E1C26;
+    --mute: #5E6973;
+    --line: #DAD8D3;
+    --paper: #FFFFFF;
+    --desk: #E6E4E0;
+    --tint: #EEF7F6;
+    --aqua: #00AA9F;
+    --deep: #124E7D;
+    --display: "Instrument Serif", Georgia, "Times New Roman", serif;
+    --body: "Geist", "Helvetica Neue", Arial, sans-serif;
+    --mono: "Geist Mono", ui-monospace, "SFMono-Regular", Menlo, monospace;
+    color-scheme: light;
+  }
+  * { box-sizing: border-box; }
+  body {
+    background: var(--desk);
+    color: var(--ink);
+    font: 400 10pt/1.5 var(--body);
+    padding-block: 32px;
+    padding-left: max(16px, env(safe-area-inset-left, 0px));
+    padding-right: max(16px, env(safe-area-inset-right, 0px));
+  }
+  .sheet {
+    background: var(--paper);
+    width: 210mm;
+    max-width: 100%;
+    min-height: 297mm;
+    margin: 0 auto 24px;
+    padding: 16mm 17mm 14mm;
+    box-shadow: 0 1px 3px rgba(14, 28, 38, .08), 0 10px 30px rgba(14, 28, 38, .07);
+    display: flex;
+    flex-direction: column;
+    gap: 7mm;
+  }
+  .sheet > .foot { margin-top: auto; }
+
+  h1, h2 { font-family: var(--display); font-weight: 400; margin: 0; text-wrap: balance; line-height: 1.05; }
+  h1 { font-size: 30pt; letter-spacing: -.01em; }
+  h1 em { color: var(--aqua); }
+  h2 { font-size: 20pt; }
+  h3 { font: 600 10pt/1.3 var(--body); margin: 0; }
+  p { margin: 0; max-width: 68ch; }
+  .label {
+    font: 500 7.5pt/1.2 var(--mono);
+    text-transform: uppercase;
+    letter-spacing: .09em;
+    color: var(--mute);
+  }
+  .num { font-variant-numeric: tabular-nums; }
+  section { display: flex; flex-direction: column; gap: 3.5mm; }
+  .sec-head { display: flex; align-items: baseline; justify-content: space-between; gap: 12px; padding-bottom: 2mm; border-bottom: 1px solid var(--ink); }
+
+  /* Portada */
+  .top { display: flex; justify-content: space-between; align-items: flex-start; gap: 16px; flex-wrap: wrap; }
+  .brand { font: 600 9pt/1 var(--body); letter-spacing: .14em; color: var(--deep); }
+  .brand span { color: var(--aqua); }
+  .meta { display: grid; grid-template-columns: auto auto; gap: 1mm 6mm; font-size: 8.5pt; }
+  .meta dt { color: var(--mute); }
+  .meta dd { margin: 0; }
+  .lede { font-size: 11pt; color: var(--ink); }
+  .pair { display: grid; grid-template-columns: 1fr 1fr; gap: 4mm; }
+  .pair > div { background: var(--tint); border-radius: 3px; padding: 4mm 5mm; display: flex; flex-direction: column; gap: 1.5mm; min-width: 0; }
+  .pair .dot { width: 8px; height: 8px; border-radius: 50%; background: var(--aqua); display: inline-block; margin-right: 6px; transform: translateY(-1px); }
+  .pair > div:last-child .dot { background: var(--deep); }
+
+  /* Tablas */
+  .tbl { overflow-x: auto; }
+  table { width: 100%; border-collapse: collapse; font-size: 9pt; }
+  th, td { text-align: left; padding: 1.8mm 3mm 1.8mm 0; border-bottom: 1px solid var(--line); vertical-align: top; }
+  thead th { font: 500 7.5pt/1.2 var(--mono); text-transform: uppercase; letter-spacing: .08em; color: var(--mute); border-bottom-color: var(--ink); }
+  tbody th { font-weight: 500; color: var(--mute); width: 30%; }
+  tr.total td, tr.total th { border-bottom: 0; padding-top: 3mm; }
+  .price { font: 400 17pt/1 var(--display); }
+  td.c, th.c { text-align: center; padding-right: 0; padding-left: 3mm; width: 22mm; }
+  .yes, .no { font-size: 12pt; line-height: 1; }
+  .yes { color: var(--aqua); }
+  .no { color: var(--line); }
+
+  /* Flujo Fase 1 */
+  .flow { display: grid; grid-template-columns: repeat(6, 1fr); gap: 0; counter-reset: paso; }
+  .flow li { list-style: none; position: relative; padding: 3mm 3mm 0 0; font-size: 8.5pt; line-height: 1.35; min-width: 0; }
+  .flow li::before {
+    counter-increment: paso; content: counter(paso);
+    display: grid; place-items: center; width: 6mm; height: 6mm; border-radius: 50%;
+    background: var(--deep); color: var(--paper); font: 500 8pt/1 var(--mono); margin-bottom: 2mm;
+    position: relative; z-index: 1;
+  }
+  .flow li::after { content: ""; position: absolute; top: calc(3mm + 3mm); left: 6mm; right: 0; height: 1px; background: var(--line); }
+  .flow li:last-child::after { display: none; }
+  .flow b { display: block; font-weight: 600; color: var(--ink); margin-bottom: .5mm; }
+  .flow { margin: 0; padding: 0; }
+
+  /* Cronograma */
+  .gantt { display: grid; grid-template-columns: 34mm repeat(12, 1fr); gap: 1.2mm 0; font-size: 8pt; align-items: center; }
+  .gantt .wk { font: 500 7pt/1 var(--mono); color: var(--mute); text-align: center; }
+  .gantt .row-l { color: var(--ink); padding-right: 2mm; }
+  .bar { height: 4.5mm; border-radius: 2px; background: var(--aqua); margin: 0 .6mm; }
+  .bar.f2 { background: var(--deep); }
+  .bar.soft { opacity: .45; }
+
+  ul.cond { margin: 0; padding: 0; list-style: none; display: grid; gap: 1.6mm; font-size: 9pt; }
+  ul.cond li { padding-left: 4.5mm; position: relative; max-width: 72ch; }
+  ul.cond li::before { content: ""; position: absolute; left: 0; top: .62em; width: 1.6mm; height: 1.6mm; background: var(--aqua); border-radius: 50%; }
+  .cols { display: grid; grid-template-columns: 1fr 1fr; gap: 6mm; }
+  .cols > div { display: flex; flex-direction: column; gap: 2.5mm; min-width: 0; }
+
+  ol.check { margin: 0; padding: 0; list-style: none; display: grid; grid-template-columns: 1fr 1fr; gap: 1.8mm 6mm; font-size: 9pt; }
+  ol.check li { display: flex; gap: 2.5mm; align-items: baseline; }
+  ol.check li::before { content: ""; flex: none; width: 3mm; height: 3mm; border: 1px solid var(--ink); border-radius: 1px; transform: translateY(.4mm); }
+
+  .note { font-size: 8.5pt; color: var(--mute); }
+  .foot { display: flex; justify-content: space-between; gap: 12px; padding-top: 3mm; border-top: 1px solid var(--line); font: 400 7.5pt/1.3 var(--mono); color: var(--mute); }
+
+  @media (max-width: 640px) {
+    body { font-size: 10.5pt; }
+    .sheet { min-height: 0; padding: 22px 18px; gap: 22px; }
+    h1 { font-size: 30pt; }
+    .pair, .cols, ol.check { grid-template-columns: 1fr; }
+    .flow { grid-template-columns: 1fr 1fr; row-gap: 3mm; }
+    .flow li::after { display: none; }
+    .gantt { grid-template-columns: 26mm repeat(12, 1fr); }
+  }
+  @page { size: A4; margin: 0; }
+  @media print {
+    body { background: var(--paper); padding: 0; margin: 0; }
+    .sheet { box-shadow: none; margin: 0; width: 210mm; height: 296mm; min-height: 0; overflow: hidden; gap: 6mm; break-after: page; }
+    .sheet:last-child { break-after: auto; }
+    * { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+  }
+</style>
+
+<!-- Hoja 1: resumen y capacitación -->
+<article class="sheet">
+  <div class="top">
+    <div class="brand">EKO<span>SOLV</span></div>
+    <dl class="meta">
+      <dt>Para</dt><dd>Mario Castilla Sánchez, Gerente General</dd>
+      <dt>De</dt><dd>Mike</dd>
+      <dt>Fecha</dt><dd>20 de octubre de 2026</dd>
+    </dl>
+  </div>
+
+  <div style="display:flex;flex-direction:column;gap:4mm">
+    <span class="label">Propuesta comercial</span>
+    <h1>Capacitación en IA y <em>automatización</em> de propuestas</h1>
+    <p class="lede">Dos servicios independientes. La capacitación puede empezar en noviembre mientras cerramos las cifras de la automatización.</p>
+  </div>
+
+  <section>
+    <div class="sec-head"><h2>1. Capacitación en IA</h2><span class="label">Sábados · 8:00 a 11:00 a. m.</span></div>
+    <p>Práctica sobre documentos reales de Ekosolv: resoluciones, informes y propuestas. 30% explicación, 70% trabajo en computador.</p>
+    <div class="tbl">
+      <table>
+        <thead><tr><th></th><th>Plan Esencial</th><th>Plan Completo</th></tr></thead>
+        <tbody class="num">
+          <tr><th>Sesiones</th><td>2 sábados de 3 h (6 h)</td><td>4 sábados de 3 h (12 h)</td></tr>
+          <tr><th>Fechas propuestas</th><td>7 y 14 de noviembre</td><td>7, 14, 21 y 28 de noviembre</td></tr>
+          <tr><th>Participantes</th><td>Hasta 12</td><td>Hasta 12</td></tr>
+          <tr><th>Material</th><td>Guía de uso y biblioteca de instrucciones de Ekosolv</td><td>Lo mismo, más espacios de trabajo por área y borrador de política de uso de IA</td></tr>
+          <tr><th>Acompañamiento</th><td>15 días por chat</td><td>30 días por chat</td></tr>
+          <tr class="total"><th>Inversión</th><td><span class="price">$2.400.000</span></td><td><span class="price">$4.200.000</span></td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="tbl">
+      <table>
+        <thead><tr><th>Sábado</th><th>Contenido</th><th class="c">Esencial</th><th class="c">Completo</th></tr></thead>
+        <tbody>
+          <tr><td class="num">1</td><td><b>Fundamentos y uso diario.</b> Cómo pedirle bien a la IA, dónde se equivoca y qué información no se sube (Ley 1581 de 2012). Resumen de una resolución y respuesta a un cliente.</td><td class="c yes">●</td><td class="c yes">●</td></tr>
+          <tr><td class="num">2</td><td><b>Trabajo técnico y comercial.</b> Documentos largos (EIA, PMA, ICA), revisión normativa con verificación de fuente, borradores de informe y de propuesta.</td><td class="c yes">●</td><td class="c yes">●</td></tr>
+          <tr><td class="num">3</td><td><b>Espacios de trabajo y datos.</b> Proyectos con las plantillas y normas de Ekosolv, matrices a partir de documentos, resultados de laboratorio frente a límites normativos.</td><td class="c no">○</td><td class="c yes">●</td></tr>
+          <tr><td class="num">4</td><td><b>Automatización y taller final.</b> Qué automatizar y qué no, IA con Zoho y correo, un caso real por área y reglas internas de uso.</td><td class="c no">○</td><td class="c yes">●</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <div class="foot"><span>Propuesta Ekosolv · Capacitación y automatización</span><span>1 / 3</span></div>
+</article>
+
+<!-- Hoja 2: automatización -->
+<article class="sheet">
+  <section>
+    <div class="sec-head"><h2>2. Automatización de propuestas</h2><span class="label">Zoho One</span></div>
+    <p>Cuando el consultor registra un Brief en Zoho CRM, el sistema deja listo en minutos el paquete de la propuesta. El consultor lo revisa, ajusta y aprueba: el sistema no envía nada al cliente.</p>
+  </section>
+
+  <section>
+    <h3>Fase 1 · Del Brief a la propuesta lista para revisar</h3>
+    <ol class="flow">
+      <li><b>Brief en CRM</b>Se registra como hoy. Con el NIT se completan los datos públicos.</li>
+      <li><b>Diagnóstico</b>Servicios que aplican, con norma, autoridad y periodicidad.</li>
+      <li><b>Propuesta</b>Borrador sobre las plantillas de Ekosolv.</li>
+      <li><b>Zoho Books</b>Estimación con el catálogo de precios.</li>
+      <li><b>WorkDrive</b>Carpeta de cotización y costeo.</li>
+      <li><b>Presentación</b>PowerPoint con la marca, en la carpeta.</li>
+    </ol>
+  </section>
+
+  <section>
+    <h3>Fase 2 · Detección de oportunidades</h3>
+    <div class="cols">
+      <div><p><b>Referidos.</b> Quién refirió a cada prospecto, con entrada desde el sitio web y WhatsApp. Cada referido entra al flujo de la Fase 1.</p></div>
+      <div><p><b>Base propia.</b> Alertas de permisos por vencer, informes pendientes y servicios cruzados entre líneas (por ejemplo, clientes de EKORAEE con obligaciones de consultoría).</p></div>
+    </div>
+  </section>
+
+  <section>
+    <h3>Cronograma</h3>
+    <div class="tbl">
+      <div class="gantt" role="img" aria-label="Fase 1 en 8 semanas: levantamiento semanas 1 y 2, construcción 3 a 5, piloto 6 y 7, entrega semana 8. Fase 2 en 4 semanas adicionales.">
+        <span></span>
+        <span class="wk">1</span><span class="wk">2</span><span class="wk">3</span><span class="wk">4</span><span class="wk">5</span><span class="wk">6</span><span class="wk">7</span><span class="wk">8</span><span class="wk">9</span><span class="wk">10</span><span class="wk">11</span><span class="wk">12</span>
+        <span class="row-l">Levantamiento</span><span class="bar" style="grid-column:2/4"></span><span style="grid-column:4/14"></span>
+        <span class="row-l">Construcción</span><span style="grid-column:2/4"></span><span class="bar" style="grid-column:4/7"></span><span style="grid-column:7/14"></span>
+        <span class="row-l">Piloto con casos reales</span><span style="grid-column:2/7"></span><span class="bar" style="grid-column:7/9"></span><span style="grid-column:9/14"></span>
+        <span class="row-l">Entrega y medición</span><span style="grid-column:2/9"></span><span class="bar" style="grid-column:9/10"></span><span style="grid-column:10/14"></span>
+        <span class="row-l">Fase 2</span><span style="grid-column:2/10"></span><span class="bar f2" style="grid-column:10/14"></span>
+      </div>
+    </div>
+    <p class="note">La Fase 2 puede empezar al terminar la Fase 1 o más adelante. El indicador principal es el tiempo de preparación por propuesta, medido antes y después.</p>
+  </section>
+
+  <section>
+    <h3>Inversión</h3>
+    <div class="tbl">
+      <table>
+        <thead><tr><th></th><th>Fase 1</th><th>Fase 1 + 2</th></tr></thead>
+        <tbody class="num">
+          <tr><th>Meses 1 a 24</th><td><span class="price">$1.005.000</span> /mes</td><td><span class="price">$1.455.000</span> /mes</td></tr>
+          <tr><th>Desde el mes 25</th><td>$420.000 /mes</td><td>$560.000 /mes</td></tr>
+          <tr><th>Soporte incluido</th><td>6 h al mes</td><td>8 h al mes</td></tr>
+          <tr><th>Volumen incluido</th><td>Hasta 60 propuestas al mes</td><td>Hasta 60 propuestas al mes</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <p class="note">La mensualidad incluye construcción, operación en servidores con consumo de IA, y soporte. Sin inversión inicial. Valores preliminares hasta recibir la información de la hoja 3.</p>
+  </section>
+
+  <div class="foot"><span>Propuesta Ekosolv · Capacitación y automatización</span><span>2 / 3</span></div>
+</article>
+
+<!-- Hoja 3: condiciones y próximos pasos -->
+<article class="sheet">
+  <section>
+    <div class="sec-head"><h2>3. Condiciones</h2><span class="label">Valores en pesos colombianos</span></div>
+    <div class="cols">
+      <div>
+        <span class="label">Capacitación</span>
+        <ul class="cond">
+          <li>Pago del 50% al confirmar la fecha de inicio y 50% al terminar la última sesión.</li>
+          <li>Hasta 12 participantes, presencial en la oficina de Ekosolv o virtual, por el mismo valor.</li>
+          <li>Las fechas se pueden mover a otros sábados con una semana de aviso.</li>
+          <li>Las cuentas de IA de cada participante las contrata Ekosolv. En la primera sesión revisamos qué plan conviene.</li>
+          <li>Para la modalidad presencial: sala con proyector e internet, y cada participante con su computador.</li>
+          <li>Ekosolv comparte 3 o 4 documentos de trabajo una semana antes de empezar, para preparar los ejercicios.</li>
+        </ul>
+      </div>
+      <div>
+        <span class="label">Automatización</span>
+        <ul class="cond">
+          <li>Plazo mínimo de 24 meses. Si el contrato termina antes, se liquida el saldo pendiente de la construcción.</li>
+          <li>Desde el mes 25 la mensualidad baja porque la construcción ya quedó pagada.</li>
+          <li>Las horas de soporte no son acumulables. Ajustes a plantillas o a la matriz después de la entrega usan esas horas.</li>
+          <li>Por encima de 60 propuestas al mes se revisa la tarifa de operación.</li>
+          <li>El sistema genera borradores. La recomendación técnica y el envío al cliente son del consultor de Ekosolv.</li>
+          <li>La matriz de servicios y obligaciones la valida el equipo técnico de Ekosolv antes de entrar en uso.</li>
+          <li>Propuesta y presentación en español, presentación en PowerPoint. Inglés y Zoho Show se cotizan aparte.</li>
+          <li>No incluye migración de datos históricos (salvo la base de clientes de la Fase 2), prospección en frío ni compra de bases de datos.</li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <section>
+    <div class="sec-head"><h2>4. Próximos pasos</h2><span class="label">Lo que necesitamos de Ekosolv</span></div>
+    <ol class="check">
+      <li>Plan de capacitación, fecha de inicio y lista de participantes</li>
+      <li>Propuestas al mes y horas que toma cada una</li>
+      <li>3 a 5 propuestas recientes con presentación y costeo</li>
+      <li>Plantillas de propuesta, presentación y costeo</li>
+      <li>Dónde viven hoy los precios: Books, Excel u otro</li>
+      <li>Administrador de Zoho CRM y usuario de integración (CRM, Books, WorkDrive)</li>
+      <li>Responsable técnico para validar la matriz (4 a 6 h)</li>
+      <li>Para la Fase 2: base de clientes con fechas de permisos</li>
+    </ol>
+    <p>Con el plan de capacitación y la fecha confirmados apartamos los sábados. Con la línea base y las muestras cerramos las cifras definitivas de la automatización.</p>
+  </section>
+
+  <div class="foot"><span>Propuesta Ekosolv · Capacitación y automatización</span><span>3 / 3</span></div>
+</article>

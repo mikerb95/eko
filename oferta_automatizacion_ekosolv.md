@@ -3,6 +3,12 @@
 > **Estado:** borrador del 2026-10-07, escrito después de la reunión con el gerente. Las cifras son
 > preliminares y todo lo marcado como **PENDIENTE** depende de las respuestas de la sección 8.
 > Las secciones 1 a 6 son el texto para el cliente. Las secciones 7 a 9 son internas y no se envían.
+>
+> **Actualización 2026-10-20:** Mario pidió por correo la propuesta y los horarios de capacitación en
+> IA los sábados en la mañana. Se agregó la sección 10 (capacitación, servicio aparte con precio) y se
+> ajustó la entrada de la Fase 1 al módulo Briefs de Zoho CRM. La versión para el cliente vive en el
+> página PDF (3 hojas A4) `propuesta_ekosolv_ia.html`, publicada en
+> https://claude.ai/artifact/86jonrUCcxDZn2SZNUMGgP (el doc anterior 4B39jPmwgbrmYcxyxtTxVJ quedó descartado).
 
 ---
 
@@ -32,9 +38,8 @@ segunda alimenta ese flujo con más oportunidades.
 
 ### Fase 1. De solicitud a propuesta lista para revisar
 
-1. **Entrada de la oportunidad.** Un formulario corto (empresa, NIT, sector, actividad, ubicación,
-   necesidad descrita por el cliente) que puede llenar el consultor o el mismo cliente desde el sitio
-   web. Con el NIT se completan los datos públicos de la empresa.
+1. **Entrada de la oportunidad.** El consultor registra el Brief en Zoho CRM como lo hace hoy (módulo
+   "Briefs"). Con el NIT se completan los datos públicos de la empresa.
 2. **Diagnóstico de servicios.** El sistema cruza el perfil de la empresa con la matriz de
    obligaciones ambientales de Ekosolv y recomienda los servicios que aplican, explicando por qué
    (norma, autoridad, periodicidad). La matriz la valida el equipo técnico de Ekosolv antes de entrar
@@ -91,8 +96,8 @@ empezar tomamos la línea base con Ekosolv (**PENDIENTE**: propuestas al mes y h
 
 ## 5. Supuestos y exclusiones
 
-- Ekosolv usa Zoho Books y Zoho WorkDrive en un plan con acceso a la API (**PENDIENTE** confirmar
-  productos y plan).
+- Ekosolv usa Zoho One (confirmado por captura el 2026-10-07): CRM con módulo Briefs, Books y
+  WorkDrive. **PENDIENTE** saber quién administra el CRM y en qué data center está la cuenta.
 - La propuesta y la presentación se generan en español. La versión en inglés se cotiza aparte.
 - El sistema no envía nada al cliente: todo pasa por aprobación del consultor.
 - La presentación se entrega en PowerPoint. La edición nativa en Zoho Show no está incluida.
@@ -182,9 +187,10 @@ competencia.
 
 - [ ] ¿Qué pasó con la oferta de agosto: alcance 1, 1+2 o ninguno? Define si esto es un alcance 3 o
       una oferta independiente.
-- [ ] ¿Qué productos de Zoho usan y con qué plan? Si tienen **Zoho One**, parte del flujo se puede
-      hacer con Zoho Flow y Deluge, y hay que dejar claro que el valor está en el diagnóstico con IA,
-      la redacción y la presentación.
+- [x] ¿Qué productos de Zoho usan y con qué plan? **Zoho One.** Parte del flujo se puede hacer con
+      Zoho Flow y Deluge, así que hay que dejar claro que el valor está en el diagnóstico con IA, la
+      redacción y la presentación.
+- [ ] ¿Quién administra Zoho CRM?
 - [ ] Línea base: propuestas al mes, horas por propuesta, quién las hace, tasa de cierre.
 - [ ] ¿Qué quiso decir con "mercado propio": su base de clientes o prospección en frío?
 - [ ] 3 a 5 propuestas reales con presentación y costeo.
@@ -207,3 +213,73 @@ competencia.
       consumo. Ajustar plantillas o la matriz después de la entrega cuenta como hora de soporte.
 - [ ] **Contexto sensible con el gerente** (ver `oportunidad_ekosolv.md`): mantener todo en tono de
       oferta profesional nueva.
+
+---
+
+## 10. Capacitación en IA (agregado 2026-10-20)
+
+Servicio **aparte, con precio propio**, independiente de la automatización. Puede empezar ya mientras
+se cierran las cifras de la automatización, y genera ingreso inmediato. Sábados de 8:00 a 11:00 a. m.,
+hasta 12 participantes, presencial en la oficina de Ekosolv o virtual.
+
+| | Plan Esencial | Plan Completo |
+|---|---|---|
+| Sesiones | 2 sábados de 3 h (6 h) | 4 sábados de 3 h (12 h) |
+| Fechas propuestas | 7 y 14 de noviembre | 7, 14, 21 y 28 de noviembre |
+| Material | Guía y biblioteca de instrucciones | + espacios de trabajo por área y borrador de política de uso de IA |
+| Acompañamiento | 15 días por chat | 30 días por chat |
+| Precio | $2.400.000 | $4.200.000 |
+
+Pago 50% al confirmar la fecha y 50% al terminar. Las licencias de IA las paga Ekosolv.
+
+**Contenido:** S1 fundamentos, cómo pedir y qué no subir (Ley 1581). S2 documentos largos (EIA, PMA,
+ICA), revisión normativa con fuente, borradores de informe y propuesta. S3 proyectos con conocimiento
+de Ekosolv, tablas y matrices, resultados de laboratorio frente a límites. S4 qué automatizar, IA con
+Zoho y correo, casos por área y reglas internas de uso.
+
+### Precio (interno)
+
+- Esencial: $400.000/h. Completo: $350.000/h, para que el plan largo sea el que conviene.
+- Coherente con agosto: allá se declararon 7 h en $3.200.000 (unos $457.000/h) como regalo de cierre.
+  Si Mario saca esa comparación, la respuesta es que este programa es a la medida y con material propio.
+- **PENDIENTE** confirmar si Mike factura con IVA. En el doc del cliente no se mencionó IVA.
+- **Palancas, en orden:** 10% de descuento por pago completo anticipado; subir el cupo a 15 personas
+  sin costo; si firma la automatización en los 60 días siguientes, el sábado 4 hace también de
+  levantamiento de la Fase 1 (ahorra horas de las semanas 1 y 2).
+- **No ceder:** el 50% antes de empezar.
+- Valor estratégico: la capacitación pone a Mike frente a todo el equipo y deja recogidas las
+  plantillas y documentos reales que pide la sección 4. Usar los sábados para tomar la línea base de
+  horas por propuesta.
+
+## 11. Respuesta al correo de Mario (2026-10-20)
+
+Asunto: RE: PROPUESTA AUTOMATIZACIÓN e IA PARA EKOSOLV
+
+> Hola, Mario. Muy bien, gracias. ¿Cómo vas tú?
+>
+> Te comparto la propuesta con las dos cosas que hablamos:
+>
+> [LINK]
+>
+> Para la capacitación armé dos planes, los dos en sábado de 8:00 a 11:00 a. m.:
+>
+> - **Plan Esencial:** 2 sábados de 3 horas (7 y 14 de noviembre), por $2.400.000.
+> - **Plan Completo:** 4 sábados de 3 horas (7, 14, 21 y 28 de noviembre), por $4.200.000. Además
+>   del uso diario, deja montados los espacios de trabajo del equipo y unas reglas internas de uso de
+>   IA.
+>
+> Los dos son para hasta 12 personas, presenciales en la oficina o virtuales, y trabajan sobre
+> documentos reales de Ekosolv. Las fechas se pueden mover si les queda mejor otro sábado.
+>
+> La automatización de propuestas va en el mismo documento, ya ajustada a su Zoho CRM: arranca
+> desde el Brief y deja lista la propuesta, la estimación en Books, la carpeta en WorkDrive y la
+> presentación para que el consultor solo la revise. Para cerrar las cifras necesito algunos datos
+> que dejé al final del documento, sobre todo cuántas propuestas hacen al mes y cuánto tiempo les
+> toma cada una.
+>
+> ¿Te parece si me confirmas el plan de capacitación y la fecha de inicio? Con eso aparto los
+> sábados.
+>
+> Un saludo,
+>
+> Mike
