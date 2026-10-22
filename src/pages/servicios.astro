@@ -1,79 +1,20 @@
 ---
 import Layout from '../layouts/Layout.astro'
+import { LINEAS } from '../data/servicios'
 import SiteFooter from '../components/SiteFooter.astro'
 import VideoFacade from '../components/VideoFacade.astro'
 import { videoServiciosVisible } from '../lib/credenciales'
 
 const videoServicios = videoServiciosVisible('es')
 
-const lines = [
-  {
-    n: "01", code: "EKONSULTING", slug: "/ekonsulting",
-    title: "Asesoría y cumplimiento ANLA",
-    lede: "El núcleo de nuestra práctica. Estructuramos y ejecutamos todos los trámites regulatorios ante la ANLA y las CAR — desde el licenciamiento hasta la defensa en procesos sancionatorios.",
-    deliverables: [
-      "Licenciamiento ambiental (EIA, DAA, PMA)",
-      "Planes posconsumo RAEE y pilas",
-      "Auditoría de cumplimiento 360°",
-      "Reportes ante autoridad (RUA, ICA, ANLA)",
-      "Acompañamiento en procesos sancionatorios",
-      "Capacitación in-house del equipo HSE",
-      "Estrategia ESG y alineación ODS",
-    ],
-    plazo: "Continuo",
-    accent: "accent-deep",
-    thumb: "sg-deep",
-    icon: "shield",
-  },
-  {
-    n: "02", code: "EKORAEE", slug: "/ekoraee",
-    title: "Gestión certificada de residuos electrónicos",
-    lede: "Recolección, transporte, almacenamiento y certificación de aparatos eléctricos y electrónicos bajo la Resolución 1297 de 2010 y la Ley 1672 de 2013.",
-    deliverables: [
-      "Recolección en punto o a domicilio",
-      "Transporte certificado a gestor autorizado",
-      "Certificados de disposición final",
-      "Integración con plan posconsumo EKONSULTING",
-      "Reporte de metas para la autoridad",
-    ],
-    plazo: "Por campaña o continuo",
-    accent: "accent-forest",
-    thumb: "sg-forest",
-    icon: "chip",
-  },
-  {
-    n: "03", code: "EKOPARTNER", slug: "/ekopartner",
-    title: "Operación de sistemas de gestión de residuos",
-    lede: "Integramos y operamos el sistema completo de recolección y disposición de residuos de la organización. No solo asesoramos — lo hacemos. Aplica únicamente en Colombia.",
-    deliverables: [
-      "Diseño del sistema de gestión integral",
-      "Operación de puntos de recolección",
-      "Gestión de gestores y transportistas",
-      "Trazabilidad end-to-end de residuos",
-      "Reportes operativos y regulatorios",
-    ],
-    plazo: "Retainer mensual",
-    accent: "",
-    thumb: "sg-neutral",
-    icon: "loop",
-  },
-  {
-    n: "04", code: "EKOTRADING", slug: "/ekotrading",
-    title: "Economía circular · compra y venta de activos IT",
-    lede: "Cerramos el ciclo de vida de los equipos tecnológicos dentro de un marco de economía circular. Compramos y vendemos tecnología usada u obsoleta al por mayor, con la trazabilidad que exigen los ODS.",
-    deliverables: [
-      "Valoración y retiro de activos IT obsoletos",
-      "Reacondicionamiento y certificación",
-      "Recolocación en mercados secundarios",
-      "Documentación para reporte ESG",
-      "Integración con EKORAEE para lo no reacondicionable",
-    ],
-    plazo: "Por lote o continuo",
-    accent: "accent-clay",
-    thumb: "sg-clay",
-    icon: "swap",
-  },
-]
+// Contenido en src/data/servicios.ts (lo lee también el asesor con IA); aquí solo lo visual.
+const estilo: Record<string, { accent: string, icon: string, thumb: string }> = {
+  EKONSULTING: { accent: "accent-deep", thumb: "sg-deep", icon: "shield" },
+  EKORAEE: { accent: "accent-forest", thumb: "sg-forest", icon: "chip" },
+  EKOPARTNER: { accent: "", thumb: "sg-neutral", icon: "loop" },
+  EKOTRADING: { accent: "accent-clay", thumb: "sg-clay", icon: "swap" },
+}
+const lines = LINEAS.es.map((l) => ({ ...l, ...estilo[l.code] }))
 
 const icons: Record<string, string> = {
   shield: '<path d="M12 3l7 3v6c0 4.5-3 7.5-7 9-4-1.5-7-4.5-7-9V6l7-3Z"/><path d="M9 12l2 2 4-4"/>',

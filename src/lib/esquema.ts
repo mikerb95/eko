@@ -130,6 +130,94 @@ export const TABLAS: readonly string[] = [
   `CREATE UNIQUE INDEX IF NOT EXISTS zoho_outbox_unico ON zoho_outbox (entity, ref_type, ref_id)`,
 
   `CREATE INDEX IF NOT EXISTS zoho_outbox_estado ON zoho_outbox (status, id)`,
+
+  // ── Agente de cumplimiento ──────────────────────────────────────────────
+  // Expedientes que vigila el agente. `numero_norm` es el número sin espacios,
+  // guiones ni puntos, en mayúsculas: así "LAM-1234" y "LAM 1234" son el mismo
+  // expediente al cruzarlo con lo que trae un auto.
+  `CREATE TABLE IF NOT EXISTS expedientes (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    cliente TEXT NOT NULL DEFAULT '',
+    nit TEXT NOT NULL DEFAULT '',
+    autoridad TEXT NOT NULL DEFAULT '',
+    numero TEXT NOT NULL DEFAULT '',
+    numero_norm TEXT NOT NULL DEFAULT '',
+    tipo_permiso TEXT NOT NULL DEFAULT '',
+    responsable TEXT NOT NULL DEFAULT '',
+    responsable_email TEXT NOT NULL DEFAULT '',
+    notas TEXT NOT NULL DEFAULT '',
+    activo INTEGER NOT NULL DEFAULT 1,
+    created_at TEXT NOT NULL DEFAULT '',
+    updated_at TEXT NOT NULL DEFAULT ''
+  )`,
+
+  `CREATE INDEX IF NOT EXISTS expedientes_numero ON expedientes (numero_norm)`,
+
+  // Cada documento que recibe el agente (un auto, una resolución), con lo que
+  // la IA extrajo. `hash` evita procesar dos veces el mismo archivo.
+  `CREATE TABLE IF NOT EXISTS actos (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    origen TEXT NOT NULL DEFAULT 'manual',
+    archivo_nombre TEXT NOT NULL DEFAULT '',
+    archivo_tipo TEXT NOT NULL DEFAULT '',
+    hash TEXT NOT NULL DEFAULT '',
+    texto TEXT NOT NULL DEFAULT '',
+    fecha_notificacion TEXT NOT NULL DEFAULT '',
+    expediente_id INTEGER NOT NULL DEFAULT 0,
+    estado TEXT NOT NULL DEFAULT 'pendiente',
+    error TEXT NOT NULL DEFAULT '',
+    extraccion TEXT NOT NULL DEFAULT '{}',
+    modelo TEXT NOT NULL DEFAULT '',
+    tokens_entrada INTEGER NOT NULL DEFAULT 0,
+    tokens_salida INTEGER NOT NULL DEFAULT 0,
+    subido_por TEXT NOT NULL DEFAULT '',
+    created_at TEXT NOT NULL DEFAULT '',
+    updated_at TEXT NOT NULL DEFAULT ''
+  )`,
+
+  `CREATE UNIQUE INDEX IF NOT EXISTS actos_hash ON actos (hash) WHERE hash <> ''`,
+
+  // Alertas para el consultor. `por_confirmar` = 1 cuando un dato crítico
+  // (plazo, expediente) salió con baja confianza y hay que revisarlo contra el
+  // original antes de actuar.
+  `CREATE TABLE IF NOT EXISTS alertas (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    acto_id INTEGER NOT NULL DEFAULT 0,
+    expediente_id INTEGER NOT NULL DEFAULT 0,
+    prioridad TEXT NOT NULL DEFAULT 'media',
+    tipo_acto TEXT NOT NULL DEFAULT '',
+    titulo TEXT NOT NULL DEFAULT '',
+    que_pide TEXT NOT NULL DEFAULT '',
+    norma TEXT NOT NULL DEFAULT '',
+    plazo_texto TEXT NOT NULL DEFAULT '',
+    plazo_dias INTEGER NOT NULL DEFAULT 0,
+    plazo_tipo TEXT NOT NULL DEFAULT '',
+    vence_el TEXT NOT NULL DEFAULT '',
+    accion TEXT NOT NULL DEFAULT '',
+    por_confirmar INTEGER NOT NULL DEFAULT 0,
+    motivo_confirmar TEXT NOT NULL DEFAULT '',
+    estado TEXT NOT NULL DEFAULT 'abierta',
+    responsable TEXT NOT NULL DEFAULT '',
+    nota TEXT NOT NULL DEFAULT '',
+    created_at TEXT NOT NULL DEFAULT '',
+    updated_at TEXT NOT NULL DEFAULT ''
+  )`,
+
+  `CREATE INDEX IF NOT EXISTS alertas_estado ON alertas (estado, vence_el)`,
+
+  // Reglas que define el equipo técnico de Ekosolv: para cada tipo de acto,
+  // qué prioridad tiene y qué acción se sugiere. `umbral_alta` sube la
+  // prioridad a alta cuando quedan esos días hábiles o menos.
+  `CREATE TABLE IF NOT EXISTS reglas_agente (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    tipo_acto TEXT UNIQUE NOT NULL,
+    nombre TEXT NOT NULL DEFAULT '',
+    prioridad TEXT NOT NULL DEFAULT 'media',
+    umbral_alta INTEGER NOT NULL DEFAULT 0,
+    accion TEXT NOT NULL DEFAULT '',
+    activa INTEGER NOT NULL DEFAULT 1,
+    updated_at TEXT NOT NULL DEFAULT ''
+  )`,
 ]
 
 /**
@@ -155,11 +243,15 @@ export const COLUMNAS: readonly (readonly [tabla: string, columna: string])[] = 
 
 /** Tablas que deben existir al terminar. Sirve para verificar tras migrar. */
 export const TABLAS_ESPERADAS: readonly string[] = [
+  'actos',
+  'alertas',
   'contacts',
+  'expedientes',
   'normativas',
   'order_events',
   'orders',
   'posts',
+  'reglas_agente',
   'users',
   'zoho_outbox',
 ]
