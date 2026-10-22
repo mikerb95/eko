@@ -301,7 +301,8 @@ Asunto: RE: PROPUESTA AUTOMATIZACIÓN e IA PARA EKOSOLV
 > agente, en la fecha que acordemos.
 >
 > La mensualidad solo cambia según cuántas propuestas hagan al mes (hay niveles de 20, 40 y 80):
-> desde $1.185.000 con hasta 20, sin inversión inicial. Desde el mes 19 baja, porque la construcción ya queda pagada. En la página 5 del documento está el desglose de la mensualidad.
+> desde $1.185.000 con hasta 20. El desarrollo arranca con un anticipo de $500.000 y la primera
+> mensualidad se cobra cuando el sistema ya esté funcionando. Desde el mes 19 baja, porque la construcción ya queda pagada. En la página 5 del documento está el desglose de la mensualidad.
 >
 > Para ajustar las cifras necesito algunos datos que dejé al final del documento, sobre todo cuántas
 > propuestas hacen al mes y cuánto tiempo les toma cada una.
@@ -471,3 +472,8 @@ Sobre el precio de referencia completo es un descuento acumulado del 65%. La cap
 > formato + exclusiones), sin quitar contenido.
 
 > **Alcance del soporte (2026-10-21):** las 8 h cubren errores y ajustes, no funciones nuevas; lo nuevo se cotiza aparte bajo acuerdo previo.
+
+> **Anticipo de desarrollo y primer cobro (2026-10-21):** el desarrollo inicia con un anticipo de
+> $500.000, adicional al total (construcción = $500.000 + 18 x $400.000 = $7.700.000). La primera
+> mensualidad se cobra en el primer mes de funcionamiento (después de las 8 semanas de desarrollo).
+> Las mensualidades no cambian.
