@@ -300,7 +300,7 @@ Asunto: RE: PROPUESTA AUTOMATIZACIÓN e IA PARA EKOSOLV
 > consultor. También incluyo 2 horas de capacitación para el equipo en el uso del panel y del
 > agente, en la fecha que acordemos.
 >
-> Hay tres planes (Inicial, Profesional y Empresarial). Los tres incluyen el agente, el panel, el
+> Hay tres planes, de hasta 20, 40 y 80 propuestas al mes. Los tres incluyen el agente, el panel, el
 > chat y el soporte; lo único que cambia es cuántas propuestas hacen al mes. Desde $1.185.000. El desarrollo arranca con un anticipo de $500.000 y la primera
 > mensualidad se cobra cuando el sistema ya esté funcionando. Desde el mes 19 baja, porque la construcción ya queda pagada. En la página 5 del documento está el desglose de la mensualidad.
 >
@@ -497,3 +497,14 @@ Sobre el precio de referencia completo es un descuento acumulado del 65%. La cap
 > tabla de la página 6 muestra primero "Incluido en los tres planes" (agente, panel, chat,
 > oportunidades, 8 h de soporte) y luego "Lo único que cambia: propuestas al mes". Se quitó la línea
 > "Indicador principal" y se compactó el cronograma para que cupiera.
+
+> **Propuesta ampliada a 14 páginas (2026-10-21):** Mike pidió no comprimir ni recortar; se recuperó
+> el contenido quitado por espacio y se agregaron páginas: 1 portada y contenido, 2 resumen,
+> 3 capacitación, 4 propuestas, 5 ajustes y documentos (rondas, escaneos, versiones), 6 agente
+> (cómo trabaja, qué vigila, cómo llegan los autos, quién hace qué), 7 una alerta por dentro (de dónde
+> sale cada dato), 8 panel y chat, 9 cronograma (con qué pasa en cada etapa), 10 inversión (con lo
+> incluido), 11 esquema de pago (línea de tiempo con los tres planes y pagos de la capacitación),
+> 12 desglose, 13 condiciones, 14 próximos pasos (lista por servicio y cierre). Mike pidió no usar
+> notas en letra pequeña que parezcan engañosas: los valores de todos los planes van visibles.
+
+> **2026-10-21:** se quitaron los nombres Inicial / Profesional / Empresarial; los planes se identifican solo por "hasta 20 / 40 / 80 propuestas al mes".

@@ -181,6 +181,9 @@
   ol.paytl b { font: 600 13pt/1.1 var(--body); color: var(--ink); white-space: nowrap; }
   ol.paytl b i { font-style: normal; font-size: 8pt; color: var(--mute); font-weight: 400; }
   ol.paytl p { margin: 0; line-height: 1.45; }
+  dl.pp { display: grid; grid-template-columns: auto 1fr; gap: .8mm 2mm; margin: .5mm 0 1mm; align-items: baseline; }
+  dl.pp dt { color: var(--mute); font-size: 7.8pt; }
+  dl.pp dd { margin: 0; text-align: right; font: 600 10pt/1.2 var(--body); color: var(--ink); white-space: nowrap; }
   /* Cronograma */
   .gantt { display: grid; grid-template-columns: 44mm repeat(8, 1fr); gap: 2.5mm 0; font-size: 8.5pt; align-items: center; min-width: 130mm; }
   .gantt .wk { font-size: 7.5pt; color: var(--mute); text-align: center; font-variant-numeric: tabular-nums; }
@@ -463,6 +466,23 @@
     </div>
   </section>
 
+  <section class="cols">
+    <div>
+      <h3>Cómo llegan los autos</h3>
+      <ul class="cond">
+        <li><b>Buzón de notificaciones.</b> Fuente principal. Las autoridades notifican por correo y el agente lee ese buzón.</li>
+        <li><b>Gacetas y boletines públicos.</b> Complemento. Cada autoridad publica distinto, por eso la cobertura es parcial.</li>
+      </ul>
+    </div>
+    <div>
+      <h3>Quién hace qué</h3>
+      <ul class="cond">
+        <li><b>El agente</b> vigila, lee, calcula plazos y avisa.</li>
+        <li><b>El consultor</b> confirma los datos de escaneos, decide y responde a la autoridad.</li>
+      </ul>
+    </div>
+  </section>
+
   <div class="foot"><span>Ekosolv · Propuesta comercial</span><span>Página 6 de 14</span></div>
 </article>
 
@@ -504,23 +524,6 @@
           <tr><th><b>Prioridad y acción</b></th><td>Las reglas que define el equipo técnico de Ekosolv para cada tipo de acto.</td></tr>
         </tbody>
       </table>
-    </div>
-  </section>
-
-  <section class="cols">
-    <div>
-      <h3>Cómo llegan los autos</h3>
-      <ul class="cond">
-        <li><b>Buzón de notificaciones.</b> Fuente principal. Las autoridades notifican por correo y el agente lee ese buzón.</li>
-        <li><b>Gacetas y boletines públicos.</b> Complemento. Cada autoridad publica distinto, por eso la cobertura es parcial.</li>
-      </ul>
-    </div>
-    <div>
-      <h3>Quién hace qué</h3>
-      <ul class="cond">
-        <li><b>El agente</b> vigila, lee, calcula plazos y avisa.</li>
-        <li><b>El consultor</b> confirma los datos de escaneos, decide y responde a la autoridad.</li>
-      </ul>
     </div>
   </section>
 
@@ -650,9 +653,9 @@
           <tr class="group"><td colspan="3">Incluido en los tres planes</td></tr>
           <tr><td colspan="3" class="incl">Agente de cumplimiento (50 expedientes y 10 revisiones de documentos al mes) · panel web · chat con IA en el sitio web · detección de oportunidades · 8 h de soporte al mes</td></tr>
           <tr class="group"><td colspan="3">Lo único que cambia: propuestas al mes</td></tr>
-          <tr class="lead"><th>Inicial<br><span class="unit">hasta 20 propuestas al mes</span></th><td><span class="price">$1.185.000</span> <span class="unit">/ mes</span></td><td>$785.000 <span class="unit">/ mes</span></td></tr>
-          <tr class="lead"><th>Profesional<br><span class="unit">hasta 40 propuestas al mes</span></th><td><span class="price">$1.400.000</span> <span class="unit">/ mes</span></td><td>$1.000.000 <span class="unit">/ mes</span></td></tr>
-          <tr class="lead"><th>Empresarial<br><span class="unit">hasta 80 propuestas al mes</span></th><td><span class="price">$1.700.000</span> <span class="unit">/ mes</span></td><td>$1.300.000 <span class="unit">/ mes</span></td></tr>
+          <tr class="lead"><th>Hasta 20 propuestas al mes</th><td><span class="price">$1.185.000</span> <span class="unit">/ mes</span></td><td>$785.000 <span class="unit">/ mes</span></td></tr>
+          <tr class="lead"><th>Hasta 40 propuestas al mes</th><td><span class="price">$1.400.000</span> <span class="unit">/ mes</span></td><td>$1.000.000 <span class="unit">/ mes</span></td></tr>
+          <tr class="lead"><th>Hasta 80 propuestas al mes</th><td><span class="price">$1.700.000</span> <span class="unit">/ mes</span></td><td>$1.300.000 <span class="unit">/ mes</span></td></tr>
           <tr><th>Excedente</th><td colspan="2">$25.000 por propuesta sobre el plan contratado</td></tr>
           <tr class="group blue"><td colspan="3">Uso adicional del agente, según demanda</td></tr>
           <tr><th>Expedientes adicionales</th><td colspan="2">$50.000 al mes por cada 25 expedientes</td></tr>
@@ -661,6 +664,20 @@
       </table>
     </div>
     <p class="note">Cada propuesta incluye 2 rondas de ajuste en 30 días; la tercera cuenta como propuesta nueva. Una propuesta con más de 100 páginas de documentos, sumando los agregados, cuenta como 2. El esquema de pago está en la página 11 y el desglose, en la página 12.</p>
+  </section>
+
+  <section class="bonus">
+    <span class="phase-tag">Incluido al contratar la automatización</span>
+    <div class="bonus-grid">
+      <div>
+        <h3>Chat con IA en el sitio web</h3>
+        <p>Atiende al instante con la normativa, los casos de Ekosolv y su base de conocimiento. Si hace falta, pasa la conversación a un consultor.</p>
+      </div>
+      <div>
+        <h3>2 horas de capacitación con el agente</h3>
+        <p>Uso del panel y del agente de cumplimiento: alertas, reglas, expedientes y cómo actuar. Fecha bajo acuerdo.</p>
+      </div>
+    </div>
   </section>
 
   <div class="foot"><span>Ekosolv · Propuesta comercial</span><span>Página 10 de 14</span></div>
@@ -675,28 +692,14 @@
   </div>
 
   <section class="stack">
-    <h3>Automatización <span class="unit">(ejemplo con el plan Inicial)</span></h3>
+    <h3>Automatización</h3>
     <ol class="paytl">
-      <li><span class="when">Al firmar</span><b>$500.000</b><p>Anticipo único para iniciar el desarrollo. Se suma al valor de la construcción.</p></li>
+      <li><span class="when">Al firmar</span><b>$500.000</b><p>Anticipo único para iniciar el desarrollo, igual en los tres planes. Se suma al valor de la construcción.</p></li>
       <li><span class="when">Semanas 1 a 8</span><b>$0</b><p>Desarrollo del sistema. No se cobra mensualidad mientras se construye.</p></li>
-      <li><span class="when">Meses 1 a 18</span><b>$1.185.000 <i>/ mes</i></b><p>Desde el primer mes de funcionamiento. Incluye la cuota de construcción.</p></li>
-      <li><span class="when">Desde el mes 19</span><b>$785.000 <i>/ mes</i></b><p>La construcción ya está pagada; quedan infraestructura, funcionamiento e IA.</p></li>
+      <li><span class="when">Meses 1 a 18, por mes</span><dl class="pp"><dt>Hasta 20</dt><dd>$1.185.000</dd><dt>Hasta 40</dt><dd>$1.400.000</dd><dt>Hasta 80</dt><dd>$1.700.000</dd></dl><p>Desde el primer mes de funcionamiento. Incluye la cuota de construcción.</p></li>
+      <li><span class="when">Desde el mes 19, por mes</span><dl class="pp"><dt>Hasta 20</dt><dd>$785.000</dd><dt>Hasta 40</dt><dd>$1.000.000</dd><dt>Hasta 80</dt><dd>$1.300.000</dd></dl><p>La construcción ya está pagada; quedan infraestructura, funcionamiento e IA.</p></li>
     </ol>
-  </section>
-
-  <section class="stack">
-    <h3>Por plan</h3>
-    <div class="tbl">
-      <table class="tight paytab">
-        <thead><tr><th>Plan</th><th>Al firmar</th><th>Semanas 1 a 8</th><th>Meses 1 a 18</th><th>Desde el mes 19</th></tr></thead>
-        <tbody class="num">
-          <tr><th><b>Inicial</b></th><td>$500.000</td><td>$0</td><td><b>$1.185.000</b></td><td>$785.000</td></tr>
-          <tr><th><b>Profesional</b></th><td>$500.000</td><td>$0</td><td><b>$1.400.000</b></td><td>$1.000.000</td></tr>
-          <tr><th><b>Empresarial</b></th><td>$500.000</td><td>$0</td><td><b>$1.700.000</b></td><td>$1.300.000</td></tr>
-        </tbody>
-      </table>
-    </div>
-    <p class="note">El anticipo se paga una sola vez y se suma al valor de la construcción. Los meses se cuentan desde el primer mes de funcionamiento.</p>
+    <p class="note">Los meses se cuentan desde el primer mes de funcionamiento. El anticipo se paga una sola vez.</p>
   </section>
 
   <section class="stack">
@@ -714,19 +717,6 @@
     </div>
   </section>
 
-  <section class="bonus">
-    <span class="phase-tag">Incluido al contratar la automatización</span>
-    <div class="bonus-grid">
-      <div>
-        <h3>Chat con IA en el sitio web</h3>
-        <p>Atiende al instante con la normativa, los casos de Ekosolv y su base de conocimiento. Si hace falta, pasa la conversación a un consultor.</p>
-      </div>
-      <div>
-        <h3>2 horas de capacitación con el agente</h3>
-        <p>Uso del panel y del agente de cumplimiento: alertas, reglas, expedientes y cómo actuar. Fecha bajo acuerdo.</p>
-      </div>
-    </div>
-  </section>
 
   <div class="foot"><span>Ekosolv · Propuesta comercial</span><span>Página 11 de 14</span></div>
 </article>
@@ -745,7 +735,7 @@
     <h3>Componentes</h3>
     <div class="tbl">
       <table class="tight comp">
-        <thead><tr><th>Componente</th><th>Inicial<br><span class="unit">hasta 20</span></th><th>Profesional<br><span class="unit">hasta 40</span></th><th>Empresarial<br><span class="unit">hasta 80</span></th></tr></thead>
+        <thead><tr><th>Componente</th><th>Hasta 20<br><span class="unit">propuestas</span></th><th>Hasta 40<br><span class="unit">propuestas</span></th><th>Hasta 80<br><span class="unit">propuestas</span></th></tr></thead>
         <tbody class="num">
           <tr class="group"><td colspan="4">Meses 1 a 18</td></tr>
           <tr><th><b>Construcción</b><br>Desarrollo de todo lo de las páginas 4 a 8: anticipo de $500.000 más 18 cuotas</th><td>$400.000</td><td>$400.000</td><td>$400.000</td></tr>
