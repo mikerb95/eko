@@ -1,12 +1,15 @@
 import type { APIRoute } from 'astro'
 import { fail, json } from '../../../../lib/apiError'
 import { actualizarAlerta, listarAlertas } from '../../../../lib/agente/datos'
+import { habilesRestantes, hoyEnBogota } from '../../../../lib/agente/diasHabiles'
 
 export const prerender = false
 
 export const GET: APIRoute = async () => {
   try {
-    return json({ alertas: await listarAlertas() })
+    const hoy = hoyEnBogota()
+    const alertas = (await listarAlertas()).map((a) => ({ ...a, restantes: a.vence_el ? habilesRestantes(hoy, a.vence_el) : null }))
+    return json({ alertas })
   } catch (e) {
     return fail('cumplimiento/alertas', e)
   }
