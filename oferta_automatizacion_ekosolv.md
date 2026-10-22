@@ -284,15 +284,16 @@ Asunto: RE: PROPUESTA AUTOMATIZACIÓN e IA PARA EKOSOLV
 > documentos reales de Ekosolv. Cada participante necesita una suscripción a Claude (plan Pro o
 > Team) a nombre de la empresa. Las fechas se pueden mover si les queda mejor otro sábado.
 >
-> La automatización de propuestas va en el mismo documento, ya ajustada a su Zoho CRM: arranca
-> desde el Brief y deja lista la propuesta, la estimación en Books, la carpeta en WorkDrive y la
-> presentación para que el consultor solo la revise. Esa es la Fase 1, por $400.000 al mes.
+> La automatización va en el mismo documento, ya ajustada a su Zoho CRM. Es un solo proyecto que
+> incluye todo: arranca desde el Brief y deja lista la propuesta, la estimación en Books, la carpeta
+> en WorkDrive y la presentación para que el consultor solo la revise. Además trae un panel web con
+> un agente de cumplimiento que revisa todos los días la normativa nueva, los autos de sus clientes,
+> los documentos y los vencimientos, y cuando algo aplica les manda una alerta con la norma, el
+> plazo y la acción sugerida. La decisión siempre queda en manos del consultor.
 >
-> La Fase 2 suma el panel web de administración con un agente de cumplimiento: revisa todos los días
-> la normativa nueva, los autos de sus clientes, los documentos y los vencimientos, y cuando algo
-> aplica les manda una alerta con la norma, el plazo y la acción sugerida. La decisión siempre queda
-> en manos del consultor. Las dos fases juntas quedan en $750.000 al mes. Las dos mensualidades son
-> a 24 meses y desde el mes 25 bajan a solo operación y soporte.
+> La mensualidad solo cambia según cuántas propuestas hagan al mes: desde $1.035.000 con hasta 20
+> (hay niveles de 20, 40 y 80). En la página 5 del documento explico de dónde sale cada cifra y cómo
+> se compara con las horas de un consultor.
 >
 > Para ajustar las cifras necesito algunos datos que dejé al final del documento, sobre todo cuántas
 > propuestas hacen al mes y cuánto tiempo les toma cada una.
@@ -336,3 +337,36 @@ Sobre el precio de referencia completo es un descuento acumulado del 65%. La cap
 > **Ajuste 2026-10-21:** Plan Completo baja a $1.000.000 (Esencial sigue en $600.000). Anticipo del 50%: $300.000 / $500.000.
 
 > **Ajuste 2026-10-21:** mensualidades de automatización fijadas por Mike: Fase 1 $400.000/mes y Fase 1 + 2 $750.000/mes (meses 1 a 24). Desde el mes 25: $250.000 / $350.000.
+
+> **Matriz por volumen 2026-10-21 (reemplaza el tope de 60 propuestas):** costo de IA estimado con
+> Sonnet 5.5 a ~$9.500 COP por propuesta (mezcla 50% cortas ~$4.000 y 50% largas ~$15.000, TRM 4.000,
+> sin Batch API), por 1,5 de margen = ~$14.250. Consumo: 40 propuestas $570.000, 80 propuestas
+> $1.140.000, adicional sobre 80 a $15.000. Base fija sin IA: Fase 1 $400.000 / Fase 1 + 2 $750.000
+> (desde el mes 25: $250.000 / $350.000).
+>
+> | | Hasta 40 | Hasta 80 | Mes 25+ (40) | Mes 25+ (80) |
+> |---|---|---|---|---|
+> | Fase 1 | $970.000 | $1.540.000 | $820.000 | $1.390.000 |
+> | Fase 1 + 2 | $1.320.000 | $1.890.000 | $920.000 | $1.490.000 |
+>
+> La propuesta ahora tiene 6 páginas; la 5 explica el costo de la IA para alguien no técnico y lo
+> compara con horas de consultor (supuestos: $50.000/h, 6 h hoy, 1,5 h de revisión). Si se usa Batch
+> API el costo real de IA baja a la mitad y el margen sube.
+
+> **Nivel de 20 propuestas (2026-10-21):** consumo IA 20 x $14.250 = $285.000. Fase 1 $685.000,
+> Fase 1 + 2 $1.035.000; desde el mes 25: $535.000 / $635.000. Ahora es el precio "desde" de la portada.
+
+> **Sin fases (2026-10-21, reemplaza todo lo anterior de Fase 1 / Fase 1 + 2):** Mike decidió un solo
+> proyecto que incluye todo (flujo de propuestas, panel web, agente y oportunidades). La tarifa solo
+> cambia por volumen. Se tomaron los valores de la antigua Fase 1 + 2 (base $750.000 / $350.000 +
+> IA por volumen a costo x1,5), soporte 8 h al mes, cronograma único de 8 semanas.
+>
+> | Propuestas al mes | Meses 1 a 24 | Desde el mes 25 |
+> |---|---|---|
+> | Hasta 20 | $1.035.000 | $635.000 |
+> | Hasta 40 | $1.320.000 | $920.000 |
+> | Hasta 80 | $1.890.000 | $1.490.000 |
+> | Más de 80 | + $15.000 por adicional | + $15.000 por adicional |
+>
+> Ejemplo de la página 5 (40 propuestas): $12.000.000 a mano frente a $4.320.000 con el sistema,
+> ahorro de unos $7.700.000 y 180 horas al mes.
