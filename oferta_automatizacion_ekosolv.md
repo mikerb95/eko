@@ -300,8 +300,8 @@ Asunto: RE: PROPUESTA AUTOMATIZACIÓN e IA PARA EKOSOLV
 > consultor. También incluyo 2 horas de capacitación para el equipo en el uso del panel y del
 > agente, en la fecha que acordemos.
 >
-> La mensualidad solo cambia según cuántas propuestas hagan al mes (hay niveles de 20, 40 y 80):
-> desde $1.185.000 con hasta 20. El desarrollo arranca con un anticipo de $500.000 y la primera
+> Hay tres planes (Inicial, Profesional y Empresarial). Los tres incluyen el agente, el panel, el
+> chat y el soporte; lo único que cambia es cuántas propuestas hacen al mes. Desde $1.185.000. El desarrollo arranca con un anticipo de $500.000 y la primera
 > mensualidad se cobra cuando el sistema ya esté funcionando. Desde el mes 19 baja, porque la construcción ya queda pagada. En la página 5 del documento está el desglose de la mensualidad.
 >
 > Para ajustar las cifras necesito algunos datos que dejé al final del documento, sobre todo cuántas
@@ -477,3 +477,23 @@ Sobre el precio de referencia completo es un descuento acumulado del 65%. La cap
 > $500.000, adicional al total (construcción = $500.000 + 18 x $400.000 = $7.700.000). La primera
 > mensualidad se cobra en el primer mes de funcionamiento (después de las 8 semanas de desarrollo).
 > Las mensualidades no cambian.
+
+> **Propuesta ampliada a 8 páginas (2026-10-21):** la antigua página 3 se dividió en tres:
+> 3 "Del Brief a la propuesta lista para revisar" (6 pasos con su resultado, hoy vs con el sistema,
+> qué pasa si llegan más documentos); 4 "Agente de cumplimiento" (cómo trabaja en 5 pasos, qué vigila
+> con ejemplos de aviso, alerta de ejemplo ilustrativa); 5 "Panel web, chat y oportunidades"
+> (ilustración del panel, ejemplo de conversación del chat, tres fuentes de oportunidades).
+> Cronograma e inversión pasa a la 6, desglose a la 7 y condiciones a la 8.
+
+> **Requisitos del agente (2026-10-21):** la lista de la página 8 ahora pide la tabla de expedientes
+> con su responsable, un buzón para las notificaciones de los clientes y la cláusula de autorización
+> de notificaciones en los contratos de Ekosolv. Fuente principal de autos: buzón de notificaciones
+> (CPACA); gacetas públicas como complemento. Plazos en días hábiles calculados por código con
+> festivos colombianos desde la notificación. Mensaje comercial: "nadie más tiene que vigilar", no
+> "ya no necesitan personas". Mejora futura cotizable: borrador de respuesta a la autoridad.
+
+> **Planes con nombre (2026-10-21):** para que la mensualidad no se lea como "pagar $1.185.000 por 20
+> propuestas", los niveles pasan a ser planes Inicial (20), Profesional (40) y Empresarial (80). La
+> tabla de la página 6 muestra primero "Incluido en los tres planes" (agente, panel, chat,
+> oportunidades, 8 h de soporte) y luego "Lo único que cambia: propuestas al mes". Se quitó la línea
+> "Indicador principal" y se compactó el cronograma para que cupiera.

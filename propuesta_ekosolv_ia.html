@@ -4,7 +4,7 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Geist:wght@300..700&family=Instrument+Serif&display=swap">
 <style>
-  /* Propuesta de consultoría en 5 hojas A4, un tema por hoja: portada con resumen, capacitación, automatización, cronograma e inversión, condiciones. Un solo tema claro a propósito, pensado para PDF. */
+  /* Propuesta de consultoría en 14 hojas A4, un tema por hoja: portada con resumen, capacitación, automatización, cronograma e inversión, condiciones. Un solo tema claro a propósito, pensado para PDF. */
   :root {
     --ink: #13212B;
     --body-ink: #33424C;
@@ -68,7 +68,7 @@
   .logo { width: 38mm; height: auto; display: block; }
   .cover { display: flex; flex-direction: column; gap: 9mm; padding-top: 6mm; }
   .cover h1 { max-width: 15ch; }
-  .index { margin: 0; padding: 0; list-style: none; display: grid; grid-template-columns: repeat(5, 1fr); gap: 4mm; }
+  .index { margin: 0; padding: 0; list-style: none; display: grid; grid-template-columns: repeat(5, 1fr); gap: 5mm 4mm; }
   .index li { border-top: 1.5px solid var(--ink); padding-top: 2.5mm; font-size: 9pt; color: var(--ink); font-weight: 500; }
   .index li span { display: block; font-size: 7.5pt; color: var(--mute); font-weight: 400; margin-bottom: 1mm; }
 
@@ -90,6 +90,9 @@
   .comp tr.group td { text-align: left; }
   .comp tbody th b { font-size: 9.3pt; }
   .tight tr.group td { padding-top: 3.5mm; }
+  td.incl { background: var(--tint); color: var(--ink); font-size: 8.8pt; line-height: 1.5; border-radius: 1mm; }
+  .paytab tbody th { width: 30%; }
+  .paytab td b { color: var(--ink); }
   td.nw { white-space: nowrap; width: 1%; padding-right: 8mm; }
   td.r, th.r { text-align: right; white-space: nowrap; }
   td.c, th.c { text-align: center; width: 22mm; }
@@ -119,8 +122,67 @@
   .watch li { padding-left: 4mm; position: relative; }
   .watch li::before { content: ""; position: absolute; left: 0; top: .6em; width: 1.8mm; height: 1.8mm; border-radius: 50%; background: var(--blue); }
 
+  /* Flujo de propuestas */
+  ol.flow { margin: 0; padding: 0; list-style: none; counter-reset: f; display: grid; gap: 0; }
+  ol.flow li { counter-increment: f; display: grid; grid-template-columns: 9mm 1fr 40mm; gap: 4mm; align-items: start; padding: 2.6mm 0; border-bottom: 1px solid var(--line); font-size: 9pt; position: relative; }
+  ol.flow li::before { content: counter(f); display: grid; place-items: center; width: 7mm; height: 7mm; border-radius: 50%; background: var(--teal); color: var(--paper); font: 600 8.5pt/1 var(--body); }
+  ol.flow li b { display: block; color: var(--ink); }
+  ol.flow li p { margin: .5mm 0 0; line-height: 1.45; }
+  ol.flow .out { justify-self: end; text-align: right; font-size: 8pt; color: var(--teal); font-weight: 500; background: var(--tint); border-radius: 1mm; padding: 1mm 2.2mm; }
+  ul.cond.plain li::before { background: var(--mute); opacity: .5; }
+  .trio { display: grid; grid-template-columns: repeat(3, 1fr); gap: 5mm; }
+  .trio > div { background: var(--tint); border-radius: 1.5mm; padding: 4mm; font-size: 8.8pt; display: flex; flex-direction: column; gap: 1.2mm; }
+  .trio b { color: var(--ink); }
+  /* Agente */
+  ol.pipe { margin: 0; padding: 0; list-style: none; display: grid; grid-template-columns: repeat(5, 1fr); gap: 3mm; counter-reset: pp; }
+  ol.pipe li { counter-increment: pp; background: var(--tint-blue); border-radius: 1.5mm; padding: 3.5mm 3mm; font-size: 8.3pt; line-height: 1.4; position: relative; }
+  ol.pipe li::before { content: counter(pp); display: inline-grid; place-items: center; width: 5.5mm; height: 5.5mm; border-radius: 50%; background: var(--blue); color: var(--paper); font: 600 7.5pt/1 var(--body); margin-bottom: 2mm; }
+  ol.pipe li:not(:last-child)::after { content: ""; position: absolute; right: -2.6mm; top: 50%; width: 2.2mm; height: 2.2mm; border-top: 1.5px solid var(--blue); border-right: 1.5px solid var(--blue); transform: translateY(-50%) rotate(45deg); }
+  ol.pipe b { display: block; color: var(--ink); font-size: 9.3pt; }
+  ol.pipe p { margin: 1mm 0 0; }
+  .watch-t tbody th { width: 24%; }
+  .watch-t td:last-child { color: var(--ink); font-style: italic; }
+  .alert { border: 1px solid var(--line); border-radius: 2mm; padding: 4mm 5mm; display: flex; flex-direction: column; gap: 2mm; box-shadow: 0 1px 2px rgba(19,33,43,.05), 0 6px 18px rgba(19,33,43,.06); font-size: 8.8pt; }
+  .alert-top { display: flex; justify-content: space-between; gap: 3mm; font-size: 7.8pt; color: var(--mute); }
+  .pri { display: inline-flex; align-items: center; gap: 1.5mm; color: #B4462F; font-weight: 600; text-transform: uppercase; letter-spacing: .08em; }
+  .pri::before { content: ""; width: 2.2mm; height: 2.2mm; border-radius: 50%; background: currentColor; }
+  .alert h4 { font-size: 10.5pt; }
+  .alert dl { display: grid; grid-template-columns: 30mm 1fr; gap: 1.4mm 4mm; margin: 0; }
+  .alert dt { color: var(--mute); }
+  .alert dd { margin: 0; color: var(--ink); }
+  .alert-foot { font-size: 7.8pt; color: var(--blue); border-top: 1px solid var(--line); padding-top: 2mm; }
+  /* Panel y chat */
+  .mock { display: grid; grid-template-columns: 34mm 1fr; border: 1px solid var(--line); border-radius: 2mm; overflow: hidden; font-size: 8.3pt; box-shadow: 0 6px 18px rgba(19,33,43,.06); }
+  .mock-side { background: var(--ink); color: #C9D3D8; padding: 4mm 3mm; display: flex; flex-direction: column; gap: 2mm; }
+  .mock-side b { color: var(--paper); letter-spacing: .1em; text-transform: uppercase; font-size: 7.5pt; margin-bottom: 1.5mm; }
+  .mock-side span { padding: 1mm 2mm; border-radius: 1mm; }
+  .mock-side .on { background: rgba(255,255,255,.12); color: var(--paper); }
+  .mock-main { padding: 4mm; display: flex; flex-direction: column; gap: 3.5mm; }
+  .kpis { display: grid; grid-template-columns: repeat(3, 1fr); gap: 3mm; }
+  .kpis div { background: var(--tint); border-radius: 1.5mm; padding: 2.5mm 3mm; display: flex; flex-direction: column; gap: 1mm; }
+  .kpis span { font-size: 7.5pt; color: var(--mute); }
+  .kpis b { font-size: 13pt; color: var(--ink); font-weight: 600; }
+  .mock-list { margin: 0; padding: 0; list-style: none; display: grid; }
+  .mock-list li { display: grid; grid-template-columns: 4mm 1fr auto; align-items: center; gap: 2mm; padding: 2mm 0; border-bottom: 1px solid var(--line); color: var(--ink); }
+  .mock-list em { font-style: normal; color: var(--mute); font-size: 7.8pt; }
+  .d { width: 2.2mm; height: 2.2mm; border-radius: 50%; display: inline-block; }
+  .d.hi { background: #B4462F; } .d.md { background: var(--clay); } .d.lo { background: var(--teal); }
+  .chat { display: flex; flex-direction: column; gap: 2mm; font-size: 8.6pt; }
+  .chat p { max-width: none; border-radius: 3mm; padding: 2.5mm 3.5mm; line-height: 1.45; }
+  .chat .q { background: var(--tint); align-self: flex-end; margin-left: 10mm; border-bottom-right-radius: .8mm; }
+  .chat .a { background: var(--tint-blue); color: var(--ink); margin-right: 6mm; border-bottom-left-radius: .8mm; }
+  ol.paytl { margin: 0; padding: 0; list-style: none; display: grid; grid-template-columns: repeat(4, 1fr); gap: 3mm; position: relative; }
+  ol.paytl li { background: var(--tint); border-radius: 1.5mm; padding: 4mm 3.5mm 3.5mm; display: flex; flex-direction: column; gap: 1.2mm; font-size: 8.5pt; position: relative; }
+  ol.paytl li:nth-child(3) { background: var(--tint-blue); }
+  ol.paytl li::before { content: ""; position: absolute; top: -1.6mm; left: 3.5mm; width: 3.2mm; height: 3.2mm; border-radius: 50%; background: var(--teal); box-shadow: 0 0 0 1mm var(--paper); }
+  ol.paytl li:nth-child(3)::before { background: var(--blue); }
+  ol.paytl::before { content: ""; position: absolute; top: 0; left: 5mm; right: 5mm; height: 1.5px; background: var(--line); }
+  ol.paytl .when { font: 600 7.5pt/1.2 var(--body); text-transform: uppercase; letter-spacing: .1em; color: var(--mute); }
+  ol.paytl b { font: 600 13pt/1.1 var(--body); color: var(--ink); white-space: nowrap; }
+  ol.paytl b i { font-style: normal; font-size: 8pt; color: var(--mute); font-weight: 400; }
+  ol.paytl p { margin: 0; line-height: 1.45; }
   /* Cronograma */
-  .gantt { display: grid; grid-template-columns: 44mm repeat(8, 1fr); gap: 2mm 0; font-size: 8.5pt; align-items: center; min-width: 130mm; }
+  .gantt { display: grid; grid-template-columns: 44mm repeat(8, 1fr); gap: 2.5mm 0; font-size: 8.5pt; align-items: center; min-width: 130mm; }
   .gantt .wk { font-size: 7.5pt; color: var(--mute); text-align: center; font-variant-numeric: tabular-nums; }
   .gantt .row-l { color: var(--ink); padding-right: 2mm; font-weight: 500; }
   .bar { height: 6mm; border-radius: 1mm; background: var(--teal); margin: 0 .5mm; display: flex; align-items: center; padding: 0 2mm; color: var(--paper); font-size: 7pt; font-weight: 500; white-space: nowrap; overflow: hidden; }
@@ -131,8 +193,7 @@
   .bonus .phase-tag { color: var(--blue); }
   .bonus-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 7mm; }
   .bonus-grid > div { display: flex; flex-direction: column; gap: 1.5mm; min-width: 0; }
-  .sheet.dense { gap: 7mm; }
-  /* Condiciones y próximos pasos */
+    /* Condiciones y próximos pasos */
   .cols { display: grid; grid-template-columns: 1fr 1fr; gap: 9mm; }
   .cols > div { display: flex; flex-direction: column; gap: 3mm; min-width: 0; }
   ul.cond { margin: 0; padding: 0; list-style: none; display: grid; gap: 1.6mm; font-size: 9pt; }
@@ -149,7 +210,11 @@
     h1 { font-size: 28pt; }
     h2 { font-size: 21pt; }
     .index, .steps { grid-template-columns: 1fr 1fr; }
-    .blocks, .watch, .cols, ol.check, .bonus-grid { grid-template-columns: 1fr; }
+    .blocks, .watch, .cols, ol.check, .bonus-grid, .trio, ol.pipe, .mock { grid-template-columns: 1fr; }
+    ol.paytl { grid-template-columns: 1fr 1fr; row-gap: 5mm; }
+    ol.flow li { grid-template-columns: 9mm 1fr; }
+    ol.flow .out { grid-column: 2; justify-self: start; }
+    ol.pipe li:not(:last-child)::after { display: none; }
   }
   @page { size: A4; margin: 0; }
   @media print {
@@ -170,8 +235,42 @@
     </div>
   </header>
 
+
+
   <section class="stack">
-    <h3>Resumen</h3>
+    <h3>Contenido</h3>
+  <ol class="index">
+    <li><span>Página 2</span>Resumen</li>
+    <li><span>Página 3</span>Capacitación en IA</li>
+    <li><span>Página 4</span>Automatización de propuestas</li>
+    <li><span>Página 5</span>Ajustes y documentos</li>
+    <li><span>Página 6</span>Agente de cumplimiento</li>
+    <li><span>Página 7</span>Una alerta por dentro</li>
+    <li><span>Página 8</span>Panel web, chat y oportunidades</li>
+    <li><span>Página 9</span>Cronograma</li>
+    <li><span>Página 10</span>Inversión</li>
+    <li><span>Página 11</span>Esquema de pago</li>
+    <li><span>Página 12</span>Desglose de la mensualidad</li>
+    <li><span>Página 13</span>Condiciones</li>
+    <li><span>Página 14</span>Próximos pasos</li>
+  </ol>
+  </section>
+
+  <div class="foot"><span>Ekosolv · Propuesta comercial</span><span>Página 1 de 14</span></div>
+</article>
+
+<!-- Hoja: resumen -->
+<article class="sheet">
+  <div class="runhead"><b>Ekosolv</b><span>Capacitación en IA y automatización de propuestas</span></div>
+
+  <div class="page-head">
+    <span class="eyebrow">01 · Resumen</span>
+    <h2>Dos servicios, una propuesta</h2>
+    <p>Capacitación en IA para el equipo, con pago único, y automatización de propuestas con agente de cumplimiento, con mensualidad según el plan.</p>
+  </div>
+
+  <section class="stack">
+    <h3>Valores</h3>
     <div class="tbl">
       <table>
         <thead><tr><th>Servicio</th><th>Qué incluye</th><th class="r">Inversión</th></tr></thead>
@@ -180,22 +279,14 @@
           <tr><td class="nw"><b>Plan Esencial</b></td><td>2 sábados de 3 horas</td><td class="r"><span class="price">$600.000</span><br><span class="unit">Sola: $800.000</span></td></tr>
           <tr><td class="nw"><b>Plan Completo</b></td><td>4 sábados de 3 horas</td><td class="r"><span class="price">$1.000.000</span><br><span class="unit">Sola: $1.400.000</span></td></tr>
           <tr class="group blue"><td colspan="3">Automatización · mensualidad</td></tr>
-          <tr><td class="nw"><b>Proyecto completo</b></td><td>Propuestas desde el Brief en Zoho CRM, panel web, agente de cumplimiento, detección de oportunidades y chat con IA en el sitio web</td><td class="r"><span class="unit">desde</span> <span class="price">$1.185.000</span> <span class="unit">/ mes</span></td></tr>
+          <tr><td class="nw"><b>Proyecto completo</b></td><td>Propuestas desde el Brief en Zoho CRM, panel web, agente de cumplimiento, detección de oportunidades y chat con IA en el sitio web. Tres planes según las propuestas al mes.</td><td class="r"><span class="unit">desde</span> <span class="price">$1.185.000</span> <span class="unit">/ mes</span></td></tr>
         </tbody>
       </table>
     </div>
-    <p class="note">La capacitación tiene precio especial al contratarla con la automatización. La automatización inicia con un anticipo de $500.000 y se cobra por mes desde que entra en funcionamiento, según el volumen de propuestas (detalle en las páginas 4 y 5). Valores en pesos colombianos.</p>
+    <p class="note">La capacitación tiene precio especial al contratarla con la automatización. La automatización inicia con un anticipo de $500.000 y se cobra por mes desde que entra en funcionamiento, según el volumen de propuestas (detalle en las páginas 10 a 12). Valores en pesos colombianos.</p>
   </section>
 
-  <ol class="index">
-    <li><span>Página 2</span>Capacitación en IA</li>
-    <li><span>Página 3</span>Automatización</li>
-    <li><span>Página 4</span>Cronograma e inversión</li>
-    <li><span>Página 5</span>Desglose de la mensualidad</li>
-    <li><span>Página 6</span>Condiciones y próximos pasos</li>
-  </ol>
-
-  <div class="foot"><span>Ekosolv · Propuesta comercial</span><span>Página 1 de 6</span></div>
+  <div class="foot"><span>Ekosolv · Propuesta comercial</span><span>Página 2 de 14</span></div>
 </article>
 
 <!-- Hoja 2: capacitación -->
@@ -203,7 +294,7 @@
   <div class="runhead"><b>Ekosolv</b><span>Capacitación en IA y automatización de propuestas</span></div>
 
   <div class="page-head">
-    <span class="eyebrow">01 · Capacitación en IA</span>
+    <span class="eyebrow">02 · Capacitación en IA</span>
     <h2>Dos planes de capacitación los sábados</h2>
     <p>Práctica sobre documentos reales de Ekosolv: resoluciones, informes y propuestas. Cada sesión es 30% explicación y 70% trabajo en computador.</p>
   </div>
@@ -240,72 +331,272 @@
     </div>
   </section>
 
-  <div class="foot"><span>Ekosolv · Propuesta comercial</span><span>Página 2 de 6</span></div>
+  <div class="foot"><span>Ekosolv · Propuesta comercial</span><span>Página 3 de 14</span></div>
 </article>
 
-<!-- Hoja 3: automatización -->
+<!-- Hoja 3: automatización de propuestas -->
 <article class="sheet">
   <div class="runhead"><b>Ekosolv</b><span>Capacitación en IA y automatización de propuestas</span></div>
 
   <div class="page-head">
-    <span class="eyebrow">02 · Automatización</span>
-    <h2>Del Brief a la propuesta, y un agente que vigila el cumplimiento</h2>
-    <p>Todo funciona sobre el Zoho One que Ekosolv ya usa. El sistema prepara y avisa; el consultor revisa, decide y envía.</p>
-  </div>
-
-  <section class="phase">
-    <span class="phase-tag">Propuestas</span>
-    <h3>Propuesta lista para revisar el mismo día</h3>
-    <ol class="steps">
-      <li><b>Brief en Zoho CRM</b>Se registra como hoy. Con el NIT se completan los datos públicos.</li>
-      <li><b>Diagnóstico</b>Servicios que aplican, con norma, autoridad y periodicidad.</li>
-      <li><b>Borrador de propuesta</b>Sobre las plantillas de Ekosolv.</li>
-      <li><b>Estimación en Zoho Books</b>Con el catálogo de precios de Ekosolv.</li>
-      <li><b>Carpeta en WorkDrive</b>Estructura de cotización y costeo.</li>
-      <li><b>Presentación</b>PowerPoint con la marca, guardado en la carpeta.</li>
-    </ol>
-  </section>
-
-  <section class="phase f2">
-    <span class="phase-tag">Panel web y agente</span>
-    <h3>Panel web, agente de cumplimiento y oportunidades</h3>
-    <div class="blocks">
-      <div class="block">
-        <h4>Desarrollo web del panel de administración</h4>
-        <p>Página privada del equipo donde vive el agente: alertas, expedientes, documentos y reglas.</p>
-      </div>
-      <div class="block">
-        <h4>Detección de oportunidades</h4>
-        <p>Referidos desde el sitio web y WhatsApp, y servicios cruzados entre líneas (por ejemplo, EKORAEE y consultoría), directo al flujo de propuestas.</p>
-      </div>
-      <div class="block wide">
-        <h4>Agente de cumplimiento</h4>
-        <p>Trabaja con reglas tomadas de la norma y validadas por el equipo técnico de Ekosolv. Cuando encuentra algo, avisa al consultor responsable con un resumen, la norma aplicable, el plazo y la acción sugerida. Vigila hasta 50 expedientes de clientes.</p>
-        <ul class="watch">
-          <li><b>Normativa nueva.</b> Decretos, resoluciones y circulares de MinAmbiente, la ANLA y las CAR.</li>
-          <li><b>Autos de los clientes.</b> Autos, requerimientos y resoluciones en sus expedientes, con plazo.</li>
-          <li><b>Documentos.</b> ICA, PMA, permisos e informes frente a la norma, con faltantes señalados. Hasta 10 al mes.</li>
-          <li><b>Vencimientos.</b> Permisos, informes periódicos y obligaciones, con aviso previo.</li>
-        </ul>
-      </div>
-    </div>
-  </section>
-
-  <div class="foot"><span>Ekosolv · Propuesta comercial</span><span>Página 3 de 6</span></div>
-</article>
-
-<!-- Hoja 4: cronograma e inversión -->
-<article class="sheet">
-  <div class="runhead"><b>Ekosolv</b><span>Capacitación en IA y automatización de propuestas</span></div>
-
-  <div class="page-head">
-    <span class="eyebrow">03 · Cronograma e inversión</span>
-    <h2>8 semanas y una mensualidad según el volumen</h2>
-    <p>El proyecto incluye todo lo de la página 3 y toma 8 semanas. La mensualidad depende de las propuestas al mes y, si se necesita, del uso adicional del agente.</p>
+    <span class="eyebrow">03 · Automatización de propuestas</span>
+    <h2>Del Brief a la propuesta lista para revisar</h2>
+    <p>Todo funciona sobre el Zoho One que Ekosolv ya usa. El consultor registra el Brief como hoy y, el mismo día, encuentra la propuesta armada para revisar, ajustar y enviar.</p>
   </div>
 
   <section class="stack">
-    <h3>Cronograma</h3>
+    <h3>Qué pasa en cada paso</h3>
+    <ol class="flow">
+      <li><div><b>Brief en Zoho CRM</b><p>El consultor lo registra como hoy. Con el NIT, el sistema completa razón social, sector y ubicación.</p></div><span class="out">Ficha del cliente</span></li>
+      <li><div><b>Diagnóstico</b><p>Cruza el sector, la actividad y la ubicación con la norma: qué servicios aplican, ante qué autoridad y con qué periodicidad.</p></div><span class="out">Servicios con su norma</span></li>
+      <li><div><b>Borrador de propuesta</b><p>Redacta sobre las plantillas de Ekosolv: alcance, metodología, entregables y tiempos, con el tono de la empresa.</p></div><span class="out">Documento en Word</span></li>
+      <li><div><b>Estimación en Zoho Books</b><p>Arma la cotización con el catálogo de precios de Ekosolv, lista para aprobar.</p></div><span class="out">Estimación en Books</span></li>
+      <li><div><b>Carpeta en WorkDrive</b><p>Crea la estructura de cotización y costeo y guarda ahí todo lo generado.</p></div><span class="out">Carpeta organizada</span></li>
+      <li><div><b>Presentación</b><p>PowerPoint con la marca de Ekosolv para la reunión con el cliente.</p></div><span class="out">Presentación lista</span></li>
+    </ol>
+  </section>
+
+  <section class="cols">
+    <div>
+      <h3>Hoy</h3>
+      <ul class="cond plain">
+        <li>Buscar la norma que aplica a cada cliente.</li>
+        <li>Copiar y adaptar una propuesta anterior.</li>
+        <li>Cotizar a mano y pasarlo a Books.</li>
+        <li>Armar carpeta y presentación por separado.</li>
+      </ul>
+    </div>
+    <div>
+      <h3>Con el sistema</h3>
+      <ul class="cond">
+        <li>El consultor revisa un paquete ya armado.</li>
+        <li>Todas las propuestas salen con la misma estructura y calidad.</li>
+        <li>Cada servicio llega con su norma de soporte.</li>
+        <li>El equipo dedica su tiempo al criterio técnico.</li>
+      </ul>
+    </div>
+  </section>
+
+  <div class="foot"><span>Ekosolv · Propuesta comercial</span><span>Página 4 de 14</span></div>
+</article>
+
+<!-- Hoja 4: ajustes, documentos escaneados y versiones -->
+<article class="sheet">
+  <div class="runhead"><b>Ekosolv</b><span>Capacitación en IA y automatización de propuestas</span></div>
+
+  <div class="page-head">
+    <span class="eyebrow">04 · Ajustes y documentos</span>
+    <h2>Cuando llegan más documentos o cambia el alcance</h2>
+    <p>Es normal que, después de abrir una propuesta, aparezcan documentos, notas o servicios que faltaban. El sistema los incorpora sin empezar de cero y sin perder lo que ya se envió.</p>
+  </div>
+
+  <section class="stack">
+    <h3>Cómo se actualiza una propuesta</h3>
+    <ol class="flow">
+      <li><div><b>Se agrega el documento o la nota</b><p>El consultor lo sube a la misma propuesta, en Zoho CRM o en su carpeta de WorkDrive, en cualquier momento.</p></div><span class="out">Borrador de nueva versión</span></li>
+      <li><div><b>El sistema lo lee una sola vez</b><p>Saca una ficha con la autoridad, las obligaciones, los plazos y los datos clave, y la guarda para los siguientes pasos.</p></div><span class="out">Ficha del documento</span></li>
+      <li><div><b>Muestra qué cambia</b><p>Antes de reescribir, indica qué servicios, valores o secciones se modifican, por ejemplo un permiso que faltaba.</p></div><span class="out">Resumen de cambios</span></li>
+      <li><div><b>El consultor aprueba</b><p>Solo se actualizan las secciones afectadas. La versión que ya se envió al cliente queda guardada y no se sobrescribe.</p></div><span class="out">Versión 2 lista</span></li>
+    </ol>
+  </section>
+
+  <section class="cols">
+    <div>
+      <h3>Documentos escaneados y fotos</h3>
+      <ul class="cond">
+        <li>Los escaneos y las fotos de documentos se convierten a texto una sola vez.</li>
+        <li>Las páginas borrosas, cortadas o escritas a mano se señalan para cargar una mejor copia.</li>
+        <li>Las fotos de campo se guardan como anexo, con una descripción corta.</li>
+        <li>Fechas, plazos, números de expediente y cifras que salen de un escaneo quedan “por confirmar” y el consultor los revisa junto al recorte del original.</li>
+      </ul>
+    </div>
+    <div>
+      <h3>Rondas de ajuste incluidas</h3>
+      <ul class="cond">
+        <li><b>2 rondas por propuesta</b> durante 30 días desde su creación: documentos, notas o cambios de alcance.</li>
+        <li>La <b>tercera ronda</b>, o un cambio que convierta la propuesta en otro proyecto, cuenta como una propuesta nueva.</li>
+        <li>Las páginas agregadas suman para la regla de las 100 páginas.</li>
+      </ul>
+    </div>
+  </section>
+
+  <section class="closing">
+    <b>Recomendación de carga:</b> escanear en PDF a 300 dpi, un archivo por documento, y evitar fotos de WhatsApp para documentos oficiales. Con eso se evita la mayoría de los errores de lectura.
+  </section>
+
+  <div class="foot"><span>Ekosolv · Propuesta comercial</span><span>Página 5 de 14</span></div>
+</article>
+
+<!-- Hoja 5: agente de cumplimiento -->
+<article class="sheet">
+  <div class="runhead"><b>Ekosolv</b><span>Capacitación en IA y automatización de propuestas</span></div>
+
+  <div class="page-head">
+    <span class="eyebrow">05 · Agente de cumplimiento</span>
+    <h2>Un agente que vigila el cumplimiento de cada cliente</h2>
+    <p>Revisa todos los días lo que puede afectar a los clientes de Ekosolv y avisa al consultor responsable. No responde a la autoridad ni decide: prepara la información para que el consultor actúe a tiempo.</p>
+  </div>
+
+  <section class="stack">
+    <h3>Cómo trabaja</h3>
+    <ol class="pipe">
+      <li><b>Vigila</b><p>Revisa cada día normativa, expedientes y documentos.</p></li>
+      <li><b>Filtra</b><p>Descarta lo que no aplica a ningún cliente.</p></li>
+      <li><b>Lee</b><p>Saca la obligación, el plazo y el expediente.</p></li>
+      <li><b>Aplica reglas</b><p>Usa reglas de la norma validadas por Ekosolv.</p></li>
+      <li><b>Avisa</b><p>Alerta al consultor con resumen y acción sugerida.</p></li>
+    </ol>
+  </section>
+
+  <section class="stack">
+    <h3>Qué vigila</h3>
+    <div class="tbl">
+      <table class="tight watch-t">
+        <thead><tr><th>Frente</th><th>Qué revisa</th><th>Ejemplo de aviso</th></tr></thead>
+        <tbody>
+          <tr><th><b>Normativa nueva</b></th><td>Decretos, resoluciones y circulares de MinAmbiente, la ANLA y las CAR.</td><td>“Nueva resolución cambia los límites de vertimiento: afecta a 4 clientes.”</td></tr>
+          <tr><th><b>Autos de los clientes</b></th><td>Autos, requerimientos y resoluciones en sus expedientes.</td><td>“La CAR requiere información adicional al cliente X: 15 días hábiles.”</td></tr>
+          <tr><th><b>Documentos</b></th><td>ICA, PMA, permisos e informes frente a la norma. Hasta 10 al mes.</td><td>“Al ICA del cliente Y le faltan los monitoreos de ruido del semestre.”</td></tr>
+          <tr><th><b>Vencimientos</b></th><td>Permisos, informes periódicos y obligaciones de cada cliente.</td><td>“El permiso de emisiones del cliente Z vence en 60 días.”</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <div class="foot"><span>Ekosolv · Propuesta comercial</span><span>Página 6 de 14</span></div>
+</article>
+
+<!-- Hoja: una alerta por dentro -->
+<article class="sheet">
+  <div class="runhead"><b>Ekosolv</b><span>Capacitación en IA y automatización de propuestas</span></div>
+
+  <div class="page-head">
+    <span class="eyebrow">06 · Agente de cumplimiento</span>
+    <h2>Una alerta por dentro</h2>
+    <p>Así le llega una alerta al consultor, de dónde sale cada dato y qué le queda a cada quien.</p>
+  </div>
+
+  <section class="stack">
+    <h3>Así se ve una alerta <span class="unit">(ejemplo ilustrativo)</span></h3>
+    <div class="alert">
+      <div class="alert-top"><span class="pri">Prioridad alta</span><span>Autos de los clientes · hace 2 horas</span></div>
+      <h4>Requerimiento de información adicional al Cliente de ejemplo S.A.S.</h4>
+      <dl>
+        <dt>Autoridad</dt><dd>CAR de la jurisdicción · expediente del permiso de vertimientos</dd>
+        <dt>Qué pide</dt><dd>Caracterización actualizada del vertimiento y ajustes al plan de manejo.</dd>
+        <dt>Norma</dt><dd>Decreto 1076 de 2015, sección de vertimientos</dd>
+        <dt>Plazo</dt><dd>15 días hábiles desde la notificación · quedan 12</dd>
+        <dt>Acción sugerida</dt><dd>Asignar al consultor del permiso, programar muestreo y preparar la respuesta.</dd>
+      </dl>
+      <div class="alert-foot">Responsable: consultor asignado · Ver documento original</div>
+    </div>
+  </section>
+
+  <section class="stack">
+    <h3>De dónde sale cada dato</h3>
+    <div class="tbl">
+      <table class="tight">
+        <tbody>
+          <tr><th><b>Autoridad y expediente</b></th><td>Del auto, cruzado con la tabla de expedientes de Ekosolv. Así el agente sabe de qué cliente es y a quién avisar.</td></tr>
+          <tr><th><b>Qué pide</b></th><td>La IA lee el auto completo y resume lo que exige la autoridad.</td></tr>
+          <tr><th><b>Norma</b></th><td>La IA, con la base normativa cargada en el sistema.</td></tr>
+          <tr><th><b>Plazo</b></th><td>El sistema cuenta los días hábiles con el calendario de festivos de Colombia, desde la fecha de notificación. Si el auto es un escaneo, el plazo queda por confirmar.</td></tr>
+          <tr><th><b>Prioridad y acción</b></th><td>Las reglas que define el equipo técnico de Ekosolv para cada tipo de acto.</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <section class="cols">
+    <div>
+      <h3>Cómo llegan los autos</h3>
+      <ul class="cond">
+        <li><b>Buzón de notificaciones.</b> Fuente principal. Las autoridades notifican por correo y el agente lee ese buzón.</li>
+        <li><b>Gacetas y boletines públicos.</b> Complemento. Cada autoridad publica distinto, por eso la cobertura es parcial.</li>
+      </ul>
+    </div>
+    <div>
+      <h3>Quién hace qué</h3>
+      <ul class="cond">
+        <li><b>El agente</b> vigila, lee, calcula plazos y avisa.</li>
+        <li><b>El consultor</b> confirma los datos de escaneos, decide y responde a la autoridad.</li>
+      </ul>
+    </div>
+  </section>
+
+  <p class="closing">Nadie más tiene que vigilar portales, correos ni calendarios. El equipo dedica su tiempo a decidir y responder.</p>
+
+  <div class="foot"><span>Ekosolv · Propuesta comercial</span><span>Página 7 de 14</span></div>
+</article>
+
+<!-- Hoja 6: panel web, chat y oportunidades -->
+<article class="sheet">
+  <div class="runhead"><b>Ekosolv</b><span>Capacitación en IA y automatización de propuestas</span></div>
+
+  <div class="page-head">
+    <span class="eyebrow">07 · Panel web, chat y oportunidades</span>
+    <h2>Un panel para el equipo y un chat para los clientes</h2>
+    <p>El panel es una página privada de Ekosolv donde vive el agente. El chat atiende a los visitantes del sitio web. Los dos usan la misma base de conocimiento.</p>
+  </div>
+
+  <section class="stack">
+    <h3>Desarrollo web del panel de administración <span class="unit">(ilustración)</span></h3>
+    <div class="mock">
+      <div class="mock-side">
+        <b>Ekosolv</b>
+        <span class="on">Alertas</span><span>Expedientes</span><span>Vencimientos</span><span>Propuestas</span><span>Reglas</span><span>Consumo</span>
+      </div>
+      <div class="mock-main">
+        <div class="kpis">
+          <div><span>Alertas abiertas</span><b>7</b></div>
+          <div><span>Vencen esta semana</span><b>3</b></div>
+          <div><span>Propuestas del mes</span><b>12 de 20</b></div>
+        </div>
+        <ul class="mock-list">
+          <li><i class="d hi"></i><span>Requerimiento de la CAR · Cliente de ejemplo</span><em>12 días</em></li>
+          <li><i class="d md"></i><span>Nueva resolución de vertimientos · 4 clientes</span><em>Revisar</em></li>
+          <li><i class="d md"></i><span>ICA incompleto · faltan monitoreos de ruido</span><em>Revisar</em></li>
+          <li><i class="d lo"></i><span>Permiso de emisiones vence en 60 días</span><em>60 días</em></li>
+        </ul>
+      </div>
+    </div>
+    <p class="note">Cada alerta abre la ficha del expediente con el documento original, el historial y el consultor responsable. El panel también muestra el consumo del mes frente al plan contratado.</p>
+  </section>
+
+  <section class="cols">
+    <div>
+      <h3>Chat con IA en el sitio web</h3>
+      <div class="chat">
+        <p class="q">¿Qué permiso necesito para descargar aguas residuales a una quebrada?</p>
+        <p class="a">Necesita un permiso de vertimientos ante la autoridad ambiental de su jurisdicción, según el Decreto 1076 de 2015. ¿Quiere que un consultor de Ekosolv revise su caso?</p>
+      </div>
+      <p class="note">Responde con la normativa, los casos de Ekosolv y su base de conocimiento. Si hace falta, pasa la conversación a un consultor con el resumen.</p>
+    </div>
+    <div>
+      <h3>Detección de oportunidades</h3>
+      <ul class="cond">
+        <li><b>Referidos.</b> Las consultas del sitio web y WhatsApp entran directo al flujo de propuestas.</li>
+        <li><b>Servicios cruzados.</b> Si un cliente de una línea necesita otra (por ejemplo, EKORAEE y consultoría), el sistema lo señala.</li>
+        <li><b>Desde las alertas.</b> Una norma nueva que afecta a varios clientes se vuelve una oportunidad de servicio para cada uno.</li>
+      </ul>
+    </div>
+  </section>
+
+  <div class="foot"><span>Ekosolv · Propuesta comercial</span><span>Página 8 de 14</span></div>
+</article>
+
+<!<!-- Hoja 7: cronograma -->
+<article class="sheet">
+  <div class="runhead"><b>Ekosolv</b><span>Capacitación en IA y automatización de propuestas</span></div>
+
+  <div class="page-head">
+    <span class="eyebrow">08 · Cronograma</span>
+    <h2>8 semanas de desarrollo</h2>
+    <p>El proyecto incluye todo lo de las páginas 4 a 8. Arranca con el anticipo y la primera mensualidad se cobra cuando el sistema entra en funcionamiento.</p>
+  </div>
+
+  <section class="stack">
+    <h3>Semana a semana</h3>
     <div class="tbl">
       <div class="gantt" role="img" aria-label="Proyecto de 8 semanas: levantamiento semana 1, flujo de propuestas semanas 2 y 3, panel web y agente semanas 4 a 6, piloto semanas 6 y 7, chat con IA semanas 7 y 8, entrega semana 8.">
         <span class="wk" style="text-align:left">Semana</span>
@@ -322,55 +613,102 @@
   </section>
 
   <section class="stack">
+    <h3>Qué pasa en cada etapa</h3>
+    <div class="tbl">
+      <table>
+        <tbody>
+          <tr><th><b>Levantamiento</b></th><td>Plantillas, catálogo de precios en Books, matriz de servicios, tabla de expedientes y reglas del agente con el equipo técnico.</td></tr>
+          <tr><th><b>Flujo de propuestas</b></th><td>Integración con Zoho CRM, Books y WorkDrive; diagnóstico, borradores, costeo y presentación.</td></tr>
+          <tr><th><b>Panel web y agente</b></th><td>Panel de administración, conexión con el buzón de notificaciones y las fuentes públicas, reglas y alertas.</td></tr>
+          <tr><th><b>Piloto con casos reales</b></th><td>Propuestas reales en paralelo al proceso actual, ajustes de calidad y medición de la línea base.</td></tr>
+          <tr><th><b>Chat con IA en la web</b></th><td>Base de conocimiento de Ekosolv, pruebas de respuestas y paso a consultor.</td></tr>
+          <tr><th><b>Entrega y medición</b></th><td>Puesta en funcionamiento, 2 horas de capacitación con el agente y comparación contra la línea base.</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <div class="foot"><span>Ekosolv · Propuesta comercial</span><span>Página 9 de 14</span></div>
+</article>
+
+<!-- Hoja 8: inversión -->
+<article class="sheet">
+  <div class="runhead"><b>Ekosolv</b><span>Capacitación en IA y automatización de propuestas</span></div>
+
+  <div class="page-head">
+    <span class="eyebrow">09 · Inversión</span>
+    <h2>Una mensualidad según el plan</h2>
+    <p>Los tres planes incluyen lo mismo: agente, panel, chat y soporte. Lo único que cambia es cuántas propuestas se procesan al mes. Si se necesita, el agente se amplía según la demanda.</p>
+  </div>
+
+  <section class="stack">
     <h3>Inversión de la automatización</h3>
     <div class="tbl">
       <table class="tight">
-        <thead><tr><th>Propuestas al mes</th><th>Meses 1 a 18</th><th>Desde el mes 19</th></tr></thead>
+        <thead><tr><th>Plan</th><th>Meses 1 a 18</th><th>Desde el mes 19</th></tr></thead>
         <tbody class="num">
-          <tr class="lead"><th>Hasta 20</th><td><span class="price">$1.185.000</span> <span class="unit">/ mes</span></td><td>$785.000 <span class="unit">/ mes</span></td></tr>
-          <tr class="lead"><th>Hasta 40</th><td><span class="price">$1.400.000</span> <span class="unit">/ mes</span></td><td>$1.000.000 <span class="unit">/ mes</span></td></tr>
-          <tr class="lead"><th>Hasta 80</th><td><span class="price">$1.700.000</span> <span class="unit">/ mes</span></td><td>$1.300.000 <span class="unit">/ mes</span></td></tr>
-          <tr><th>Excedente</th><td colspan="2">$25.000 por propuesta sobre el nivel contratado</td></tr>
-          <tr><th>Soporte incluido</th><td>8 h al mes</td><td>8 h al mes</td></tr>
-          <tr class="group blue"><td colspan="3">Agente de cumplimiento, según demanda</td></tr>
-          <tr><th>Incluido</th><td colspan="2">Hasta 50 expedientes vigilados y 10 revisiones de documentos al mes</td></tr>
+          <tr class="group"><td colspan="3">Incluido en los tres planes</td></tr>
+          <tr><td colspan="3" class="incl">Agente de cumplimiento (50 expedientes y 10 revisiones de documentos al mes) · panel web · chat con IA en el sitio web · detección de oportunidades · 8 h de soporte al mes</td></tr>
+          <tr class="group"><td colspan="3">Lo único que cambia: propuestas al mes</td></tr>
+          <tr class="lead"><th>Inicial<br><span class="unit">hasta 20 propuestas al mes</span></th><td><span class="price">$1.185.000</span> <span class="unit">/ mes</span></td><td>$785.000 <span class="unit">/ mes</span></td></tr>
+          <tr class="lead"><th>Profesional<br><span class="unit">hasta 40 propuestas al mes</span></th><td><span class="price">$1.400.000</span> <span class="unit">/ mes</span></td><td>$1.000.000 <span class="unit">/ mes</span></td></tr>
+          <tr class="lead"><th>Empresarial<br><span class="unit">hasta 80 propuestas al mes</span></th><td><span class="price">$1.700.000</span> <span class="unit">/ mes</span></td><td>$1.300.000 <span class="unit">/ mes</span></td></tr>
+          <tr><th>Excedente</th><td colspan="2">$25.000 por propuesta sobre el plan contratado</td></tr>
+          <tr class="group blue"><td colspan="3">Uso adicional del agente, según demanda</td></tr>
           <tr><th>Expedientes adicionales</th><td colspan="2">$50.000 al mes por cada 25 expedientes</td></tr>
           <tr><th>Revisión adicional</th><td colspan="2">$20.000 por documento</td></tr>
         </tbody>
       </table>
     </div>
-    <p class="note">El desarrollo inicia con un anticipo de $500.000; la primera mensualidad se cobra en el primer mes de funcionamiento. Cada propuesta incluye 2 rondas de ajuste en 30 días; la tercera cuenta como nueva. Más de 100 páginas de documentos, sumando los agregados, cuenta como 2. Desglose en la página 5.</p>
+    <p class="note">Cada propuesta incluye 2 rondas de ajuste en 30 días; la tercera cuenta como propuesta nueva. Una propuesta con más de 100 páginas de documentos, sumando los agregados, cuenta como 2. El esquema de pago está en la página 11 y el desglose, en la página 12.</p>
   </section>
 
-<div class="foot"><span>Ekosolv · Propuesta comercial</span><span>Página 4 de 6</span></div>
-</article>
-
-<!-- Hoja 5: desglose de la mensualidad -->
+  <div class="foot"><span>Ekosolv · Propuesta comercial</span><span>Página 10 de 14</span></div>
+</article><!-- Hoja: esquema de pago -->
 <article class="sheet">
   <div class="runhead"><b>Ekosolv</b><span>Capacitación en IA y automatización de propuestas</span></div>
 
   <div class="page-head">
-    <span class="eyebrow">04 · Qué paga la mensualidad</span>
-    <h2>Desglose de la mensualidad</h2>
-    <p>Tres partes fijas y una que depende del volumen. Desde el mes 19 ya no se paga construcción.</p>
+    <span class="eyebrow">10 · Esquema de pago</span>
+    <h2>Cómo se paga</h2>
+    <p>Un anticipo para arrancar el desarrollo, ocho semanas sin mensualidad y, desde que el sistema funciona, una mensualidad fija según el plan.</p>
   </div>
 
   <section class="stack">
-    <h3>Componentes</h3>
+    <h3>Automatización <span class="unit">(ejemplo con el plan Inicial)</span></h3>
+    <ol class="paytl">
+      <li><span class="when">Al firmar</span><b>$500.000</b><p>Anticipo único para iniciar el desarrollo. Se suma al valor de la construcción.</p></li>
+      <li><span class="when">Semanas 1 a 8</span><b>$0</b><p>Desarrollo del sistema. No se cobra mensualidad mientras se construye.</p></li>
+      <li><span class="when">Meses 1 a 18</span><b>$1.185.000 <i>/ mes</i></b><p>Desde el primer mes de funcionamiento. Incluye la cuota de construcción.</p></li>
+      <li><span class="when">Desde el mes 19</span><b>$785.000 <i>/ mes</i></b><p>La construcción ya está pagada; quedan infraestructura, funcionamiento e IA.</p></li>
+    </ol>
+  </section>
+
+  <section class="stack">
+    <h3>Por plan</h3>
     <div class="tbl">
-      <table class="tight comp">
-        <thead><tr><th>Componente</th><th>Hasta 20</th><th>Hasta 40</th><th>Hasta 80</th></tr></thead>
+      <table class="tight paytab">
+        <thead><tr><th>Plan</th><th>Al firmar</th><th>Semanas 1 a 8</th><th>Meses 1 a 18</th><th>Desde el mes 19</th></tr></thead>
         <tbody class="num">
-          <tr class="group"><td colspan="4">Meses 1 a 18</td></tr>
-          <tr><th><b>Construcción</b><br>Desarrollo de todo lo de la página 3: anticipo de $500.000 más 18 cuotas</th><td>$400.000</td><td>$400.000</td><td>$400.000</td></tr>
-          <tr><th><b>Infraestructura</b><br>Servidores, base de datos, almacenamiento y copias de seguridad</th><td>$150.000</td><td>$150.000</td><td>$150.000</td></tr>
-          <tr><th><b>Funcionamiento</b><br>Operación diaria, mantenimiento y 8 h de soporte</th><td>$350.000</td><td>$350.000</td><td>$350.000</td></tr>
-          <tr><th><b>Consumo de IA</b><br>Propuestas, agente y chat, según el nivel</th><td>$285.000</td><td>$500.000</td><td>$800.000</td></tr>
-          <tr class="total"><th><b>Total al mes</b></th><td><span class="price">$1.185.000</span></td><td><span class="price">$1.400.000</span></td><td><span class="price">$1.700.000</span></td></tr>
-          <tr class="group"><td colspan="4">Desde el mes 19</td></tr>
-          <tr><th><b>Construcción</b><br>Ya pagada</th><td>$0</td><td>$0</td><td>$0</td></tr>
-          <tr><th><b>Infraestructura, funcionamiento y consumo de IA</b><br>Iguales a los meses 1 a 18</th><td>$785.000</td><td>$1.000.000</td><td>$1.300.000</td></tr>
-          <tr class="total"><th><b>Total al mes</b></th><td><span class="price">$785.000</span></td><td><span class="price">$1.000.000</span></td><td><span class="price">$1.300.000</span></td></tr>
+          <tr><th><b>Inicial</b></th><td>$500.000</td><td>$0</td><td><b>$1.185.000</b></td><td>$785.000</td></tr>
+          <tr><th><b>Profesional</b></th><td>$500.000</td><td>$0</td><td><b>$1.400.000</b></td><td>$1.000.000</td></tr>
+          <tr><th><b>Empresarial</b></th><td>$500.000</td><td>$0</td><td><b>$1.700.000</b></td><td>$1.300.000</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <p class="note">El anticipo se paga una sola vez y se suma al valor de la construcción. Los meses se cuentan desde el primer mes de funcionamiento.</p>
+  </section>
+
+  <section class="stack">
+    <h3>Capacitación</h3>
+    <div class="tbl">
+      <table class="tight paytab">
+        <thead><tr><th>Plan</th><th>Al confirmar la fecha</th><th>Al terminar</th><th>Total</th></tr></thead>
+        <tbody class="num">
+          <tr><th><b>Esencial</b><br><span class="unit">con la automatización</span></th><td>$300.000</td><td>$300.000</td><td><b>$600.000</b></td></tr>
+          <tr><th><b>Completo</b><br><span class="unit">con la automatización</span></th><td>$500.000</td><td>$500.000</td><td><b>$1.000.000</b></td></tr>
+          <tr><th><b>Esencial</b><br><span class="unit">contratada sola</span></th><td>$400.000</td><td>$400.000</td><td><b>$800.000</b></td></tr>
+          <tr><th><b>Completo</b><br><span class="unit">contratada sola</span></th><td>$700.000</td><td>$700.000</td><td><b>$1.400.000</b></td></tr>
         </tbody>
       </table>
     </div>
@@ -390,15 +728,49 @@
     </div>
   </section>
 
-  <div class="foot"><span>Ekosolv · Propuesta comercial</span><span>Página 5 de 6</span></div>
+  <div class="foot"><span>Ekosolv · Propuesta comercial</span><span>Página 11 de 14</span></div>
 </article>
 
-<!-- Hoja 6: condiciones y próximos pasos -->
-<article class="sheet dense">
+<!-- Hoja 9: desglose de la mensualidad -->
+<article class="sheet">
   <div class="runhead"><b>Ekosolv</b><span>Capacitación en IA y automatización de propuestas</span></div>
 
   <div class="page-head">
-    <span class="eyebrow">05 · Condiciones y próximos pasos</span>
+    <span class="eyebrow">11 · Qué paga la mensualidad</span>
+    <h2>Desglose de la mensualidad</h2>
+    <p>La mensualidad tiene tres partes fijas y una que depende del plan. Al terminar de pagar la construcción, en el mes 19, la mensualidad baja.</p>
+  </div>
+
+  <section class="stack">
+    <h3>Componentes</h3>
+    <div class="tbl">
+      <table class="tight comp">
+        <thead><tr><th>Componente</th><th>Inicial<br><span class="unit">hasta 20</span></th><th>Profesional<br><span class="unit">hasta 40</span></th><th>Empresarial<br><span class="unit">hasta 80</span></th></tr></thead>
+        <tbody class="num">
+          <tr class="group"><td colspan="4">Meses 1 a 18</td></tr>
+          <tr><th><b>Construcción</b><br>Desarrollo de todo lo de las páginas 4 a 8: anticipo de $500.000 más 18 cuotas</th><td>$400.000</td><td>$400.000</td><td>$400.000</td></tr>
+          <tr><th><b>Infraestructura</b><br>Servidores, base de datos, almacenamiento y copias de seguridad</th><td>$150.000</td><td>$150.000</td><td>$150.000</td></tr>
+          <tr><th><b>Funcionamiento</b><br>Operación diaria, mantenimiento y 8 h de soporte</th><td>$350.000</td><td>$350.000</td><td>$350.000</td></tr>
+          <tr><th><b>Consumo de IA</b><br>Propuestas, agente y chat, según el plan</th><td>$285.000</td><td>$500.000</td><td>$800.000</td></tr>
+          <tr class="total"><th><b>Total al mes</b></th><td><span class="price">$1.185.000</span></td><td><span class="price">$1.400.000</span></td><td><span class="price">$1.700.000</span></td></tr>
+          <tr class="group"><td colspan="4">Desde el mes 19</td></tr>
+          <tr><th><b>Construcción</b><br>Ya pagada</th><td>$0</td><td>$0</td><td>$0</td></tr>
+          <tr><th><b>Infraestructura, funcionamiento y consumo de IA</b><br>Iguales a los meses 1 a 18</th><td>$785.000</td><td>$1.000.000</td><td>$1.300.000</td></tr>
+          <tr class="total"><th><b>Total al mes</b></th><td><span class="price">$785.000</span></td><td><span class="price">$1.000.000</span></td><td><span class="price">$1.300.000</span></td></tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <div class="foot"><span>Ekosolv · Propuesta comercial</span><span>Página 12 de 14</span></div>
+</article>
+
+<!-- Hoja 10: condiciones -->
+<article class="sheet">
+  <div class="runhead"><b>Ekosolv</b><span>Capacitación en IA y automatización de propuestas</span></div>
+
+  <div class="page-head">
+    <span class="eyebrow">12 · Condiciones</span>
     <h2>Condiciones</h2>
   </div>
 
@@ -418,31 +790,67 @@
       <h3>Automatización</h3>
       <ul class="cond">
         <li>Plazo mínimo de 18 meses. Si el contrato termina antes, se liquida el saldo pendiente de la construcción.</li>
-        <li>Soporte por correo o el panel, sin atención inmediata: errores urgentes en 12 horas hábiles desde el reporte, lo demás en 24. Las 8 h no son acumulables y cubren errores y ajustes, no funciones nuevas, que se cotizan aparte bajo acuerdo previo.</li>
-        <li>El nivel de volumen se elige al firmar y se cambia con un mes de aviso.</li>
+        <li>Soporte por correo o el panel, sin atención inmediata. Los errores urgentes se revisan dentro de las 12 horas hábiles siguientes al reporte; el soporte normal, dentro de las 24 horas hábiles.</li>
+        <li>Las 8 h de soporte no son acumulables y cubren errores y ajustes. Las funciones nuevas se cotizan aparte, bajo acuerdo previo.</li>
+        <li>El plan se elige al firmar y se cambia con un mes de aviso.</li>
         <li>Las tarifas se confirman con el consumo real de las primeras 4 semanas de operación.</li>
         <li>Ajuste anual por IPC. Si la TRM varía más del 10% o el proveedor de IA cambia sus tarifas, el consumo de IA se ajusta en la misma proporción.</li>
-        <li>El sistema genera borradores y alertas con reglas validadas por Ekosolv; la decisión técnica y el envío al cliente son del consultor.</li>
-        <li>El agente vigila hasta 50 expedientes y revisa hasta 10 documentos al mes; lo adicional se cobra según la página 4. Donde una autoridad no publica en línea, la cobertura es parcial.</li>
+        <li>El sistema genera borradores y alertas. La decisión técnica y el envío al cliente son del consultor.</li>
+        <li>Las reglas del diagnóstico y del agente las valida el equipo técnico de Ekosolv antes de entrar en uso.</li>
+        <li>El agente vigila hasta 50 expedientes y revisa hasta 10 documentos al mes; lo adicional se cobra según la página 10. Donde una autoridad no publica en línea, la cobertura es parcial.</li>
         <li>El chat solo usa información aprobada por Ekosolv, sin datos personales de clientes.</li>
-        <li>Propuestas en español y PowerPoint. No incluye inglés, Zoho Show, migración de datos históricos, prospección en frío ni compra de bases de datos.</li>
+        <li>Propuesta y presentación en español, en PowerPoint. Inglés y Zoho Show se cotizan aparte.</li>
+        <li>No incluye migración de datos históricos, prospección en frío ni compra de bases de datos.</li>
       </ul>
     </div>
   </section>
 
+  <div class="foot"><span>Ekosolv · Propuesta comercial</span><span>Página 13 de 14</span></div>
+</article>
+
+<!-- Hoja 11: próximos pasos -->
+<article class="sheet">
+  <div class="runhead"><b>Ekosolv</b><span>Capacitación en IA y automatización de propuestas</span></div>
+
+  <div class="page-head">
+    <span class="eyebrow">13 · Próximos pasos</span>
+    <h2>Lo que necesitamos para empezar</h2>
+    <p>Con esta información arrancamos la capacitación y el levantamiento del proyecto.</p>
+  </div>
+
   <section class="stack">
-    <h3>Lo que necesitamos de Ekosolv</h3>
+    <h3>Para la capacitación</h3>
     <ol class="check">
-      <li>Plan de capacitación, fecha, participantes y sus cuentas de Claude</li>
+      <li>Plan elegido, fecha de inicio y participantes</li>
+      <li>Una cuenta de Claude (Pro o Team) por participante</li>
+      <li>3 o 4 documentos de trabajo, una semana antes</li>
+      <li>Sala con proyector e internet, si es presencial</li>
+    </ol>
+  </section>
+
+  <section class="stack">
+    <h3>Para la automatización</h3>
+    <ol class="check">
       <li>Propuestas al mes y horas que toma cada una</li>
       <li>3 a 5 propuestas recientes con presentación y costeo</li>
       <li>Plantillas de propuesta, presentación y costeo</li>
       <li>Dónde están hoy los precios: Books, Excel u otro</li>
       <li>Administrador de Zoho CRM y usuario de integración</li>
       <li>Responsable técnico para validar las reglas (4 a 6 h)</li>
-      <li>Autoridades y expedientes que vigilará el agente</li>
     </ol>
   </section>
 
-  <div class="foot"><span>Ekosolv · Propuesta comercial</span><span>Página 6 de 6</span></div>
+  <section class="stack">
+    <h3>Para el agente de cumplimiento</h3>
+    <ol class="check">
+      <li>Tabla de expedientes: cliente, autoridad, número y consultor responsable</li>
+      <li>Buzón de correo para las notificaciones de los clientes</li>
+      <li>Cláusula de autorización de notificaciones en los contratos de Ekosolv</li>
+      <li>Autoridades y fuentes públicas que se deben vigilar</li>
+    </ol>
+  </section>
+
+  <p class="closing">Con el plan de capacitación y la fecha confirmados apartamos los sábados. Con la línea base y las muestras cerramos las cifras definitivas de la automatización.</p>
+
+  <div class="foot"><span>Ekosolv · Propuesta comercial</span><span>Página 14 de 14</span></div>
 </article>
