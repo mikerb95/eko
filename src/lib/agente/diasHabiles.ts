@@ -143,6 +143,22 @@ export function venceDiasCalendario(fechaNotificacion: string, n: number): strin
 }
 
 /**
+ * Último día de un plazo en meses: el mismo día del mes de vencimiento (o el
+ * último día de ese mes si no existe, como el 31 de febrero), corrido al
+ * siguiente hábil si cae en día no hábil.
+ */
+export function venceMeses(fechaNotificacion: string, n: number): string {
+  if (!Number.isInteger(n) || n < 1) throw new Error(`Plazo inválido: ${n}`)
+  const d = aFecha(fechaNotificacion)
+  const anio = d.getUTCFullYear()
+  const mes = d.getUTCMonth() + n
+  const ultimoDia = new Date(Date.UTC(anio, mes + 1, 0)).getUTCDate()
+  let r = new Date(Date.UTC(anio, mes, Math.min(d.getUTCDate(), ultimoDia)))
+  while (!esHabil(aIso(r))) r = masDias(r, 1)
+  return aIso(r)
+}
+
+/**
  * Días hábiles que quedan entre hoy y el vencimiento, contando el día del
  * vencimiento y sin contar hoy. 0 significa que vence hoy; negativo, vencido.
  */

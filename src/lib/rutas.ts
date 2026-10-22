@@ -10,7 +10,7 @@
  * Al añadir una página nueva, añadirla aquí.
  */
 
-import { FOUNDED_YEAR, tonnesManaged } from './brand'
+import { FOUNDED_YEAR, tonnesManaged } from './brand.ts'
 
 export interface Ruta {
   path: string
