@@ -177,6 +177,14 @@ export const TABLAS: readonly string[] = [
 
   `CREATE UNIQUE INDEX IF NOT EXISTS actos_hash ON actos (hash) WHERE hash <> ''`,
 
+  // El archivo original, aparte de `actos` para que listar actos no arrastre
+  // megas de base64. Sirve para "ver documento original" y para reprocesar.
+  // En la fase siguiente esto pasa a almacenamiento de archivos (Blob).
+  `CREATE TABLE IF NOT EXISTS actos_archivos (
+    acto_id INTEGER PRIMARY KEY,
+    contenido TEXT NOT NULL DEFAULT ''
+  )`,
+
   // Alertas para el consultor. `por_confirmar` = 1 cuando un dato crítico
   // (plazo, expediente) salió con baja confianza y hay que revisarlo contra el
   // original antes de actuar.
@@ -244,6 +252,7 @@ export const COLUMNAS: readonly (readonly [tabla: string, columna: string])[] = 
 /** Tablas que deben existir al terminar. Sirve para verificar tras migrar. */
 export const TABLAS_ESPERADAS: readonly string[] = [
   'actos',
+  'actos_archivos',
   'alertas',
   'contacts',
   'expedientes',
