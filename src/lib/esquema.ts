@@ -226,6 +226,14 @@ export const TABLAS: readonly string[] = [
     activa INTEGER NOT NULL DEFAULT 1,
     updated_at TEXT NOT NULL DEFAULT ''
   )`,
+
+  // Ajustes sueltos de la app, una fila por clave. Hoy solo el gasto diario
+  // del asesor con IA del sitio (src/lib/asesor/presupuesto.ts).
+  `CREATE TABLE IF NOT EXISTS ajustes (
+    clave TEXT PRIMARY KEY,
+    valor TEXT NOT NULL,
+    actualizado TEXT NOT NULL
+  )`,
 ]
 
 /**
@@ -253,6 +261,7 @@ export const COLUMNAS: readonly (readonly [tabla: string, columna: string])[] = 
 export const TABLAS_ESPERADAS: readonly string[] = [
   'actos',
   'actos_archivos',
+  'ajustes',
   'alertas',
   'contacts',
   'expedientes',

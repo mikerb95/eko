@@ -1,0 +1,54 @@
+/* Agente de cumplimiento: complementa admin.css con lo propio de las alertas. */
+
+.banner-aviso { background: #fff7e6; color: #8a5a00; padding: 10px 24px; font-size: 13px; border-bottom: 1px solid #f3e2bd; }
+.banner-aviso code { font-size: 12px; }
+.intro { margin: -6px 0 16px; font-size: 13px; }
+.nota-modelo { font-size: 12px; margin-top: 12px; }
+
+.kpis { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; margin-bottom: 22px; }
+.kpis > div { background: var(--paper); border: 1px solid var(--line); border-radius: var(--radius); padding: 14px 16px; display: flex; flex-direction: column; gap: 4px; }
+.kpis span { font-size: 12px; color: var(--mute); }
+.kpis b { font-size: 24px; font-weight: 600; line-height: 1.1; }
+.kpis b i { font-style: normal; font-size: 13px; color: var(--mute); font-weight: 500; }
+
+.card-form { background: var(--paper); border: 1px solid var(--line); border-radius: var(--radius); padding: 22px; display: flex; flex-direction: column; gap: 16px; max-width: 640px; }
+
+/* Tarjeta de alerta. La prioridad se marca con una etiqueta de color, no con
+   una franja lateral. */
+.alerta { background: var(--paper); border: 1px solid var(--line); border-radius: var(--radius); padding: 16px 18px; display: flex; flex-direction: column; gap: 10px; }
+.alerta.cerrada { opacity: .65; }
+.alerta-top { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; font-size: 12px; color: var(--mute); }
+.alerta-top .sp { margin-left: auto; }
+.pri { font-size: 11px; font-weight: 600; padding: 2px 9px; border-radius: 999px; text-transform: uppercase; letter-spacing: .04em; }
+.pri.alta { background: #fbe8e4; color: #b4462f; }
+.pri.media { background: #f6eee4; color: #8a5f37; }
+.pri.baja { background: #e6f4f2; color: #037a71; }
+.alerta h3 { margin: 0; font-size: 15px; }
+.alerta .que { margin: 0; white-space: pre-line; color: var(--ink-2); font-size: 13.5px; }
+.datos { display: grid; grid-template-columns: 130px 1fr; gap: 4px 14px; margin: 0; font-size: 13px; }
+.datos dt { color: var(--mute); }
+.datos dd { margin: 0; }
+.plazo-chip { display: inline-block; font-size: 12px; font-weight: 600; padding: 1px 8px; border-radius: 6px; margin-left: 6px; background: var(--paper-2); }
+.plazo-chip.urgente { background: #fbe8e4; color: #b4462f; }
+.plazo-chip.vencido { background: #b4462f; color: #fff; }
+.confirmar { background: #fff7e6; border-radius: 9px; padding: 9px 12px; font-size: 12.5px; color: #8a5a00; display: flex; gap: 10px; align-items: center; justify-content: space-between; }
+.alerta-acciones { display: flex; gap: 6px; flex-wrap: wrap; align-items: center; }
+.alerta-acciones .sp { margin-left: auto; }
+.alerta-acciones input { width: auto; flex: 1; min-width: 200px; padding: 7px 10px; font-size: 13px; }
+
+.regla { background: var(--paper); border: 1px solid var(--line); border-radius: var(--radius); padding: 14px 16px; display: grid; grid-template-columns: 1.2fr 130px 120px auto; gap: 10px; align-items: end; }
+.regla .accion { grid-column: 1 / -1; }
+
+.estado-acto.procesado { background: #e6f4f2; color: #037a71; }
+.estado-acto.error { background: #fbe8e4; color: #b4462f; }
+.estado-acto.sin_clave, .estado-acto.pendiente { background: #fff7e6; color: #8a5a00; }
+
+.leyendo { display: inline-flex; align-items: center; gap: 8px; }
+.leyendo::before { content: ""; width: 14px; height: 14px; border-radius: 50%; border: 2px solid var(--line); border-top-color: var(--deep); animation: gira .8s linear infinite; }
+@keyframes gira { to { transform: rotate(360deg); } }
+
+@media (max-width: 720px) {
+  .kpis { grid-template-columns: 1fr 1fr; }
+  .regla { grid-template-columns: 1fr; }
+  .datos { grid-template-columns: 1fr; }
+}

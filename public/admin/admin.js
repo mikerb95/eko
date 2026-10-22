@@ -12,7 +12,8 @@ const role = window.__ROLE__ || ''
 const esc = (s) => String(s ?? '').replace(/[&<>"]/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]))
 
 /* ---------- Tabs ---------- */
-$$('.tab').forEach((t) => t.addEventListener('click', () => {
+// Los enlaces con aspecto de pestaña (Cumplimiento) navegan a otra página.
+$$('.tab[data-tab]').forEach((t) => t.addEventListener('click', () => {
   $$('.tab').forEach((x) => x.classList.remove('is-active'))
   $$('.panel').forEach((x) => x.classList.remove('is-active'))
   t.classList.add('is-active')
