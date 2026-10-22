@@ -1,0 +1,182 @@
+---
+export const prerender = false
+import { listarActos, listarAlertas, listarExpedientes, listarReglas } from '../../lib/agente/datos'
+import { habilesRestantes, hoyEnBogota } from '../../lib/agente/diasHabiles'
+import { iaConfigurada, modeloAgente } from '../../lib/agente/ia'
+
+// Todo se carga en el servidor y el script del cliente solo pinta y envía
+// cambios, igual que el panel principal.
+let errorCarga = ''
+let alertas: any[] = []
+let expedientes: any[] = []
+let reglas: any[] = []
+let actos: any[] = []
+const hoy = hoyEnBogota()
+try {
+  ;[alertas, expedientes, reglas, actos] = await Promise.all([listarAlertas(), listarExpedientes(), listarReglas(), listarActos()])
+  alertas = alertas.map((a) => ({ ...a, restantes: a.vence_el ? habilesRestantes(hoy, a.vence_el) : null }))
+} catch (e: any) {
+  console.error('[cumplimiento] carga', e?.stack || e)
+  errorCarga = 'No se pudo cargar la información del agente.'
+}
+// Los actos viajan sin la extracción completa: el panel solo necesita el estado.
+const actosLigeros = actos.map(({ extraccion, ...a }) => ({ ...a, resumen: extraccion?.resumen ?? '' }))
+const user = Astro.locals.user || ''
+const role = Astro.locals.role || ''
+const puedeEscribir = role === 'admin' || role === 'consultor'
+const conIA = iaConfigurada()
+const modelo = modeloAgente()
+const abiertas = alertas.filter((a) => a.estado === 'abierta' || a.estado === 'en_curso')
+const kpis = {
+  abiertas: abiertas.length,
+  semana: abiertas.filter((a) => a.restantes !== null && a.restantes <= 5).length,
+  confirmar: abiertas.filter((a) => a.por_confirmar).length,
+  expedientes: expedientes.filter((e) => e.activo).length,
+}
+---
+
+<!DOCTYPE html>
+<html lang="es">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="robots" content="noindex, nofollow" />
+    <link rel="icon" href="/favicon.ico" sizes="any" />
+    <title>Cumplimiento · EKOSOLV</title>
+    <link rel="stylesheet" href="/admin/admin.css" />
+    <link rel="stylesheet" href="/admin/cumplimiento.css" />
+  </head>
+  <body>
+    <header class="admin-top">
+      <div class="brand-mini">
+        <img src="/brand/ekosolv-horizontal.png" alt="EKOSOLV" />
+        <span class="tag">Cumplimiento</span>
+      </div>
+      <div class="top-right">
+        <span class="muted">Sesión: {user}{role ? ` · ${role}` : ''}</span>
+        <a href="/admin" class="btn-ghost">← Panel</a>
+      </div>
+    </header>
+
+    {errorCarga && <div class="banner-error">{errorCarga}</div>}
+    {!conIA && (
+      <div class="banner-aviso">
+        Falta <code>ANTHROPIC_API_KEY</code>. Los documentos que subas quedan guardados y se leen cuando se configure la clave.
+      </div>
+    )}
+
+    <nav class="tabs">
+      <button class="tab is-active" data-tab="alertas">Alertas <span class="count">{kpis.abiertas}</span></button>
+      {puedeEscribir && <button class="tab" data-tab="subir">Subir acto</button>}
+      <button class="tab" data-tab="expedientes">Expedientes <span class="count">{kpis.expedientes}</span></button>
+      <button class="tab" data-tab="reglas">Reglas</button>
+      <button class="tab" data-tab="actos">Historial <span class="count">{actos.length}</span></button>
+    </nav>
+
+    <main class="admin-main">
+      <!-- ALERTAS -->
+      <section id="panel-alertas" class="panel is-active">
+        <div class="kpis">
+          <div><span>Alertas abiertas</span><b>{kpis.abiertas}</b></div>
+          <div><span>Vencen en 5 días hábiles o menos</span><b>{kpis.semana}</b></div>
+          <div><span>Por confirmar</span><b>{kpis.confirmar}</b></div>
+          <div><span>Expedientes vigilados</span><b>{kpis.expedientes}<i>/50</i></b></div>
+        </div>
+        <div class="panel-head">
+          <h2>Alertas</h2>
+          <select id="alerta-filtro" class="icon-btn" title="Filtrar">
+            <option value="activas">Abiertas y en curso</option>
+            <option value="confirmar">Por confirmar</option>
+            <option value="cerradas">Cerradas y descartadas</option>
+            <option value="">Todas</option>
+          </select>
+        </div>
+        <div id="alerta-list" class="list"></div>
+      </section>
+
+      <!-- SUBIR -->
+      {puedeEscribir && (
+        <section id="panel-subir" class="panel">
+          <div class="panel-head"><h2>Subir un acto administrativo</h2></div>
+          <form id="subir-form" class="card-form">
+            <label>Documento
+              <input type="file" name="archivo" accept="application/pdf,image/png,image/jpeg,text/plain" required />
+              <small>PDF, imagen (PNG o JPG) o texto, de hasta 4 MB. Si es un escaneo, que se lea bien: las páginas borrosas quedan marcadas para confirmar.</small>
+            </label>
+            <label>Fecha de notificación
+              <input type="date" name="fecha_notificacion" max={hoy} />
+              <small>El plazo corre desde el día hábil siguiente a esta fecha. Si la dejas vacía, se calcula desde la fecha del acto y la alerta queda por confirmar.</small>
+            </label>
+            <div class="drawer-actions">
+              <button type="submit" class="btn-primary"><span class="t">Leer y crear alerta</span></button>
+              <span id="subir-estado" class="muted"></span>
+              <p class="form-error" id="subir-err"></p>
+            </div>
+          </form>
+          <p class="muted nota-modelo">Lectura con {modelo}. El consultor siempre revisa la alerta antes de actuar.</p>
+        </section>
+      )}
+
+      <!-- EXPEDIENTES -->
+      <section id="panel-expedientes" class="panel">
+        <div class="panel-head">
+          <h2>Expedientes vigilados</h2>
+          {puedeEscribir && <button class="btn-primary" id="nuevo-exp">+ Nuevo expediente</button>}
+        </div>
+        <div id="exp-list" class="list"></div>
+      </section>
+
+      <!-- REGLAS -->
+      <section id="panel-reglas" class="panel">
+        <div class="panel-head"><h2>Reglas por tipo de acto</h2></div>
+        <p class="muted intro">La prioridad base de cada tipo de acto y la acción que se sugiere. Si quedan tantos días hábiles o menos, la alerta sube a prioridad alta.</p>
+        <div id="regla-list" class="list"></div>
+      </section>
+
+      <!-- HISTORIAL -->
+      <section id="panel-actos" class="panel">
+        <div class="panel-head">
+          <h2>Documentos recibidos</h2>
+          {puedeEscribir && <button class="btn-ghost" id="procesar-pendientes">Procesar pendientes</button>}
+        </div>
+        <div id="acto-list" class="list"></div>
+      </section>
+    </main>
+
+    <!-- EXPEDIENTE -->
+    <div class="drawer" id="exp-drawer" hidden>
+      <div class="drawer-bg" data-close></div>
+      <div class="drawer-panel">
+        <div class="drawer-head"><h3 id="exp-titulo">Expediente</h3><button class="x" data-close>×</button></div>
+        <form id="exp-form" class="drawer-body">
+          <input type="hidden" name="id" />
+          <div class="grid2">
+            <label>Cliente<input name="cliente" required /></label>
+            <label>NIT<input name="nit" placeholder="900123456-7" /></label>
+          </div>
+          <div class="grid2">
+            <label>Autoridad<input name="autoridad" placeholder="CAR Cundinamarca, ANLA…" /></label>
+            <label>Número de expediente<input name="numero" required placeholder="Como aparece en los autos" /></label>
+          </div>
+          <label>Tipo de permiso o trámite<input name="tipo_permiso" placeholder="Permiso de vertimientos, licencia ambiental…" /></label>
+          <div class="grid2">
+            <label>Consultor responsable<input name="responsable" /></label>
+            <label>Correo del responsable<input name="responsable_email" type="email" /></label>
+          </div>
+          <label>Notas<textarea name="notas" rows="3"></textarea></label>
+          <label class="check"><input type="checkbox" name="activo" checked /> Vigilar este expediente</label>
+          <div class="drawer-actions">
+            <button type="button" class="btn-ghost" data-close>Cancelar</button>
+            <button type="submit" class="btn-primary"><span class="t">Guardar</span></button>
+            <p class="form-error" id="exp-err"></p>
+          </div>
+        </form>
+      </div>
+    </div>
+
+    <script is:inline define:vars={{ alertas, expedientes, reglas, actos: actosLigeros, puedeEscribir }}>
+      window.__AGENTE__ = { alertas, expedientes, reglas, actos, puedeEscribir }
+    </script>
+    <script src="/admin/cumplimiento.js" type="module"></script>
+  </body>
+</html>
