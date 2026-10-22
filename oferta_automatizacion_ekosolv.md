@@ -110,12 +110,15 @@ empezar tomamos la línea base con Ekosolv (**PENDIENTE**: propuestas al mes y h
 
 | Semana | Fase 1 |
 |---|---|
-| 1 a 2 | Levantamiento: plantillas, catálogo en Books, matriz de servicios |
-| 3 a 5 | Construcción del flujo e integraciones con Zoho |
-| 6 a 7 | Piloto en paralelo con propuestas reales y ajustes de calidad |
-| 8 | Entrega, capacitación y medición contra la línea base |
+| 1 | Levantamiento: plantillas, catálogo en Books, matriz de servicios |
+| 2 | Construcción del flujo e integraciones con Zoho |
+| 3 | Piloto en paralelo con propuestas reales y ajustes de calidad |
+| 4 | Entrega, capacitación y medición contra la línea base |
 
-La Fase 2 toma 4 semanas adicionales y puede empezar al terminar la Fase 1 o más adelante.
+La Fase 2 (panel web, agente y oportunidades) toma 4 semanas adicionales, de la 5 a la 8, y puede
+empezar al terminar la Fase 1 o más adelante. Total: 8 semanas.
+
+> **2026-10-21:** Mike redujo el tiempo de desarrollo a la mitad (antes 8 + 7 = 15 semanas).
 
 ---
 
@@ -205,7 +208,7 @@ competencia.
 ## 9. Riesgos internos
 
 - [ ] **Calidad de la IA sin muestras reales.** No prometer nivel de redacción antes de probar con
-      propuestas de Ekosolv. El piloto en paralelo (semanas 6 y 7) existe para esto.
+      propuestas de Ekosolv. El piloto en paralelo (semana 3) existe para esto.
 - [ ] **La matriz perfil-norma** del selector "¿Qué le exige la ANLA?" sigue sin validar por Ekosolv.
       Es la base del diagnóstico: si está mal, el sistema recomienda mal. Su validación es requisito
       de la Fase 1.
@@ -233,9 +236,9 @@ hasta 12 participantes, presencial en la oficina de Ekosolv o virtual.
 | Sesiones | 2 sábados de 3 h (6 h) | 4 sábados de 3 h (12 h) |
 | Fechas propuestas | 7 y 14 de noviembre | 7, 14, 21 y 28 de noviembre |
 | Material | Guía y biblioteca de instrucciones | + espacios de trabajo por área y borrador de política de uso de IA |
-| Precio | $600.000 | $1.200.000 |
+| Precio | $600.000 | $1.000.000 |
 
-Pago 50% al confirmar la fecha y 50% al terminar. Las licencias de IA las paga Ekosolv.
+Pago 50% al confirmar la fecha y 50% al terminar. Cada participante necesita suscripción a Claude (Pro o Team), contratada por Ekosolv antes de la primera sesión.
 
 **Contenido:** S1 fundamentos, cómo pedir y qué no subir (Ley 1581). S2 documentos largos (EIA, PMA,
 ICA), revisión normativa con fuente, borradores de informe y propuesta. S3 proyectos con conocimiento
@@ -244,17 +247,17 @@ Zoho y correo, casos por área y reglas internas de uso.
 
 ### Precio (interno)
 
-- **2026-10-21: tarifa por hora, $100.000/h.** Esencial (6 h) $600.000, Completo (12 h) $1.200.000.
+- **2026-10-21: tarifa por hora, $100.000/h.** Esencial (6 h) $600.000, Completo (12 h) $1.200.000, y luego Completo bajó a $1.000.000.
   Historial: $2.400.000 / $4.200.000, luego a la mitad ($1.200.000 / $2.100.000), luego a $70.000 y
   $80.000/h, y quedó en $100.000/h. La preparación del material va incluida en la tarifa.
 - **Sin acompañamiento posterior:** Mike solo atiende los sábados contratados. No ofrecer soporte por
   chat después de la última sesión.
 - Coherente con agosto: allá se declararon 7 h en $3.200.000 (unos $457.000/h) como regalo de cierre.
   Si Mario saca esa comparación, la respuesta es que este programa es a la medida y con material propio.
-- **PENDIENTE** confirmar si Mike factura con IVA. En el doc del cliente no se mencionó IVA.
+- Mike no factura con IVA: los precios son finales y la propuesta no menciona IVA.
 - **Palancas, en orden:** 10% de descuento por pago completo anticipado; subir el cupo a 15 personas
   sin costo; si firma la automatización en los 60 días siguientes, el sábado 4 hace también de
-  levantamiento de la Fase 1 (ahorra horas de las semanas 1 y 2).
+  levantamiento de la Fase 1 (ahorra horas de la semana 1).
 - **No ceder:** el 50% antes de empezar.
 - Valor estratégico: la capacitación pone a Mike frente a todo el equipo y deja recogidas las
   plantillas y documentos reales que pide la sección 4. Usar los sábados para tomar la línea base de
@@ -273,21 +276,22 @@ Asunto: RE: PROPUESTA AUTOMATIZACIÓN e IA PARA EKOSOLV
 > Para la capacitación armé dos planes, los dos en sábado de 8:00 a 11:00 a. m.:
 >
 > - **Plan Esencial:** 2 sábados de 3 horas (7 y 14 de noviembre), por $600.000.
-> - **Plan Completo:** 4 sábados de 3 horas (7, 14, 21 y 28 de noviembre), por $1.200.000. Además
+> - **Plan Completo:** 4 sábados de 3 horas (7, 14, 21 y 28 de noviembre), por $1.000.000. Además
 >   del uso diario, deja montados los espacios de trabajo del equipo y unas reglas internas de uso de
 >   IA.
 >
 > Los dos son para hasta 12 personas, presenciales en la oficina o virtuales, y trabajan sobre
-> documentos reales de Ekosolv. Las fechas se pueden mover si les queda mejor otro sábado.
+> documentos reales de Ekosolv. Cada participante necesita una suscripción a Claude (plan Pro o
+> Team) a nombre de la empresa. Las fechas se pueden mover si les queda mejor otro sábado.
 >
 > La automatización de propuestas va en el mismo documento, ya ajustada a su Zoho CRM: arranca
 > desde el Brief y deja lista la propuesta, la estimación en Books, la carpeta en WorkDrive y la
-> presentación para que el consultor solo la revise. Esa es la Fase 1, por $351.750 al mes.
+> presentación para que el consultor solo la revise. Esa es la Fase 1, por $400.000 al mes.
 >
 > La Fase 2 suma el panel web de administración con un agente de cumplimiento: revisa todos los días
 > la normativa nueva, los autos de sus clientes, los documentos y los vencimientos, y cuando algo
 > aplica les manda una alerta con la norma, el plazo y la acción sugerida. La decisión siempre queda
-> en manos del consultor. Las dos fases juntas quedan en $712.250 al mes. Las dos mensualidades son
+> en manos del consultor. Las dos fases juntas quedan en $750.000 al mes. Las dos mensualidades son
 > a 24 meses y desde el mes 25 bajan a solo operación y soporte.
 >
 > Para ajustar las cifras necesito algunos datos que dejé al final del documento, sobre todo cuántas
@@ -311,7 +315,7 @@ con reglas tomadas de la norma y validadas por el equipo técnico de Ekosolv.
 - **Acción:** alerta al consultor responsable con resumen, norma aplicable, plazo y acción sugerida.
   No redacta respuestas ni actúa solo.
 - **Esfuerzo estimado:** unas 130 h (normativa 30, autos 30, documentos 24, vencimientos 8, motor de
-  reglas 16, integración al panel 12, pruebas 10). Fase 2 pasa de 4 a 7 semanas.
+  reglas 16, integración al panel 12, pruebas 10). Fase 2 pasa de 4 a 7 semanas (luego Mike lo dejó en 4 semanas al reducir el cronograma a la mitad).
 - **Precio a cliente (ya a la mitad):** Fase 1 + 2 con agente **$1.017.500/mes** (antes $727.500), desde
   el mes 25 **$320.000** (antes $280.000). A precio completo serían unos $12M de construcción más
   $80.000/mes de operación por el monitoreo diario.
@@ -328,3 +332,7 @@ Sobre el precio de referencia completo es un descuento acumulado del 65%. La cap
 > **Ajuste 2026-10-21 (reemplaza el anterior):** la capacitación se cobra por hora a $80.000. Plan Esencial (6 h) $480.000 y Plan Completo (12 h) $960.000. Anticipo del 50%: $240.000 / $480.000.
 
 > **Ajuste 2026-10-21 (reemplaza los anteriores):** capacitación a $100.000 por hora. Plan Esencial (6 h) $600.000 y Plan Completo (12 h) $1.200.000. Anticipo del 50%: $300.000 / $600.000.
+
+> **Ajuste 2026-10-21:** Plan Completo baja a $1.000.000 (Esencial sigue en $600.000). Anticipo del 50%: $300.000 / $500.000.
+
+> **Ajuste 2026-10-21:** mensualidades de automatización fijadas por Mike: Fase 1 $400.000/mes y Fase 1 + 2 $750.000/mes (meses 1 a 24). Desde el mes 25: $250.000 / $350.000.

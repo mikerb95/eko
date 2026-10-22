@@ -114,7 +114,7 @@
   .watch li::before { content: ""; position: absolute; left: 0; top: .6em; width: 1.8mm; height: 1.8mm; border-radius: 50%; background: var(--blue); }
 
   /* Cronograma */
-  .gantt { display: grid; grid-template-columns: 34mm repeat(15, 1fr); gap: 2mm 0; font-size: 8.5pt; align-items: center; min-width: 130mm; }
+  .gantt { display: grid; grid-template-columns: 44mm repeat(8, 1fr); gap: 2mm 0; font-size: 8.5pt; align-items: center; min-width: 130mm; }
   .gantt .wk { font-size: 7.5pt; color: var(--mute); text-align: center; font-variant-numeric: tabular-nums; }
   .gantt .row-l { color: var(--ink); padding-right: 2mm; font-weight: 500; }
   .bar { height: 6mm; border-radius: 1mm; background: var(--teal); margin: 0 .5mm; display: flex; align-items: center; padding: 0 2mm; color: var(--paper); font-size: 7pt; font-weight: 500; white-space: nowrap; overflow: hidden; }
@@ -167,14 +167,14 @@
         <tbody class="num">
           <tr class="group"><td colspan="3">Capacitación en IA · pago único</td></tr>
           <tr><td class="nw"><b>Plan Esencial</b></td><td>2 sábados de 3 horas</td><td class="r"><span class="price">$600.000</span></td></tr>
-          <tr><td class="nw"><b>Plan Completo</b></td><td>4 sábados de 3 horas</td><td class="r"><span class="price">$1.200.000</span></td></tr>
+          <tr><td class="nw"><b>Plan Completo</b></td><td>4 sábados de 3 horas</td><td class="r"><span class="price">$1.000.000</span></td></tr>
           <tr class="group blue"><td colspan="3">Automatización · mensualidad a 24 meses</td></tr>
-          <tr><td class="nw"><b>Fase 1</b></td><td>Del Brief en Zoho CRM a la propuesta lista para revisar</td><td class="r"><span class="price">$351.750</span> <span class="unit">/ mes</span></td></tr>
-          <tr><td class="nw"><b>Fase 1 + 2</b></td><td>Lo anterior, más el panel web, el agente de cumplimiento y la detección de oportunidades</td><td class="r"><span class="price">$712.250</span> <span class="unit">/ mes</span></td></tr>
+          <tr><td class="nw"><b>Fase 1</b></td><td>Del Brief en Zoho CRM a la propuesta lista para revisar</td><td class="r"><span class="unit">desde</span> <span class="price">$970.000</span> <span class="unit">/ mes</span></td></tr>
+          <tr><td class="nw"><b>Fase 1 + 2</b></td><td>Lo anterior, más el panel web, el agente de cumplimiento y la detección de oportunidades</td><td class="r"><span class="unit">desde</span> <span class="price">$1.320.000</span> <span class="unit">/ mes</span></td></tr>
         </tbody>
       </table>
     </div>
-    <p class="note">La capacitación y la automatización se contratan por separado. Valores en pesos colombianos.</p>
+    <p class="note">La capacitación y la automatización se contratan por separado. La automatización se cobra según el volumen de propuestas al mes (detalle en la página 4). Valores en pesos colombianos.</p>
   </section>
 
   <ol class="index">
@@ -207,7 +207,7 @@
           <tr><th>Fechas propuestas</th><td>7 y 14 de noviembre</td><td>7, 14, 21 y 28 de noviembre</td></tr>
           <tr><th>Participantes</th><td>Hasta 12</td><td>Hasta 12</td></tr>
           <tr><th>Material</th><td>Guía de uso y biblioteca de instrucciones de Ekosolv</td><td>Lo mismo, más espacios de trabajo por área y borrador de política de uso de IA</td></tr>
-          <tr class="total"><th>Inversión</th><td><span class="price">$600.000</span></td><td><span class="price">$1.200.000</span></td></tr>
+          <tr class="total"><th>Inversión</th><td><span class="price">$600.000</span></td><td><span class="price">$1.000.000</span></td></tr>
         </tbody>
       </table>
     </div>
@@ -288,21 +288,21 @@
 
   <div class="page-head">
     <span class="eyebrow">03 · Cronograma e inversión</span>
-    <h2>15 semanas y una sola mensualidad</h2>
-    <p>La Fase 1 toma 8 semanas. La Fase 2 toma 7 más y puede empezar al terminar la Fase 1 o después.</p>
+    <h2>8 semanas y una sola mensualidad</h2>
+    <p>La Fase 1 toma 4 semanas. La Fase 2 toma 4 más y puede empezar al terminar la Fase 1 o después.</p>
   </div>
 
   <section class="stack">
     <h3>Cronograma</h3>
     <div class="tbl">
-      <div class="gantt" role="img" aria-label="Fase 1 en 8 semanas: levantamiento semanas 1 y 2, construcción 3 a 5, piloto 6 y 7, entrega semana 8. Fase 2 de la semana 9 a la 15.">
+      <div class="gantt" role="img" aria-label="Fase 1 en 4 semanas: levantamiento semana 1, construcción semana 2, piloto semana 3, entrega semana 4. Fase 2 de la semana 5 a la 8.">
         <span class="wk" style="text-align:left">Semana</span>
-        <span class="wk">1</span><span class="wk">2</span><span class="wk">3</span><span class="wk">4</span><span class="wk">5</span><span class="wk">6</span><span class="wk">7</span><span class="wk">8</span><span class="wk">9</span><span class="wk">10</span><span class="wk">11</span><span class="wk">12</span><span class="wk">13</span><span class="wk">14</span><span class="wk">15</span>
-        <span class="row-l">Levantamiento</span><span class="bar s1" style="grid-column:2/4"></span><span style="grid-column:4/17"></span>
-        <span class="row-l">Construcción</span><span style="grid-column:2/4"></span><span class="bar s2" style="grid-column:4/7"></span><span style="grid-column:7/17"></span>
-        <span class="row-l">Piloto con casos reales</span><span style="grid-column:2/7"></span><span class="bar s3" style="grid-column:7/9"></span><span style="grid-column:9/17"></span>
-        <span class="row-l">Entrega y medición</span><span style="grid-column:2/9"></span><span class="bar s4" style="grid-column:9/10"></span><span style="grid-column:10/17"></span>
-        <span class="row-l">Fase 2</span><span style="grid-column:2/10"></span><span class="bar f2" style="grid-column:10/17">Panel web, agente y oportunidades</span>
+        <span class="wk">1</span><span class="wk">2</span><span class="wk">3</span><span class="wk">4</span><span class="wk">5</span><span class="wk">6</span><span class="wk">7</span><span class="wk">8</span>
+        <span class="row-l">Levantamiento</span><span class="bar s1" style="grid-column:2/3"></span><span style="grid-column:3/10"></span>
+        <span class="row-l">Construcción</span><span style="grid-column:2/3"></span><span class="bar s2" style="grid-column:3/4"></span><span style="grid-column:4/10"></span>
+        <span class="row-l">Piloto con casos reales</span><span style="grid-column:2/4"></span><span class="bar s3" style="grid-column:4/5"></span><span style="grid-column:5/10"></span>
+        <span class="row-l">Entrega y medición</span><span style="grid-column:2/5"></span><span class="bar s4" style="grid-column:5/6"></span><span style="grid-column:6/10"></span>
+        <span class="row-l">Fase 2</span><span style="grid-column:2/6"></span><span class="bar f2" style="grid-column:6/10">Panel web, agente y oportunidades</span>
       </div>
     </div>
     <p class="note">Indicador principal: horas de preparación por propuesta, medidas antes y después.</p>
@@ -314,14 +314,19 @@
       <table>
         <thead><tr><th></th><th>Fase 1</th><th>Fase 1 + 2</th></tr></thead>
         <tbody class="num">
-          <tr class="lead"><th>Meses 1 a 24</th><td><span class="price">$351.750</span> <span class="unit">/ mes</span></td><td><span class="price">$712.250</span> <span class="unit">/ mes</span></td></tr>
-          <tr><th>Desde el mes 25</th><td>$147.000 <span class="unit">/ mes</span></td><td>$224.000 <span class="unit">/ mes</span></td></tr>
+          <tr class="group"><td colspan="3">Meses 1 a 24</td></tr>
+          <tr class="lead"><th>Hasta 40 propuestas al mes</th><td><span class="price">$970.000</span> <span class="unit">/ mes</span></td><td><span class="price">$1.320.000</span> <span class="unit">/ mes</span></td></tr>
+          <tr class="lead"><th>Hasta 80 propuestas al mes</th><td><span class="price">$1.540.000</span> <span class="unit">/ mes</span></td><td><span class="price">$1.890.000</span> <span class="unit">/ mes</span></td></tr>
+          <tr><th>Más de 80 propuestas</th><td>Nivel de 80, más $15.000 por propuesta adicional</td><td>Nivel de 80, más $15.000 por propuesta adicional</td></tr>
+          <tr class="group"><td colspan="3">Desde el mes 25</td></tr>
+          <tr><th>Hasta 40 propuestas al mes</th><td>$820.000 <span class="unit">/ mes</span></td><td>$920.000 <span class="unit">/ mes</span></td></tr>
+          <tr><th>Hasta 80 propuestas al mes</th><td>$1.390.000 <span class="unit">/ mes</span></td><td>$1.490.000 <span class="unit">/ mes</span></td></tr>
+          <tr class="group"><td colspan="3">En todos los niveles</td></tr>
           <tr><th>Soporte incluido</th><td>6 h al mes</td><td>8 h al mes</td></tr>
-          <tr><th>Volumen incluido</th><td>Hasta 60 propuestas al mes</td><td>Hasta 60 propuestas al mes</td></tr>
         </tbody>
       </table>
     </div>
-    <p class="note">La mensualidad incluye construcción, operación en servidores con consumo de IA, y soporte. No hay inversión inicial. Desde el mes 25 baja porque la construcción ya quedó pagada. Valores preliminares hasta recibir la información de la página 5.</p>
+    <p class="note">La mensualidad incluye construcción, servidores, consumo de IA según el nivel elegido, y soporte. No hay inversión inicial. Desde el mes 25 baja porque la construcción ya quedó pagada; el consumo de IA se mantiene. Valores preliminares hasta recibir la información de la página 5.</p>
   </section>
 
   <div class="foot"><span>Ekosolv · Propuesta comercial</span><span>Página 4 de 5</span></div>
@@ -343,7 +348,7 @@
         <li>Pago del 50% al confirmar la fecha de inicio y 50% al terminar la última sesión.</li>
         <li>Hasta 12 participantes, presencial en la oficina de Ekosolv o virtual, por el mismo valor.</li>
         <li>Las fechas se pueden mover a otros sábados con una semana de aviso.</li>
-        <li>Las cuentas de IA de cada participante las contrata Ekosolv. En la primera sesión revisamos qué plan conviene.</li>
+        <li>Cada participante necesita una suscripción activa a Claude (plan Pro o Team), contratada por Ekosolv antes de la primera sesión.</li>
         <li>Para la modalidad presencial: sala con proyector e internet, y cada participante con su computador.</li>
         <li>Ekosolv comparte 3 o 4 documentos de trabajo una semana antes de empezar.</li>
       </ul>
@@ -353,7 +358,7 @@
       <ul class="cond">
         <li>Plazo mínimo de 24 meses. Si el contrato termina antes, se liquida el saldo pendiente de la construcción.</li>
         <li>Las horas de soporte no son acumulables. Los ajustes a plantillas o reglas después de la entrega usan esas horas.</li>
-        <li>Por encima de 60 propuestas al mes se revisa la tarifa de operación.</li>
+        <li>El nivel de volumen se elige al firmar y se puede cambiar con un mes de aviso. Cuenta cada propuesta generada.</li>
         <li>El sistema genera borradores y alertas. La decisión técnica y el envío al cliente son del consultor.</li>
         <li>Las reglas del diagnóstico y del agente las valida el equipo técnico de Ekosolv antes de entrar en uso.</li>
         <li>El agente vigila fuentes públicas y los expedientes a los que Ekosolv dé acceso. Donde una autoridad no publica en línea, la cobertura es parcial.</li>
@@ -366,7 +371,7 @@
   <section class="stack">
     <h3>Lo que necesitamos de Ekosolv</h3>
     <ol class="check">
-      <li>Plan de capacitación, fecha de inicio y participantes</li>
+      <li>Plan de capacitación, fecha, participantes y sus cuentas de Claude</li>
       <li>Propuestas al mes y horas que toma cada una</li>
       <li>3 a 5 propuestas recientes con presentación y costeo</li>
       <li>Plantillas de propuesta, presentación y costeo</li>
