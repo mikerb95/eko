@@ -309,3 +309,13 @@ con reglas tomadas de la norma y validadas por el equipo técnico de Ekosolv.
 - **Riesgos:** muchas CAR no publican autos en línea y la ANLA exige credenciales del titular para ver
   expedientes (cobertura parcial; quedó como condición). Las alertas no reemplazan revisión técnica ni
   jurídica. Falta la lista de autoridades y expedientes a vigilar.
+
+**2026-10-21: Mike bajó 30% más las mensualidades de la automatización.** Fase 1 **$351.750/mes**
+(desde el mes 25, $147.000) y Fase 1 + 2 con agente **$712.250/mes** (desde el mes 25, $224.000).
+Sobre el precio de referencia completo es un descuento acumulado del 65%. La capacitación no cambió.
+
+> **Ajuste 2026-10-21:** la capacitación baja un 30%. Plan Esencial $840.000 (antes $1.200.000) y Plan Completo $1.470.000 (antes $2.100.000). Anticipo del 50%: $420.000 / $735.000.
+
+> **Ajuste 2026-10-21 (reemplaza el anterior):** la capacitación se cobra por hora a $80.000. Plan Esencial (6 h) $480.000 y Plan Completo (12 h) $960.000. Anticipo del 50%: $240.000 / $480.000.
+
+> **Ajuste 2026-10-21 (reemplaza los anteriores):** capacitación a $100.000 por hora. Plan Esencial (6 h) $600.000 y Plan Completo (12 h) $1.200.000. Anticipo del 50%: $300.000 / $600.000.
