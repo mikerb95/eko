@@ -20,7 +20,7 @@ carpeta de cotización y costeo en WorkDrive y elaborar la presentación. Son ta
 le quitan tiempo al trabajo técnico y retrasan la respuesta al cliente.
 
 El objetivo de este proyecto es que, a partir de la información básica de un prospecto, el sistema
-deje listo en minutos un paquete completo para que el consultor solo tenga que revisarlo y ajustarlo:
+deje listo el mismo día un paquete completo para que el consultor solo tenga que revisarlo y ajustarlo:
 
 - servicios recomendados, con la razón regulatoria de cada uno;
 - borrador de propuesta con la plantilla de Ekosolv;
@@ -301,7 +301,7 @@ Asunto: RE: PROPUESTA AUTOMATIZACIÓN e IA PARA EKOSOLV
 > agente, en la fecha que acordemos.
 >
 > La mensualidad solo cambia según cuántas propuestas hagan al mes (hay niveles de 20, 40 y 80):
-> desde $1.185.000 con hasta 20, y entre más propuestas, menor el precio por propuesta. Desde el mes 19 baja, porque la construcción ya queda pagada. En la página 5 del documento está el desglose de la mensualidad.
+> desde $1.185.000 con hasta 20, sin inversión inicial. Desde el mes 19 baja, porque la construcción ya queda pagada. En la página 5 del documento está el desglose de la mensualidad.
 >
 > Para ajustar las cifras necesito algunos datos que dejé al final del documento, sobre todo cuántas
 > propuestas hacen al mes y cuánto tiempo les toma cada una.
@@ -432,3 +432,42 @@ Sobre el precio de referencia completo es un descuento acumulado del 65%. La cap
 > - **Interno, obligatorio:** procesar con Batch API. Sin él, el nivel de 80 con propuestas largas
 >   pierde ~$368.000/mes en IA. Con Batch, el peor caso (todas largas) cuesta ~$7.300 c/u.
 > - Se quitó el cierre de la página 6 para que cupieran las cláusulas.
+
+> **2026-10-21:** sin precio por propuesta visible en el documento (el colchón de IA también cubre el agente y el chat). En la página 5 el componente se llama "Consumo de IA: propuestas, agente y chat".
+
+> **Rondas de ajuste (2026-10-21):** cada propuesta incluye 2 rondas de ajuste en 30 días (documentos,
+> notas, cambios); la tercera cuenta como propuesta nueva; páginas agregadas suman a la regla de 100.
+> Interno: ajustes con esfuerzo medio + Batch API + regenerar solo secciones afectadas (~$800 por
+> ronda). Peor caso nivel 80 (larga + 2 rondas) ~$8.900 de IA por propuesta: margen justo.
+
+> **Proveedor de IA y tiempos (2026-10-21):** cláusula agregada: si la TRM varía más del 10% o el
+> proveedor de IA cambia sus tarifas, el consumo de IA se ajusta en la misma proporción. La promesa
+> pasó de "en minutos" a "el mismo día" porque el Batch API puede tardar hasta 24 h (normalmente
+> minutos). Interno: Batch por defecto, modo normal solo para propuestas marcadas como urgentes;
+> sistema desacoplado del modelo (Haiku 5.5 para pasos mecánicos); indicador de costo real vs
+> cobrado con alerta al 70%.
+
+> **Límites del agente (2026-10-21):** vigila hasta 50 expedientes y revisa hasta 10 documentos al
+> mes (ICA, PMA, permisos, informes); lo adicional se cotiza aparte. Autos y normativa nueva sin
+> límite porque son baratos (auto de 40 págs ~$15 con Haiku, ~$450 con Sonnet bajo). Interno:
+> filtro por capas (código/Haiku), OCR antes de IA para autos escaneados, presupuesto mensual por
+> función (propuestas / agente / chat), agente por Batch salvo plazos < 48 h.
+
+> **Pricing del agente según demanda (2026-10-21):** incluido en cualquier nivel: 50 expedientes y
+> 10 revisiones de documentos al mes. Adicionales: $50.000/mes por cada 25 expedientes (costo
+> estimado $5.000 a $25.000) y $20.000 por revisión de documento (costo $3.000 a $6.000). Así el
+> uso intensivo del agente no se come el consumo de IA de las propuestas.
+
+> **Anticipo (2026-10-21):** $1.000.000 al firmar, abonado a la construcción. Construcción total
+> $7.210.000 = $1.000.000 + 18 x $345.000. Mensualidades meses 1 a 18: $1.130.000 / $1.345.000 /
+> $1.645.000 (antes $1.185.000 / $1.400.000 / $1.700.000). Desde el mes 19 sin cambio: $785.000 /
+> $1.000.000 / $1.300.000. Reduce el riesgo de financiar toda la construcción.
+
+> **Revertido (2026-10-21):** Mike prefirió volver a "sin inversión inicial" por ser más atractivo. Vigente: construcción 18 x $400.000; meses 1 a 18: $1.185.000 / $1.400.000 / $1.700.000.
+
+> **Tiempos de soporte (2026-10-21):** soporte por correo o el panel, sin atención inmediata. Errores
+> urgentes se revisan dentro de las 12 horas hábiles siguientes al reporte; lo demás, dentro de 24
+> horas hábiles. Para que cupiera, se fusionaron condiciones (borradores + reglas validadas; idioma y
+> formato + exclusiones), sin quitar contenido.
+
+> **Alcance del soporte (2026-10-21):** las 8 h cubren errores y ajustes, no funciones nuevas; lo nuevo se cotiza aparte bajo acuerdo previo.
