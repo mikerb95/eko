@@ -233,8 +233,7 @@ hasta 12 participantes, presencial en la oficina de Ekosolv o virtual.
 | Sesiones | 2 sábados de 3 h (6 h) | 4 sábados de 3 h (12 h) |
 | Fechas propuestas | 7 y 14 de noviembre | 7, 14, 21 y 28 de noviembre |
 | Material | Guía y biblioteca de instrucciones | + espacios de trabajo por área y borrador de política de uso de IA |
-| Acompañamiento | 15 días por chat | 30 días por chat |
-| Precio | $1.200.000 | $2.100.000 |
+| Precio | $600.000 | $1.200.000 |
 
 Pago 50% al confirmar la fecha y 50% al terminar. Las licencias de IA las paga Ekosolv.
 
@@ -245,8 +244,11 @@ Zoho y correo, casos por área y reglas internas de uso.
 
 ### Precio (interno)
 
-- **2026-10-20: Mike bajó todos los precios a la mitad.** Esencial $1.200.000 ($200.000/h), Completo
-  $2.100.000 ($175.000/h). Antes eran $2.400.000 y $4.200.000.
+- **2026-10-21: tarifa por hora, $100.000/h.** Esencial (6 h) $600.000, Completo (12 h) $1.200.000.
+  Historial: $2.400.000 / $4.200.000, luego a la mitad ($1.200.000 / $2.100.000), luego a $70.000 y
+  $80.000/h, y quedó en $100.000/h. La preparación del material va incluida en la tarifa.
+- **Sin acompañamiento posterior:** Mike solo atiende los sábados contratados. No ofrecer soporte por
+  chat después de la última sesión.
 - Coherente con agosto: allá se declararon 7 h en $3.200.000 (unos $457.000/h) como regalo de cierre.
   Si Mario saca esa comparación, la respuesta es que este programa es a la medida y con material propio.
 - **PENDIENTE** confirmar si Mike factura con IVA. En el doc del cliente no se mencionó IVA.
@@ -258,7 +260,7 @@ Zoho y correo, casos por área y reglas internas de uso.
   plantillas y documentos reales que pide la sección 4. Usar los sábados para tomar la línea base de
   horas por propuesta.
 
-## 11. Respuesta al correo de Mario (2026-10-20)
+## 11. Respuesta al correo de Mario (actualizada 2026-10-21)
 
 Asunto: RE: PROPUESTA AUTOMATIZACIÓN e IA PARA EKOSOLV
 
@@ -270,8 +272,8 @@ Asunto: RE: PROPUESTA AUTOMATIZACIÓN e IA PARA EKOSOLV
 >
 > Para la capacitación armé dos planes, los dos en sábado de 8:00 a 11:00 a. m.:
 >
-> - **Plan Esencial:** 2 sábados de 3 horas (7 y 14 de noviembre), por $1.200.000.
-> - **Plan Completo:** 4 sábados de 3 horas (7, 14, 21 y 28 de noviembre), por $2.100.000. Además
+> - **Plan Esencial:** 2 sábados de 3 horas (7 y 14 de noviembre), por $600.000.
+> - **Plan Completo:** 4 sábados de 3 horas (7, 14, 21 y 28 de noviembre), por $1.200.000. Además
 >   del uso diario, deja montados los espacios de trabajo del equipo y unas reglas internas de uso de
 >   IA.
 >
@@ -280,9 +282,16 @@ Asunto: RE: PROPUESTA AUTOMATIZACIÓN e IA PARA EKOSOLV
 >
 > La automatización de propuestas va en el mismo documento, ya ajustada a su Zoho CRM: arranca
 > desde el Brief y deja lista la propuesta, la estimación en Books, la carpeta en WorkDrive y la
-> presentación para que el consultor solo la revise. Para cerrar las cifras necesito algunos datos
-> que dejé al final del documento, sobre todo cuántas propuestas hacen al mes y cuánto tiempo les
-> toma cada una.
+> presentación para que el consultor solo la revise. Esa es la Fase 1, por $351.750 al mes.
+>
+> La Fase 2 suma el panel web de administración con un agente de cumplimiento: revisa todos los días
+> la normativa nueva, los autos de sus clientes, los documentos y los vencimientos, y cuando algo
+> aplica les manda una alerta con la norma, el plazo y la acción sugerida. La decisión siempre queda
+> en manos del consultor. Las dos fases juntas quedan en $712.250 al mes. Las dos mensualidades son
+> a 24 meses y desde el mes 25 bajan a solo operación y soporte.
+>
+> Para ajustar las cifras necesito algunos datos que dejé al final del documento, sobre todo cuántas
+> propuestas hacen al mes y cuánto tiempo les toma cada una.
 >
 > ¿Te parece si me confirmas el plan de capacitación y la fecha de inicio? Con eso aparto los
 > sábados.
