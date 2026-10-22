@@ -131,7 +131,7 @@ export function normalizarExtraccion(raw: any): Extraccion {
     titular: texto(r.titular, 200),
     nit: texto(r.nit, 30),
     resumen: texto(r.resumen, 1000),
-    obligaciones: Array.isArray(r.obligaciones) ? r.obligaciones.map(obligacion).filter((o): o is Obligacion => !!o).slice(0, 20) : [],
+    obligaciones: Array.isArray(r.obligaciones) ? r.obligaciones.map(obligacion).filter((o: Obligacion | null): o is Obligacion => !!o).slice(0, 20) : [],
     normas: Array.isArray(r.normas) ? r.normas.map((n: unknown) => texto(n, 200)).filter(Boolean).slice(0, 20) : [],
     accion_sugerida: texto(r.accion_sugerida, 600),
     confianza,

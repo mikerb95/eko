@@ -1,0 +1,445 @@
+---
+/**
+ * Burbuja de WhatsApp con el asistente con IA (skill chat-ia).
+ *
+ * Sin JavaScript es el mismo enlace a WhatsApp de siempre. Con JavaScript abre
+ * un panel con dos caminos: escribir por WhatsApp (siempre a un toque) o
+ * preguntarle al asistente. La IA nunca es un paso obligatorio: si el endpoint
+ * dice que no está disponible (sin clave o sin presupuesto del día), el panel
+ * solo ofrece WhatsApp.
+ *
+ * El historial vive en sessionStorage (solo esta pestaña) y el texto del
+ * modelo se pinta con textContent: es dato no confiable, nunca HTML.
+ */
+import { SITE_ADDRESS } from '../lib/site'
+
+interface Props {
+  lang: 'es' | 'en'
+}
+
+const { lang } = Astro.props
+const numero = SITE_ADDRESS.telefono.replace(/\D/g, '')
+
+const T = {
+  es: {
+    fab: 'Chatea por WhatsApp',
+    titulo: 'Ekosolv',
+    sub: 'Asistente con IA',
+    cerrar: 'Cerrar',
+    saludo: 'Hola, soy el asistente con IA de Ekosolv. Puedo orientarle sobre los servicios y la normativa que publica el sitio; un consultor confirma todo.',
+    sinIa: 'Escríbanos por WhatsApp y un consultor le responde.',
+    whatsapp: 'Escribir por WhatsApp',
+    enviar: 'Enviar a un consultor',
+    placeholder: 'Escriba su pregunta',
+    preguntar: 'Enviar',
+    escribiendo: 'Escribiendo',
+    aviso: 'Respuestas orientativas. No escriba datos personales aquí.',
+    error: 'No pude responder en este momento. Puede escribirle a un consultor por WhatsApp.',
+    limite: 'Llegamos al máximo de preguntas de esta conversación. Siga con un consultor por WhatsApp.',
+    sugerencias: ['¿Qué normas le aplican a un importador de tecnología?', '¿Cómo funciona la recolección de RAEE?', '¿Cuánto cuesta el diagnóstico?'],
+    saludoWa: 'Hola, vengo del sitio de Ekosolv y quiero hablar con un consultor.',
+  },
+  en: {
+    fab: 'Chat on WhatsApp',
+    titulo: 'Ekosolv',
+    sub: 'AI assistant',
+    cerrar: 'Close',
+    saludo: "Hi, I'm Ekosolv's AI assistant. I can guide you on the services and regulations published on the site; a consultant confirms everything.",
+    sinIa: 'Message us on WhatsApp and a consultant will reply.',
+    whatsapp: 'Message on WhatsApp',
+    enviar: 'Send to a consultant',
+    placeholder: 'Type your question',
+    preguntar: 'Send',
+    escribiendo: 'Typing',
+    aviso: 'Indicative answers. Do not type personal data here.',
+    error: "I couldn't answer right now. You can message a consultant on WhatsApp.",
+    limite: 'We reached the question limit for this conversation. Continue with a consultant on WhatsApp.',
+    sugerencias: ['Which regulations apply to a technology importer?', 'How does e-waste collection work?', 'How much does the diagnostic cost?'],
+    saludoWa: 'Hi, I come from the Ekosolv website and would like to talk to a consultant.',
+  },
+}[lang]
+
+const waBase = `https://wa.me/${numero}`
+---
+
+<div class="asesor" data-asesor data-lang={lang} data-wa={waBase} data-textos={JSON.stringify(T)}>
+  <a
+    href={`${waBase}?text=${encodeURIComponent(T.saludoWa)}`}
+    target="_blank"
+    rel="noopener noreferrer"
+    class="whatsapp-fab"
+    aria-label={T.fab}
+    aria-expanded="false"
+    aria-controls="asesor-panel"
+    data-asesor-fab
+  >
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" width="28" height="28" aria-hidden="true">
+      <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/>
+    </svg>
+  </a>
+
+  <section id="asesor-panel" class="asesor-panel" role="dialog" aria-label={`${T.titulo} · ${T.sub}`} hidden>
+    <header class="asesor-head">
+      <div>
+        <div class="asesor-titulo"><span class="asesor-punto" aria-hidden="true"></span>{T.titulo}</div>
+        <div class="asesor-sub">{T.sub}</div>
+      </div>
+      <button type="button" class="asesor-cerrar" data-asesor-cerrar aria-label={T.cerrar}>
+        <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18"/></svg>
+      </button>
+    </header>
+
+    <div class="asesor-log" data-asesor-log data-lenis-prevent role="log" aria-live="polite"></div>
+
+    <div class="asesor-sugerencias" data-asesor-sugerencias hidden></div>
+
+    <div class="asesor-pie">
+      <a class="asesor-wa" data-asesor-wa href={`${waBase}?text=${encodeURIComponent(T.saludoWa)}`} target="_blank" rel="noopener noreferrer">
+        <svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor" aria-hidden="true"><path d="M12.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893A11.821 11.821 0 0012.05 0z"/></svg>
+        <span data-asesor-wa-texto>{T.whatsapp}</span>
+      </a>
+      <form class="asesor-form" data-asesor-form hidden>
+        <label class="sr-only" for="asesor-input">{T.placeholder}</label>
+        <textarea id="asesor-input" rows="1" maxlength="500" placeholder={T.placeholder} data-asesor-input></textarea>
+        <button type="submit" aria-label={T.preguntar} data-asesor-enviar>
+          <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
+        </button>
+      </form>
+      <p class="asesor-aviso" data-asesor-aviso hidden>{T.aviso}</p>
+    </div>
+  </section>
+</div>
+
+<script>
+  type Mensaje = { rol: 'usuario' | 'asesor'; texto: string }
+  type Estado = { mensajes: Mensaje[]; whatsapp: string | null }
+
+  const MAX_PREGUNTAS = 30
+  const CLAVE = 'asesor:v1'
+
+  const raiz = document.querySelector<HTMLElement>('[data-asesor]')
+  if (raiz) iniciar(raiz)
+
+  function iniciar(raiz: HTMLElement) {
+    const lang = raiz.dataset.lang === 'en' ? 'en' : 'es'
+    const T = JSON.parse(raiz.dataset.textos || '{}')
+    const waBase = raiz.dataset.wa || ''
+    const $ = <E extends Element>(s: string) => raiz.querySelector<E>(s)!
+    const fab = $<HTMLAnchorElement>('[data-asesor-fab]')
+    const panel = $<HTMLElement>('#asesor-panel')
+    const log = $<HTMLElement>('[data-asesor-log]')
+    const form = $<HTMLFormElement>('[data-asesor-form]')
+    const input = $<HTMLTextAreaElement>('[data-asesor-input]')
+    const enviar = $<HTMLButtonElement>('[data-asesor-enviar]')
+    const wa = $<HTMLAnchorElement>('[data-asesor-wa]')
+    const waTexto = $<HTMLElement>('[data-asesor-wa-texto]')
+    const aviso = $<HTMLElement>('[data-asesor-aviso]')
+    const sugerencias = $<HTMLElement>('[data-asesor-sugerencias]')
+
+    let estado: Estado = leer()
+    let disponible: boolean | null = null
+    let ocupado = false
+
+    function leer(): Estado {
+      try {
+        const v = JSON.parse(sessionStorage.getItem(CLAVE) || 'null')
+        if (v && Array.isArray(v.mensajes)) return v
+      } catch {}
+      return { mensajes: [], whatsapp: null }
+    }
+    function guardar() {
+      try {
+        sessionStorage.setItem(CLAVE, JSON.stringify(estado))
+      } catch {}
+    }
+
+    function pagina(): string {
+      const p = location.pathname.replace(/\/$/, '').replace(/^\/en/, '') || '/'
+      const mapa: Record<string, string> = {
+        '/': 'inicio',
+        '/servicios': 'servicios', '/services': 'servicios',
+        '/ekonsulting': 'ekonsulting', '/ekoraee': 'ekoraee', '/ekopartner': 'ekopartner', '/ekotrading': 'ekotrading',
+        '/normativas': 'normativas', '/regulations': 'normativas',
+        '/agenda-una-recoleccion': 'recoleccion', '/schedule-a-collection': 'recoleccion',
+        '/contacto': 'contacto', '/contact': 'contacto',
+      }
+      return mapa[p] || 'sitio'
+    }
+
+    function burbuja(rol: 'usuario' | 'asesor' | 'sistema', texto: string) {
+      const el = document.createElement('div')
+      el.className = `asesor-msg asesor-msg-${rol}`
+      el.textContent = texto
+      log.appendChild(el)
+      log.scrollTop = log.scrollHeight
+      return el
+    }
+
+    function pintar() {
+      log.replaceChildren()
+      burbuja('asesor', disponible === false ? T.sinIa : T.saludo)
+      for (const m of estado.mensajes) burbuja(m.rol, m.texto)
+      actualizarWa()
+      const preguntas = estado.mensajes.filter((m) => m.rol === 'usuario').length
+      sugerencias.hidden = !(disponible && preguntas === 0)
+      if (preguntas >= MAX_PREGUNTAS && disponible) burbuja('sistema', T.limite)
+    }
+
+    function actualizarWa() {
+      const texto = estado.whatsapp || T.saludoWa
+      wa.href = `${waBase}?text=${encodeURIComponent(texto)}`
+      waTexto.textContent = estado.whatsapp ? T.enviar : T.whatsapp
+      wa.classList.toggle('asesor-wa-listo', !!estado.whatsapp)
+    }
+
+    function abrir() {
+      panel.hidden = false
+      fab.setAttribute('aria-expanded', 'true')
+      raiz.classList.add('abierto')
+      if (disponible === null) consultar()
+      else pintar()
+      if (disponible) input.focus()
+    }
+    function cerrar() {
+      panel.hidden = true
+      fab.setAttribute('aria-expanded', 'false')
+      raiz.classList.remove('abierto')
+      fab.focus()
+    }
+
+    async function consultar() {
+      pintar()
+      try {
+        const r = await fetch('/api/asesor', { headers: { accept: 'application/json' } })
+        disponible = r.ok && (await r.json()).disponible === true
+      } catch {
+        disponible = false
+      }
+      form.hidden = !disponible
+      aviso.hidden = !disponible
+      pintar()
+      if (disponible) input.focus()
+    }
+
+    async function preguntar(texto: string) {
+      texto = texto.trim().slice(0, 500)
+      if (!texto || ocupado) return
+      const preguntas = estado.mensajes.filter((m) => m.rol === 'usuario').length
+      if (preguntas >= MAX_PREGUNTAS) return
+      ocupado = true
+      enviar.disabled = true
+      sugerencias.hidden = true
+      estado.mensajes.push({ rol: 'usuario', texto })
+      guardar()
+      burbuja('usuario', texto)
+      input.value = ''
+      ajustar()
+      const escribiendo = burbuja('asesor', T.escribiendo)
+      escribiendo.classList.add('asesor-escribiendo')
+      try {
+        const r = await fetch('/api/asesor', {
+          method: 'POST',
+          headers: { 'content-type': 'application/json' },
+          body: JSON.stringify({ locale: lang, pagina: pagina(), mensajes: estado.mensajes }),
+        })
+        const datos = await r.json().catch(() => ({}))
+        if (!r.ok || typeof datos.texto !== 'string') {
+          // Sin respuesta, la pregunta sale del historial: si quedara, el
+          // siguiente envío rompería la alternancia que exige el servidor.
+          estado.mensajes.pop()
+          if (r.status === 503) {
+            disponible = false
+            form.hidden = true
+            aviso.hidden = true
+          }
+          escribiendo.remove()
+          burbuja('sistema', T.error)
+        } else {
+          estado.mensajes.push({ rol: 'asesor', texto: datos.texto })
+          if (typeof datos.whatsapp === 'string') estado.whatsapp = datos.whatsapp
+          escribiendo.remove()
+          await escribir(burbuja('asesor', ''), datos.texto)
+          actualizarWa()
+        }
+      } catch {
+        estado.mensajes.pop()
+        escribiendo.remove()
+        burbuja('sistema', T.error)
+      } finally {
+        guardar()
+        ocupado = false
+        enviar.disabled = false
+        const total = estado.mensajes.filter((m) => m.rol === 'usuario').length
+        if (total >= MAX_PREGUNTAS) {
+          form.hidden = true
+          burbuja('sistema', T.limite)
+        }
+      }
+    }
+
+    // Efecto de escritura en el navegador, sobre la respuesta ya revisada por
+    // la guardia del servidor (por eso no hay transmisión real).
+    async function escribir(el: HTMLElement, texto: string) {
+      if (matchMedia('(prefers-reduced-motion: reduce)').matches) {
+        el.textContent = texto
+        return
+      }
+      const palabras = texto.split(/(\s+)/)
+      let acumulado = ''
+      for (const p of palabras) {
+        acumulado += p
+        el.textContent = acumulado
+        log.scrollTop = log.scrollHeight
+        if (p.trim()) await new Promise((r) => setTimeout(r, 18))
+      }
+    }
+
+    function ajustar() {
+      input.style.height = 'auto'
+      input.style.height = `${Math.min(input.scrollHeight, 120)}px`
+    }
+
+    for (const s of T.sugerencias as string[]) {
+      const b = document.createElement('button')
+      b.type = 'button'
+      b.textContent = s
+      b.addEventListener('click', () => preguntar(s))
+      sugerencias.appendChild(b)
+    }
+
+    fab.addEventListener('click', (e) => {
+      e.preventDefault()
+      panel.hidden ? abrir() : cerrar()
+    })
+    $<HTMLButtonElement>('[data-asesor-cerrar]').addEventListener('click', cerrar)
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape' && !panel.hidden) cerrar()
+    })
+    form.addEventListener('submit', (e) => {
+      e.preventDefault()
+      preguntar(input.value)
+    })
+    input.addEventListener('input', ajustar)
+    input.addEventListener('keydown', (e) => {
+      if (e.key === 'Enter' && !e.shiftKey) {
+        e.preventDefault()
+        preguntar(input.value)
+      }
+    })
+  }
+</script>
+
+<style is:global>
+  .asesor-panel {
+    position: fixed;
+    right: 28px;
+    bottom: 96px;
+    z-index: 1000;
+    width: min(380px, calc(100vw - 32px));
+    max-height: min(600px, calc(100dvh - 130px));
+    display: flex;
+    flex-direction: column;
+    background: var(--paper-warm);
+    color: var(--ink);
+    border: 1px solid var(--line);
+    border-radius: var(--r-lg);
+    box-shadow: 0 24px 60px -20px color-mix(in oklab, var(--ink) 45%, transparent), 0 4px 14px color-mix(in oklab, var(--ink) 12%, transparent);
+    overflow: hidden;
+    font-family: var(--font-sans);
+    animation: asesor-entra .22s ease;
+  }
+  .asesor-panel[hidden] { display: none; }
+  @keyframes asesor-entra {
+    from { opacity: 0; transform: translateY(10px) scale(.98); }
+    to { opacity: 1; transform: none; }
+  }
+  @media (prefers-reduced-motion: reduce) { .asesor-panel { animation: none; } }
+
+  .asesor-head {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 14px 16px;
+    background: var(--deep);
+    color: #fff;
+  }
+  .asesor-titulo { display: flex; align-items: center; gap: 8px; font-weight: 600; font-size: 15px; }
+  .asesor-punto { width: 8px; height: 8px; border-radius: 50%; background: var(--aqua); box-shadow: 0 0 0 3px color-mix(in oklab, var(--aqua) 30%, transparent); }
+  .asesor-sub { font-family: var(--font-mono); font-size: 11px; letter-spacing: .04em; text-transform: uppercase; opacity: .7; margin-top: 2px; }
+  .asesor-cerrar {
+    display: grid; place-items: center; width: 34px; height: 34px;
+    border: 0; border-radius: 50%; background: transparent; color: #fff; cursor: pointer;
+  }
+  .asesor-cerrar:hover { background: color-mix(in oklab, #fff 14%, transparent); }
+
+  .asesor-log {
+    flex: 1;
+    min-height: 140px;
+    overflow-y: auto;
+    overscroll-behavior: contain;
+    padding: 16px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+  .asesor-msg {
+    max-width: 88%;
+    padding: 10px 13px;
+    border-radius: 14px;
+    font-size: 14px;
+    line-height: 1.5;
+    white-space: pre-wrap;
+    overflow-wrap: anywhere;
+  }
+  .asesor-msg-asesor { align-self: flex-start; background: #fff; border: 1px solid var(--line); border-bottom-left-radius: 4px; }
+  .asesor-msg-usuario { align-self: flex-end; background: var(--deep); color: #fff; border-bottom-right-radius: 4px; }
+  .asesor-msg-sistema { align-self: center; max-width: 100%; text-align: center; font-size: 12.5px; color: var(--mute); background: transparent; padding: 4px 8px; }
+  .asesor-escribiendo { color: var(--mute); }
+  .asesor-escribiendo::after { content: '…'; display: inline-block; animation: asesor-pulso 1s steps(3) infinite; }
+  @keyframes asesor-pulso { 50% { opacity: .3; } }
+
+  .asesor-sugerencias { display: flex; flex-wrap: wrap; gap: 8px; padding: 0 16px 12px; }
+  .asesor-sugerencias[hidden] { display: none; }
+  .asesor-sugerencias button {
+    font: inherit; font-size: 12.5px; line-height: 1.35; text-align: left;
+    padding: 7px 12px; border-radius: 999px; cursor: pointer;
+    color: var(--deep); background: color-mix(in oklab, var(--deep) 7%, #fff);
+    border: 1px solid color-mix(in oklab, var(--deep) 18%, transparent);
+  }
+  .asesor-sugerencias button:hover { background: color-mix(in oklab, var(--deep) 13%, #fff); }
+
+  .asesor-pie { padding: 12px 16px 14px; border-top: 1px solid var(--line); display: flex; flex-direction: column; gap: 10px; background: var(--paper-warm); }
+  .asesor-wa {
+    display: inline-flex; align-items: center; justify-content: center; gap: 8px;
+    padding: 10px 14px; border-radius: 999px; text-decoration: none;
+    font-size: 14px; font-weight: 600;
+    color: #0b5c2c; background: color-mix(in oklab, #25D366 16%, #fff);
+    border: 1px solid color-mix(in oklab, #25D366 40%, transparent);
+    transition: background .2s ease, color .2s ease;
+  }
+  .asesor-wa:hover { background: color-mix(in oklab, #25D366 26%, #fff); }
+  .asesor-wa-listo { color: #fff; background: #1ebe5c; border-color: #1ebe5c; }
+  .asesor-wa-listo:hover { background: #18a94f; }
+
+  .asesor-form { display: flex; align-items: flex-end; gap: 8px; }
+  .asesor-form[hidden] { display: none; }
+  .asesor-form textarea {
+    flex: 1; resize: none; font: inherit; font-size: 14px; line-height: 1.4;
+    padding: 10px 12px; border-radius: 12px; border: 1px solid var(--line-2);
+    background: #fff; color: var(--ink); max-height: 120px;
+  }
+  .asesor-form textarea:focus { outline: 2px solid color-mix(in oklab, var(--deep) 50%, transparent); outline-offset: 1px; }
+  .asesor-form button {
+    display: grid; place-items: center; width: 42px; height: 42px; flex: none;
+    border: 0; border-radius: 50%; background: var(--deep); color: #fff; cursor: pointer;
+  }
+  .asesor-form button:disabled { opacity: .5; cursor: progress; }
+  .asesor-aviso { margin: 0; font-size: 11.5px; color: var(--mute); text-align: center; }
+  .asesor-aviso[hidden] { display: none; }
+
+  .asesor.abierto .whatsapp-fab { background: var(--deep); box-shadow: 0 4px 16px color-mix(in oklab, var(--deep) 45%, transparent); }
+
+  @media (max-width: 600px) {
+    .asesor-panel { right: 16px; left: 16px; width: auto; bottom: 82px; max-height: calc(100dvh - 110px); }
+  }
+</style>
