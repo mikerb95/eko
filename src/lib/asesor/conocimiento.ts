@@ -80,13 +80,13 @@ export function conocimiento(locale: Locale): string {
 
   if (es) {
     return `## Quién es Ekosolv
-${SITE_LEGAL_NAME}. ${SITE_TAGLINE.es} Opera desde ${FOUNDED_YEAR} y ha gestionado más de ${tonnesManaged('es')} toneladas de RAEE desde ese año. Sede en ${SITE_ADDRESS.edificio}, ${SITE_ADDRESS.calle}, ${SITE_ADDRESS.ciudad}. La consultoría (EKONSULTING) se presta de forma remota en todo el país; la logística de recolección (EKORAEE, EKOPARTNER) es solo en Colombia.
+${SITE_LEGAL_NAME} ${SITE_TAGLINE.es} Opera desde ${FOUNDED_YEAR} y ha gestionado ${tonnesManaged('es')} toneladas de RAEE desde ese año. Sede en ${SITE_ADDRESS.edificio}, ${SITE_ADDRESS.calle}, ${SITE_ADDRESS.ciudad}. La asesoría normativa se presta de forma remota en todo el país. La recolección se coordina caso a caso según volumen y ubicación, y se confirma la cobertura antes de agendar.
 
 ## Líneas de servicio
 ${lineas}
 
 ## Forma de trabajo
-${f.modalidades} ${f.diagnostico}: ${f.diagnosticoMin} minutos con un consultor. Ekosolv no publica tarifas: cada caso se cotiza después del diagnóstico, según el alcance.
+${f.modalidades} ${f.diagnostico} (${f.diagnosticoMin} minutos). Las tarifas no están publicadas: cada caso se cotiza según su alcance.
 
 ## Normativa que publica el sitio (/normativas)
 ${listaNormas}
@@ -103,13 +103,13 @@ WhatsApp y teléfono ${tel}, correo ${SITE_ADDRESS.correo}. El formulario de /co
   }
 
   return `## Who Ekosolv is
-${SITE_LEGAL_NAME}. ${SITE_TAGLINE.en} Operating since ${FOUNDED_YEAR}, it has managed more than ${tonnesManaged('en')} tonnes of WEEE since then. Offices at ${SITE_ADDRESS.edificio}, ${SITE_ADDRESS.calle}, ${SITE_ADDRESS.ciudad}, Colombia. Consulting (EKONSULTING) is delivered remotely; collection logistics (EKORAEE, EKOPARTNER) are Colombia only.
+${SITE_LEGAL_NAME} ${SITE_TAGLINE.en} Operating since ${FOUNDED_YEAR}, it has managed ${tonnesManaged('en')} tonnes of WEEE since then. Offices at ${SITE_ADDRESS.edificio}, ${SITE_ADDRESS.calle}, ${SITE_ADDRESS.ciudad}, Colombia. Regulatory advisory is delivered remotely nationwide. Collection is arranged case by case based on volume and location, and coverage is confirmed before scheduling.
 
 ## Service lines
 ${lineas}
 
 ## How we work
-${f.modalidades} ${f.diagnostico}: ${f.diagnosticoMin} minutes with a consultant. Ekosolv does not publish rates: every case is quoted after the diagnostic, depending on scope.
+${f.modalidades} ${f.diagnostico} (${f.diagnosticoMin} minutes). Rates are not published: every case is quoted according to its scope.
 
 ## Regulations published on the site (/en/regulations)
 ${listaNormas}
