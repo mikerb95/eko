@@ -228,13 +228,13 @@ competencia.
 ## 10. Capacitación en IA (agregado 2026-10-20)
 
 Servicio **aparte, con precio propio**, independiente de la automatización. Puede empezar ya mientras
-se cierran las cifras de la automatización, y genera ingreso inmediato. Sábados de 8:00 a 11:00 a. m.,
+se cierran las cifras de la automatización, y genera ingreso inmediato. Sábados, con fechas y horario bajo acuerdo,
 hasta 12 participantes, presencial en la oficina de Ekosolv o virtual.
 
 | | Plan Esencial | Plan Completo |
 |---|---|---|
 | Sesiones | 2 sábados de 3 h (6 h) | 4 sábados de 3 h (12 h) |
-| Fechas propuestas | 7 y 14 de noviembre | 7, 14, 21 y 28 de noviembre |
+| Fechas y horario | Bajo acuerdo | Bajo acuerdo |
 | Material | Guía y biblioteca de instrucciones | + espacios de trabajo por área y borrador de política de uso de IA |
 | Precio | $600.000 | $1.000.000 |
 
@@ -273,16 +273,19 @@ Asunto: RE: PROPUESTA AUTOMATIZACIÓN e IA PARA EKOSOLV
 >
 > [LINK]
 >
-> Para la capacitación armé dos planes, los dos en sábado de 8:00 a 11:00 a. m.:
+> Para la capacitación armé dos planes, los dos en sábado, con fechas y horario a convenir:
 >
-> - **Plan Esencial:** 2 sábados de 3 horas (7 y 14 de noviembre), por $600.000.
-> - **Plan Completo:** 4 sábados de 3 horas (7, 14, 21 y 28 de noviembre), por $1.000.000. Además
+> - **Plan Esencial:** 2 sábados de 3 horas, por $600.000.
+> - **Plan Completo:** 4 sábados de 3 horas, por $1.000.000. Además
 >   del uso diario, deja montados los espacios de trabajo del equipo y unas reglas internas de uso de
 >   IA.
 >
+> Estos valores aplican si contratan también la automatización; la capacitación sola vale
+> $800.000 y $1.400.000.
+>
 > Los dos son para hasta 12 personas, presenciales en la oficina o virtuales, y trabajan sobre
 > documentos reales de Ekosolv. Cada participante necesita una suscripción a Claude (plan Pro o
-> Team) a nombre de la empresa. Las fechas se pueden mover si les queda mejor otro sábado.
+> Team) a nombre de la empresa.
 >
 > La automatización va en el mismo documento, ya ajustada a su Zoho CRM. Es un solo proyecto que
 > incluye todo: arranca desde el Brief y deja lista la propuesta, la estimación en Books, la carpeta
@@ -291,9 +294,14 @@ Asunto: RE: PROPUESTA AUTOMATIZACIÓN e IA PARA EKOSOLV
 > los documentos y los vencimientos, y cuando algo aplica les manda una alerta con la norma, el
 > plazo y la acción sugerida. La decisión siempre queda en manos del consultor.
 >
-> La mensualidad solo cambia según cuántas propuestas hagan al mes: desde $1.035.000 con hasta 20
-> (hay niveles de 20, 40 y 80). En la página 5 del documento explico de dónde sale cada cifra y cómo
-> se compara con las horas de un consultor.
+> Y por contratar la automatización les incluyo un chat con IA en el sitio web de Ekosolv: atiende
+> a clientes y visitantes al instante, a cualquier hora, con la normativa vigente, los casos de
+> Ekosolv y la base de conocimiento de la empresa, y cuando hace falta le pasa la conversación a un
+> consultor. También incluyo 2 horas de capacitación para el equipo en el uso del panel y del
+> agente, en la fecha que acordemos.
+>
+> La mensualidad solo cambia según cuántas propuestas hagan al mes (hay niveles de 20, 40 y 80):
+> desde $1.185.000 con hasta 20, y entre más propuestas, menor el precio por propuesta. Desde el mes 19 baja, porque la construcción ya queda pagada. En la página 5 del documento está el desglose de la mensualidad.
 >
 > Para ajustar las cifras necesito algunos datos que dejé al final del documento, sobre todo cuántas
 > propuestas hacen al mes y cuánto tiempo les toma cada una.
@@ -370,3 +378,57 @@ Sobre el precio de referencia completo es un descuento acumulado del 65%. La cap
 >
 > Ejemplo de la página 5 (40 propuestas): $12.000.000 a mano frente a $4.320.000 con el sistema,
 > ahorro de unos $7.700.000 y 180 horas al mes.
+
+> **Bono chat con IA en la web (2026-10-21):** incluido sin costo al contratar la automatización.
+> Responde con normativa, casos de Ekosolv (anonimizados) y RAG de la empresa; escala a un consultor
+> con resumen. Va en el cronograma semanas 7 y 8. Condición: solo información aprobada por Ekosolv,
+> sin datos personales. **Riesgo interno:** su consumo de IA sale del margen. Estimado con Sonnet 5.5
+> y caché: ~$300 COP por conversación de 5 mensajes, unos $90.000/mes con 300 conversaciones. Con
+> Haiku 5.5 sería mucho menos. Si el tráfico crece, poner un tope de uso razonable. Para construirlo,
+> usar la skill `chat-ia`.
+
+> **Desglose de la mensualidad (2026-10-21), mismos totales:**
+>
+> | Componente | Meses 1 a 24 | Desde el mes 25 |
+> |---|---|---|
+> | Construcción (todo lo de la página 3, en 24 cuotas = $9.600.000) | $400.000 | Ya pagada |
+> | Infraestructura (servidores, base de datos, almacenamiento, copias) | $150.000 | $150.000 |
+> | Funcionamiento del agente (vigilancia diaria, chat web, 8 h de soporte) | $200.000 | $200.000 |
+> | Propuestas con IA (20 / 40 / 80) | $285.000 / $570.000 / $1.140.000 | Igual |
+>
+> El reparto 150/200 de los $350.000 fijos es una asignación propuesta; ajustarlo si el costo real
+> de servidores es distinto. Va en la página 5 de la propuesta.
+
+> **Construcción a 18 meses (2026-10-21):** misma cuota de $400.000, ahora 18 cuotas (total
+> $7.200.000, antes $9.600.000). Plazo mínimo 18 meses. Meses 1 a 18: $1.035.000 / $1.320.000 /
+> $1.890.000; desde el mes 19: $635.000 / $920.000 / $1.490.000.
+
+> **2026-10-21:** se quitaron de la propuesta "Cómo cobra la IA" y la comparación con horas de
+> consultor. La página 5 ahora es "Desglose de la mensualidad" (componentes + bono del chat).
+
+> **Capacitación con o sin automatización (2026-10-21):** $600.000 / $1.000.000 solo si contratan
+> también la automatización; sola: $900.000 / $1.500.000. Anticipo 50% de la sola: $450.000 / $750.000.
+
+> **Ajuste:** capacitación sola pasa a $800.000 / $1.400.000 (anticipo 50%: $400.000 / $700.000).
+
+> **Bono 2 h de capacitación con el agente (2026-10-21):** incluido al contratar la automatización; uso del panel y del agente de cumplimiento, en la semana de entrega.
+
+> **Valores con descuento por volumen y cláusulas de protección (2026-10-21, reemplaza los anteriores):**
+>
+> | Componente | Hasta 20 | Hasta 40 | Hasta 80 |
+> |---|---|---|---|
+> | Construcción (18 cuotas) | $400.000 | $400.000 | $400.000 |
+> | Infraestructura | $150.000 | $150.000 | $150.000 |
+> | Funcionamiento (agente, chat, 8 h soporte) | $350.000 | $350.000 | $350.000 |
+> | Propuestas con IA | $285.000 ($14.250 c/u) | $500.000 ($12.500 c/u) | $800.000 ($10.000 c/u) |
+> | **Total meses 1 a 18** | **$1.185.000** ($59.250 c/u) | **$1.400.000** ($35.000 c/u) | **$1.700.000** ($21.250 c/u) |
+> | **Desde el mes 19** | **$785.000** | **$1.000.000** | **$1.300.000** |
+>
+> - Excedente: $25.000 por propuesta sobre el nivel contratado (más caro que cualquier nivel, para empujar a subir).
+> - Propuesta con documentos de más de 100 páginas cuenta como 2.
+> - Cláusulas nuevas: tarifas se confirman con el consumo real de las primeras 4 semanas; ajuste anual
+>   por IPC; si la TRM varía más del 10% se revisa el componente de IA.
+> - Funcionamiento subió de $200.000 a $350.000 porque 8 h de soporte ya valían ~$400.000.
+> - **Interno, obligatorio:** procesar con Batch API. Sin él, el nivel de 80 con propuestas largas
+>   pierde ~$368.000/mes en IA. Con Batch, el peor caso (todas largas) cuesta ~$7.300 c/u.
+> - Se quitó el cierre de la página 6 para que cupieran las cláusulas.

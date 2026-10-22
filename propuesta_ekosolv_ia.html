@@ -85,6 +85,10 @@
   .price { font: 600 13pt/1 var(--body); color: var(--ink); letter-spacing: -.01em; white-space: nowrap; }
   .unit { font-size: 8pt; color: var(--mute); white-space: nowrap; }
   .tight th, .tight td { padding-block: 2.1mm; }
+  .comp tbody th { width: 46%; font-size: 8.5pt; }
+  .comp td, .comp thead th:not(:first-child) { text-align: right; }
+  .comp tr.group td { text-align: left; }
+  .comp tbody th b { font-size: 9.3pt; }
   .tight tr.group td { padding-top: 3.5mm; }
   td.nw { white-space: nowrap; width: 1%; padding-right: 8mm; }
   td.r, th.r { text-align: right; white-space: nowrap; }
@@ -123,14 +127,19 @@
   .bar.f2 { background: var(--blue); }
   .bar.s1 { background: #6CC3BC; } .bar.s2 { background: #2FB0A5; } .bar.s3 { background: var(--teal); } .bar.s4 { background: #037A71; }
 
+  .bonus { background: var(--tint-blue); border-radius: 1.5mm; padding: 5mm 6mm; display: flex; flex-direction: column; gap: 2mm; font-size: 9pt; }
+  .bonus .phase-tag { color: var(--blue); }
+  .bonus-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 7mm; }
+  .bonus-grid > div { display: flex; flex-direction: column; gap: 1.5mm; min-width: 0; }
+  .sheet.dense { gap: 7mm; }
   /* Condiciones y próximos pasos */
   .cols { display: grid; grid-template-columns: 1fr 1fr; gap: 9mm; }
   .cols > div { display: flex; flex-direction: column; gap: 3mm; min-width: 0; }
-  ul.cond { margin: 0; padding: 0; list-style: none; display: grid; gap: 2.4mm; font-size: 9pt; }
+  ul.cond { margin: 0; padding: 0; list-style: none; display: grid; gap: 1.6mm; font-size: 9pt; }
   ul.cond li { padding-left: 4.5mm; position: relative; }
   ul.cond li::before { content: ""; position: absolute; left: 0; top: .65em; width: 1.5mm; height: 1.5mm; background: var(--teal); border-radius: 50%; }
   .cols > div:last-child ul.cond li::before { background: var(--blue); }
-  ol.check { margin: 0; padding: 0; list-style: none; display: grid; grid-template-columns: 1fr 1fr; gap: 2.6mm 9mm; font-size: 9pt; }
+  ol.check { margin: 0; padding: 0; list-style: none; display: grid; grid-template-columns: 1fr 1fr; gap: 2mm 9mm; font-size: 9pt; }
   ol.check li { display: flex; gap: 2.5mm; align-items: baseline; }
   ol.check li::before { content: ""; flex: none; width: 3mm; height: 3mm; border: 1px solid var(--mute); border-radius: .6mm; transform: translateY(.5mm); }
   .closing { background: var(--tint); border-radius: 1.5mm; padding: 5mm 6mm; font-size: 9.5pt; color: var(--ink); }
@@ -140,7 +149,7 @@
     h1 { font-size: 28pt; }
     h2 { font-size: 21pt; }
     .index, .steps { grid-template-columns: 1fr 1fr; }
-    .blocks, .watch, .cols, ol.check { grid-template-columns: 1fr; }
+    .blocks, .watch, .cols, ol.check, .bonus-grid { grid-template-columns: 1fr; }
   }
   @page { size: A4; margin: 0; }
   @media print {
@@ -168,21 +177,21 @@
         <thead><tr><th>Servicio</th><th>Qué incluye</th><th class="r">Inversión</th></tr></thead>
         <tbody class="num">
           <tr class="group"><td colspan="3">Capacitación en IA · pago único</td></tr>
-          <tr><td class="nw"><b>Plan Esencial</b></td><td>2 sábados de 3 horas</td><td class="r"><span class="price">$600.000</span></td></tr>
-          <tr><td class="nw"><b>Plan Completo</b></td><td>4 sábados de 3 horas</td><td class="r"><span class="price">$1.000.000</span></td></tr>
-          <tr class="group blue"><td colspan="3">Automatización · mensualidad a 24 meses</td></tr>
-          <tr><td class="nw"><b>Proyecto completo</b></td><td>Propuestas desde el Brief en Zoho CRM, panel web, agente de cumplimiento y detección de oportunidades</td><td class="r"><span class="unit">desde</span> <span class="price">$1.035.000</span> <span class="unit">/ mes</span></td></tr>
+          <tr><td class="nw"><b>Plan Esencial</b></td><td>2 sábados de 3 horas</td><td class="r"><span class="price">$600.000</span><br><span class="unit">Sola: $800.000</span></td></tr>
+          <tr><td class="nw"><b>Plan Completo</b></td><td>4 sábados de 3 horas</td><td class="r"><span class="price">$1.000.000</span><br><span class="unit">Sola: $1.400.000</span></td></tr>
+          <tr class="group blue"><td colspan="3">Automatización · mensualidad</td></tr>
+          <tr><td class="nw"><b>Proyecto completo</b></td><td>Propuestas desde el Brief en Zoho CRM, panel web, agente de cumplimiento, detección de oportunidades y chat con IA en el sitio web</td><td class="r"><span class="unit">desde</span> <span class="price">$1.185.000</span> <span class="unit">/ mes</span></td></tr>
         </tbody>
       </table>
     </div>
-    <p class="note">La capacitación y la automatización se contratan por separado. La automatización incluye todo y se cobra solo según el volumen de propuestas al mes (detalle en las páginas 4 y 5). Valores en pesos colombianos.</p>
+    <p class="note">La capacitación tiene precio especial al contratarla con la automatización. La automatización incluye todo y se cobra solo según el volumen de propuestas al mes (detalle en las páginas 4 y 5). Valores en pesos colombianos.</p>
   </section>
 
   <ol class="index">
     <li><span>Página 2</span>Capacitación en IA</li>
     <li><span>Página 3</span>Automatización</li>
     <li><span>Página 4</span>Cronograma e inversión</li>
-    <li><span>Página 5</span>Por qué cuesta lo que cuesta</li>
+    <li><span>Página 5</span>Desglose de la mensualidad</li>
     <li><span>Página 6</span>Condiciones y próximos pasos</li>
   </ol>
 
@@ -195,7 +204,7 @@
 
   <div class="page-head">
     <span class="eyebrow">01 · Capacitación en IA</span>
-    <h2>Dos planes, los sábados de 8:00 a 11:00 a. m.</h2>
+    <h2>Dos planes de capacitación los sábados</h2>
     <p>Práctica sobre documentos reales de Ekosolv: resoluciones, informes y propuestas. Cada sesión es 30% explicación y 70% trabajo en computador.</p>
   </div>
 
@@ -206,10 +215,11 @@
         <thead><tr><th></th><th>Plan Esencial</th><th>Plan Completo</th></tr></thead>
         <tbody class="num">
           <tr><th>Sesiones</th><td>2 sábados de 3 h (6 h)</td><td>4 sábados de 3 h (12 h)</td></tr>
-          <tr><th>Fechas propuestas</th><td>7 y 14 de noviembre</td><td>7, 14, 21 y 28 de noviembre</td></tr>
+          <tr><th>Fechas y horario</th><td>Bajo acuerdo</td><td>Bajo acuerdo</td></tr>
           <tr><th>Participantes</th><td>Hasta 12</td><td>Hasta 12</td></tr>
           <tr><th>Material</th><td>Guía de uso y biblioteca de instrucciones de Ekosolv</td><td>Lo mismo, más espacios de trabajo por área y borrador de política de uso de IA</td></tr>
-          <tr class="total"><th>Inversión</th><td><span class="price">$600.000</span></td><td><span class="price">$1.000.000</span></td></tr>
+          <tr class="total"><th>Con la automatización</th><td><span class="price">$600.000</span></td><td><span class="price">$1.000.000</span></td></tr>
+          <tr><th>Contratada sola</th><td>$800.000</td><td>$1.400.000</td></tr>
         </tbody>
       </table>
     </div>
@@ -297,13 +307,14 @@
   <section class="stack">
     <h3>Cronograma</h3>
     <div class="tbl">
-      <div class="gantt" role="img" aria-label="Proyecto de 8 semanas: levantamiento semana 1, flujo de propuestas semanas 2 y 3, panel web y agente semanas 4 a 6, piloto semanas 6 y 7, entrega semana 8.">
+      <div class="gantt" role="img" aria-label="Proyecto de 8 semanas: levantamiento semana 1, flujo de propuestas semanas 2 y 3, panel web y agente semanas 4 a 6, piloto semanas 6 y 7, chat con IA semanas 7 y 8, entrega semana 8.">
         <span class="wk" style="text-align:left">Semana</span>
         <span class="wk">1</span><span class="wk">2</span><span class="wk">3</span><span class="wk">4</span><span class="wk">5</span><span class="wk">6</span><span class="wk">7</span><span class="wk">8</span>
         <span class="row-l">Levantamiento</span><span class="bar s1" style="grid-column:2/3"></span><span style="grid-column:3/10"></span>
         <span class="row-l">Flujo de propuestas</span><span style="grid-column:2/3"></span><span class="bar s2" style="grid-column:3/5"></span><span style="grid-column:5/10"></span>
         <span class="row-l">Panel web y agente</span><span style="grid-column:2/5"></span><span class="bar f2" style="grid-column:5/8"></span><span style="grid-column:8/10"></span>
         <span class="row-l">Piloto con casos reales</span><span style="grid-column:2/7"></span><span class="bar s3" style="grid-column:7/9"></span><span style="grid-column:9/10"></span>
+        <span class="row-l">Chat con IA en la web</span><span style="grid-column:2/8"></span><span class="bar f2" style="grid-column:8/10"></span>
         <span class="row-l">Entrega y medición</span><span style="grid-column:2/9"></span><span class="bar s4" style="grid-column:9/10"></span>
       </div>
     </div>
@@ -314,69 +325,72 @@
     <h3>Inversión de la automatización</h3>
     <div class="tbl">
       <table class="tight">
-        <thead><tr><th>Propuestas al mes</th><th>Meses 1 a 24</th><th>Desde el mes 25</th></tr></thead>
+        <thead><tr><th>Propuestas al mes</th><th>Meses 1 a 18</th><th>Desde el mes 19</th></tr></thead>
         <tbody class="num">
-          <tr class="lead"><th>Hasta 20</th><td><span class="price">$1.035.000</span> <span class="unit">/ mes</span></td><td>$635.000 <span class="unit">/ mes</span></td></tr>
-          <tr class="lead"><th>Hasta 40</th><td><span class="price">$1.320.000</span> <span class="unit">/ mes</span></td><td>$920.000 <span class="unit">/ mes</span></td></tr>
-          <tr class="lead"><th>Hasta 80</th><td><span class="price">$1.890.000</span> <span class="unit">/ mes</span></td><td>$1.490.000 <span class="unit">/ mes</span></td></tr>
-          <tr><th>Más de 80</th><td>+ $15.000 por propuesta adicional</td><td>+ $15.000 por propuesta adicional</td></tr>
+          <tr class="lead"><th>Hasta 20</th><td><span class="price">$1.185.000</span> <span class="unit">/ mes</span><br><span class="unit">$59.250 por propuesta</span></td><td>$785.000 <span class="unit">/ mes</span></td></tr>
+          <tr class="lead"><th>Hasta 40</th><td><span class="price">$1.400.000</span> <span class="unit">/ mes</span><br><span class="unit">$35.000 por propuesta</span></td><td>$1.000.000 <span class="unit">/ mes</span></td></tr>
+          <tr class="lead"><th>Hasta 80</th><td><span class="price">$1.700.000</span> <span class="unit">/ mes</span><br><span class="unit">$21.250 por propuesta</span></td><td>$1.300.000 <span class="unit">/ mes</span></td></tr>
+          <tr><th>Excedente</th><td colspan="2">$25.000 por propuesta sobre el nivel contratado</td></tr>
           <tr><th>Soporte incluido</th><td>8 h al mes</td><td>8 h al mes</td></tr>
         </tbody>
       </table>
     </div>
-    <p class="note">Sin inversión inicial. Desde el mes 25 baja porque la construcción ya quedó pagada. Valores preliminares hasta recibir la información de la página 6.</p>
+    <p class="note">Sin inversión inicial. Una propuesta con documentos de más de 100 páginas cuenta como 2 dentro del cupo. El desglose está en la página 5.</p>
   </section>
 
-  <div class="foot"><span>Ekosolv · Propuesta comercial</span><span>Página 4 de 6</span></div>
+<div class="foot"><span>Ekosolv · Propuesta comercial</span><span>Página 4 de 6</span></div>
 </article>
 
-<!-- Hoja 5: por qué cuesta lo que cuesta -->
+<!-- Hoja 5: desglose de la mensualidad -->
 <article class="sheet">
   <div class="runhead"><b>Ekosolv</b><span>Capacitación en IA y automatización de propuestas</span></div>
 
   <div class="page-head">
     <span class="eyebrow">04 · Qué paga la mensualidad</span>
-    <h2>Por qué cuesta lo que cuesta</h2>
-    <p>La mensualidad tiene una parte fija (construcción, servidores, soporte y agente) y otra que depende de cuántas propuestas prepara la IA en el mes.</p>
+    <h2>Desglose de la mensualidad</h2>
+    <p>Tres partes fijas y una que depende del volumen. Desde el mes 19 ya no se paga construcción.</p>
   </div>
 
   <section class="stack">
-    <h3>Cómo cobra la IA</h3>
-    <p>La IA no cobra por hora ni por licencia: cobra por la cantidad de texto que lee y escribe. Para preparar una propuesta, el sistema lee los documentos del cliente, las plantillas y las normas de Ekosolv, razona en varios pasos (diagnóstico, borrador, revisión normativa, costeo y presentación) y escribe el resultado. Entre más largo el documento y más profundo el análisis, más texto procesa y más cuesta.</p>
+    <h3>Componentes</h3>
     <div class="tbl">
-      <table>
-        <thead><tr><th></th><th>Propuesta corta</th><th>Propuesta larga</th></tr></thead>
-        <tbody>
-          <tr><th>Ejemplo</th><td>Poca documentación</td><td>EIA o PMA de 100 a 150 páginas</td></tr>
-          <tr><th>Lo que lee la IA</th><td>Unas 500 páginas</td><td>Unas 1.800 páginas</td></tr>
-          <tr><th>Lo que escribe</th><td>Unas 120 páginas</td><td>Unas 400 páginas</td></tr>
+      <table class="tight comp">
+        <thead><tr><th>Componente</th><th>Hasta 20</th><th>Hasta 40</th><th>Hasta 80</th></tr></thead>
+        <tbody class="num">
+          <tr class="group"><td colspan="4">Meses 1 a 18</td></tr>
+          <tr><th><b>Construcción</b><br>Desarrollo de todo lo de la página 3, en 18 cuotas</th><td>$400.000</td><td>$400.000</td><td>$400.000</td></tr>
+          <tr><th><b>Infraestructura</b><br>Servidores, base de datos, almacenamiento y copias de seguridad</th><td>$150.000</td><td>$150.000</td><td>$150.000</td></tr>
+          <tr><th><b>Funcionamiento del agente</b><br>Vigilancia diaria, chat web y 8 h de soporte</th><td>$350.000</td><td>$350.000</td><td>$350.000</td></tr>
+          <tr><th><b>Propuestas con IA</b><br>Consumo de IA según el nivel, con descuento por volumen</th><td>$285.000</td><td>$500.000</td><td>$800.000</td></tr>
+          <tr class="total"><th><b>Total al mes</b></th><td><span class="price">$1.185.000</span></td><td><span class="price">$1.400.000</span></td><td><span class="price">$1.700.000</span></td></tr>
+          <tr class="group"><td colspan="4">Desde el mes 19</td></tr>
+          <tr><th><b>Construcción</b><br>Ya pagada</th><td>$0</td><td>$0</td><td>$0</td></tr>
+          <tr><th><b>Infraestructura, agente y propuestas</b><br>Iguales a los meses 1 a 18</th><td>$785.000</td><td>$1.000.000</td><td>$1.300.000</td></tr>
+          <tr class="total"><th><b>Total al mes</b></th><td><span class="price">$785.000</span></td><td><span class="price">$1.000.000</span></td><td><span class="price">$1.300.000</span></td></tr>
         </tbody>
       </table>
     </div>
-    <p class="note">Páginas sumadas en todos los pasos; lo escrito incluye el razonamiento interno de la IA. Por eso el precio va por niveles de volumen: Ekosolv paga lo que usa, sin sorpresas a fin de mes.</p>
   </section>
 
-  <section class="stack">
-    <h3>Comparado con hacerlo a mano</h3>
-    <p>Ejemplo con 40 propuestas al mes:</p>
-    <div class="tbl">
-      <table>
-        <thead><tr><th></th><th>Hoy</th><th>Con el sistema</th></tr></thead>
-        <tbody class="num">
-          <tr class="lead"><th>Horas del equipo</th><td><span class="price">240 h</span></td><td><span class="price">60 h</span></td></tr>
-          <tr class="lead"><th>Costo al mes</th><td><span class="price">$12.000.000</span></td><td><span class="price">$4.320.000</span></td></tr>
-        </tbody>
-      </table>
+  <section class="bonus">
+    <span class="phase-tag">Incluido al contratar la automatización</span>
+    <div class="bonus-grid">
+      <div>
+        <h3>Chat con IA en el sitio web</h3>
+        <p>Atiende al instante con la normativa, los casos de Ekosolv y su base de conocimiento. Si hace falta, pasa la conversación a un consultor.</p>
+      </div>
+      <div>
+        <h3>2 horas de capacitación con el agente</h3>
+        <p>Uso del panel y del agente de cumplimiento: alertas, reglas, expedientes y cómo actuar. Fecha bajo acuerdo.</p>
+      </div>
     </div>
-    <p><b>Ahorro: 180 horas al mes, casi un consultor de tiempo completo, y unos $7.700.000.</b></p>
-    <p class="note">Supuestos: hoy una propuesta toma 6 horas; con el sistema, 1,5 horas de revisión. Hora de consultor a $50.000. El costo con el sistema incluye la mensualidad. Las cifras reales se miden con la línea base de la página 6.</p>
   </section>
 
   <div class="foot"><span>Ekosolv · Propuesta comercial</span><span>Página 5 de 6</span></div>
 </article>
 
 <!-- Hoja 6: condiciones y próximos pasos -->
-<article class="sheet">
+<article class="sheet dense">
   <div class="runhead"><b>Ekosolv</b><span>Capacitación en IA y automatización de propuestas</span></div>
 
   <div class="page-head">
@@ -390,7 +404,7 @@
       <ul class="cond">
         <li>Pago del 50% al confirmar la fecha de inicio y 50% al terminar la última sesión.</li>
         <li>Hasta 12 participantes, presencial en la oficina de Ekosolv o virtual, por el mismo valor.</li>
-        <li>Las fechas se pueden mover a otros sábados con una semana de aviso.</li>
+        <li>Fechas y horario bajo acuerdo; se pueden mover con una semana de aviso.</li>
         <li>Cada participante necesita una suscripción activa a Claude (plan Pro o Team), contratada por Ekosolv antes de la primera sesión.</li>
         <li>Para la modalidad presencial: sala con proyector e internet, y cada participante con su computador.</li>
         <li>Ekosolv comparte 3 o 4 documentos de trabajo una semana antes de empezar.</li>
@@ -399,13 +413,16 @@
     <div>
       <h3>Automatización</h3>
       <ul class="cond">
-        <li>Plazo mínimo de 24 meses. Si el contrato termina antes, se liquida el saldo pendiente de la construcción.</li>
+        <li>Plazo mínimo de 18 meses. Si el contrato termina antes, se liquida el saldo pendiente de la construcción.</li>
         <li>Las horas de soporte no son acumulables. Los ajustes a plantillas o reglas después de la entrega usan esas horas.</li>
         <li>El nivel de volumen se elige al firmar y se cambia con un mes de aviso.</li>
+        <li>Las tarifas se confirman con el consumo real de las primeras 4 semanas de operación.</li>
+        <li>Ajuste anual por IPC. Si la TRM varía más del 10%, se revisa el componente de IA.</li>
         <li>El sistema genera borradores y alertas. La decisión técnica y el envío al cliente son del consultor.</li>
         <li>Las reglas del diagnóstico y del agente las valida el equipo técnico de Ekosolv antes de entrar en uso.</li>
         <li>El agente vigila fuentes públicas y los expedientes a los que Ekosolv dé acceso. Donde una autoridad no publica en línea, la cobertura es parcial.</li>
         <li>Propuesta y presentación en español, en PowerPoint. Inglés y Zoho Show se cotizan aparte.</li>
+        <li>El chat solo usa información aprobada por Ekosolv, sin datos personales de clientes.</li>
         <li>No incluye migración de datos históricos, prospección en frío ni compra de bases de datos.</li>
       </ul>
     </div>
@@ -423,7 +440,6 @@
       <li>Responsable técnico para validar las reglas (4 a 6 h)</li>
       <li>Autoridades y expedientes que vigilará el agente</li>
     </ol>
-    <p class="closing">Con el plan de capacitación y la fecha confirmados apartamos los sábados. Con la línea base y las muestras cerramos las cifras definitivas de la automatización.</p>
   </section>
 
   <div class="foot"><span>Ekosolv · Propuesta comercial</span><span>Página 6 de 6</span></div>
