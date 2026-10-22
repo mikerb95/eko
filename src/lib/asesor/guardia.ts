@@ -29,9 +29,11 @@ const MULTIPLICADOR: Record<string, number> = {
   k: 1e3,
 }
 
-// $ o US$ delante, o COP/USD/millones/mil/M/k detrás (al menos una marca).
+// $, US$, USD o COP delante, o COP/USD/millones/mil/M/k detrás (al menos una
+// marca). "USD 1.500" y "COP 2.000.000" con la moneda delante no estaban en la
+// copia original del portafolio: se agregaron aquí.
 const PATRON =
-  /(US\$|COP\s?\$|\$)?\s?(\d{1,3}(?:[.,]\d{3})+|\d+(?:[.,]\d{1,2})?)(?:\s?(millones|millón|millon|mil|M|k)\b)?(?:\s?(COP|USD|pesos|dólares|dolares))?/gi
+  /(US\$|COP\s?\$|USD\s?|COP\s?|\$)?\s?(\d{1,3}(?:[.,]\d{3})+|\d+(?:[.,]\d{1,2})?)(?:\s?(millones|millón|millon|mil|M|k)\b)?(?:\s?(COP|USD|pesos|dólares|dolares))?/gi
 
 /** Lee un número con separadores de miles o un decimal corto. Devuelve [valor, decimales]. */
 function leerNumero(crudo: string): [number, number] {
