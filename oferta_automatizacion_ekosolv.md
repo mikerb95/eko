@@ -273,46 +273,50 @@ Asunto: RE: PROPUESTA AUTOMATIZACIÓN e IA PARA EKOSOLV
 >
 > [LINK]
 >
-> Para la capacitación armé dos planes, los dos en sábado, con fechas y horario a convenir:
+> **Capacitación en IA.** Armé dos planes en sábado, con fechas y horario a convenir, para hasta 12
+> personas, presenciales en la oficina o virtuales, y siempre sobre documentos reales de Ekosolv:
 >
 > - **Plan Esencial:** 2 sábados de 3 horas, por $600.000.
-> - **Plan Completo:** 4 sábados de 3 horas, por $1.000.000. Además
->   del uso diario, deja montados los espacios de trabajo del equipo y unas reglas internas de uso de
->   IA.
+> - **Plan Completo:** 4 sábados de 3 horas, por $1.000.000. Además del uso diario, deja montados
+>   los espacios de trabajo del equipo y unas reglas internas de uso de IA.
 >
-> Estos valores aplican si contratan también la automatización; la capacitación sola vale
-> $800.000 y $1.400.000.
+> Esos valores aplican si contratan también la automatización; la capacitación sola vale $800.000
+> y $1.400.000. Cada participante necesita una cuenta de Claude (plan Pro o Team) a nombre de la
+> empresa.
 >
-> Los dos son para hasta 12 personas, presenciales en la oficina o virtuales, y trabajan sobre
-> documentos reales de Ekosolv. Cada participante necesita una suscripción a Claude (plan Pro o
-> Team) a nombre de la empresa.
+> **Automatización.** Es un solo proyecto, ya ajustado a su Zoho One. El consultor registra el Brief
+> como hoy y, el mismo día, encuentra lista la propuesta, la estimación en Books, la carpeta en
+> WorkDrive y la presentación para revisar y enviar. Además incluye un panel web con un agente de
+> cumplimiento que revisa todos los días la normativa nueva, los autos de sus clientes, los
+> documentos y los vencimientos, y le avisa al consultor responsable con la norma, el plazo y la
+> acción sugerida. La decisión siempre queda en manos del equipo.
 >
-> La automatización va en el mismo documento, ya ajustada a su Zoho CRM. Es un solo proyecto que
-> incluye todo: arranca desde el Brief y deja lista la propuesta, la estimación en Books, la carpeta
-> en WorkDrive y la presentación para que el consultor solo la revise. Además trae un panel web con
-> un agente de cumplimiento que revisa todos los días la normativa nueva, los autos de sus clientes,
-> los documentos y los vencimientos, y cuando algo aplica les manda una alerta con la norma, el
-> plazo y la acción sugerida. La decisión siempre queda en manos del consultor.
+> Al contratar la automatización les incluyo también un chat con IA para el sitio web, que atiende
+> a los visitantes al instante y pasa a un consultor cuando hace falta, y 2 horas de capacitación
+> en el uso del panel y del agente.
 >
-> Y por contratar la automatización les incluyo un chat con IA en el sitio web de Ekosolv: atiende
-> a clientes y visitantes al instante, a cualquier hora, con la normativa vigente, los casos de
-> Ekosolv y la base de conocimiento de la empresa, y cuando hace falta le pasa la conversación a un
-> consultor. También incluyo 2 horas de capacitación para el equipo en el uso del panel y del
-> agente, en la fecha que acordemos.
+> **Valores.** Hay tres planes, de hasta 20, 40 y 80 propuestas al mes. Los tres incluyen lo mismo
+> (agente, panel, chat y soporte); solo cambia el volumen de propuestas:
 >
-> Hay tres planes, de hasta 20, 40 y 80 propuestas al mes. Los tres incluyen el agente, el panel, el
-> chat y el soporte; lo único que cambia es cuántas propuestas hacen al mes. Desde $1.185.000. El desarrollo arranca con un anticipo de $500.000 y la primera
-> mensualidad se cobra cuando el sistema ya esté funcionando. Desde el mes 19 baja, porque la construcción ya queda pagada. En la página 5 del documento está el desglose de la mensualidad.
+> - Hasta 20 propuestas: $1.185.000 al mes.
+> - Hasta 40 propuestas: $1.400.000 al mes.
+> - Hasta 80 propuestas: $1.700.000 al mes.
 >
-> Para ajustar las cifras necesito algunos datos que dejé al final del documento, sobre todo cuántas
+> El desarrollo arranca con un anticipo de $500.000 y toma 8 semanas, sin mensualidad mientras se
+> construye. La primera mensualidad se cobra cuando el sistema ya está funcionando, y desde el mes
+> 19 baja ($785.000, $1.000.000 o $1.300.000), porque la construcción ya queda pagada. En la página
+> 12 del documento está el esquema de pago completo y en la 13, el desglose.
+>
+> Para cerrar las cifras necesito algunos datos que dejé en la última página, sobre todo cuántas
 > propuestas hacen al mes y cuánto tiempo les toma cada una.
 >
-> ¿Te parece si me confirmas el plan de capacitación y la fecha de inicio? Con eso aparto los
+> ¿Te parece si me confirmas el plan de capacitación y los participantes? Con eso cuadramos los
 > sábados.
 >
 > Un saludo,
 >
 > Mike
+> codebymike.net · 0368dev@gmail.com
 
 ## 12. Agente de cumplimiento en el panel (agregado 2026-10-21)
 
@@ -508,3 +512,10 @@ Sobre el precio de referencia completo es un descuento acumulado del 65%. La cap
 > notas en letra pequeña que parezcan engañosas: los valores de todos los planes van visibles.
 
 > **2026-10-21:** se quitaron los nombres Inicial / Profesional / Empresarial; los planes se identifican solo por "hasta 20 / 40 / 80 propuestas al mes".
+
+> **Diseño (2026-10-21):** propuesta en 15 páginas. Panel web en página propia con ilustración
+> detallada (menú, indicadores, alertas con prioridad, vencimientos, consumo del plan, actividad del
+> agente); chat en página propia con ventana de chat sobre el sitio y "qué pasa detrás". Marca de
+> codebymike.net (logo de portfolio/public/codebymike-logo-light.svg) en el encabezado de cada página,
+> en el pie ("Propuesta de codebymike.net para Ekosolv") y en un bloque "Propuesta preparada por" en
+> la portada, con la línea "Desarrollo de software e inteligencia artificial".
