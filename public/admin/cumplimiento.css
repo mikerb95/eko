@@ -52,3 +52,6 @@
   .regla { grid-template-columns: 1fr; }
   .datos { grid-template-columns: 1fr; }
 }
+
+.panel-head select { width: auto; }
+a.icon-btn { text-decoration: none; color: inherit; display: inline-flex; align-items: center; }
