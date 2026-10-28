@@ -43,3 +43,7 @@ programa_capacitacion_*.pdf
 docs/correo-alcances-proton.html
 pendientes.md
 docs/plan-asistente.md
+
+# Playwright
+test-results/
+playwright-report/
