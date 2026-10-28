@@ -228,36 +228,35 @@ const asis = {
         </div>
         <div id="norm-list" class="list"></div>
       </section>
-    </main>
-
-    {isAdmin && (
-      <section id="panel-ia" class="panel">
-        <div class="panel-head"><h2>Asistente IA: límites y consumo</h2></div>
-        <div class="ia-grid">
-          <form id="ia-topes" class="ia-card">
-            <h3>Límite de gasto diario</h3>
-            <p class="muted">Si se alcanza, la IA se detiene hasta el día siguiente (hora de Colombia). El buscador sigue funcionando.</p>
-            <div class="grid2">
-              <label>Toda la empresa (US$)<input name="empresaUsd" type="number" min="0" max="100" step="0.5" required /></label>
-              <label>Cada persona (US$)<input name="usuarioUsd" type="number" min="0" max="100" step="0.5" required /></label>
+      {isAdmin && (
+        <section id="panel-ia" class="panel">
+          <div class="panel-head"><h2>Asistente IA: límites y consumo</h2></div>
+          <div class="ia-grid">
+            <form id="ia-topes" class="ia-card">
+              <h3>Límite de gasto diario</h3>
+              <p class="muted">Si se alcanza, la IA se detiene hasta el día siguiente (hora de Colombia). El buscador sigue funcionando.</p>
+              <div class="grid2">
+                <label>Toda la empresa (US$)<input name="empresaUsd" type="number" min="0" max="100" step="0.5" required /></label>
+                <label>Cada persona (US$)<input name="usuarioUsd" type="number" min="0" max="100" step="0.5" required /></label>
+              </div>
+              <p class="muted" id="ia-hoy"></p>
+              <div class="drawer-actions">
+                <button type="submit" class="btn-primary"><span class="t">Guardar límites</span></button>
+                <p class="form-error" id="ia-err"></p>
+              </div>
+            </form>
+            <div class="ia-card">
+              <div class="ia-mes-head">
+                <h3>Consumo del mes</h3>
+                <input type="month" id="ia-mes" />
+              </div>
+              <div id="ia-consumo"><p class="muted">Cargando…</p></div>
+              <a class="btn-ghost" id="ia-csv" href="#">Descargar CSV</a>
             </div>
-            <p class="muted" id="ia-hoy"></p>
-            <div class="drawer-actions">
-              <button type="submit" class="btn-primary"><span class="t">Guardar límites</span></button>
-              <p class="form-error" id="ia-err"></p>
-            </div>
-          </form>
-          <div class="ia-card">
-            <div class="ia-mes-head">
-              <h3>Consumo del mes</h3>
-              <input type="month" id="ia-mes" />
-            </div>
-            <div id="ia-consumo"><p class="muted">Cargando…</p></div>
-            <a class="btn-ghost" id="ia-csv" href="#">Descargar CSV</a>
           </div>
-        </div>
-      </section>
-    )}
+        </section>
+      )}
+    </main>
 
     {isAdmin && (
       <section id="panel-usuarios" class="panel">

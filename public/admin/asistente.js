@@ -30,7 +30,7 @@ function el(tag, attrs = {}, ...hijos) {
     else if (k.startsWith('on')) n.addEventListener(k.slice(2), v)
     else n.setAttribute(k, v === true ? '' : v)
   }
-  for (const h of hijos.flat()) if (h != null && h !== false) n.append(h instanceof Node ? h : document.createTextNode(String(h)))
+  for (const h of hijos.flat(Infinity)) if (h != null && h !== false) n.append(h instanceof Node ? h : document.createTextNode(String(h)))
   return n
 }
 
@@ -197,9 +197,10 @@ function evento(ev, t) {
       t.cuerpo.append(bloques(sinRayas(ev.texto)))
       return false
     case 'aprobacion':
+      // El servidor se detiene aquí a esperar la decisión: cierra el turno sin `fin`.
       pensando(t, false)
       tarjeta(t, ev)
-      return false
+      return true
     case 'decision':
       if (tarjetaAbierta) sellar(ev.aprobado ? 'Aprobado.' : 'Descartado.', ev.aprobado)
       return false
@@ -308,6 +309,9 @@ form.addEventListener('submit', (e) => {
   const q = caja.value.trim()
   if (!q) return
   if (!ASIS.ia) return buscar(q)
+  // Que una búsqueda pendiente no vuelva a abrir los resultados encima del hilo.
+  clearTimeout(temporizador)
+  ultimaBusqueda = ''
   caja.value = ''
   caja.style.height = 'auto'
   preguntar(q)

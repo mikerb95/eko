@@ -83,3 +83,14 @@ test('admin: pestaña de límites y consumo', async ({ page }) => {
   await expect(page.locator('#ia-topes input[name="usuarioUsd"]')).toHaveValue('2')
   await page.screenshot({ path: 'test-results/asistente-limites.png', fullPage: true })
 })
+
+test('en celular la caja y la tarjeta caben sin desplazamiento horizontal', async ({ page }) => {
+  await page.setViewportSize({ width: 390, height: 844 })
+  await entrar(page, 'admin', 'ekosolv2026*')
+  await page.getByLabel('Pregunte o busque algo').fill('pase la orden 1 a confirmada')
+  await page.keyboard.press('Enter')
+  await expect(page.locator('.asis-card')).toBeVisible()
+  const desborde = await page.evaluate(() => document.documentElement.scrollWidth - window.innerWidth)
+  expect(desborde).toBeLessThanOrEqual(0)
+  await page.locator('.asis-card').screenshot({ path: 'test-results/asistente-celular.png' })
+})
