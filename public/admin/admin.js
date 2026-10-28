@@ -433,3 +433,20 @@ renderOrders()
 renderPosts()
 renderNorms()
 renderUsers()
+
+/* ---------- Abrir desde la URL ---------- */
+// Los enlaces del asistente apuntan a /admin?tab=<pestaña>&id=<id>: se abre
+// la pestaña y, si hay ficha, su editor o su detalle.
+;(() => {
+  const params = new URLSearchParams(location.search)
+  const tab = params.get('tab')
+  const id = Number(params.get('id'))
+  const boton = tab && $(`.tab[data-tab="${CSS.escape(tab)}"]`)
+  if (!boton) return
+  boton.click()
+  if (!id) return
+  if (tab === 'recolecciones') openOrder(id)
+  else if (tab === 'blog') { const p = posts.find((x) => x.id == id); if (p) openPost(p) }
+  else if (tab === 'normativas') { const n = norms.find((x) => x.id == id); if (n) openNorm(n) }
+  else if (tab === 'usuarios') { const u = users.find((x) => x.id == id); if (u) openUser(u) }
+})()

@@ -69,3 +69,9 @@ export function turnosDe(mensajes: Mensaje[]): Turno[] {
 
 /** Preguntas en la conversación. */
 export const contarTurnos = (mensajes: Mensaje[]) => turnosDe(mensajes).length
+
+/**
+ * Quita rayas largas y medias usadas como puntuación. El modelo las pone
+ * aunque el prompt lo prohíba; se limpian al mostrar, nunca en el historial.
+ */
+export const sinRayas = (t: string) => t.replace(/\s*[—–]\s*/g, ', ').replace(/,\s*,/g, ',')

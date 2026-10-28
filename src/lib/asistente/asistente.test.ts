@@ -500,3 +500,40 @@ test('auditoría guarda quién pidió y quién decidió', async () => {
     cerrar()
   }
 })
+
+// ── Prompt, modelo simulado y costos (fase 7) ────────────────────────────
+
+import { systemPrompt } from './prompt.ts'
+import { responderFalso } from './modeloFalso.ts'
+import { costoUsdModelo } from './costo.ts'
+import { sinRayas } from './turnos.ts'
+
+test('el prompt es de usted, prohíbe el voseo y cambia con el rol', () => {
+  const admin = systemPrompt(HOY, 'admin', herramientasDe('admin'), escriturasDe('admin'))
+  const lectura = systemPrompt(HOY, 'lectura', herramientasDe('lectura'), escriturasDe('lectura'))
+  assert.match(admin, /de usted/)
+  assert.match(admin, /Nunca use voseo/)
+  assert.match(admin, /actualizar_recoleccion/)
+  assert.doesNotMatch(lectura, /actualizar_recoleccion/)
+  assert.match(lectura, /solo puede consultar/)
+  assert.match(admin, new RegExp(HOY))
+  assert.doesNotMatch(admin + lectura, /[—–]/)
+})
+
+test('el modelo simulado propone solo si el rol tiene la acción', () => {
+  const pide = [{ role: 'user' as const, content: 'pase la orden 2 a programada' }]
+  const conPermiso: any = responderFalso(pide, ['recolecciones', 'actualizar_recoleccion'])
+  assert.equal(conPermiso.stop_reason, 'tool_use')
+  assert.deepEqual(conPermiso.content.at(-1).input, { recoleccionId: 2, estado: 'programada' })
+  const sinPermiso: any = responderFalso(pide, ['recolecciones'])
+  assert.equal(sinPermiso.stop_reason, 'end_turn')
+})
+
+test('rayas largas fuera al mostrar; tarifa del modelo que respondió y la más cara si es desconocido', () => {
+  assert.equal(sinRayas('Hay dos órdenes — ambas en Bogotá'), 'Hay dos órdenes, ambas en Bogotá')
+  const u = { entrada: 1_000_000, salida: 0, cacheLectura: 0, cacheEscritura: 0 }
+  assert.equal(costoUsdModelo(u, 'claude-sonnet-5-5'), 2)
+  assert.equal(costoUsdModelo(u, 'claude-opus-5-5'), 4)
+  assert.equal(costoUsdModelo(u, 'modelo-nuevo'), 10)
+  assert.equal(costoUsdModelo(u, 'falso'), 0)
+})

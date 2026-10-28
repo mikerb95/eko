@@ -7,7 +7,7 @@
 // mitad, lo ya pagado cuenta igual.
 
 import type { Client } from '@libsql/client'
-import { costoUsd, MODELO, sumarUso, TARIFA_VIGENTE_DESDE, USO_CERO } from './costo.ts'
+import { costoUsdModelo, MODELO, sumarUso, TARIFA_VIGENTE_DESDE, USO_CERO } from './costo.ts'
 
 /** Fecha en Colombia: el día del tope y del reporte empieza a medianoche de Bogotá. */
 export function diaBogota(ahora = new Date()): string {
@@ -22,7 +22,7 @@ export async function registrarConsumo(
   ahora = new Date(),
 ): Promise<number> {
   const uso = sumarUso(USO_CERO, r.usage)
-  const usd = costoUsd(uso)
+  const usd = costoUsdModelo(uso, r.modelo ?? MODELO)
   await db.execute({
     sql: `INSERT INTO asistente_consumo (fecha, dia, usuario, conversacion, modelo, tokens_entrada, tokens_salida, tokens_cache_lectura, tokens_cache_escritura, costo_usd)
           VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,

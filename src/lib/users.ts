@@ -1,5 +1,5 @@
-import { asegurarEsquema, cliente } from './db'
-import { UserError } from './apiError'
+import { asegurarEsquema, cliente } from './db.ts'
+import { UserError } from './apiError.ts'
 
 // Usuarios del panel: credenciales hasheadas (PBKDF2 via WebCrypto, sin deps)
 // y roles para autorización en el middleware.

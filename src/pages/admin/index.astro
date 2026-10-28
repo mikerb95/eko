@@ -3,7 +3,12 @@ export const prerender = false
 import { seedIfEmpty, getPostsAdmin, getNormativasAdmin } from '../../lib/cms'
 import { listOrders } from '../../lib/ops'
 import { listContacts } from '../../lib/contactos'
-import { listUsers, type User } from '../../lib/users'
+import { listUsers, ROLE_LABELS, type Role, type User } from '../../lib/users'
+import { asegurarEsquema, cliente } from '../../lib/db'
+import { iaDisponible, usuarioDeSesion } from '../../lib/asistente/motor'
+import { listarRecientes, obtenerConversacion } from '../../lib/asistente/conversaciones'
+import { sinRayas, turnosDe } from '../../lib/asistente/turnos'
+import { escriturasDe } from '../../lib/asistente/escrituras/index'
 
 // Populate DB from JSON on first run, then load everything
 let seedError = ''
@@ -39,6 +44,56 @@ if (isAdmin) {
     if (!seedError) seedError = String(e?.message || e)
   }
 }
+
+// ── Asistente con IA (docs/plan-asistente.md, fase 8) ─────────────────────
+// Fail-soft: si las tablas del asistente fallan, el panel carga igual, sin
+// recientes. La caja busca sin IA aunque no haya clave.
+const asisUsuario = usuarioDeSesion(Astro.locals)
+const nombreCorto = String(user).split(' ')[0]
+const proponeAlgo = asisUsuario ? escriturasDe(asisUsuario.rol).length > 0 : false
+const ATAJOS: Record<string, string[]> = {
+  recolecciones: ['¿Qué recolecciones están pendientes esta semana?'],
+  cumplimiento: ['¿Qué alertas de cumplimiento vencen en los próximos 10 días?'],
+  contactos: ['¿Qué contactos no se han atendido?'],
+}
+const atajos = [
+  ...ATAJOS.recolecciones,
+  ...(['admin', 'consultor', 'lectura', 'finanzas'].includes(role) ? ATAJOS.cumplimiento : []),
+  ...(['admin', 'operaciones', 'consultor'].includes(role) ? ATAJOS.contactos : []),
+]
+let asisRecientes: Awaited<ReturnType<typeof listarRecientes>> = []
+let asisInicial: unknown = null
+const verTodas = isAdmin && Astro.url.searchParams.get('todas') === '1'
+if (asisUsuario) {
+  try {
+    await asegurarEsquema()
+    const db = cliente()
+    asisRecientes = await listarRecientes(db, asisUsuario, { limite: 6, todas: verTodas })
+    const idConv = Astro.url.searchParams.get('c')
+    const c = idConv ? await obtenerConversacion(db, idConv, asisUsuario) : null
+    if (c) {
+      asisInicial = {
+        id: c.id,
+        estado: c.estado,
+        ajena: c.usuario !== asisUsuario.usuario,
+        dueno: c.usuario,
+        turnos: turnosDe(c.mensajes as never).map((t) => ({ ...t, respuesta: sinRayas(t.respuesta) })),
+        propuesta: c.propuesta ? { origen: c.propuesta.origen, motivo: c.propuesta.motivo, herramienta: c.propuesta.herramienta, vista: c.propuesta.vista } : null,
+        error: c.error,
+      }
+    }
+  } catch (e: any) {
+    console.error('[admin] asistente', e?.message || e)
+  }
+}
+const asis = {
+  ia: iaDisponible(),
+  rol: role,
+  rolTexto: ROLE_LABELS[role as Role] ?? role,
+  proponeAlgo,
+  inicial: asisInicial,
+  esAdmin: isAdmin,
+}
 ---
 
 <!DOCTYPE html>
@@ -52,6 +107,7 @@ if (isAdmin) {
     <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
     <title>EKOSOLV CMS</title>
     <link rel="stylesheet" href="/admin/admin.css" />
+    <link rel="stylesheet" href="/admin/asistente.css" />
   </head>
   <body>
     <header class="admin-top">
@@ -68,12 +124,57 @@ if (isAdmin) {
 
     {seedError && <div class="banner-error">No se pudo inicializar la base de datos: {seedError}</div>}
 
+    <!-- ASISTENTE -->
+    <section class="asis" aria-labelledby="asis-saludo">
+      <h1 id="asis-saludo" class="asis-saludo">Hola, {nombreCorto}. ¿En qué le ayudo?</h1>
+      <form id="asis-form" class="asis-caja" autocomplete="off">
+        <textarea id="asis-q" name="q" rows="1" maxlength="1000" placeholder={asis.ia ? 'Pregunte o busque algo: una orden, una alerta, un contacto…' : 'Busque una orden, un expediente, un contacto…'} aria-label="Pregunte o busque algo"></textarea>
+        <button type="submit" class="asis-enviar" aria-label="Enviar">
+          <svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true"><path d="M5 12h12M13 6l6 6-6 6" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        </button>
+        <div id="asis-resultados" class="asis-resultados" hidden></div>
+      </form>
+      <p class="asis-nota">
+        {asis.ia
+          ? (proponeAlgo
+              ? 'La IA consulta el panel y prepara cambios; nada se guarda sin que usted lo apruebe.'
+              : 'Con su rol, la IA solo consulta: no propone cambios.')
+          : 'El asistente con IA aún no está activo; por ahora la caja solo busca.'}
+      </p>
+      {asis.ia && (
+        <div class="asis-atajos" id="asis-atajos">
+          {atajos.map((a) => <button type="button" class="asis-atajo" data-atajo={a}>{a}</button>)}
+        </div>
+      )}
+      <div id="asis-hilo" class="asis-hilo" aria-live="polite"></div>
+      {asisRecientes.length > 0 && (
+        <div class="asis-recientes">
+          <div class="asis-recientes-head">
+            <span>{verTodas ? 'Conversaciones del equipo' : 'Sus conversaciones recientes'}</span>
+            {isAdmin && <a href={verTodas ? '/admin' : '/admin?todas=1'}>{verTodas ? 'Ver solo las mías' : 'Ver las de todos'}</a>}
+          </div>
+          <ul>
+            {asisRecientes.map((r) => (
+              <li>
+                <a href={`/admin?c=${r.id}${verTodas ? '&todas=1' : ''}`}>
+                  {r.pendiente && <span class="asis-punto" title="Tiene un cambio esperando su aprobación"></span>}
+                  <span class="asis-rec-q">{r.pregunta}</span>
+                  {verTodas && <span class="asis-rec-u">{r.usuario}</span>}
+                </a>
+              </li>
+            ))}
+          </ul>
+        </div>
+      )}
+    </section>
+
     <nav class="tabs">
       <button class="tab is-active" data-tab="recolecciones">Recolecciones <span class="count">{pendingOrders ? `${pendingOrders} nuevas` : orders.length}</span></button>
       <button class="tab" data-tab="contactos">Contactos <span class="count">{newContacts ? `${newContacts} nuevos` : contacts.length}</span></button>
       <button class="tab" data-tab="blog">Blog <span class="count">{posts.length}</span></button>
       <button class="tab" data-tab="normativas">Normativas <span class="count">{normativas.length}</span></button>
       {isAdmin && <button class="tab" data-tab="usuarios">Usuarios <span class="count">{users.length}</span></button>}
+      {isAdmin && <button class="tab" data-tab="ia">Asistente IA</button>}
       <a class="tab" href="/admin/cumplimiento">Cumplimiento ↗</a>
     </nav>
 
@@ -128,6 +229,35 @@ if (isAdmin) {
         <div id="norm-list" class="list"></div>
       </section>
     </main>
+
+    {isAdmin && (
+      <section id="panel-ia" class="panel">
+        <div class="panel-head"><h2>Asistente IA: límites y consumo</h2></div>
+        <div class="ia-grid">
+          <form id="ia-topes" class="ia-card">
+            <h3>Límite de gasto diario</h3>
+            <p class="muted">Si se alcanza, la IA se detiene hasta el día siguiente (hora de Colombia). El buscador sigue funcionando.</p>
+            <div class="grid2">
+              <label>Toda la empresa (US$)<input name="empresaUsd" type="number" min="0" max="100" step="0.5" required /></label>
+              <label>Cada persona (US$)<input name="usuarioUsd" type="number" min="0" max="100" step="0.5" required /></label>
+            </div>
+            <p class="muted" id="ia-hoy"></p>
+            <div class="drawer-actions">
+              <button type="submit" class="btn-primary"><span class="t">Guardar límites</span></button>
+              <p class="form-error" id="ia-err"></p>
+            </div>
+          </form>
+          <div class="ia-card">
+            <div class="ia-mes-head">
+              <h3>Consumo del mes</h3>
+              <input type="month" id="ia-mes" />
+            </div>
+            <div id="ia-consumo"><p class="muted">Cargando…</p></div>
+            <a class="btn-ghost" id="ia-csv" href="#">Descargar CSV</a>
+          </div>
+        </div>
+      </section>
+    )}
 
     {isAdmin && (
       <section id="panel-usuarios" class="panel">
@@ -292,7 +422,8 @@ if (isAdmin) {
       </div>
     </div>
 
-    <script is:inline define:vars={{ posts, normativas, orders, contacts, users, role }}>
+    <script is:inline define:vars={{ posts, normativas, orders, contacts, users, role, asis }}>
+      window.__ASIS__ = asis
       window.__POSTS__ = posts
       window.__NORMS__ = normativas
       window.__ORDERS__ = orders
@@ -301,5 +432,6 @@ if (isAdmin) {
       window.__ROLE__ = role
     </script>
     <script src="/admin/admin.js" type="module"></script>
+    <script src="/admin/asistente.js" type="module"></script>
   </body>
 </html>

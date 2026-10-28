@@ -43,3 +43,23 @@ export function costoUsd(u: Uso): number {
     (u.cacheEscritura * TARIFA.cacheEscritura) / m
   )
 }
+
+/**
+ * Con `fallbacks` activado, si Sonnet declina por una regla de seguridad la
+ * API repite la pregunta en otro modelo y la cobra a su tarifa. El costo se
+ * calcula con la del modelo que respondió (`message.model`), y si es uno que
+ * no está aquí, con la más cara: el tope no puede quedarse corto.
+ * Tarifas verificadas con la skill claude-api el 2026-10-28.
+ */
+const TARIFAS: Record<string, { entrada: number; salida: number; cacheLectura: number; cacheEscritura: number }> = {
+  'claude-sonnet-5-5': TARIFA,
+  'claude-opus-5-5': { entrada: 4, salida: 20, cacheLectura: 0.2, cacheEscritura: 5 },
+  'claude-fable-5-1': { entrada: 10, salida: 50, cacheLectura: 0.25, cacheEscritura: 12.5 },
+}
+const MAS_CARA = TARIFAS['claude-fable-5-1']!
+
+export function costoUsdModelo(u: Uso, modelo: string | null | undefined): number {
+  const t = (modelo && TARIFAS[modelo]) || (modelo === 'falso' ? { entrada: 0, salida: 0, cacheLectura: 0, cacheEscritura: 0 } : MAS_CARA)
+  const m = 1_000_000
+  return (u.entrada * t.entrada + u.salida * t.salida + u.cacheLectura * t.cacheLectura + u.cacheEscritura * t.cacheEscritura) / m
+}
