@@ -77,7 +77,7 @@ function renderAlertas() {
         <button class="icon-btn" data-reprocesar="${a.acto_id}" title="Volver a leer el documento">Reprocesar</button>
       </div>` : `<div class="alerta-acciones"><a class="icon-btn" href="${API}/archivo?id=${a.acto_id}" target="_blank" rel="noopener">Ver documento</a></div>`
     return `
-    <article class="alerta ${cerrada ? 'cerrada' : ''}">
+    <article class="alerta ${cerrada ? 'cerrada' : ''}" id="alerta-${a.id}">
       <div class="alerta-top">
         <span class="pri ${esc(a.prioridad)}">${esc(a.prioridad)}</span>
         <span>${esc(TIPO[a.tipo_acto] || a.tipo_acto)}</span>
@@ -334,3 +334,28 @@ renderAlertas()
 renderExpedientes()
 renderReglas()
 renderActos()
+
+/* ---------- Abrir desde la URL ---------- */
+// Los enlaces del asistente apuntan a /admin/cumplimiento?alerta=<id>: se
+// abre la pestaña, se cambia el filtro si la alerta no cabe en el actual y se
+// lleva la vista hasta ella resaltada.
+;(() => {
+  const id = Number(new URLSearchParams(location.search).get('alerta'))
+  if (!id) return
+  irA('alertas')
+  const a = estado.alertas.find((x) => x.id === id)
+  if (!a) {
+    alertaError(new Error(`No se encontró la alerta ${id}. Puede que ya no exista.`))
+    return
+  }
+  let el = $('#alerta-' + id)
+  if (!el) {
+    $('#alerta-filtro').value = ''
+    renderAlertas()
+    el = $('#alerta-' + id)
+  }
+  if (!el) return
+  el.classList.add('is-destacada')
+  el.scrollIntoView({ block: 'center', behavior: matchMedia('(prefers-reduced-motion: reduce)').matches ? 'auto' : 'smooth' })
+  setTimeout(() => el.classList.remove('is-destacada'), 4000)
+})()

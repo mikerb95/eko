@@ -20,5 +20,13 @@ export default async function preparar() {
     sql: `INSERT INTO contacts (name, email, company, message, status, created_at, updated_at) VALUES ('Pedro Ruiz', 'pedro@correo.co', 'Constructora Uno', 'Necesito asesoría RAEE', 'nuevo', ?, ?)`,
     args: [ts, ts],
   })
+  // Una alerta abierta y otra cerrada: la cerrada no sale con el filtro de
+  // entrada, así se prueba que el enlace ?alerta= cambia el filtro.
+  for (const [titulo, estado] of [['Requerimiento de información ANLA', 'abierta'], ['Seguimiento atendido', 'cerrada']]) {
+    await db.execute({
+      sql: `INSERT INTO alertas (prioridad, tipo_acto, titulo, estado, created_at, updated_at) VALUES ('media', 'requerimiento', ?, ?, ?, ?)`,
+      args: [titulo, estado, ts, ts],
+    })
+  }
   db.close()
 }
