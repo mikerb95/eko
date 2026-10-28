@@ -22,7 +22,11 @@ export default defineConfig({
   },
   projects: [{ name: 'chromium', use: { ...devices['Desktop Chrome'] } }],
   webServer: {
-    command: `astro dev --port ${PUERTO} --ignore-lock`,
+    // Servidor en primer plano y sin el candado, para no chocar con un `astro
+    // dev` que ya esté corriendo. Si las pruebas las lanza un agente de IA,
+    // Astro lo detecta por estas variables y fuerza el modo en segundo plano,
+    // que no admite --ignore-lock: se quitan solo para este proceso.
+    command: `env -u CLAUDECODE -u AI_AGENT -u CLAUDE_CODE_ENTRYPOINT astro dev --port ${PUERTO} --ignore-lock`,
     url: `http://localhost:${PUERTO}/admin/login`,
     reuseExistingServer: false,
     timeout: 120_000,
