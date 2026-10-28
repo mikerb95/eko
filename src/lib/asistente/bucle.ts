@@ -19,7 +19,7 @@
 // Módulo sin BD ni red: todo lo externo llega por `Dependencias`, para poder
 // probar cada rama con un modelo falso.
 //
-// Receta: skill asistente-panel (generalizado del bucle del analista de
+// Receta: skill panel-ia (generalizado del bucle del analista de
 // codebymike, src/lib/analista/bucle.ts).
 
 import type Anthropic from '@anthropic-ai/sdk'
