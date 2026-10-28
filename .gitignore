@@ -33,3 +33,13 @@ pnpm-debug.log*
 oportunidad_lito.md
 .vercel
 .env*
+
+# documentos de oferta comercial (no se versionan)
+oferta_*.md
+propuesta_*.html
+propuesta_*.pdf
+programa_capacitacion_*.html
+programa_capacitacion_*.pdf
+docs/correo-alcances-proton.html
+pendientes.md
+docs/plan-asistente.md

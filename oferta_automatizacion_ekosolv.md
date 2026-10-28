@@ -263,6 +263,17 @@ Zoho y correo, casos por área y reglas internas de uso.
   plantillas y documentos reales que pide la sección 4. Usar los sábados para tomar la línea base de
   horas por propuesta.
 
+> **Actualización 2026-10-27 (retroalimentación del gerente tras la reunión):** pidió diagnóstico por
+> departamento (Gerencia General, Ventas, Operaciones, Finanzas, Mercadeo / Redes), capacitación general
+> más módulos por departamento según el diagnóstico, cronograma con fechas según el diagnóstico y
+> entregables por módulo. Se armó un documento aparte, **sin precios**: `programa_capacitacion_ekosolv.html`
+> y `.pdf`. Mike cobra las horas de cada sábado; el tema de costos no se toca todavía.
+> **Versión vigente (6 hojas):** 5 sábados de 3 h (15 h): sábado 1 diagnóstico 1 h + general 2 h;
+> sábado 2 Operaciones 3 h; sábado 3 Ventas y Mercadeo 1,5 h c/u; sábado 4 Gerencia y Finanzas 1,5 h c/u;
+> sábado 5 taller final con caso real por área. Tope: 6 sábados (18 h), porque Mike no autoriza pasar
+> de 1,5 veces el Plan Completo actual (4 sábados, 12 h). El énfasis está en el punto 4: qué aprende y
+> qué podrá hacer cada área.
+
 ## 11. Respuesta al correo de Mario (actualizada 2026-10-21)
 
 Asunto: RE: PROPUESTA AUTOMATIZACIÓN e IA PARA EKOSOLV
@@ -519,3 +530,8 @@ Sobre el precio de referencia completo es un descuento acumulado del 65%. La cap
 > codebymike.net (logo de portfolio/public/codebymike-logo-light.svg) en el encabezado de cada página,
 > en el pie ("Propuesta de codebymike.net para Ekosolv") y en un bloque "Propuesta preparada por" en
 > la portada, con la línea "Desarrollo de software e inteligencia artificial".
+
+> **Ajuste 2026-10-27 en `programa_capacitacion_por_area.pdf`:** sigue en 5 sábados (15 h). Sábado 1
+> diagnóstico + general; sábados 2 y 3 taller técnico ambiental (autos, requerimientos y normativa;
+> documentos y procesos); sábado 4 Ventas y Mercadeo; sábado 5 Gerencia y Finanzas. Se quitó el taller
+> final: cada taller cierra con su ejercicio real.

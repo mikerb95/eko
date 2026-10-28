@@ -102,6 +102,33 @@ Lo que falta y no se puede resolver desde el código:
   autorización. Si esa base se va a seguir usando para contacto comercial, hay que
   pedir autorización retroactiva a esos titulares o suprimir los registros.
 
+## Agente de cumplimiento
+
+La Fase 1 está construida y probada de punta a punta con base temporal e IA simulada (2026-10-21): subir un acto en `/admin/cumplimiento`, leerlo con Claude, cruzarlo con la tabla de expedientes, calcular el vencimiento en días hábiles con festivos de Colombia y dejar la alerta. Código en `src/lib/agente/`, API en `src/pages/api/admin/cumplimiento/`. Sin `ANTHROPIC_API_KEY` el agente no falla: los actos quedan como "esperando clave" y se procesan después desde Historial → Procesar pendientes.
+
+### Para activarlo (le toca a Mike)
+
+- [ ] **Clave de la API de Anthropic en local y en Vercel**: `ANTHROPIC_API_KEY` en `.env.local` y `vercel env add ANTHROPIC_API_KEY`. Opcional: `AGENTE_MODELO` (por defecto `claude-sonnet-5-5`).
+- [ ] **Primera prueba con un auto real**, con los datos del cliente tapados. Es la primera lectura con costo y la que valida la calidad de la extracción; hasta ahora solo se probó con respuestas simuladas.
+- [ ] **Revisar las 9 reglas iniciales con el equipo técnico de Ekosolv** (prioridad, umbral y acción por tipo de acto). Están en `src/lib/agente/reglas.ts` y se editan desde la pestaña Reglas.
+
+### Depende de Ekosolv
+
+- [ ] **Tabla de expedientes**: cliente, NIT, autoridad, número y consultor responsable de cada expediente a vigilar (hasta 50). Sin ella el agente no sabe de quién es cada auto.
+- [ ] **Buzón de correo para las notificaciones** de los clientes, y **cláusula de autorización** en los contratos de Ekosolv para recibirlas ahí. Es la fuente principal de la Fase 2.
+
+### Queda por construir
+
+- [ ] **Fase 2: leer el buzón de notificaciones**, para que los autos lleguen solos y no haya que subirlos a mano.
+- [ ] **Fase 3: vencimientos y avisos por correo** a 60, 30 y 7 días (Resend), y aviso al responsable cuando entra una alerta alta.
+- [ ] **Fase 4: gacetas y boletines públicos** (ANLA y CAR) y normativa nueva. Cobertura parcial: cada autoridad publica distinto.
+- [ ] **Fase 5: revisión de documentos** (ICA, PMA, permisos) frente a la norma, con el límite de 10 al mes.
+- [ ] **Batch API** para bajar a la mitad el costo de la IA. Es requisito para no perder plata en el plan de 80 propuestas.
+- [ ] **OCR antes de la IA** para autos escaneados: mandarlos como imagen gasta de 3 a 5 veces más tokens.
+- [ ] **Presupuesto mensual por función** (propuestas, agente, chat) y un indicador del costo real de IA frente a lo cobrado, con alerta al 70%.
+- [ ] **Archivos a Vercel Blob**: hoy el documento original se guarda en base64 en la tabla `actos_archivos`, que sirve para empezar pero no escala.
+- [ ] **Marcar "por confirmar" los datos de páginas mal escaneadas**, con la confianza del OCR página por página. Depende del punto anterior.
+
 ## Otros pendientes
 
 - (agregar aquí)
