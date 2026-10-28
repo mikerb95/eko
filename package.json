@@ -9,10 +9,12 @@
     "preview": "astro preview",
     "astro": "astro",
     "test": "node --test \"src/**/*.test.ts\"",
-    "migrate": "node --env-file=.env.local scripts/migrate.mjs"
+    "migrate": "node --env-file=.env.local scripts/migrate.mjs",
+    "test:e2e": "playwright test"
   },
   "devDependencies": {
     "@astrojs/check": "^0.9.9",
+    "@playwright/test": "1.58",
     "@tailwindcss/typography": "^0.5.19",
     "@tailwindcss/vite": "^4.1.17",
     "astro": "^7.1.3",

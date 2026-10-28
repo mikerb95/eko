@@ -1,0 +1,278 @@
+/* Caja del asistente con IA en la pantalla principal del panel.
+   Usa los tokens de admin.css. Las tarjetas se distinguen con sombra y un
+   punto de color junto al rótulo, nunca con una franja en el borde. */
+
+.asis {
+  max-width: 760px;
+  margin: 40px auto 28px;
+  padding: 0 20px;
+}
+.asis-saludo {
+  font-size: 24px;
+  font-weight: 600;
+  letter-spacing: -0.01em;
+  margin: 0 0 16px;
+  text-align: center;
+}
+
+/* ---------- Caja ---------- */
+.asis-caja {
+  position: relative;
+  display: flex;
+  align-items: flex-end;
+  gap: 8px;
+  background: var(--paper);
+  border: 1px solid var(--line);
+  border-radius: 18px;
+  padding: 10px 10px 10px 18px;
+  box-shadow: 0 6px 24px rgba(16, 40, 36, 0.06);
+  transition: border-color 0.15s, box-shadow 0.15s;
+}
+.asis-caja:focus-within {
+  border-color: var(--deep);
+  box-shadow: 0 0 0 4px color-mix(in oklab, var(--deep) 12%, transparent), 0 6px 24px rgba(16, 40, 36, 0.06);
+}
+.asis-caja textarea {
+  border: 0;
+  box-shadow: none;
+  padding: 8px 0;
+  resize: none;
+  font-size: 15px;
+  line-height: 1.5;
+  min-height: 24px;
+  max-height: 200px;
+  background: transparent;
+}
+.asis-caja textarea:focus { box-shadow: none; }
+.asis-enviar {
+  flex: none;
+  width: 38px;
+  height: 38px;
+  border-radius: 50%;
+  border: 0;
+  display: grid;
+  place-items: center;
+  background: var(--deep);
+  color: #fff;
+  cursor: pointer;
+  transition: background 0.15s, transform 0.15s;
+}
+.asis-enviar:hover { background: var(--deep-2); }
+.asis-enviar:active { transform: scale(0.95); }
+.asis-caja.is-ocupado .asis-enviar { opacity: 0.5; pointer-events: none; }
+
+.asis-nota {
+  margin: 10px 4px 0;
+  font-size: 12.5px;
+  color: var(--mute);
+  text-align: center;
+}
+
+/* ---------- Resultados del buscador ---------- */
+.asis-resultados {
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: calc(100% + 6px);
+  z-index: 20;
+  background: var(--paper);
+  border: 1px solid var(--line);
+  border-radius: 14px;
+  box-shadow: 0 14px 40px rgba(16, 40, 36, 0.12);
+  padding: 6px;
+}
+.asis-resultado {
+  display: flex;
+  gap: 10px;
+  align-items: baseline;
+  padding: 8px 10px;
+  border-radius: 9px;
+  color: var(--ink);
+  text-decoration: none;
+}
+.asis-resultado:hover, .asis-resultado:focus { background: color-mix(in oklab, var(--deep) 8%, transparent); outline: none; }
+.asis-res-tipo {
+  flex: none;
+  min-width: 76px;
+  font-size: 11.5px;
+  color: var(--mute);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+.asis-res-pie { margin: 4px 10px 2px; font-size: 12px; color: var(--mute); }
+
+/* ---------- Atajos ---------- */
+.asis-atajos {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 8px;
+  margin-top: 14px;
+}
+.asis-atajo {
+  font: inherit;
+  font-size: 13px;
+  color: var(--ink-2);
+  background: var(--paper);
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  padding: 7px 14px;
+  cursor: pointer;
+  transition: background 0.15s, color 0.15s;
+}
+.asis-atajo:hover { background: color-mix(in oklab, var(--deep) 8%, var(--paper)); color: var(--deep-2); }
+
+/* ---------- Hilo ---------- */
+.asis-hilo:not(:empty) { margin-top: 24px; display: flex; flex-direction: column; gap: 22px; }
+.asis-ajena { font-size: 12.5px; color: var(--mute); margin: 0; }
+.asis-pregunta {
+  align-self: flex-end;
+  margin: 0 0 8px auto;
+  max-width: 85%;
+  width: fit-content;
+  background: color-mix(in oklab, var(--deep) 9%, var(--paper));
+  border-radius: 14px 14px 4px 14px;
+  padding: 9px 14px;
+  font-weight: 500;
+  white-space: pre-wrap;
+}
+.asis-turno { display: flex; flex-direction: column; }
+.asis-pasos { list-style: none; margin: 0 0 6px; padding: 0; font-size: 12.5px; color: var(--mute); }
+.asis-pasos li { padding-left: 18px; position: relative; }
+.asis-pasos li::before {
+  content: "";
+  position: absolute;
+  left: 4px;
+  top: 0.55em;
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--forest);
+}
+.asis-turno.is-pensando .asis-respuesta::after {
+  content: "";
+  display: block;
+  width: 36px;
+  height: 8px;
+  margin: 6px 0;
+  background: radial-gradient(circle closest-side, var(--deep) 90%, transparent) 0 50% / 12px 8px repeat-x;
+  animation: asis-pensar 1s steps(4) infinite;
+  opacity: 0.6;
+}
+@keyframes asis-pensar { to { width: 48px; } }
+@media (prefers-reduced-motion: reduce) { .asis-turno.is-pensando .asis-respuesta::after { animation: none; } }
+
+.asis-respuesta { font-size: 14.5px; line-height: 1.6; }
+.asis-respuesta p { margin: 0 0 8px; }
+.asis-respuesta ul { margin: 0 0 8px; padding-left: 20px; }
+.asis-respuesta a { color: var(--deep-2); font-weight: 500; }
+.asis-error { color: var(--danger); font-size: 13.5px; }
+.asis-hecho { color: var(--forest); font-weight: 500; }
+
+/* ---------- Tarjeta de aprobación ---------- */
+.asis-card {
+  margin: 10px 0 8px;
+  background: var(--paper);
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  padding: 16px 18px;
+  box-shadow: 0 8px 28px rgba(16, 40, 36, 0.08);
+}
+.asis-card-head { display: flex; align-items: center; gap: 8px; }
+.asis-punto {
+  display: inline-block;
+  flex: none;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--clay);
+}
+.asis-card.is-aprobada .asis-punto { background: var(--forest); }
+.asis-card.is-descartada .asis-punto { background: var(--mute); }
+.asis-card-rotulo { font-size: 11.5px; text-transform: uppercase; letter-spacing: 0.05em; color: var(--ink-2); font-weight: 600; }
+.asis-card-titulo { margin: 6px 0 2px; font-size: 16px; font-weight: 600; }
+.asis-card-contexto { margin: 0 0 8px; color: var(--ink-2); font-size: 13px; }
+.asis-cambios {
+  display: grid;
+  grid-template-columns: minmax(110px, max-content) 1fr;
+  gap: 6px 14px;
+  margin: 12px 0;
+  font-size: 13.5px;
+}
+.asis-cambios dt { color: var(--mute); }
+.asis-cambios dd { margin: 0; overflow-wrap: anywhere; }
+.asis-cambios s { color: var(--mute); }
+.asis-despues { font-weight: 600; }
+.asis-aviso {
+  margin: 8px 0;
+  padding: 10px 12px;
+  border-radius: 9px;
+  background: color-mix(in oklab, var(--clay) 12%, var(--paper));
+  color: #7a4a05;
+  font-size: 13.5px;
+  font-weight: 500;
+}
+.asis-card-nota { margin: 6px 0 0; font-size: 12.5px; color: var(--mute); }
+.asis-card-acciones { display: flex; flex-wrap: wrap; align-items: center; gap: 10px; margin-top: 14px; }
+.asis-card-acciones .asis-card-nota { margin: 0; }
+.asis-card-acciones button:disabled { opacity: 0.5; cursor: progress; }
+.asis-sello { margin: 0; font-size: 13px; font-weight: 600; color: var(--ink-2); }
+.asis-card.is-aprobada { background: color-mix(in oklab, var(--forest) 5%, var(--paper)); }
+.asis-card.is-descartada { opacity: 0.75; }
+
+/* ---------- Recientes ---------- */
+.asis-recientes { margin-top: 26px; }
+.asis-recientes-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  font-size: 12px;
+  color: var(--mute);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  margin-bottom: 6px;
+}
+.asis-recientes-head a { color: var(--deep-2); text-transform: none; letter-spacing: 0; font-size: 12.5px; }
+.asis-recientes ul { list-style: none; margin: 0; padding: 0; }
+.asis-recientes li a {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 7px 10px;
+  border-radius: 9px;
+  color: var(--ink-2);
+  text-decoration: none;
+  font-size: 13.5px;
+}
+.asis-recientes li a:hover { background: var(--paper); color: var(--ink); }
+.asis-rec-q { flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.asis-rec-u { flex: none; font-size: 12px; color: var(--mute); }
+
+/* ---------- Pestaña de límites y consumo ---------- */
+.ia-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 16px; }
+.ia-card {
+  background: var(--paper);
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  padding: 18px 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+.ia-card h3 { margin: 0; font-size: 15px; }
+.ia-card p { margin: 0; }
+.ia-mes-head { display: flex; justify-content: space-between; align-items: center; gap: 12px; }
+.ia-mes-head input { width: auto; }
+.ia-total strong { font-size: 20px; }
+.ia-tabla { width: 100%; border-collapse: collapse; font-size: 13.5px; }
+.ia-tabla th { text-align: left; font-weight: 500; color: var(--mute); padding: 6px 4px; border-bottom: 1px solid var(--line); }
+.ia-tabla td { padding: 7px 4px; border-bottom: 1px solid var(--line); }
+.ia-nota { font-size: 12px; }
+#ia-csv { align-self: flex-start; text-decoration: none; }
+
+@media (max-width: 640px) {
+  .asis { margin-top: 24px; padding: 0 16px; }
+  .asis-saludo { font-size: 20px; }
+  .asis-cambios { grid-template-columns: 1fr; gap: 2px; }
+  .asis-cambios dd { margin-bottom: 8px; }
+}
