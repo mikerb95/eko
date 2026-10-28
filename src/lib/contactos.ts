@@ -1,4 +1,4 @@
-import { asegurarEsquema, cliente } from './db'
+import { asegurarEsquema, cliente } from './db.ts'
 
 // Mensajes del formulario de contacto público. Misma DB libSQL/Turso que el
 // CMS y las órdenes, con su propio módulo y tabla.

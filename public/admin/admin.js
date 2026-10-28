@@ -271,6 +271,7 @@ function renderPosts() {
         <div class="title">${esc(p.title)}</div>
         <div class="meta">
           <span class="pill ${esc(p.accent)}">${esc(p.category)}</span>
+          ${p.borrador ? '<span class="pill warn">Borrador</span>' : ''}
           ${p.featured ? '<span class="pill feat">Destacado</span>' : ''}
           ${p.image ? '' : '<span class="pill warn">Sin imagen</span>'}
           <span>${esc(p.date)}</span><span>·</span><span>${esc(p.readtime)}</span>
@@ -298,7 +299,7 @@ function renderNorms() {
       <div class="row-card">
         <div class="main">
           <div class="title">${esc(n.code)} — ${esc(n.title)}</div>
-          <div class="meta">${(n.tags || []).map((t) => `<span class="pill">${esc(t)}</span>`).join('')}<span>orden ${esc(n.position)}</span></div>
+          <div class="meta">${n.borrador ? '<span class="pill warn">Borrador</span>' : ''}${(n.tags || []).map((t) => `<span class="pill">${esc(t)}</span>`).join('')}<span>orden ${esc(n.position)}</span></div>
         </div>
         <div class="row-actions">
           <button class="icon-btn" data-edit-norm="${n.id}">Editar</button>
@@ -362,6 +363,7 @@ function openPost(post) {
   pf.readtime.value = post?.readtime || ''
   pf.accent.value = post?.accent || 'deep'
   pf.featured.checked = !!post?.featured
+  pf.borrador.checked = !!post?.borrador
   pf.lede.value = post?.lede || ''
   pf.image.value = post?.image || ''
   ;(post?.sections || [{ type: 'p' }]).forEach((s) => addSection(s.type || 'p', s))
@@ -375,7 +377,7 @@ pf.addEventListener('submit', async (e) => {
     id: pf.id.value || undefined,
     title: pf.title.value, slug: pf.slug.value, category: pf.category.value,
     date: pf.date.value, readtime: pf.readtime.value, accent: pf.accent.value,
-    featured: pf.featured.checked, lede: pf.lede.value, image: pf.image.value,
+    featured: pf.featured.checked, borrador: pf.borrador.checked, lede: pf.lede.value, image: pf.image.value,
     sections: collectSections(),
   }
   const res = await fetch('/api/admin/posts', { method: 'POST', headers: { 'content-type': 'application/json' }, body: JSON.stringify(payload) })
@@ -402,6 +404,7 @@ function openNorm(norm) {
   nf.body.value = norm?.body || ''
   nf.tags.value = (norm?.tags || []).join(', ')
   nf.position.value = norm?.position ?? 0
+  nf.borrador.checked = !!norm?.borrador
   openDrawer('#norm-drawer')
 }
 nf.addEventListener('submit', async (e) => {
@@ -411,6 +414,7 @@ nf.addEventListener('submit', async (e) => {
   const payload = {
     id: nf.id.value || undefined, code: nf.code.value, col: Number(nf.col.value),
     title: nf.title.value, body: nf.body.value, tags: nf.tags.value, position: Number(nf.position.value),
+    borrador: nf.borrador.checked,
   }
   const res = await fetch('/api/admin/normativas', { method: 'POST', headers: { 'content-type': 'application/json' }, body: JSON.stringify(payload) })
   const j = await res.json()

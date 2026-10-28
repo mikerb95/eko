@@ -234,6 +234,62 @@ export const TABLAS: readonly string[] = [
     valor TEXT NOT NULL,
     actualizado TEXT NOT NULL
   )`,
+
+  // ── Asistente con IA del panel (docs/plan-asistente.md) ─────────────────
+  // Una fila por conversación: es el estado del bucle (src/lib/asistente/
+  // bucle.ts). `mensajes` es el historial de la API, solo por anexión.
+  `CREATE TABLE IF NOT EXISTS asistente_conversaciones (
+    id TEXT PRIMARY KEY,
+    usuario TEXT NOT NULL,
+    rol TEXT NOT NULL DEFAULT '',
+    estado TEXT NOT NULL,
+    pregunta TEXT NOT NULL DEFAULT '',
+    mensajes TEXT NOT NULL DEFAULT '[]',
+    propuesta TEXT NOT NULL DEFAULT '',
+    respuesta TEXT NOT NULL DEFAULT '',
+    error TEXT NOT NULL DEFAULT '',
+    turnos INTEGER NOT NULL DEFAULT 0,
+    iteraciones INTEGER NOT NULL DEFAULT 0,
+    costo_usd REAL NOT NULL DEFAULT 0,
+    creada TEXT NOT NULL,
+    actualizada TEXT NOT NULL
+  )`,
+
+  `CREATE INDEX IF NOT EXISTS asistente_conv_usuario ON asistente_conversaciones (usuario, actualizada)`,
+
+  // Una fila por llamada al modelo. Es la fuente del tope diario y de lo que
+  // se le factura a Ekosolv: no se purga con las conversaciones.
+  `CREATE TABLE IF NOT EXISTS asistente_consumo (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    fecha TEXT NOT NULL,
+    dia TEXT NOT NULL,
+    usuario TEXT NOT NULL,
+    conversacion TEXT NOT NULL,
+    modelo TEXT NOT NULL,
+    tokens_entrada INTEGER NOT NULL DEFAULT 0,
+    tokens_salida INTEGER NOT NULL DEFAULT 0,
+    tokens_cache_lectura INTEGER NOT NULL DEFAULT 0,
+    tokens_cache_escritura INTEGER NOT NULL DEFAULT 0,
+    costo_usd REAL NOT NULL DEFAULT 0
+  )`,
+
+  `CREATE INDEX IF NOT EXISTS asistente_consumo_dia ON asistente_consumo (dia, usuario)`,
+
+  // Cada decisión sobre una propuesta del asistente: quién la pidió, quién la
+  // aprobó o descartó, qué cambiaba y qué pasó. Tampoco se purga.
+  `CREATE TABLE IF NOT EXISTS asistente_auditoria (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    fecha TEXT NOT NULL,
+    conversacion TEXT NOT NULL,
+    herramienta TEXT NOT NULL,
+    pidio TEXT NOT NULL,
+    decidio TEXT NOT NULL,
+    decision TEXT NOT NULL,
+    entrada TEXT NOT NULL DEFAULT '{}',
+    vista TEXT NOT NULL DEFAULT '',
+    resultado TEXT NOT NULL DEFAULT '',
+    ok INTEGER NOT NULL DEFAULT 0
+  )`,
 ]
 
 /**
@@ -255,6 +311,10 @@ export const COLUMNAS: readonly (readonly [tabla: string, columna: string])[] = 
   ['orders', 'consent_version'],
   ['orders', 'consent_ip'],
   ['orders', 'marketing_at'],
+  // 'borrador' = no se publica; vacío = publicado (todo lo anterior a la
+  // columna). Los borradores los crea el asistente del panel (docs/plan-asistente.md).
+  ['posts', 'estado'],
+  ['normativas', 'estado'],
 ]
 
 /** Tablas que deben existir al terminar. Sirve para verificar tras migrar. */
@@ -263,6 +323,9 @@ export const TABLAS_ESPERADAS: readonly string[] = [
   'actos_archivos',
   'ajustes',
   'alertas',
+  'asistente_auditoria',
+  'asistente_consumo',
+  'asistente_conversaciones',
   'contacts',
   'expedientes',
   'normativas',

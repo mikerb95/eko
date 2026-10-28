@@ -67,6 +67,7 @@ export const POST: APIRoute = async ({ request }) => {
     lede: String(b.lede ?? '').trim(),
     sections: cleanSections(b.sections),
     image: cleanImage(b.image),
+    borrador: !!b.borrador,
   }
 
   try {

@@ -29,6 +29,8 @@ export interface Post {
    * exige imagen en toda publicación, así que sin esto no hay difusión posible.
    */
   image?: string
+  /** En borrador no sale en el sitio (blog, sitemap); solo en el panel. */
+  borrador?: boolean
 }
 
 export interface Normativa {
@@ -39,6 +41,8 @@ export interface Normativa {
   title: string
   body: string
   tags: string[]
+  /** En borrador no sale en /normativas; solo en el panel. */
+  borrador?: boolean
 }
 
 // ---------- Client ----------
@@ -66,6 +70,7 @@ function rowToPost(r: any): Post {
     lede: r.lede,
     sections: safeParse(r.sections, []),
     image: r.image || '',
+    borrador: r.estado === 'borrador',
   }
 }
 function rowToNormativa(r: any): Normativa {
@@ -77,6 +82,7 @@ function rowToNormativa(r: any): Normativa {
     title: r.title,
     body: r.body,
     tags: safeParse(r.tags, []),
+    borrador: r.estado === 'borrador',
   }
 }
 function safeParse<T>(v: any, fallback: T): T {
@@ -119,7 +125,7 @@ export async function getPosts(): Promise<Post[]> {
   if (!getDbUrl()) return (seedPosts as Post[])
   try {
     await ensureSchema()
-    const res = await client().execute('SELECT * FROM posts ORDER BY featured DESC, id ASC')
+    const res = await client().execute(`SELECT * FROM posts WHERE estado <> 'borrador' ORDER BY featured DESC, id ASC`)
     if (res.rows.length) return res.rows.map(rowToPost)
   } catch (e) {
     console.error('[cms] getPosts fell back to JSON:', (e as Error).message)
@@ -131,7 +137,7 @@ export async function getPostBySlug(slug: string): Promise<Post | null> {
   if (!getDbUrl()) return (seedPosts as Post[]).find((p) => p.slug === slug) ?? null
   try {
     await ensureSchema()
-    const res = await client().execute({ sql: 'SELECT * FROM posts WHERE slug = ? LIMIT 1', args: [slug] })
+    const res = await client().execute({ sql: `SELECT * FROM posts WHERE slug = ? AND estado <> 'borrador' LIMIT 1`, args: [slug] })
     if (res.rows.length) return rowToPost(res.rows[0])
   } catch (e) {
     console.error('[cms] getPostBySlug fell back to JSON:', (e as Error).message)
@@ -143,12 +149,39 @@ export async function getNormativas(): Promise<Normativa[]> {
   if (!getDbUrl()) return (seedNormativas as any[]).map((n, i) => ({ id: i + 1, position: i, col: n.col ?? 1, code: n.code, title: n.title, body: n.body, tags: n.tags ?? [] }))
   try {
     await ensureSchema()
-    const res = await client().execute('SELECT * FROM normativas ORDER BY col ASC, position ASC, id ASC')
+    const res = await client().execute(`SELECT * FROM normativas WHERE estado <> 'borrador' ORDER BY col ASC, position ASC, id ASC`)
     if (res.rows.length) return res.rows.map(rowToNormativa)
   } catch (e) {
     console.error('[cms] getNormativas fell back to JSON:', (e as Error).message)
   }
   return (seedNormativas as any[]).map((n, i) => ({ id: i + 1, position: i, col: n.col ?? 1, code: n.code, title: n.title, body: n.body, tags: n.tags ?? [] }))
+}
+
+// ---------- Admin reads (incluyen borradores) ----------
+// Las lecturas públicas de arriba esconden los borradores. El panel necesita
+// verlos para revisarlos y publicarlos, con el mismo respaldo en JSON.
+export async function getPostsAdmin(): Promise<Post[]> {
+  if (!getDbUrl()) return (seedPosts as Post[])
+  try {
+    await ensureSchema()
+    const res = await client().execute('SELECT * FROM posts ORDER BY featured DESC, id ASC')
+    if (res.rows.length) return res.rows.map(rowToPost)
+  } catch (e) {
+    console.error('[cms] getPostsAdmin fell back to JSON:', (e as Error).message)
+  }
+  return (seedPosts as Post[])
+}
+
+export async function getNormativasAdmin(): Promise<Normativa[]> {
+  if (!getDbUrl()) return getNormativas()
+  try {
+    await ensureSchema()
+    const res = await client().execute('SELECT * FROM normativas ORDER BY col ASC, position ASC, id ASC')
+    if (res.rows.length) return res.rows.map(rowToNormativa)
+  } catch (e) {
+    console.error('[cms] getNormativasAdmin fell back to JSON:', (e as Error).message)
+  }
+  return getNormativas()
 }
 
 // ---------- Admin writes (DB required) ----------
@@ -161,16 +194,16 @@ export async function getPostById(id: number): Promise<Post | null> {
 export async function upsertPost(p: Post): Promise<number> {
   await ensureSchema()
   const db = client()
-  const args = [p.slug, p.category, p.date, p.readtime, p.accent, p.featured ? 1 : 0, p.title, p.lede, JSON.stringify(p.sections ?? []), p.image ?? '', now()]
+  const args = [p.slug, p.category, p.date, p.readtime, p.accent, p.featured ? 1 : 0, p.title, p.lede, JSON.stringify(p.sections ?? []), p.image ?? '', p.borrador ? 'borrador' : '', now()]
   if (p.id) {
     await db.execute({
-      sql: `UPDATE posts SET slug=?,category=?,date=?,readtime=?,accent=?,featured=?,title=?,lede=?,sections=?,image=?,updated_at=? WHERE id=?`,
+      sql: `UPDATE posts SET slug=?,category=?,date=?,readtime=?,accent=?,featured=?,title=?,lede=?,sections=?,image=?,estado=?,updated_at=? WHERE id=?`,
       args: [...args, p.id],
     })
     return p.id
   }
   const res = await db.execute({
-    sql: `INSERT INTO posts (slug,category,date,readtime,accent,featured,title,lede,sections,image,updated_at) VALUES (?,?,?,?,?,?,?,?,?,?,?)`,
+    sql: `INSERT INTO posts (slug,category,date,readtime,accent,featured,title,lede,sections,image,estado,updated_at) VALUES (?,?,?,?,?,?,?,?,?,?,?,?)`,
     args,
   })
   return Number(res.lastInsertRowid)
@@ -184,16 +217,16 @@ export async function deletePost(id: number): Promise<void> {
 export async function upsertNormativa(n: Normativa): Promise<number> {
   await ensureSchema()
   const db = client()
-  const args = [n.col ?? 1, n.position ?? 0, n.code, n.title, n.body, JSON.stringify(n.tags ?? []), now()]
+  const args = [n.col ?? 1, n.position ?? 0, n.code, n.title, n.body, JSON.stringify(n.tags ?? []), n.borrador ? 'borrador' : '', now()]
   if (n.id) {
     await db.execute({
-      sql: `UPDATE normativas SET col=?,position=?,code=?,title=?,body=?,tags=?,updated_at=? WHERE id=?`,
+      sql: `UPDATE normativas SET col=?,position=?,code=?,title=?,body=?,tags=?,estado=?,updated_at=? WHERE id=?`,
       args: [...args, n.id],
     })
     return n.id
   }
   const res = await db.execute({
-    sql: `INSERT INTO normativas (col,position,code,title,body,tags,updated_at) VALUES (?,?,?,?,?,?,?)`,
+    sql: `INSERT INTO normativas (col,position,code,title,body,tags,estado,updated_at) VALUES (?,?,?,?,?,?,?,?)`,
     args,
   })
   return Number(res.lastInsertRowid)

@@ -4,10 +4,10 @@
  * Mismo criterio que el resto de `src/lib`: un solo cliente y un solo arranque
  * de esquema (`db.ts`), consultas con parámetros y fechas en ISO.
  */
-import { asegurarEsquema, cliente } from '../db'
-import { normalizarNumero, type AlertaNueva, type ExpedienteRef } from './alerta'
-import { normalizarExtraccion, type Extraccion } from './extraccion'
-import { esPrioridad, esTipoActo, REGLAS_INICIALES, type Regla } from './reglas'
+import { asegurarEsquema, cliente } from '../db.ts'
+import { normalizarNumero, type AlertaNueva, type ExpedienteRef } from './alerta.ts'
+import { normalizarExtraccion, type Extraccion } from './extraccion.ts'
+import { esPrioridad, esTipoActo, REGLAS_INICIALES, type Regla } from './reglas.ts'
 
 const ahora = () => new Date().toISOString()
 const str = (v: unknown) => (v == null ? '' : String(v))

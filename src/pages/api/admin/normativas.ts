@@ -28,6 +28,7 @@ export const POST: APIRoute = async ({ request }) => {
     title,
     body: String(b.body ?? '').trim(),
     tags,
+    borrador: !!b.borrador,
   }
 
   try {

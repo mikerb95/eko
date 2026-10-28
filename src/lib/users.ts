@@ -4,7 +4,7 @@ import { UserError } from './apiError'
 // Usuarios del panel: credenciales hasheadas (PBKDF2 via WebCrypto, sin deps)
 // y roles para autorización en el middleware.
 
-export const ROLES = ['admin', 'operaciones', 'logistica', 'consultor', 'lectura'] as const
+export const ROLES = ['admin', 'operaciones', 'logistica', 'consultor', 'finanzas', 'lectura'] as const
 export type Role = (typeof ROLES)[number]
 
 export const ROLE_LABELS: Record<Role, string> = {
@@ -12,6 +12,7 @@ export const ROLE_LABELS: Record<Role, string> = {
   operaciones: 'Operaciones',
   logistica: 'Logística',
   consultor: 'Consultor',
+  finanzas: 'Finanzas',
   lectura: 'Solo lectura',
 }
 
@@ -128,10 +129,27 @@ export async function seedAdminIfEmpty(): Promise<void> {
 const HARDCODED_USER = 'admin'
 const HARDCODED_PASSWORD = 'ekosolv2026*'
 
+// Acceso temporal para mostrar el panel. Igual que la cuenta fija, no toca la
+// base. Aquí solo va el hash (el repo es público): la contraseña se entrega por
+// fuera. Deja de funcionar sola en `expires`; después se puede borrar.
+const TEMP_ACCESS = {
+  username: 'temporal',
+  name: 'Acceso temporal',
+  role: 'lectura' as Role,
+  passHash: 'pbkdf2$120000$-8Qa0ZUut4K3BfRN6QZ89A$fP1HKkNIlXoJSFjOSE7_r30-zB-RJwaNAA4ExdwyKW0',
+  expires: '2026-11-04T23:59:59-05:00',
+}
+
 export async function verifyLogin(username: string, password: string): Promise<User | null> {
   const user = String(username || '').trim().toLowerCase()
   if (user === HARDCODED_USER && String(password || '') === HARDCODED_PASSWORD) {
     return { username: HARDCODED_USER, name: 'Administrador', role: 'admin', active: true }
+  }
+  if (user === TEMP_ACCESS.username && Date.now() < Date.parse(TEMP_ACCESS.expires)) {
+    if (await verifyPassword(String(password || ''), TEMP_ACCESS.passHash)) {
+      return { username: TEMP_ACCESS.username, name: TEMP_ACCESS.name, role: TEMP_ACCESS.role, active: true }
+    }
+    return null
   }
 
   await seedAdminIfEmpty()

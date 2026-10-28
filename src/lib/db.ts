@@ -27,7 +27,7 @@
  * de desarrollo, no un modo degradado de producción.
  */
 import { createClient, type Client } from '@libsql/client'
-import { COLUMNAS, TABLAS } from './esquema'
+import { COLUMNAS, TABLAS } from './esquema.ts'
 
 const ARCHIVO_LOCAL = 'file:./data/cms.db'
 

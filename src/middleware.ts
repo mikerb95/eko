@@ -1,5 +1,6 @@
 import { defineMiddleware } from 'astro:middleware'
 import { SESSION_COOKIE, verifySession } from './lib/auth'
+import { canWrite } from './lib/reglasEscritura'
 
 const PUBLIC_ADMIN_PATHS = new Set(['/admin/login'])
 const PUBLIC_API_PATHS = new Set(['/api/admin/login'])
@@ -30,26 +31,8 @@ function normalize(pathname: string): string {
   return pathname.length > 1 ? pathname.replace(/\/$/, '') : pathname
 }
 
-// Autorización por rol. GET (lectura) lo permite cualquier sesión;
-// las escrituras se restringen por área.
-const WRITE_RULES: Array<{ prefix: string; roles: string[] }> = [
-  { prefix: '/api/admin/users', roles: ['admin'] },
-  { prefix: '/api/admin/recolecciones', roles: ['admin', 'operaciones', 'logistica'] },
-  { prefix: '/api/admin/contactos', roles: ['admin', 'operaciones', 'consultor'] },
-  { prefix: '/api/admin/posts', roles: ['admin', 'consultor'] },
-  { prefix: '/api/admin/normativas', roles: ['admin', 'consultor'] },
-  // Agente de cumplimiento: expedientes, actos, alertas y reglas. Los
-  // consultores son quienes atienden las alertas.
-  { prefix: '/api/admin/cumplimiento', roles: ['admin', 'consultor'] },
-  // La sincronización con Zoho escribe en un sistema externo: solo admin.
-  { prefix: '/api/admin/zoho', roles: ['admin'] },
-]
-
-function canWrite(pathname: string, role: string): boolean {
-  const rule = WRITE_RULES.find((r) => pathname.startsWith(r.prefix))
-  if (!rule) return role === 'admin'
-  return rule.roles.includes(role)
-}
+// Autorización por rol de las escrituras: tabla en src/lib/reglasEscritura.ts,
+// compartida con el asistente del panel.
 
 const SAFE_METHODS = new Set(['GET', 'HEAD', 'OPTIONS'])
 

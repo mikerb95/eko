@@ -1,5 +1,5 @@
 import type { Client } from '@libsql/client'
-import { asegurarEsquema, cliente } from './db'
+import { asegurarEsquema, cliente } from './db.ts'
 
 // Operaciones: órdenes de recolección RAEE (Fase 1 del panel operativo).
 // Comparte la misma DB Turso/libSQL que el CMS pero con su propio módulo.

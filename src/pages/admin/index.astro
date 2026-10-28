@@ -1,6 +1,6 @@
 ---
 export const prerender = false
-import { seedIfEmpty, getPosts, getNormativas } from '../../lib/cms'
+import { seedIfEmpty, getPostsAdmin, getNormativasAdmin } from '../../lib/cms'
 import { listOrders } from '../../lib/ops'
 import { listContacts } from '../../lib/contactos'
 import { listUsers, type User } from '../../lib/users'
@@ -12,8 +12,8 @@ try {
 } catch (e: any) {
   seedError = String(e?.message || e)
 }
-const posts = await getPosts()
-const normativas = await getNormativas()
+const posts = await getPostsAdmin()
+const normativas = await getNormativasAdmin()
 let orders: Awaited<ReturnType<typeof listOrders>> = []
 try {
   orders = await listOrders()
@@ -157,6 +157,7 @@ if (isAdmin) {
                 <option value="operaciones">Operaciones</option>
                 <option value="logistica">Logística</option>
                 <option value="consultor">Consultor</option>
+                <option value="finanzas">Finanzas</option>
                 <option value="lectura">Solo lectura</option>
               </select>
             </label>
@@ -235,6 +236,7 @@ if (isAdmin) {
             </label>
           </div>
           <label class="check"><input type="checkbox" name="featured" /> Destacado (aparece arriba en el blog)</label>
+          <label class="check"><input type="checkbox" name="borrador" /> Borrador (no se publica en el sitio)</label>
           <label>Entradilla (lede)<textarea name="lede" rows="3"></textarea></label>
           <label>Imagen para compartir
             <input name="image" placeholder="/og/mi-articulo.jpg" />
@@ -280,6 +282,7 @@ if (isAdmin) {
             <label>Etiquetas (separadas por coma)<input name="tags" placeholder="RAEE, Posconsumo" /></label>
             <label>Orden<input name="position" type="number" value="0" /></label>
           </div>
+          <label class="check"><input type="checkbox" name="borrador" /> Borrador (no se publica en el sitio)</label>
           <div class="drawer-actions">
             <button type="button" class="btn-ghost" data-close>Cancelar</button>
             <button type="submit" class="btn-primary"><span class="t">Guardar</span></button>
