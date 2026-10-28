@@ -93,12 +93,12 @@ export const CREAR_BORRADOR_ARTICULO: Escritura = {
   esquema: esquemaArticulo as unknown as Escritura['esquema'],
   async preparar(entrada, ctx) {
     const p = await prepararArticulo(entrada, ctx)
-    return p.ok ? aPropuesta(p.vista) : p
+    return p.ok === true ? aPropuesta(p.vista) : p
   },
   async ejecutar(entrada, ctx) {
     try {
       const p = await prepararArticulo(entrada, ctx)
-      if (!p.ok) return p
+      if (p.ok === false) return p
       const { a, slug } = p.datos
       const fecha = new Date().toLocaleDateString('es-CO', { day: 'numeric', month: 'short', year: 'numeric', timeZone: 'America/Bogota' })
       const minutos = Math.max(2, Math.round(JSON.stringify(secciones(a)).split(/\s+/).length / 200))
@@ -159,12 +159,12 @@ export const CREAR_BORRADOR_NORMATIVA: Escritura = {
   esquema: esquemaNormativa as unknown as Escritura['esquema'],
   async preparar(entrada, ctx) {
     const p = await prepararNormativa(entrada, ctx)
-    return p.ok ? aPropuesta(p.vista) : p
+    return p.ok === true ? aPropuesta(p.vista) : p
   },
   async ejecutar(entrada, ctx) {
     try {
       const p = await prepararNormativa(entrada, ctx)
-      if (!p.ok) return p
+      if (p.ok === false) return p
       const n = p.datos
       const pos = await ctx.db.execute({ sql: 'SELECT COALESCE(MAX(position), -1) + 1 AS p FROM normativas WHERE col = ?', args: [n.columna ?? 1] })
       const r = await ctx.db.execute({

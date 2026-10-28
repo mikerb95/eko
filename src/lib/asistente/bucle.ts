@@ -110,7 +110,7 @@ export function nuevaEjecucion(id: string, pregunta: string): Ejecucion {
 }
 
 const aResultado = (toolUseId: string, r: ResultadoHerramienta): ResultadoParam =>
-  r.ok
+  r.ok === true
     ? { type: 'tool_result', tool_use_id: toolUseId, content: JSON.stringify(r.datos) }
     : { type: 'tool_result', tool_use_id: toolUseId, content: r.error, is_error: true }
 
@@ -195,7 +195,7 @@ export async function avanzar(e: Ejecucion, deps: Dependencias): Promise<Ejecuci
         } catch (err) {
           preparada = { ok: false, error: `No se pudo preparar la propuesta: ${err instanceof Error ? err.message : String(err)}` }
         }
-        if (!preparada.ok) {
+        if (preparada.ok === false) {
           resultados.push(aResultado(uso.id, { ok: false, error: preparada.error }))
           continue
         }

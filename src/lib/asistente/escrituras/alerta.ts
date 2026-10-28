@@ -78,12 +78,12 @@ export const ACTUALIZAR_ALERTA: Escritura = {
   esquema: esquemaAlerta as unknown as Escritura['esquema'],
   async preparar(entrada, ctx) {
     const p = await preparar(entrada, ctx)
-    return p.ok ? aPropuesta(p.vista) : p
+    return p.ok === true ? aPropuesta(p.vista) : p
   },
   async ejecutar(entrada, ctx) {
     try {
       const p = await preparar(entrada, ctx)
-      if (!p.ok) return p
+      if (p.ok === false) return p
       const { entrada: e, id, antes } = p.datos
       const nota = e.nota ? [antes.nota, `${ctx.hoy}, ${firma(ctx)}: ${e.nota}`].filter(Boolean).join('\n').slice(-2000) : antes.nota
       const r = await ctx.db.execute({

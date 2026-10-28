@@ -55,12 +55,12 @@ export const ACTUALIZAR_CONTACTO: Escritura = {
   esquema: esquemaContacto as unknown as Escritura['esquema'],
   async preparar(entrada, ctx) {
     const p = await preparar(entrada, ctx)
-    return p.ok ? aPropuesta(p.vista) : p
+    return p.ok === true ? aPropuesta(p.vista) : p
   },
   async ejecutar(entrada, ctx) {
     try {
       const p = await preparar(entrada, ctx)
-      if (!p.ok) return p
+      if (p.ok === false) return p
       const { ids, estado } = p.datos
       // La condición va también en el UPDATE: el conteo dice lo que de verdad cambió.
       const r = await ctx.db.execute({
