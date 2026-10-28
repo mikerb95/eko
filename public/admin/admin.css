@@ -155,4 +155,11 @@ textarea { resize: vertical; }
 @media (max-width: 560px) {
   .grid2, .grid3 { grid-template-columns: 1fr; }
   .sec-row { grid-template-columns: 1fr; }
+  /* En celular las pestañas no caben en una fila: se deslizan de lado, y la
+     sesión del encabezado se oculta para que no empuje los botones fuera. */
+  .admin-top { padding: 12px 16px; gap: 8px; }
+  .top-right { gap: 8px; }
+  .top-right .muted { display: none; }
+  .tabs { overflow-x: auto; padding: 12px 16px 0; scrollbar-width: none; }
+  .tab { flex: none; white-space: nowrap; padding: 10px 12px; }
 }
