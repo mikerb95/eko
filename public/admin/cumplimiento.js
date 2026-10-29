@@ -1,15 +1,12 @@
 // Agente de cumplimiento: pinta alertas, expedientes, reglas e historial, y
 // envía los cambios a /api/admin/cumplimiento. Mismo estilo que admin.js.
-import { $, $$, esc, svg, fmtRel, avatar, estado as pastilla, crearLista } from './comun.js'
+import { $, $$, esc, svg, fmtDate, fmtRel, avatar, estado as pastilla, crearLista } from './comun.js'
 
 const estado = window.__AGENTE__ || { alertas: [], expedientes: [], reglas: [], actos: [], puedeEscribir: false }
 const API = '/api/admin/cumplimiento'
 
-const fmtFecha = (iso) => {
-  if (!iso) return ''
-  const d = new Date(iso.length === 10 ? iso + 'T12:00:00' : iso)
-  return isNaN(d) ? iso : d.toLocaleDateString('es-CO', { day: 'numeric', month: 'short', year: 'numeric' })
-}
+// Mismo formato de fecha que el resto del panel: "1 nov 2026".
+const fmtFecha = fmtDate
 
 async function api(path, opts = {}) {
   const res = await fetch(API + path, opts)
@@ -229,6 +226,7 @@ function abrirExpediente(e) {
   drawer.hidden = false
 }
 $$('[data-close]', drawer).forEach((x) => x.addEventListener('click', () => (drawer.hidden = true)))
+document.addEventListener('keydown', (e) => { if (e.key === 'Escape') drawer.hidden = true })
 $('#nuevo-exp')?.addEventListener('click', () => abrirExpediente(null))
 expForm.addEventListener('submit', async (ev) => {
   ev.preventDefault()

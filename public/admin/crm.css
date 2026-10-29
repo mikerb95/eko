@@ -158,7 +158,7 @@ body.crm {
 .tabla tbody tr { transition: background 0.1s; }
 .tabla tbody tr[data-fila] { cursor: pointer; }
 .tabla tbody tr:hover { background: color-mix(in oklab, var(--deep) 4%, var(--paper)); }
-.tabla .num { font-family: var(--mono); font-size: 12.5px; color: var(--ink-2); white-space: nowrap; }
+.tabla td.num, .tabla span.num { font-family: var(--mono); font-size: 12.5px; color: var(--ink-2); white-space: nowrap; }
 .tabla .der { text-align: right; }
 .tabla .nw { white-space: nowrap; }
 .tabla .t1 { font-weight: 600; color: var(--ink); line-height: 1.35; }

@@ -65,8 +65,9 @@
 .reglas { display: grid; grid-template-columns: repeat(auto-fill, minmax(340px, 1fr)); gap: 12px; }
 .regla {
   background: var(--paper); border: 1px solid var(--line); border-radius: 14px; box-shadow: var(--shadow-1);
-  padding: 16px 18px; display: grid; grid-template-columns: 1fr 110px 110px; gap: 10px 12px; align-items: end;
+  padding: 16px 18px; display: grid; grid-template-columns: 1fr 1fr; gap: 10px 12px; align-items: end;
 }
+.regla label:first-of-type { grid-column: 1 / -1; }
 .regla-tipo { grid-column: 1 / -1; margin: 0; font-weight: 600; font-size: 14px; color: var(--ink); }
 .regla .accion { grid-column: 1 / -1; }
 .regla-pie { grid-column: 1 / -1; display: flex; justify-content: flex-end; }
@@ -77,8 +78,6 @@
 
 @media (max-width: 720px) {
   .reglas { grid-template-columns: 1fr; }
-  .regla { grid-template-columns: 1fr 1fr; }
-  .regla label:first-of-type { grid-column: 1 / -1; }
   .datos { grid-template-columns: 1fr; gap: 2px; }
   .datos dd { margin-bottom: 6px; }
   .banner-aviso { padding: 10px 16px; }
