@@ -1,6 +1,7 @@
 ---
 export const prerender = false
 import { verifySession, SESSION_COOKIE } from '../../lib/auth'
+import { ico } from '../../lib/admin/iconos'
 
 // Destino tras entrar. Solo se acepta una ruta interna que empiece por una
 // sola '/': con '//host' o 'https://host' el parámetro sería un open redirect.
@@ -21,28 +22,56 @@ if (await verifySession(token)) return Astro.redirect(next)
     <link rel="icon" href="/favicon.ico" sizes="any" />
     <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32.png" />
     <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
-    <title>Acceso — EKOSOLV CMS</title>
+    <title>Acceso · EKOSOLV</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Geist:wght@400..700&display=swap" rel="stylesheet" />
     <link rel="stylesheet" href="/admin/admin.css" />
   </head>
   <body class="login-body">
     <main class="login-card">
-      <img src="/brand/ekosolv-horizontal.png" alt="EKOSOLV" class="login-logo" />
-      <h1>Panel de administración</h1>
-      <p class="muted">Ingresa para gestionar recolecciones, blog y normativas.</p>
-      <form id="login-form">
-        <label>Usuario<input name="username" type="text" autocomplete="username" required /></label>
-        <label>Contraseña<input name="password" type="password" autocomplete="current-password" required /></label>
-        <button type="submit" class="btn-primary"><span class="t">Entrar</span></button>
-        <p class="form-error" id="err"></p>
-      </form>
+      <section class="login-lado" aria-hidden="true">
+        <p class="login-kicker">Panel de Ekosolv</p>
+        <h2>Todo el trabajo del día, en un solo lugar.</h2>
+        <ul>
+          <li><span><Fragment set:html={ico('recolecciones')} /></span><div><b>Recolecciones</b><small>De la solicitud al certificado, con responsable y fecha.</small></div></li>
+          <li><span><Fragment set:html={ico('contactos')} /></span><div><b>Contactos</b><small>Cada mensaje del sitio, sin que se pierda ninguno.</small></div></li>
+          <li><span><Fragment set:html={ico('cumplimiento')} /></span><div><b>Cumplimiento</b><small>Alertas con el plazo contado en días hábiles.</small></div></li>
+        </ul>
+        <p class="login-pie">Acceso solo para el equipo de Ekosolv.</p>
+      </section>
+      <section class="login-form">
+        <img src="/brand/ekosolv-horizontal.png" alt="EKOSOLV" class="login-logo" />
+        <h1>Ingrese al panel</h1>
+        <p class="muted">Use el usuario y la contraseña que le asignó el administrador.</p>
+        <form id="login-form">
+          <label>Usuario<input name="username" type="text" autocomplete="username" autocapitalize="none" spellcheck="false" required autofocus /></label>
+          <label>Contraseña
+            <span class="login-clave">
+              <input name="password" type="password" autocomplete="current-password" required />
+              <button type="button" id="ver-clave" aria-pressed="false">Mostrar</button>
+            </span>
+          </label>
+          <button type="submit" class="btn-primary"><span class="t">Entrar</span></button>
+          <p class="form-error" id="err" role="alert"></p>
+        </form>
+      </section>
     </main>
     <script>
       const f = document.getElementById('login-form') as HTMLFormElement
       const err = document.getElementById('err') as HTMLElement
+      const ver = document.getElementById('ver-clave') as HTMLButtonElement
+      ver.addEventListener('click', () => {
+        const clave = f.elements.namedItem('password') as HTMLInputElement
+        const mostrar = clave.type === 'password'
+        clave.type = mostrar ? 'text' : 'password'
+        ver.textContent = mostrar ? 'Ocultar' : 'Mostrar'
+        ver.setAttribute('aria-pressed', String(mostrar))
+      })
       f.addEventListener('submit', async (e) => {
         e.preventDefault()
         err.textContent = ''
-        const btn = f.querySelector('button') as HTMLButtonElement
+        const btn = f.querySelector('button[type=submit]') as HTMLButtonElement
         const t = f.querySelector('.t') as HTMLElement
         btn.disabled = true; t.textContent = 'Entrando…'
         const data = Object.fromEntries(new FormData(f) as any)

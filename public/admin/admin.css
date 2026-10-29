@@ -25,16 +25,58 @@ body {
 .muted { color: var(--mute); }
 
 /* ---------- Login ---------- */
-.login-body { display: grid; place-items: center; min-height: 100vh; padding: 24px; }
-.login-card {
-  width: 100%; max-width: 380px; background: var(--paper);
-  border: 1px solid var(--line); border-radius: 16px; padding: 36px 32px;
-  box-shadow: 0 12px 40px rgba(0,0,0,.06);
+.login-body {
+  --font: "Geist", "Inter", system-ui, -apple-system, "Segoe UI", sans-serif;
+  display: grid; place-items: center; min-height: 100vh; padding: 24px;
+  background:
+    radial-gradient(900px 500px at 15% 0%, color-mix(in oklab, var(--deep) 10%, transparent), transparent 70%),
+    radial-gradient(700px 400px at 100% 100%, color-mix(in oklab, var(--forest) 9%, transparent), transparent 70%),
+    #f4f6f5;
 }
-.login-logo { height: 34px; margin-bottom: 22px; }
-.login-card h1 { font-size: 20px; margin: 0 0 6px; }
-.login-card p { margin: 0 0 22px; }
-.login-card form { display: flex; flex-direction: column; gap: 14px; }
+.login-card {
+  width: 100%; max-width: 900px; display: grid; grid-template-columns: 1fr 1fr;
+  background: var(--paper); border: 1px solid var(--line); border-radius: 20px; overflow: hidden;
+  box-shadow: 0 1px 2px rgba(16, 40, 36, .04), 0 24px 60px rgba(16, 40, 36, .10);
+}
+.login-lado {
+  position: relative; padding: 40px 38px; color: #fff; display: flex; flex-direction: column; gap: 18px;
+  background: linear-gradient(155deg, #1f8a8a 0%, #197373 55%, #15605f 100%);
+  overflow: hidden;
+}
+/* Anillos suaves de fondo, solo decorativos. */
+.login-lado::after {
+  content: ""; position: absolute; right: -120px; bottom: -120px; width: 340px; height: 340px; border-radius: 50%;
+  border: 46px solid rgba(255, 255, 255, .06); pointer-events: none;
+}
+.login-kicker { margin: 0; font-size: 11.5px; font-weight: 600; letter-spacing: .1em; text-transform: uppercase; color: rgba(255, 255, 255, .75); }
+.login-lado h2 { margin: 0; font-size: 26px; line-height: 1.2; font-weight: 600; letter-spacing: -.02em; max-width: 320px; }
+.login-lado ul { list-style: none; margin: 10px 0 0; padding: 0; display: flex; flex-direction: column; gap: 16px; }
+.login-lado li { display: flex; gap: 12px; align-items: flex-start; }
+.login-lado li > span { flex: none; width: 34px; height: 34px; border-radius: 10px; display: grid; place-items: center; background: rgba(255, 255, 255, .13); }
+.login-lado li svg { width: 18px; height: 18px; }
+.login-lado li b { display: block; font-size: 14px; font-weight: 600; }
+.login-lado li small { display: block; font-size: 12.5px; color: rgba(255, 255, 255, .75); line-height: 1.45; }
+.login-pie { margin: auto 0 0; padding-top: 12px; font-size: 12px; color: rgba(255, 255, 255, .6); }
+.login-form { padding: 44px 42px; display: flex; flex-direction: column; justify-content: center; }
+.login-logo { height: 32px; width: auto; align-self: flex-start; margin-bottom: 28px; }
+.login-form h1 { font-size: 22px; font-weight: 600; letter-spacing: -.015em; margin: 0 0 6px; }
+.login-form > p { margin: 0 0 24px; font-size: 13.5px; }
+.login-form form { display: flex; flex-direction: column; gap: 14px; }
+.login-form .btn-primary { margin-top: 6px; padding: 11px 18px; font-size: 14px; border-radius: 10px; }
+.login-clave { position: relative; display: block; }
+.login-clave input { padding-right: 78px; }
+.login-clave button {
+  position: absolute; right: 6px; top: 50%; transform: translateY(-50%);
+  font: 500 12px var(--font); color: var(--deep-2); background: none; border: 0; cursor: pointer; padding: 6px 8px; border-radius: 6px;
+}
+.login-clave button:hover { background: color-mix(in oklab, var(--deep) 8%, transparent); }
+@media (max-width: 760px) {
+  .login-card { grid-template-columns: 1fr; max-width: 420px; }
+  .login-lado { padding: 24px 26px; gap: 8px; }
+  .login-lado h2 { font-size: 19px; }
+  .login-lado ul, .login-pie { display: none; }
+  .login-form { padding: 30px 26px 32px; }
+}
 
 /* ---------- Inputs ---------- */
 label { display: flex; flex-direction: column; gap: 6px; font-size: 12.5px; color: var(--ink-2); font-weight: 500; }
