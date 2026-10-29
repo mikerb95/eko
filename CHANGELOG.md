@@ -1,5 +1,49 @@
 # Changelog
 
+## 2026-10-28
+
+### Added
+- **Asistente con IA del panel** (`src/lib/asistente/`, `src/pages/api/admin/asistente/`, `public/admin/asistente.js`): caja "Pregunte o busque algo" arriba de `/admin`. Consulta recolecciones, contactos, cumplimiento, blog y normativas con herramientas filtradas por rol y propone cambios (estado de una recolección, contacto atendido, cerrar o posponer una alerta, borradores de artículo y de normativa) que la persona aprueba con una tarjeta de antes y después. Al aprobar relee el rol en la base; un segundo clic sobre la misma propuesta se rechaza. Sonnet 5.5 con `fallbacks: "default"`, respuestas transmitidas en vivo (SSE) y datos de personas naturales ocultos antes de llegar al modelo. Fases 1 a 4 y 7 a 9 de `docs/plan-asistente.md`; Zoho (fases 5 y 6) y la prueba con el modelo real (fase 10) siguen pendientes.
+- **Historial, consumo, topes y auditoría del asistente**: conversaciones privadas por persona (el admin las ve todas en solo lectura), registro de consumo por llamada con reporte mensual por usuario en CSV, tope diario de US$5 para la empresa y de US$1 por persona editable desde la pestaña "Asistente IA", y auditoría de quién pidió, quién aprobó, cuándo, antes y después. Tablas nuevas en `src/lib/esquema.ts`.
+- **Buscador del panel sin IA** (`/api/admin/asistente/buscar`): encuentra pestañas y fichas sin gastar API.
+- **Rol `finanzas`** en `src/lib/users.ts` y en el formulario de usuarios. No escribe en ninguna área del panel; sus escrituras previstas son borradores en Zoho Books a través del asistente.
+- **`src/lib/reglasEscritura.ts`**: la tabla de escrituras por rol sale del middleware a un módulo puro, para que el asistente lea la misma fuente y un rol que pierde un permiso en el panel lo pierda también en el chat.
+- **Borradores en el CMS**: columna `estado` en `posts` y `normativas`. El blog, el sitemap y `/normativas` los esconden; el panel los marca "Borrador" con una casilla para publicarlos.
+- **Enlaces profundos al panel**: `/admin?tab=<pestaña>&id=<id>` abre la pestaña y la ficha, y `/admin/cumplimiento?alerta=<id>` abre la alerta, ajusta el filtro aunque esté cerrada y la resalta.
+- **Modelo simulado** (`src/lib/asistente/modeloFalso.ts`): con `ASISTENTE_MODELO_FALSO=1` el asistente responde sin clave ni costo. Nunca se activa en Vercel.
+- **Playwright** (`playwright.config.ts`, `e2e/`, `npm run test:e2e`): 8 pruebas en navegador contra una base SQLite temporal y el modelo simulado, en un servidor propio en el puerto 4329 para no chocar con un `astro dev` abierto.
+- **`/oportunidades2630` revisada al 28 de octubre**: estado de cada eje frente a lo ocurrido en 2026 (vigente, en trámite, vigente y pendiente), con el impacto del sismo y los cambios regulatorios.
+
+### Changed
+- **Acceso temporal con rol admin** (`src/lib/users.ts`): pasó de `lectura` a `admin` porque `/docs`, `/oportunidades2630` y varias secciones del panel solo abren para admin. Vence el 2026-11-04.
+- `ops.ts`, `contactos.ts`, `db.ts` y `agente/datos.ts` importan con extensión `.ts`, para que `node --test` los cargue.
+
+### Fixed
+- **Panel en celular**: el encabezado y las pestañas se desbordaban a lo ancho; ahora las pestañas se deslizan de lado.
+
+## 2026-10-21
+
+### Added
+- **Agente de cumplimiento, Fase 1** (`src/lib/agente/`, `src/pages/admin/cumplimiento.astro`, `src/pages/api/admin/cumplimiento/`): se sube un acto administrativo, Claude lo lee y extrae sus obligaciones (salida validada con Zod), el agente lo cruza con la tabla de expedientes y deja una alerta según nueve reglas iniciales editables desde la pestaña Reglas. Sin `ANTHROPIC_API_KEY` los actos quedan "esperando clave" y se procesan después desde Historial → Procesar pendientes. Modelo configurable con `AGENTE_MODELO` (por defecto `claude-sonnet-5-5`).
+- **Días hábiles de Colombia** (`src/lib/agente/diasHabiles.ts`): cálculo de vencimientos con los festivos, incluidos los que se corren al lunes por la Ley Emiliani, con su suite de pruebas. La API de alertas devuelve los días que quedan.
+- **Tope de gasto diario** (`src/lib/asesor/presupuesto.ts`), atómico y guardado en base. Lo usa el asesor y después lo reutilizó el asistente del panel.
+- **Asesor con IA en la burbuja de WhatsApp** (`src/lib/asesor/`, `POST /api/asesor`, `AsesorChat.astro`): resuelve dudas de los servicios con Haiku 5.5, de usted y sin cifras de dinero. Una guardia revisa la respuesta completa antes de mostrarla, el tope diario se configura con `ASESOR_TOPE_DIARIO_USD` (US$1 por defecto) y el endpoint limita a 40 preguntas por IP cada 10 minutos. El conocimiento público sale de `conocimiento.ts` y de la estructura de líneas de servicio, que ahora comparten las páginas de servicios.
+- **`npm test`** con `node --test` sobre los `*.test.ts` de `src/`.
+- Dependencias `@anthropic-ai/sdk` y `zod`.
+
+### Changed
+- La burbuja del asesor se esconde cuando el menú de navegación está abierto.
+
+## 2026-10-06
+
+### Added
+- **Portada con motion graphics** (GSAP): odómetro de toneladas gestionadas (con texto oculto para lectores de pantalla), radar normativo (`RadarNormativo.astro`), ciclo del servicio (`CicloServicio.astro`), escenas de beneficio con el detalle de certificación (`EscenaBeneficio.astro`) y marquesina con las normas.
+- **Selector "¿Qué le exige la ANLA a su empresa?"** en el hero (`ExigeAnla.astro`, `src/lib/exigencias.ts`): según el perfil (importadora, productora, telco, datacenter, retail) muestra las normas que le aplican y lleva al formulario de contacto con el sector ya elegido. La relación perfil → norma es un borrador pendiente de validar por Ekosolv.
+
+### Fixed
+- Animaciones de revelado y marquesina respetan `prefers-reduced-motion`.
+- La portada ya no se desplaza a lo ancho en celular; ajustadas las posiciones de los vencimientos y el encabezado de sección.
+
 ## 2026-08-03
 
 ### SEO

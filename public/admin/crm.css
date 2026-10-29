@@ -145,7 +145,7 @@ body.crm {
   position: sticky; top: 0; z-index: 1;
   text-align: left; white-space: nowrap;
   font: 500 11.5px/1 var(--font); letter-spacing: 0.04em; text-transform: uppercase; color: var(--mute);
-  padding: 12px 14px; background: color-mix(in oklab, var(--paper-2) 70%, var(--paper));
+  padding: 11px 12px; background: color-mix(in oklab, var(--paper-2) 70%, var(--paper));
   border-bottom: 1px solid var(--line);
 }
 .tabla th[data-orden] { cursor: pointer; user-select: none; }
@@ -153,7 +153,7 @@ body.crm {
 .tabla th .flecha { display: inline-block; width: 10px; margin-left: 4px; opacity: 0.4; }
 .tabla th.is-orden { color: var(--ink); }
 .tabla th.is-orden .flecha { opacity: 1; color: var(--deep); }
-.tabla td { padding: 12px 14px; border-bottom: 1px solid color-mix(in oklab, var(--line) 70%, transparent); vertical-align: middle; }
+.tabla td { padding: 11px 12px; border-bottom: 1px solid color-mix(in oklab, var(--line) 70%, transparent); vertical-align: middle; }
 .tabla tbody tr:last-child td { border-bottom: 0; }
 .tabla tbody tr { transition: background 0.1s; }
 .tabla tbody tr[data-fila] { cursor: pointer; }
@@ -339,4 +339,13 @@ body.crm {
   .datos-ficha { grid-template-columns: 1fr; gap: 2px; }
   .datos-ficha dd { margin-bottom: 6px; }
   .embudo-fila { grid-template-columns: 92px minmax(0, 1fr) 30px; }
+}
+
+.chips[hidden] { display: none; }
+.tabla .tags { flex-wrap: nowrap; }
+.ficha-top span { white-space: nowrap; }
+@media (max-width: 560px) {
+  /* En celular los filtros se deslizan de lado en vez de apilarse. */
+  .chips { flex-wrap: nowrap; overflow-x: auto; scrollbar-width: none; margin: 0 -16px; padding: 0 16px; width: calc(100% + 32px); }
+  .chip { flex: none; }
 }
