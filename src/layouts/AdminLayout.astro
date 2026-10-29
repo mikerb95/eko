@@ -1,0 +1,139 @@
+---
+// Armazón de CRM del panel: barra lateral, barra superior y contenido. Lo
+// usan /admin y /admin/cumplimiento para que todo el panel se vea igual.
+// En /admin las secciones son botones (cambian de panel sin recargar); en las
+// demás páginas son enlaces a /admin?tab=<sección>.
+import { ROLE_LABELS, type Role } from '../lib/users'
+import { ico } from '../lib/admin/iconos'
+
+interface Cuentas {
+  ordenes?: number
+  ordenesNuevas?: number
+  contactos?: number
+  contactosNuevos?: number
+  alertas?: number
+  alertasUrgentes?: number
+  posts?: number
+  normativas?: number
+  usuarios?: number
+}
+interface Props {
+  titulo: string
+  activo: string
+  enPanel?: boolean
+  css?: string[]
+  cuentas?: Cuentas
+}
+const { titulo, activo, enPanel = false, css = [], cuentas = {} } = Astro.props
+const user = String(Astro.locals.user || 'admin')
+const role = String(Astro.locals.role || '')
+const isAdmin = role === 'admin'
+const rolTexto = ROLE_LABELS[role as Role] ?? role
+const iniciales = user.split(/\s+/).filter(Boolean).slice(0, 2).map((p) => p[0]!.toUpperCase()).join('') || 'A'
+const hoyTexto = new Date().toLocaleDateString('es-CO', { weekday: 'long', day: 'numeric', month: 'long', timeZone: 'America/Bogota' })
+
+type Item = { id: string; lbl: string; href?: string; n?: number; alerta?: number; alertaTitulo?: string }
+const grupos: { titulo: string; items: Item[] }[] = [
+  { titulo: '', items: [{ id: 'inicio', lbl: 'Inicio' }] },
+  {
+    titulo: 'Operación',
+    items: [
+      { id: 'recolecciones', lbl: 'Recolecciones', n: cuentas.ordenes, alerta: cuentas.ordenesNuevas, alertaTitulo: 'Solicitudes sin confirmar' },
+      { id: 'contactos', lbl: 'Contactos', n: cuentas.contactos, alerta: cuentas.contactosNuevos, alertaTitulo: 'Mensajes sin atender' },
+      { id: 'cumplimiento', lbl: 'Cumplimiento', href: '/admin/cumplimiento', n: cuentas.alertas, alerta: cuentas.alertasUrgentes, alertaTitulo: 'Alertas que vencen en 5 días hábiles o menos' },
+    ],
+  },
+  {
+    titulo: 'Contenido del sitio',
+    items: [
+      { id: 'blog', lbl: 'Blog', n: cuentas.posts },
+      { id: 'normativas', lbl: 'Normativas', n: cuentas.normativas },
+    ],
+  },
+  ...(isAdmin
+    ? [{ titulo: 'Administración', items: [{ id: 'usuarios', lbl: 'Usuarios', n: cuentas.usuarios }, { id: 'ia', lbl: 'Asistente IA' }] }]
+    : []),
+]
+const crumb = grupos.flatMap((g) => g.items).find((i) => i.id === activo)?.lbl ?? ''
+const enlace = (i: Item) => i.href ?? (i.id === 'inicio' ? '/admin' : `/admin?tab=${i.id}`)
+---
+
+<!DOCTYPE html>
+<html lang="es">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="robots" content="noindex, nofollow" />
+    <link rel="icon" href="/favicon.ico" sizes="any" />
+    <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32.png" />
+    <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+    <title>{titulo}</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Geist:wght@400..700&family=Geist+Mono:wght@400..500&display=swap" rel="stylesheet" />
+    <link rel="stylesheet" href="/admin/admin.css" />
+    {css.map((h) => <link rel="stylesheet" href={h} />)}
+    <link rel="stylesheet" href="/admin/crm.css" />
+  </head>
+  <body class="crm">
+    <div class="crm-shell">
+      <aside class="side" id="side" aria-label="Navegación del panel">
+        <div class="side-brand">
+          <img src="/brand/ekosolv-horizontal.png" alt="EKOSOLV" />
+          <span class="tag">CRM</span>
+        </div>
+        <nav class="side-nav">
+          {grupos.map((g) => (
+            <>
+              {g.titulo && <p class="side-group">{g.titulo}</p>}
+              {g.items.map((i) => {
+                const cuenta = i.alerta
+                  ? <span class="count is-alert" title={i.alertaTitulo}>{i.alerta}</span>
+                  : i.n !== undefined ? <span class="count">{i.n}</span> : null
+                const clase = `tab${i.id === activo ? ' is-active' : ''}`
+                return enPanel && !i.href
+                  ? <button class={clase} data-tab={i.id}><Fragment set:html={ico(i.id)} /><span class="lbl">{i.lbl}</span>{cuenta}</button>
+                  : <a class={clase} href={enlace(i)} aria-current={i.id === activo ? 'page' : undefined}><Fragment set:html={ico(i.id)} /><span class="lbl">{i.lbl}</span>{cuenta}</a>
+              })}
+            </>
+          ))}
+        </nav>
+        <div class="side-user">
+          <span class="avatar" aria-hidden="true">{iniciales}</span>
+          <span class="side-user-txt">
+            <b>{user}</b>
+            <small>{rolTexto || 'Sin rol'}</small>
+          </span>
+          <button id="logout" class="side-salir" title="Cerrar sesión" aria-label="Cerrar sesión"><Fragment set:html={ico('salir')} /></button>
+        </div>
+      </aside>
+      <div class="side-velo" data-side-cerrar></div>
+
+      <div class="crm-body">
+        <header class="crm-top">
+          <button class="side-abrir" type="button" aria-label="Abrir menú" aria-controls="side"><Fragment set:html={ico('menu')} /></button>
+          <div class="crm-crumb"><span>Panel</span><span class="sep">/</span><b id="crm-crumb">{crumb}</b></div>
+          <div class="crm-top-right">
+            <span class="crm-fecha">{hoyTexto}</span>
+            <a href="/" class="btn-ghost btn-sm" target="_blank">Ver sitio<Fragment set:html={ico('externo', 'ext')} /></a>
+          </div>
+        </header>
+        <slot name="avisos" />
+        <main class="admin-main crm-main">
+          <slot />
+        </main>
+      </div>
+    </div>
+
+    <slot name="fuera" />
+
+    <script is:inline>
+      document.getElementById('logout')?.addEventListener('click', async () => {
+        await fetch('/api/admin/logout', { method: 'POST' })
+        location.href = '/admin/login'
+      })
+      document.querySelector('.side-abrir')?.addEventListener('click', () => document.body.classList.add('side-abierta'))
+      document.querySelector('[data-side-cerrar]')?.addEventListener('click', () => document.body.classList.remove('side-abierta'))
+    </script>
+  </body>
+</html>
