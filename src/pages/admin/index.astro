@@ -9,6 +9,10 @@ import { iaDisponible, usuarioDeSesion } from '../../lib/asistente/motor'
 import { listarRecientes, obtenerConversacion } from '../../lib/asistente/conversaciones'
 import { sinRayas, turnosDe } from '../../lib/asistente/turnos'
 import { escriturasDe } from '../../lib/asistente/escrituras/index'
+import { listarAlertas } from '../../lib/agente/datos'
+import { habilesRestantes, hoyEnBogota } from '../../lib/agente/diasHabiles'
+import { ico } from '../../lib/admin/iconos'
+import AdminLayout from '../../layouts/AdminLayout.astro'
 
 // Populate DB from JSON on first run, then load everything
 let seedError = ''
@@ -95,288 +99,221 @@ const asis = {
   esAdmin: isAdmin,
 }
 
-// ── Armazón del CRM ───────────────────────────────────────────────────────
-// Íconos de trazo para la barra lateral y las barras de herramientas.
-const ICONOS: Record<string, string> = {
-  inicio: '<path d="M3 11l9-7 9 7v9a1 1 0 0 1-1 1h-5v-6h-6v6H4a1 1 0 0 1-1-1z"/>',
-  recolecciones: '<path d="M3 6h11v10H3zM14 9h4l3 3v4h-7"/><circle cx="7" cy="17.5" r="1.8"/><circle cx="17" cy="17.5" r="1.8"/>',
-  contactos: '<circle cx="9" cy="8" r="3.5"/><path d="M2.5 20c.6-3.6 3.3-5.5 6.5-5.5s5.9 1.9 6.5 5.5M16 4.6a3.5 3.5 0 0 1 0 6.8M18 14.8c2 .7 3.2 2.5 3.5 5.2"/>',
-  cumplimiento: '<path d="M12 3l8 3v6c0 4.5-3.4 8-8 9-4.6-1-8-4.5-8-9V6z"/><path d="M8.5 12l2.5 2.5 4.5-5"/>',
-  blog: '<path d="M6 3h9l4 4v14H6z"/><path d="M14 3v5h5M9 12h7M9 16h7"/>',
-  normativas: '<path d="M4 5a2 2 0 0 1 2-2h13v16H6a2 2 0 0 0-2 2zM4 19V5M8 7h7M8 11h5"/>',
-  usuarios: '<circle cx="12" cy="8" r="4"/><path d="M4 21c.8-4 4-6 8-6s7.2 2 8 6"/>',
-  ia: '<path d="M12 3l1.8 5.2L19 10l-5.2 1.8L12 17l-1.8-5.2L5 10l5.2-1.8zM19 15l.8 2.2L22 18l-2.2.8L19 21l-.8-2.2L16 18l2.2-.8z"/>',
-  salir: '<path d="M15 4h4v16h-4M10 8l-4 4 4 4M6 12h10"/>',
-  buscar: '<circle cx="11" cy="11" r="7"/><path d="M20 20l-4-4"/>',
-  externo: '<path d="M14 4h6v6M20 4l-9 9M18 14v6H4V6h6"/>',
-  menu: '<path d="M4 6h16M4 12h16M4 18h16"/>',
+// Alertas de cumplimiento para el número de la barra lateral. Fail-soft: si
+// el agente no tiene tablas todavía, la barra sale sin número.
+const cuentaAlertas = { alertas: undefined as number | undefined, alertasUrgentes: 0 }
+try {
+  const hoy = hoyEnBogota()
+  const abiertas = (await listarAlertas()).filter((a) => a.estado === 'abierta' || a.estado === 'en_curso')
+  cuentaAlertas.alertas = abiertas.length
+  cuentaAlertas.alertasUrgentes = abiertas.filter((a) => a.vence_el && habilesRestantes(hoy, a.vence_el) <= 5).length
+} catch (e: any) {
+  console.error('[admin] alertas', e?.message || e)
 }
-const ico = (n: string, cls = 'ico') =>
-  `<svg class="${cls}" viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">${ICONOS[n] ?? ''}</svg>`
-const iniciales = String(user).split(/\s+/).filter(Boolean).slice(0, 2).map((p) => p[0]!.toUpperCase()).join('') || 'A'
-const hoyTexto = new Date().toLocaleDateString('es-CO', { weekday: 'long', day: 'numeric', month: 'long', timeZone: 'America/Bogota' })
+const cuentas = {
+  ordenes: orders.length, ordenesNuevas: pendingOrders,
+  contactos: contacts.length, contactosNuevos: newContacts,
+  posts: posts.length, normativas: normativas.length, usuarios: users.length,
+  ...cuentaAlertas,
+}
 ---
 
-<!DOCTYPE html>
-<html lang="es">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <meta name="robots" content="noindex, nofollow" />
-    <link rel="icon" href="/favicon.ico" sizes="any" />
-    <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32.png" />
-    <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
-    <title>EKOSOLV · Panel</title>
-    <link rel="preconnect" href="https://fonts.googleapis.com" />
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-    <link href="https://fonts.googleapis.com/css2?family=Geist:wght@400..700&family=Geist+Mono:wght@400..500&display=swap" rel="stylesheet" />
-    <link rel="stylesheet" href="/admin/admin.css" />
-    <link rel="stylesheet" href="/admin/asistente.css" />
-    <link rel="stylesheet" href="/admin/crm.css" />
-  </head>
-  <body class="crm">
-    <div class="crm-shell">
-      <!-- BARRA LATERAL -->
-      <aside class="side" id="side" aria-label="Navegación del panel">
-        <div class="side-brand">
-          <img src="/brand/ekosolv-horizontal.png" alt="EKOSOLV" />
-          <span class="tag">CRM</span>
-        </div>
-        <nav class="side-nav">
-          <button class="tab is-active" data-tab="inicio"><Fragment set:html={ico('inicio')} /><span class="lbl">Inicio</span></button>
+<AdminLayout titulo="EKOSOLV · Panel" activo="inicio" enPanel css={['/admin/asistente.css']} cuentas={cuentas}>
+  {seedError && <div slot="avisos" class="banner-error">No se pudo inicializar la base de datos: {seedError}</div>}
 
-          <p class="side-group">Operación</p>
-          <button class="tab" data-tab="recolecciones"><Fragment set:html={ico('recolecciones')} /><span class="lbl">Recolecciones</span>{pendingOrders > 0 ? <span class="count is-alert" title="Solicitudes sin confirmar">{pendingOrders}</span> : <span class="count">{orders.length}</span>}</button>
-          <button class="tab" data-tab="contactos"><Fragment set:html={ico('contactos')} /><span class="lbl">Contactos</span>{newContacts > 0 ? <span class="count is-alert" title="Mensajes sin atender">{newContacts}</span> : <span class="count">{contacts.length}</span>}</button>
-          <a class="tab" href="/admin/cumplimiento"><Fragment set:html={ico('cumplimiento')} /><span class="lbl">Cumplimiento</span><Fragment set:html={ico('externo', 'ext')} /></a>
-
-          <p class="side-group">Contenido del sitio</p>
-          <button class="tab" data-tab="blog"><Fragment set:html={ico('blog')} /><span class="lbl">Blog</span><span class="count">{posts.length}</span></button>
-          <button class="tab" data-tab="normativas"><Fragment set:html={ico('normativas')} /><span class="lbl">Normativas</span><span class="count">{normativas.length}</span></button>
-
-          {isAdmin && <p class="side-group">Administración</p>}
-          {isAdmin && <button class="tab" data-tab="usuarios"><Fragment set:html={ico('usuarios')} /><span class="lbl">Usuarios</span><span class="count">{users.length}</span></button>}
-          {isAdmin && <button class="tab" data-tab="ia"><Fragment set:html={ico('ia')} /><span class="lbl">Asistente IA</span></button>}
-        </nav>
-        <div class="side-user">
-          <span class="avatar" aria-hidden="true">{iniciales}</span>
-          <span class="side-user-txt">
-            <b>{user}</b>
-            <small>{asis.rolTexto || 'Sin rol'}</small>
-          </span>
-          <button id="logout" class="side-salir" title="Cerrar sesión" aria-label="Cerrar sesión"><Fragment set:html={ico('salir')} /></button>
-        </div>
-      </aside>
-      <div class="side-velo" data-side-cerrar></div>
-
-      <div class="crm-body">
-        <header class="crm-top">
-          <button class="side-abrir" type="button" aria-label="Abrir menú" aria-controls="side"><Fragment set:html={ico('menu')} /></button>
-          <div class="crm-crumb"><span>Panel</span><span class="sep">/</span><b id="crm-crumb">Inicio</b></div>
-          <div class="crm-top-right">
-            <span class="crm-fecha">{hoyTexto}</span>
-            <a href="/" class="btn-ghost btn-sm" target="_blank">Ver sitio<Fragment set:html={ico('externo', 'ext')} /></a>
+    <!-- INICIO -->
+    <section id="panel-inicio" class="panel is-active">
+      <!-- ASISTENTE -->
+      <section class="asis" aria-labelledby="asis-saludo">
+        <h1 id="asis-saludo" class="asis-saludo">Hola, {nombreCorto}. ¿En qué le ayudo?</h1>
+        <form id="asis-form" class="asis-caja" autocomplete="off">
+          <textarea id="asis-q" name="q" rows="1" maxlength="1000" placeholder={asis.ia ? 'Pregunte o busque algo: una orden, una alerta, un contacto…' : 'Busque una orden, un expediente, un contacto…'} aria-label="Pregunte o busque algo"></textarea>
+          <button type="submit" class="asis-enviar" aria-label="Enviar">
+            <svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true"><path d="M5 12h12M13 6l6 6-6 6" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          </button>
+          <div id="asis-resultados" class="asis-resultados" hidden></div>
+        </form>
+        <p class="asis-nota">
+          {asis.ia
+            ? (proponeAlgo
+                ? 'La IA consulta el panel y prepara cambios; nada se guarda sin que usted lo apruebe.'
+                : 'Con su rol, la IA solo consulta: no propone cambios.')
+            : 'El asistente con IA aún no está activo; por ahora la caja solo busca.'}
+        </p>
+        {asis.ia && (
+          <div class="asis-atajos" id="asis-atajos">
+            {atajos.map((a) => <button type="button" class="asis-atajo" data-atajo={a}>{a}</button>)}
           </div>
-        </header>
-
-        {seedError && <div class="banner-error">No se pudo inicializar la base de datos: {seedError}</div>}
-
-        <main class="admin-main crm-main">
-          <!-- INICIO -->
-          <section id="panel-inicio" class="panel is-active">
-            <!-- ASISTENTE -->
-            <section class="asis" aria-labelledby="asis-saludo">
-              <h1 id="asis-saludo" class="asis-saludo">Hola, {nombreCorto}. ¿En qué le ayudo?</h1>
-              <form id="asis-form" class="asis-caja" autocomplete="off">
-                <textarea id="asis-q" name="q" rows="1" maxlength="1000" placeholder={asis.ia ? 'Pregunte o busque algo: una orden, una alerta, un contacto…' : 'Busque una orden, un expediente, un contacto…'} aria-label="Pregunte o busque algo"></textarea>
-                <button type="submit" class="asis-enviar" aria-label="Enviar">
-                  <svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true"><path d="M5 12h12M13 6l6 6-6 6" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
-                </button>
-                <div id="asis-resultados" class="asis-resultados" hidden></div>
-              </form>
-              <p class="asis-nota">
-                {asis.ia
-                  ? (proponeAlgo
-                      ? 'La IA consulta el panel y prepara cambios; nada se guarda sin que usted lo apruebe.'
-                      : 'Con su rol, la IA solo consulta: no propone cambios.')
-                  : 'El asistente con IA aún no está activo; por ahora la caja solo busca.'}
-              </p>
-              {asis.ia && (
-                <div class="asis-atajos" id="asis-atajos">
-                  {atajos.map((a) => <button type="button" class="asis-atajo" data-atajo={a}>{a}</button>)}
-                </div>
-              )}
-              <div id="asis-hilo" class="asis-hilo" aria-live="polite"></div>
-              {asisRecientes.length > 0 && (
-                <div class="asis-recientes">
-                  <div class="asis-recientes-head">
-                    <span>{verTodas ? 'Conversaciones del equipo' : 'Sus conversaciones recientes'}</span>
-                    {isAdmin && <a href={verTodas ? '/admin' : '/admin?todas=1'}>{verTodas ? 'Ver solo las mías' : 'Ver las de todos'}</a>}
-                  </div>
-                  <ul>
-                    {asisRecientes.map((r) => (
-                      <li>
-                        <a href={`/admin?c=${r.id}${verTodas ? '&todas=1' : ''}`}>
-                          {r.pendiente && <span class="asis-punto" title="Tiene un cambio esperando su aprobación"></span>}
-                          <span class="asis-rec-q">{r.pregunta}</span>
-                          {verTodas && <span class="asis-rec-u">{r.usuario}</span>}
-                        </a>
-                      </li>
-                    ))}
-                  </ul>
-                </div>
-              )}
-            </section>
-
-            <div id="inicio-kpis" class="kpi-grid"></div>
-            <div class="dash-grid">
-              <article class="dash-card">
-                <header class="dash-head">
-                  <div><h3>Embudo de recolecciones</h3><p>Órdenes por etapa, de la solicitud al certificado.</p></div>
-                  <button type="button" class="link-btn" data-ir="recolecciones" data-vista="tablero">Ver tablero</button>
-                </header>
-                <div id="inicio-embudo"></div>
-              </article>
-              <article class="dash-card">
-                <header class="dash-head">
-                  <div><h3>Requiere atención</h3><p>Solicitudes sin confirmar y mensajes sin responder.</p></div>
-                </header>
-                <div id="inicio-atencion"></div>
-              </article>
+        )}
+        <div id="asis-hilo" class="asis-hilo" aria-live="polite"></div>
+        {asisRecientes.length > 0 && (
+          <div class="asis-recientes">
+            <div class="asis-recientes-head">
+              <span>{verTodas ? 'Conversaciones del equipo' : 'Sus conversaciones recientes'}</span>
+              {isAdmin && <a href={verTodas ? '/admin' : '/admin?todas=1'}>{verTodas ? 'Ver solo las mías' : 'Ver las de todos'}</a>}
             </div>
-            <article class="dash-card">
-              <header class="dash-head">
-                <div><h3>Actividad reciente</h3><p>Lo último que entró por los formularios del sitio.</p></div>
-              </header>
-              <div id="inicio-actividad"></div>
-            </article>
-          </section>
+            <ul>
+              {asisRecientes.map((r) => (
+                <li>
+                  <a href={`/admin?c=${r.id}${verTodas ? '&todas=1' : ''}`}>
+                    {r.pendiente && <span class="asis-punto" title="Tiene un cambio esperando su aprobación"></span>}
+                    <span class="asis-rec-q">{r.pregunta}</span>
+                    {verTodas && <span class="asis-rec-u">{r.usuario}</span>}
+                  </a>
+                </li>
+              ))}
+            </ul>
+          </div>
+        )}
+      </section>
 
-          <!-- RECOLECCIONES -->
-          <section id="panel-recolecciones" class="panel">
-            <div class="panel-head">
-              <div>
-                <h2>Órdenes de recolección</h2>
-                <p class="panel-sub">Solicitudes del formulario público y su avance hasta el certificado.</p>
-              </div>
-              <div class="seg" role="group" aria-label="Vista">
-                <button type="button" class="is-on" data-vista="tabla">Tabla</button>
-                <button type="button" data-vista="tablero">Tablero</button>
-              </div>
-            </div>
-            <div class="toolbar">
-              <label class="buscar"><Fragment set:html={ico('buscar')} /><input type="search" id="order-q" placeholder="Buscar por orden, cliente, ciudad o responsable" aria-label="Buscar órdenes" /></label>
-              <div class="chips" id="order-chips"></div>
-            </div>
-            <div id="order-list"></div>
-          </section>
-
-          <!-- CONTACTOS -->
-          <section id="panel-contactos" class="panel">
-            <div class="panel-head">
-              <div>
-                <h2>Contactos</h2>
-                <p class="panel-sub">Mensajes que llegan por el formulario de contacto del sitio.</p>
-              </div>
-            </div>
-            <div class="toolbar">
-              <label class="buscar"><Fragment set:html={ico('buscar')} /><input type="search" id="contact-q" placeholder="Buscar por nombre, empresa, correo o sector" aria-label="Buscar contactos" /></label>
-              <div class="chips" id="contact-chips"></div>
-            </div>
-            <div id="contact-list"></div>
-          </section>
-
-          <!-- BLOG -->
-          <section id="panel-blog" class="panel">
-            <div class="panel-head">
-              <div>
-                <h2>Artículos del blog</h2>
-                <p class="panel-sub">Lo que se publica en /blog. Los borradores no salen en el sitio.</p>
-              </div>
-              <button class="btn-primary" id="new-post">+ Nuevo artículo</button>
-            </div>
-            <div class="toolbar">
-              <label class="buscar"><Fragment set:html={ico('buscar')} /><input type="search" id="post-q" placeholder="Buscar por título, categoría o URL" aria-label="Buscar artículos" /></label>
-              <div class="chips" id="post-chips"></div>
-            </div>
-            <div id="post-list"></div>
-          </section>
-
-          <!-- NORMATIVAS -->
-          <section id="panel-normativas" class="panel">
-            <div class="panel-head">
-              <div>
-                <h2>Normativas vigentes</h2>
-                <p class="panel-sub">Las fichas de la página /normativas, en el orden en que se muestran.</p>
-              </div>
-              <button class="btn-primary" id="new-norm">+ Nueva normativa</button>
-            </div>
-            <div class="toolbar">
-              <label class="buscar"><Fragment set:html={ico('buscar')} /><input type="search" id="norm-q" placeholder="Buscar por código, título o etiqueta" aria-label="Buscar normativas" /></label>
-              <div class="chips" id="norm-chips"></div>
-            </div>
-            <div id="norm-list"></div>
-          </section>
-
-          {isAdmin && (
-            <section id="panel-usuarios" class="panel">
-              <div class="panel-head">
-                <div>
-                  <h2>Usuarios del panel</h2>
-                  <p class="panel-sub">Quién entra al panel y qué puede hacer según su rol.</p>
-                </div>
-                <button class="btn-primary" id="new-user">+ Nuevo usuario</button>
-              </div>
-              <div class="toolbar">
-                <label class="buscar"><Fragment set:html={ico('buscar')} /><input type="search" id="user-q" placeholder="Buscar por nombre o usuario" aria-label="Buscar usuarios" /></label>
-                <div class="chips" id="user-chips"></div>
-              </div>
-              <div id="user-list"></div>
-            </section>
-          )}
-
-          {isAdmin && (
-            <section id="panel-ia" class="panel">
-              <div class="panel-head">
-                <div>
-                  <h2>Asistente IA: límites y consumo</h2>
-                  <p class="panel-sub">Topes de gasto diario y lo que lleva gastado cada persona en el mes.</p>
-                </div>
-              </div>
-              <div class="ia-grid">
-                <form id="ia-topes" class="ia-card">
-                  <h3>Límite de gasto diario</h3>
-                  <p class="muted">Si se alcanza, la IA se detiene hasta el día siguiente (hora de Colombia). El buscador sigue funcionando.</p>
-                  <div class="grid2">
-                    <label>Toda la empresa (US$)<input name="empresaUsd" type="number" min="0" max="100" step="0.5" required /></label>
-                    <label>Cada persona (US$)<input name="usuarioUsd" type="number" min="0" max="100" step="0.5" required /></label>
-                  </div>
-                  <p class="muted" id="ia-hoy"></p>
-                  <div class="drawer-actions">
-                    <button type="submit" class="btn-primary"><span class="t">Guardar límites</span></button>
-                    <p class="form-error" id="ia-err"></p>
-                  </div>
-                </form>
-                <div class="ia-card">
-                  <div class="ia-mes-head">
-                    <h3>Consumo del mes</h3>
-                    <input type="month" id="ia-mes" />
-                  </div>
-                  <div id="ia-consumo"><p class="muted">Cargando…</p></div>
-                  <a class="btn-ghost" id="ia-csv" href="#">Descargar CSV</a>
-                </div>
-              </div>
-            </section>
-          )}
-        </main>
+      <div id="inicio-kpis" class="kpi-grid"></div>
+      <div class="dash-grid">
+        <article class="dash-card">
+          <header class="dash-head">
+            <div><h3>Embudo de recolecciones</h3><p>Órdenes por etapa, de la solicitud al certificado.</p></div>
+            <button type="button" class="link-btn" data-ir="recolecciones" data-vista="tablero">Ver tablero</button>
+          </header>
+          <div id="inicio-embudo"></div>
+        </article>
+        <article class="dash-card">
+          <header class="dash-head">
+            <div><h3>Requiere atención</h3><p>Solicitudes sin confirmar y mensajes sin responder.</p></div>
+          </header>
+          <div id="inicio-atencion"></div>
+        </article>
       </div>
-    </div>
+      <article class="dash-card">
+        <header class="dash-head">
+          <div><h3>Actividad reciente</h3><p>Lo último que entró por los formularios del sitio.</p></div>
+        </header>
+        <div id="inicio-actividad"></div>
+      </article>
+    </section>
 
+    <!-- RECOLECCIONES -->
+    <section id="panel-recolecciones" class="panel">
+      <div class="panel-head">
+        <div>
+          <h2>Órdenes de recolección</h2>
+          <p class="panel-sub">Solicitudes del formulario público y su avance hasta el certificado.</p>
+        </div>
+        <div class="seg" role="group" aria-label="Vista">
+          <button type="button" class="is-on" data-vista="tabla">Tabla</button>
+          <button type="button" data-vista="tablero">Tablero</button>
+        </div>
+      </div>
+      <div class="toolbar">
+        <label class="buscar"><Fragment set:html={ico('buscar')} /><input type="search" id="order-q" placeholder="Buscar por orden, cliente, ciudad o responsable" aria-label="Buscar órdenes" /></label>
+        <div class="chips" id="order-chips"></div>
+      </div>
+      <div id="order-list"></div>
+    </section>
+
+    <!-- CONTACTOS -->
+    <section id="panel-contactos" class="panel">
+      <div class="panel-head">
+        <div>
+          <h2>Contactos</h2>
+          <p class="panel-sub">Mensajes que llegan por el formulario de contacto del sitio.</p>
+        </div>
+      </div>
+      <div class="toolbar">
+        <label class="buscar"><Fragment set:html={ico('buscar')} /><input type="search" id="contact-q" placeholder="Buscar por nombre, empresa, correo o sector" aria-label="Buscar contactos" /></label>
+        <div class="chips" id="contact-chips"></div>
+      </div>
+      <div id="contact-list"></div>
+    </section>
+
+    <!-- BLOG -->
+    <section id="panel-blog" class="panel">
+      <div class="panel-head">
+        <div>
+          <h2>Artículos del blog</h2>
+          <p class="panel-sub">Lo que se publica en /blog. Los borradores no salen en el sitio.</p>
+        </div>
+        <button class="btn-primary" id="new-post">+ Nuevo artículo</button>
+      </div>
+      <div class="toolbar">
+        <label class="buscar"><Fragment set:html={ico('buscar')} /><input type="search" id="post-q" placeholder="Buscar por título, categoría o URL" aria-label="Buscar artículos" /></label>
+        <div class="chips" id="post-chips"></div>
+      </div>
+      <div id="post-list"></div>
+    </section>
+
+    <!-- NORMATIVAS -->
+    <section id="panel-normativas" class="panel">
+      <div class="panel-head">
+        <div>
+          <h2>Normativas vigentes</h2>
+          <p class="panel-sub">Las fichas de la página /normativas, en el orden en que se muestran.</p>
+        </div>
+        <button class="btn-primary" id="new-norm">+ Nueva normativa</button>
+      </div>
+      <div class="toolbar">
+        <label class="buscar"><Fragment set:html={ico('buscar')} /><input type="search" id="norm-q" placeholder="Buscar por código, título o etiqueta" aria-label="Buscar normativas" /></label>
+        <div class="chips" id="norm-chips"></div>
+      </div>
+      <div id="norm-list"></div>
+    </section>
+
+    {isAdmin && (
+      <section id="panel-usuarios" class="panel">
+        <div class="panel-head">
+          <div>
+            <h2>Usuarios del panel</h2>
+            <p class="panel-sub">Quién entra al panel y qué puede hacer según su rol.</p>
+          </div>
+          <button class="btn-primary" id="new-user">+ Nuevo usuario</button>
+        </div>
+        <div class="toolbar">
+          <label class="buscar"><Fragment set:html={ico('buscar')} /><input type="search" id="user-q" placeholder="Buscar por nombre o usuario" aria-label="Buscar usuarios" /></label>
+          <div class="chips" id="user-chips"></div>
+        </div>
+        <div id="user-list"></div>
+      </section>
+    )}
+
+    {isAdmin && (
+      <section id="panel-ia" class="panel">
+        <div class="panel-head">
+          <div>
+            <h2>Asistente IA: límites y consumo</h2>
+            <p class="panel-sub">Topes de gasto diario y lo que lleva gastado cada persona en el mes.</p>
+          </div>
+        </div>
+        <div class="ia-grid">
+          <form id="ia-topes" class="ia-card">
+            <h3>Límite de gasto diario</h3>
+            <p class="muted">Si se alcanza, la IA se detiene hasta el día siguiente (hora de Colombia). El buscador sigue funcionando.</p>
+            <div class="grid2">
+              <label>Toda la empresa (US$)<input name="empresaUsd" type="number" min="0" max="100" step="0.5" required /></label>
+              <label>Cada persona (US$)<input name="usuarioUsd" type="number" min="0" max="100" step="0.5" required /></label>
+            </div>
+            <p class="muted" id="ia-hoy"></p>
+            <div class="drawer-actions">
+              <button type="submit" class="btn-primary"><span class="t">Guardar límites</span></button>
+              <p class="form-error" id="ia-err"></p>
+            </div>
+          </form>
+          <div class="ia-card">
+            <div class="ia-mes-head">
+              <h3>Consumo del mes</h3>
+              <input type="month" id="ia-mes" />
+            </div>
+            <div id="ia-consumo"><p class="muted">Cargando…</p></div>
+            <a class="btn-ghost" id="ia-csv" href="#">Descargar CSV</a>
+          </div>
+        </div>
+      </section>
+    )}
+
+  <Fragment slot="fuera">
     <!-- CONTACTO -->
     <div class="drawer" id="contact-drawer" hidden>
       <div class="drawer-bg" data-close></div>
       <div class="drawer-panel">
-        <div class="drawer-head"><h3 id="contact-drawer-title">Contacto</h3><button class="x" data-close>×</button></div>
+        <div class="drawer-head"><div><p class="drawer-kicker">Contacto</p><h3 id="contact-drawer-title">Contacto</h3></div><button class="x" data-close aria-label="Cerrar">×</button></div>
         <div class="drawer-body" id="contact-body"></div>
       </div>
     </div>
@@ -384,15 +321,18 @@ const hoyTexto = new Date().toLocaleDateString('es-CO', { weekday: 'long', day: 
     <!-- USUARIO EDITOR -->
     <div class="drawer" id="user-drawer" hidden>
       <div class="drawer-bg" data-close></div>
-      <div class="drawer-panel">
-        <div class="drawer-head"><h3 id="user-drawer-title">Usuario</h3><button class="x" data-close>×</button></div>
+      <div class="drawer-panel drawer-angosto">
+        <div class="drawer-head"><div><p class="drawer-kicker">Usuarios del panel</p><h3 id="user-drawer-title">Usuario</h3></div><button class="x" data-close aria-label="Cerrar">×</button></div>
         <form id="user-form" class="drawer-body">
           <input type="hidden" name="id" />
-          <div class="grid2">
-            <label>Usuario (login)<input name="username" placeholder="nombre.apellido o email" required /></label>
+          <fieldset class="grupo">
+            <legend>Cuenta</legend>
             <label>Nombre<input name="name" placeholder="Nombre completo" required /></label>
-          </div>
-          <div class="grid2">
+            <label>Usuario para entrar<input name="username" placeholder="nombre.apellido o correo" required autocomplete="off" /></label>
+            <label>Contraseña<input name="password" type="password" placeholder="Mín. 8 caracteres" autocomplete="new-password" /></label>
+          </fieldset>
+          <fieldset class="grupo">
+            <legend>Acceso</legend>
             <label>Rol
               <select name="role">
                 <option value="admin">Administrador</option>
@@ -402,14 +342,18 @@ const hoyTexto = new Date().toLocaleDateString('es-CO', { weekday: 'long', day: 
                 <option value="finanzas">Finanzas</option>
                 <option value="lectura">Solo lectura</option>
               </select>
+              <small>El rol define qué secciones ve la persona y qué puede cambiar el asistente en su nombre.</small>
             </label>
-            <label>Contraseña<input name="password" type="password" placeholder="Mín. 8 caracteres" autocomplete="new-password" /></label>
-          </div>
-          <label class="check"><input type="checkbox" name="active" checked /> Cuenta activa</label>
+            <label class="switch">
+              <input type="checkbox" name="active" checked />
+              <span class="switch-ui" aria-hidden="true"></span>
+              <span class="switch-txt"><b>Cuenta activa</b><small>Si se apaga, la persona no puede entrar, pero su historial se conserva.</small></span>
+            </label>
+          </fieldset>
           <div class="drawer-actions">
+            <p class="form-error" id="user-err"></p>
             <button type="button" class="btn-ghost" data-close>Cancelar</button>
             <button type="submit" class="btn-primary"><span class="t">Guardar</span></button>
-            <p class="form-error" id="user-err"></p>
           </div>
         </form>
       </div>
@@ -419,36 +363,39 @@ const hoyTexto = new Date().toLocaleDateString('es-CO', { weekday: 'long', day: 
     <div class="drawer" id="order-drawer" hidden>
       <div class="drawer-bg" data-close></div>
       <div class="drawer-panel">
-        <div class="drawer-head"><h3 id="order-drawer-title">Orden</h3><button class="x" data-close>×</button></div>
+        <div class="drawer-head"><div><p class="drawer-kicker">Orden de recolección</p><h3 id="order-drawer-title">Orden</h3></div><button class="x" data-close aria-label="Cerrar">×</button></div>
         <form id="order-form" class="drawer-body">
           <input type="hidden" name="id" />
           <div id="order-client"></div>
-          <div class="grid3">
-            <label>Estado
-              <select name="status">
-                <option value="solicitada">Solicitada</option>
-                <option value="confirmada">Confirmada</option>
-                <option value="programada">Programada</option>
-                <option value="en_ruta">En ruta</option>
-                <option value="recolectada">Recolectada</option>
-                <option value="certificada">Certificada</option>
-                <option value="cerrada">Cerrada</option>
-                <option value="cancelada">Cancelada</option>
-              </select>
-            </label>
-            <label>Responsable<input name="assigned_to" placeholder="Nombre del responsable" /></label>
-            <label>Fecha programada<input name="scheduled_at" type="date" /></label>
-          </div>
-          <label>Notas internas<textarea name="internal_notes" rows="3" placeholder="Vehículo, transportador, observaciones…"></textarea></label>
-          <label>Comentario para la bitácora (opcional)<input name="note" placeholder="Se registra en el historial con este cambio" /></label>
-
-          <div class="sections-head"><h4>Historial</h4></div>
-          <div id="order-events" class="list"></div>
-
+          <fieldset class="grupo">
+            <legend>Gestión</legend>
+            <div class="grid3">
+              <label>Estado
+                <select name="status">
+                  <option value="solicitada">Solicitada</option>
+                  <option value="confirmada">Confirmada</option>
+                  <option value="programada">Programada</option>
+                  <option value="en_ruta">En ruta</option>
+                  <option value="recolectada">Recolectada</option>
+                  <option value="certificada">Certificada</option>
+                  <option value="cerrada">Cerrada</option>
+                  <option value="cancelada">Cancelada</option>
+                </select>
+              </label>
+              <label>Responsable<input name="assigned_to" placeholder="Nombre del responsable" /></label>
+              <label>Fecha programada<input name="scheduled_at" type="date" /></label>
+            </div>
+            <label>Notas internas<textarea name="internal_notes" rows="3" placeholder="Vehículo, transportador, observaciones…"></textarea><small>Solo las ve el equipo; el cliente no las recibe.</small></label>
+            <label>Comentario para la bitácora<input name="note" placeholder="Opcional: queda en el historial junto con este cambio" /></label>
+          </fieldset>
+          <fieldset class="grupo">
+            <legend>Historial</legend>
+            <div id="order-events"></div>
+          </fieldset>
           <div class="drawer-actions">
+            <p class="form-error" id="order-err"></p>
             <button type="button" class="btn-ghost" data-close>Cancelar</button>
             <button type="submit" class="btn-primary"><span class="t">Guardar</span></button>
-            <p class="form-error" id="order-err"></p>
           </div>
         </form>
       </div>
@@ -457,49 +404,63 @@ const hoyTexto = new Date().toLocaleDateString('es-CO', { weekday: 'long', day: 
     <!-- POST EDITOR -->
     <div class="drawer" id="post-drawer" hidden>
       <div class="drawer-bg" data-close></div>
-      <div class="drawer-panel">
-        <div class="drawer-head"><h3 id="post-drawer-title">Artículo</h3><button class="x" data-close>×</button></div>
+      <div class="drawer-panel drawer-ancho">
+        <div class="drawer-head"><div><p class="drawer-kicker">Blog</p><h3 id="post-drawer-title">Artículo</h3></div><button class="x" data-close aria-label="Cerrar">×</button></div>
         <form id="post-form" class="drawer-body">
           <input type="hidden" name="id" />
-          <label>Título<input name="title" required /></label>
-          <div class="grid2">
-            <label>Slug (URL)<input name="slug" placeholder="se genera del título" /></label>
-            <label>Categoría<input name="category" placeholder="Economía circular" /></label>
-          </div>
-          <div class="grid3">
-            <label>Fecha<input name="date" placeholder="14 abr 2025" /></label>
-            <label>Lectura<input name="readtime" placeholder="3 min" /></label>
-            <label>Acento
-              <select name="accent">
-                <option value="deep">deep</option>
-                <option value="forest">forest</option>
-                <option value="clay">clay</option>
-              </select>
+          <fieldset class="grupo">
+            <legend>Encabezado</legend>
+            <label>Título<input name="title" class="input-grande" required /></label>
+            <label>Entradilla<textarea name="lede" rows="3"></textarea><small>Párrafo corto que abre el artículo y se usa como descripción en buscadores.</small></label>
+          </fieldset>
+          <fieldset class="grupo">
+            <legend>Datos de publicación</legend>
+            <div class="grid2">
+              <label>Dirección (URL)<span class="prefijo"><span>/blog/</span><input name="slug" placeholder="se genera del título" /></span></label>
+              <label>Categoría<input name="category" placeholder="Economía circular" /></label>
+            </div>
+            <div class="grid3">
+              <label>Fecha<input name="date" placeholder="14 abr 2025" /></label>
+              <label>Lectura<input name="readtime" placeholder="3 min" /></label>
+              <label>Color de la categoría
+                <select name="accent">
+                  <option value="deep">Azul petróleo</option>
+                  <option value="forest">Verde</option>
+                  <option value="clay">Arcilla</option>
+                </select>
+              </label>
+            </div>
+            <label>Imagen para compartir
+              <input name="image" placeholder="/og/mi-articulo.jpg" />
+              <small>1200×630, subida a <code>public/og/</code>. Es lo que se ve al compartir el artículo en LinkedIn, Facebook o WhatsApp. Si se deja vacía se usa la portada genérica del sitio.</small>
             </label>
-          </div>
-          <label class="check"><input type="checkbox" name="featured" /> Destacado (aparece arriba en el blog)</label>
-          <label class="check"><input type="checkbox" name="borrador" /> Borrador (no se publica en el sitio)</label>
-          <label>Entradilla (lede)<textarea name="lede" rows="3"></textarea></label>
-          <label>Imagen para compartir
-            <input name="image" placeholder="/og/mi-articulo.jpg" />
-            <small>1200×630, subida a <code>public/og/</code>. Es lo que se ve al compartir el artículo en LinkedIn, Facebook o WhatsApp. Si se deja vacía se usa la portada genérica del sitio.</small>
-          </label>
-
-          <div class="sections-head">
-            <h4>Contenido</h4>
+            <div class="grid2">
+              <label class="switch">
+                <input type="checkbox" name="featured" />
+                <span class="switch-ui" aria-hidden="true"></span>
+                <span class="switch-txt"><b>Destacado</b><small>Aparece arriba en el blog.</small></span>
+              </label>
+              <label class="switch">
+                <input type="checkbox" name="borrador" />
+                <span class="switch-ui" aria-hidden="true"></span>
+                <span class="switch-txt"><b>Borrador</b><small>No se publica en el sitio.</small></span>
+              </label>
+            </div>
+          </fieldset>
+          <fieldset class="grupo">
+            <legend>Contenido</legend>
+            <div id="sections"></div>
             <div class="add-sec">
               <button type="button" data-add="p">+ Párrafo</button>
               <button type="button" data-add="h2">+ Subtítulo</button>
               <button type="button" data-add="pull">+ Cita</button>
               <button type="button" data-add="list">+ Lista</button>
             </div>
-          </div>
-          <div id="sections"></div>
-
+          </fieldset>
           <div class="drawer-actions">
+            <p class="form-error" id="post-err"></p>
             <button type="button" class="btn-ghost" data-close>Cancelar</button>
             <button type="submit" class="btn-primary"><span class="t">Guardar</span></button>
-            <p class="form-error" id="post-err"></p>
           </div>
         </form>
       </div>
@@ -509,30 +470,39 @@ const hoyTexto = new Date().toLocaleDateString('es-CO', { weekday: 'long', day: 
     <div class="drawer" id="norm-drawer" hidden>
       <div class="drawer-bg" data-close></div>
       <div class="drawer-panel">
-        <div class="drawer-head"><h3 id="norm-drawer-title">Normativa</h3><button class="x" data-close>×</button></div>
+        <div class="drawer-head"><div><p class="drawer-kicker">Normativas</p><h3 id="norm-drawer-title">Normativa</h3></div><button class="x" data-close aria-label="Cerrar">×</button></div>
         <form id="norm-form" class="drawer-body">
           <input type="hidden" name="id" />
-          <div class="grid2">
+          <fieldset class="grupo">
+            <legend>Ficha</legend>
             <label>Código<input name="code" placeholder="RES 1297 · 2010" required /></label>
-            <label>Columna
-              <select name="col"><option value="1">Columna 1</option><option value="2">Columna 2</option></select>
+            <label>Título<input name="title" required /></label>
+            <label>Descripción<textarea name="body" rows="4"></textarea></label>
+            <label>Etiquetas<input name="tags" placeholder="RAEE, Posconsumo" /><small>Separadas por coma.</small></label>
+          </fieldset>
+          <fieldset class="grupo">
+            <legend>Ubicación en la página</legend>
+            <div class="grid2">
+              <label>Columna
+                <select name="col"><option value="1">Columna 1</option><option value="2">Columna 2</option></select>
+              </label>
+              <label>Orden<input name="position" type="number" value="0" /><small>Las de número menor salen primero.</small></label>
+            </div>
+            <label class="switch">
+              <input type="checkbox" name="borrador" />
+              <span class="switch-ui" aria-hidden="true"></span>
+              <span class="switch-txt"><b>Borrador</b><small>No se publica en el sitio.</small></span>
             </label>
-          </div>
-          <label>Título<input name="title" required /></label>
-          <label>Descripción<textarea name="body" rows="4"></textarea></label>
-          <div class="grid2">
-            <label>Etiquetas (separadas por coma)<input name="tags" placeholder="RAEE, Posconsumo" /></label>
-            <label>Orden<input name="position" type="number" value="0" /></label>
-          </div>
-          <label class="check"><input type="checkbox" name="borrador" /> Borrador (no se publica en el sitio)</label>
+          </fieldset>
           <div class="drawer-actions">
+            <p class="form-error" id="norm-err"></p>
             <button type="button" class="btn-ghost" data-close>Cancelar</button>
             <button type="submit" class="btn-primary"><span class="t">Guardar</span></button>
-            <p class="form-error" id="norm-err"></p>
           </div>
         </form>
       </div>
     </div>
+
 
     <script is:inline define:vars={{ posts, normativas, orders, contacts, users, role, asis }}>
       window.__ASIS__ = asis
@@ -545,5 +515,5 @@ const hoyTexto = new Date().toLocaleDateString('es-CO', { weekday: 'long', day: 
     </script>
     <script src="/admin/admin.js" type="module"></script>
     <script src="/admin/asistente.js" type="module"></script>
-  </body>
-</html>
+  </Fragment>
+</AdminLayout>

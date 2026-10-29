@@ -11,7 +11,7 @@ const role = window.__ROLE__ || ''
 /* ---------- Navegación ---------- */
 // Las pestañas viven en la barra lateral. La sección activa queda en la URL
 // (?tab=) para que un guardado, que recarga la página, vuelva al mismo sitio.
-// Los enlaces con aspecto de pestaña (Cumplimiento) navegan a otra página.
+// Cumplimiento es un enlace a otra página (AdminLayout.astro).
 const crumb = $('#crm-crumb')
 function ir(tab, { url = true } = {}) {
   const boton = $(`.tab[data-tab="${CSS.escape(tab)}"]`)
@@ -33,14 +33,6 @@ function ir(tab, { url = true } = {}) {
   return true
 }
 $$('.tab[data-tab]').forEach((t) => t.addEventListener('click', () => ir(t.dataset.tab)))
-$('.side-abrir')?.addEventListener('click', () => document.body.classList.add('side-abierta'))
-$('[data-side-cerrar]')?.addEventListener('click', () => document.body.classList.remove('side-abierta'))
-
-/* ---------- Logout ---------- */
-$('#logout').addEventListener('click', async () => {
-  await fetch('/api/admin/logout', { method: 'POST' })
-  location.href = '/admin/login'
-})
 
 /* ---------- Recolecciones ---------- */
 const STATUS_LABELS = {
