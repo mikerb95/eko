@@ -3,6 +3,10 @@ export const prerender = false
 import { listarActos, listarAlertas, listarExpedientes, listarReglas } from '../../lib/agente/datos'
 import { habilesRestantes, hoyEnBogota } from '../../lib/agente/diasHabiles'
 import { iaConfigurada, modeloAgente } from '../../lib/agente/ia'
+import { listOrders } from '../../lib/ops'
+import { listContacts } from '../../lib/contactos'
+import { ico } from '../../lib/admin/iconos'
+import AdminLayout from '../../layouts/AdminLayout.astro'
 
 // Todo se carga en el servidor y el script del cliente solo pinta y envía
 // cambios, igual que el panel principal.
@@ -33,142 +37,158 @@ const kpis = {
   confirmar: abiertas.filter((a) => a.por_confirmar).length,
   expedientes: expedientes.filter((e) => e.activo).length,
 }
+// Números de la barra lateral. Fail-soft: si algo falla, la barra sale sin
+// el número y la página carga igual.
+const cuentas: Record<string, number | undefined> = {
+  alertas: abiertas.length,
+  alertasUrgentes: kpis.semana,
+}
+try {
+  const [ordenes, contactos] = await Promise.all([listOrders(), listContacts()])
+  Object.assign(cuentas, {
+    ordenes: ordenes.length, ordenesNuevas: ordenes.filter((o) => o.status === 'solicitada').length,
+    contactos: contactos.length, contactosNuevos: contactos.filter((c) => c.status === 'nuevo').length,
+  })
+} catch (e: any) {
+  console.error('[cumplimiento] barra', e?.message || e)
+}
 ---
 
-<!DOCTYPE html>
-<html lang="es">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <meta name="robots" content="noindex, nofollow" />
-    <link rel="icon" href="/favicon.ico" sizes="any" />
-    <title>Cumplimiento · EKOSOLV</title>
-    <link rel="stylesheet" href="/admin/admin.css" />
-    <link rel="stylesheet" href="/admin/cumplimiento.css" />
-  </head>
-  <body>
-    <header class="admin-top">
-      <div class="brand-mini">
-        <img src="/brand/ekosolv-horizontal.png" alt="EKOSOLV" />
-        <span class="tag">Cumplimiento</span>
-      </div>
-      <div class="top-right">
-        <span class="muted">Sesión: {user}{role ? ` · ${role}` : ''}</span>
-        <a href="/admin" class="btn-ghost">← Panel</a>
-      </div>
-    </header>
-
+<AdminLayout titulo="Cumplimiento · EKOSOLV" activo="cumplimiento" css={['/admin/cumplimiento.css']} cuentas={cuentas}>
+  <Fragment slot="avisos">
     {errorCarga && <div class="banner-error">{errorCarga}</div>}
     {!conIA && (
       <div class="banner-aviso">
-        Falta <code>ANTHROPIC_API_KEY</code>. Los documentos que subas quedan guardados y se leen cuando se configure la clave.
+        Falta <code>ANTHROPIC_API_KEY</code>. Los documentos que suba quedan guardados y se leen cuando se configure la clave.
       </div>
     )}
+  </Fragment>
 
-    <nav class="tabs">
-      <button class="tab is-active" data-tab="alertas">Alertas <span class="count">{kpis.abiertas}</span></button>
-      {puedeEscribir && <button class="tab" data-tab="subir">Subir acto</button>}
-      <button class="tab" data-tab="expedientes">Expedientes <span class="count">{kpis.expedientes}</span></button>
-      <button class="tab" data-tab="reglas">Reglas</button>
-      <button class="tab" data-tab="actos">Historial <span class="count">{actos.length}</span></button>
-    </nav>
+  <div class="panel-head">
+    <div>
+      <h2>Cumplimiento ambiental</h2>
+      <p class="panel-sub">El agente lee los actos de las autoridades y crea una alerta con el plazo y la acción sugerida.</p>
+    </div>
+    {puedeEscribir && <button class="btn-primary btn-ico-txt" type="button" data-ir-sub="subir"><Fragment set:html={ico('subir')} />Subir acto</button>}
+  </div>
 
-    <main class="admin-main">
-      <!-- ALERTAS -->
-      <section id="panel-alertas" class="panel is-active">
-        <div class="kpis">
-          <div><span>Alertas abiertas</span><b>{kpis.abiertas}</b></div>
-          <div><span>Vencen en 5 días hábiles o menos</span><b>{kpis.semana}</b></div>
-          <div><span>Por confirmar</span><b>{kpis.confirmar}</b></div>
-          <div><span>Expedientes vigilados</span><b>{kpis.expedientes}<i>/50</i></b></div>
+  <nav class="subtabs" aria-label="Secciones de cumplimiento">
+    <button class="subtab is-active" data-tab="alertas">Alertas <span class="count">{kpis.abiertas}</span></button>
+    {puedeEscribir && <button class="subtab" data-tab="subir">Subir acto</button>}
+    <button class="subtab" data-tab="expedientes">Expedientes <span class="count">{kpis.expedientes}</span></button>
+    <button class="subtab" data-tab="reglas">Reglas</button>
+    <button class="subtab" data-tab="actos">Historial <span class="count">{actos.length}</span></button>
+  </nav>
+
+  <!-- ALERTAS -->
+  <section id="panel-alertas" class="panel is-active">
+    <div class="kpi-grid">
+      <button type="button" class="kpi" style="--c:#1f8a8a" data-filtro="activas"><span class="kpi-lbl">Alertas abiertas</span><span class="kpi-num">{kpis.abiertas}</span><span class="kpi-sub">Abiertas y en curso</span></button>
+      <button type="button" class={`kpi${kpis.semana ? ' is-alerta' : ''}`} style="--c:#d8453a" data-filtro="activas"><span class="kpi-lbl">Vencen pronto</span><span class="kpi-num">{kpis.semana}</span><span class="kpi-sub">5 días hábiles o menos</span></button>
+      <button type="button" class={`kpi${kpis.confirmar ? ' is-alerta' : ''}`} style="--c:#e8920c" data-filtro="confirmar"><span class="kpi-lbl">Por confirmar</span><span class="kpi-num">{kpis.confirmar}</span><span class="kpi-sub">El agente tuvo dudas al leerlas</span></button>
+      <button type="button" class="kpi" style="--c:#2f80c9" data-ir-sub="expedientes"><span class="kpi-lbl">Expedientes vigilados</span><span class="kpi-num">{kpis.expedientes}<i>/50</i></span><span class="kpi-sub">Cupo del plan actual</span></button>
+    </div>
+    <div class="toolbar">
+      <label class="buscar"><Fragment set:html={ico('buscar')} /><input type="search" id="alerta-q" placeholder="Buscar por título, expediente, norma o responsable" aria-label="Buscar alertas" /></label>
+      <div class="chips" id="alerta-chips"></div>
+    </div>
+    <div id="alerta-list" class="list"></div>
+  </section>
+
+  <!-- SUBIR -->
+  {puedeEscribir && (
+    <section id="panel-subir" class="panel">
+      <form id="subir-form" class="card-form">
+        <div>
+          <h3>Subir un acto administrativo</h3>
+          <p class="muted">Auto, resolución o requerimiento de la autoridad. El agente lo lee, lo asigna al expediente y crea la alerta.</p>
         </div>
-        <div class="panel-head">
-          <h2>Alertas</h2>
-          <select id="alerta-filtro" class="icon-btn" title="Filtrar">
-            <option value="activas">Abiertas y en curso</option>
-            <option value="confirmar">Por confirmar</option>
-            <option value="cerradas">Cerradas y descartadas</option>
-            <option value="">Todas</option>
-          </select>
+        <label class="dropzone">
+          <Fragment set:html={ico('subir')} />
+          <b>Elija el documento</b>
+          <small>PDF, imagen (PNG o JPG) o texto, de hasta 4 MB. Si es un escaneo, que se lea bien: las páginas borrosas quedan marcadas para confirmar.</small>
+          <input type="file" name="archivo" accept="application/pdf,image/png,image/jpeg,text/plain" required />
+        </label>
+        <label>Fecha de notificación
+          <input type="date" name="fecha_notificacion" max={hoy} />
+          <small>El plazo corre desde el día hábil siguiente a esta fecha. Si la deja vacía, se calcula desde la fecha del acto y la alerta queda por confirmar.</small>
+        </label>
+        <div class="drawer-actions">
+          <span id="subir-estado" class="muted"></span>
+          <p class="form-error" id="subir-err"></p>
+          <button type="submit" class="btn-primary"><span class="t">Leer y crear alerta</span></button>
         </div>
-        <div id="alerta-list" class="list"></div>
-      </section>
+        <p class="muted nota-modelo">Lectura con {modelo}. El consultor siempre revisa la alerta antes de actuar.</p>
+      </form>
+    </section>
+  )}
 
-      <!-- SUBIR -->
-      {puedeEscribir && (
-        <section id="panel-subir" class="panel">
-          <div class="panel-head"><h2>Subir un acto administrativo</h2></div>
-          <form id="subir-form" class="card-form">
-            <label>Documento
-              <input type="file" name="archivo" accept="application/pdf,image/png,image/jpeg,text/plain" required />
-              <small>PDF, imagen (PNG o JPG) o texto, de hasta 4 MB. Si es un escaneo, que se lea bien: las páginas borrosas quedan marcadas para confirmar.</small>
-            </label>
-            <label>Fecha de notificación
-              <input type="date" name="fecha_notificacion" max={hoy} />
-              <small>El plazo corre desde el día hábil siguiente a esta fecha. Si la dejas vacía, se calcula desde la fecha del acto y la alerta queda por confirmar.</small>
-            </label>
-            <div class="drawer-actions">
-              <button type="submit" class="btn-primary"><span class="t">Leer y crear alerta</span></button>
-              <span id="subir-estado" class="muted"></span>
-              <p class="form-error" id="subir-err"></p>
-            </div>
-          </form>
-          <p class="muted nota-modelo">Lectura con {modelo}. El consultor siempre revisa la alerta antes de actuar.</p>
-        </section>
-      )}
+  <!-- EXPEDIENTES -->
+  <section id="panel-expedientes" class="panel">
+    <div class="toolbar">
+      <label class="buscar"><Fragment set:html={ico('buscar')} /><input type="search" id="exp-q" placeholder="Buscar por cliente, NIT, número o autoridad" aria-label="Buscar expedientes" /></label>
+      <div class="chips" id="exp-chips"></div>
+      {puedeEscribir && <button class="btn-primary sp" id="nuevo-exp">+ Nuevo expediente</button>}
+    </div>
+    <div id="exp-list"></div>
+  </section>
 
-      <!-- EXPEDIENTES -->
-      <section id="panel-expedientes" class="panel">
-        <div class="panel-head">
-          <h2>Expedientes vigilados</h2>
-          {puedeEscribir && <button class="btn-primary" id="nuevo-exp">+ Nuevo expediente</button>}
-        </div>
-        <div id="exp-list" class="list"></div>
-      </section>
+  <!-- REGLAS -->
+  <section id="panel-reglas" class="panel">
+    <p class="muted intro">La prioridad base de cada tipo de acto y la acción que se sugiere. Si quedan tantos días hábiles o menos como el umbral, la alerta sube a prioridad alta.</p>
+    <div id="regla-list" class="reglas"></div>
+  </section>
 
-      <!-- REGLAS -->
-      <section id="panel-reglas" class="panel">
-        <div class="panel-head"><h2>Reglas por tipo de acto</h2></div>
-        <p class="muted intro">La prioridad base de cada tipo de acto y la acción que se sugiere. Si quedan tantos días hábiles o menos, la alerta sube a prioridad alta.</p>
-        <div id="regla-list" class="list"></div>
-      </section>
+  <!-- HISTORIAL -->
+  <section id="panel-actos" class="panel">
+    <div class="toolbar">
+      <label class="buscar"><Fragment set:html={ico('buscar')} /><input type="search" id="acto-q" placeholder="Buscar por archivo, resumen o quién lo subió" aria-label="Buscar documentos" /></label>
+      <div class="chips" id="acto-chips"></div>
+      {puedeEscribir && <button class="btn-ghost sp" id="procesar-pendientes">Procesar pendientes</button>}
+    </div>
+    <div id="acto-list"></div>
+  </section>
 
-      <!-- HISTORIAL -->
-      <section id="panel-actos" class="panel">
-        <div class="panel-head">
-          <h2>Documentos recibidos</h2>
-          {puedeEscribir && <button class="btn-ghost" id="procesar-pendientes">Procesar pendientes</button>}
-        </div>
-        <div id="acto-list" class="list"></div>
-      </section>
-    </main>
-
+  <Fragment slot="fuera">
     <!-- EXPEDIENTE -->
     <div class="drawer" id="exp-drawer" hidden>
       <div class="drawer-bg" data-close></div>
       <div class="drawer-panel">
-        <div class="drawer-head"><h3 id="exp-titulo">Expediente</h3><button class="x" data-close>×</button></div>
+        <div class="drawer-head"><div><p class="drawer-kicker">Expedientes vigilados</p><h3 id="exp-titulo">Expediente</h3></div><button class="x" data-close aria-label="Cerrar">×</button></div>
         <form id="exp-form" class="drawer-body">
           <input type="hidden" name="id" />
-          <div class="grid2">
-            <label>Cliente<input name="cliente" required /></label>
-            <label>NIT<input name="nit" placeholder="900123456-7" /></label>
-          </div>
-          <div class="grid2">
-            <label>Autoridad<input name="autoridad" placeholder="CAR Cundinamarca, ANLA…" /></label>
-            <label>Número de expediente<input name="numero" required placeholder="Como aparece en los autos" /></label>
-          </div>
-          <label>Tipo de permiso o trámite<input name="tipo_permiso" placeholder="Permiso de vertimientos, licencia ambiental…" /></label>
-          <div class="grid2">
-            <label>Consultor responsable<input name="responsable" /></label>
-            <label>Correo del responsable<input name="responsable_email" type="email" /></label>
-          </div>
-          <label>Notas<textarea name="notas" rows="3"></textarea></label>
-          <label class="check"><input type="checkbox" name="activo" checked /> Vigilar este expediente</label>
+          <fieldset class="grupo">
+            <legend>Cliente</legend>
+            <div class="grid2">
+              <label>Cliente<input name="cliente" required /></label>
+              <label>NIT<input name="nit" placeholder="900123456-7" /></label>
+            </div>
+          </fieldset>
+          <fieldset class="grupo">
+            <legend>Expediente</legend>
+            <div class="grid2">
+              <label>Autoridad<input name="autoridad" placeholder="CAR Cundinamarca, ANLA…" /></label>
+              <label>Número de expediente<input name="numero" required placeholder="Como aparece en los autos" /></label>
+            </div>
+            <label>Tipo de permiso o trámite<input name="tipo_permiso" placeholder="Permiso de vertimientos, licencia ambiental…" /></label>
+            <label class="switch">
+              <input type="checkbox" name="activo" checked />
+              <span class="switch-ui" aria-hidden="true"></span>
+              <span class="switch-txt"><b>Vigilar este expediente</b><small>Cuenta para el cupo y recibe los actos que lleguen.</small></span>
+            </label>
+          </fieldset>
+          <fieldset class="grupo">
+            <legend>Responsable</legend>
+            <div class="grid2">
+              <label>Consultor responsable<input name="responsable" /></label>
+              <label>Correo del responsable<input name="responsable_email" type="email" /></label>
+            </div>
+            <label>Notas<textarea name="notas" rows="3"></textarea></label>
+          </fieldset>
           <div class="drawer-actions">
+            <p class="form-error" id="exp-err"></p>
             <button type="button" class="btn-ghost" data-close>Cancelar</button>
             <button type="submit" class="btn-primary"><span class="t">Guardar</span></button>
-            <p class="form-error" id="exp-err"></p>
           </div>
         </form>
       </div>
@@ -178,5 +198,5 @@ const kpis = {
       window.__AGENTE__ = { alertas, expedientes, reglas, actos, puedeEscribir }
     </script>
     <script src="/admin/cumplimiento.js" type="module"></script>
-  </body>
-</html>
+  </Fragment>
+</AdminLayout>

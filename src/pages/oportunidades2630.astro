@@ -216,6 +216,43 @@ const encaje = [
   },
 ]
 
+// Competencia: cifras tomadas de los sitios y de prensa (octubre de 2026).
+// Solo Lito es competidor directo; los otros dos son sistemas colectivos.
+const rivales = [
+  {
+    nombre: "Lito",
+    tipo: "Competidor directo",
+    jugada: "competir",
+    perfil: "Gestor industrial con más de 20 años, sedes en Bogotá, Medellín, Cali y Barranquilla y más de 150 empresas asociadas. Compra excedentes y chatarra, desmonta plantas, tiene plantas propias para luminarias y equipos con PCB, y opera Puntos Verdes, un programa de RAEE con puntos canjeables para empresas.",
+    fuerte: "Capacidad física, cobertura nacional y precio por volumen. Es la opción natural para la planta que quiere vender chatarra y desocupar bodega.",
+    gana: "Ekosolv deja al cliente cumplido, no solo con el residuo recogido: licencia, recolección, certificado e informe ante la ANLA con un solo responsable. En su sitio Lito no ofrece consultoría ambiental ni certificados verificables en línea.",
+    mensaje: "\"Lito le compra la chatarra. Nosotros le respondemos a la ANLA.\"",
+    accion: "No pelear por tonelada ni por cobertura. Ir por el cliente que tiene un requerimiento, una auditoría o un informe encima, y llegar primero con el certificado digital del Decreto 766. En corrientes donde Lito tiene planta propia (luminarias, PCB), puede ser proveedor de Ekosolv y no solo rival.",
+  },
+  {
+    nombre: "EcoCómputo",
+    tipo: "Sistema colectivo · canal",
+    jugada: "canal",
+    perfil: "Programa posconsumo de computadores y periféricos de la ANDI (Grupo Retorna). Reporta más de 25.200 toneladas gestionadas, entre 40 y 51 marcas afiliadas, ISO 9001 y 14001 y una plataforma B2B para agendar recolecciones.",
+    fuerte: "Las marcas grandes ya están adentro, tiene el respaldo gremial y la recolección no le cuesta nada al consumidor.",
+    gana: "EcoCómputo atiende a sus afiliados, no al importador mediano que la ANLA está encontrando como evasor. Y su servicio es recoger, no armarle al productor el sistema ni el informe ante la ANLA.",
+    mensaje: "\"Si no cabe en un colectivo de la ANDI, le armamos el sistema.\"",
+    accion: "No competir por las marcas afiliadas. Ofrecer EKONSULTING al importador que recibe el oficio de la ANLA y no está en un colectivo. Y explorar ser gestor de EcoCómputo en la Sabana con certificados digitales que su informe anual pueda usar.",
+  },
+  {
+    nombre: "Red Verde",
+    tipo: "Sistema colectivo · aliado",
+    jugada: "aliado",
+    perfil: "Corporación posconsumo de electrodomésticos grandes y pequeños, con recolección puerta a puerta en unas 30 ciudades y municipios y jornadas con otros sistemas. Opera con gestores aliados por ciudad: hoy publica uno solo en Bogotá (Fontibón).",
+    fuerte: "Llega al hogar y a las alcaldías con jornadas y logística de recolección que Ekosolv no tiene.",
+    gana: "Necesita gestores licenciados que certifiquen, y en Bogotá y la Sabana tiene poca red. El Decreto 766 le va a exigir certificados electrónicos a cada gestor que use.",
+    mensaje: "\"Su gestor en la Sabana, con certificado digital desde el primer kilo.\"",
+    accion: "Postularse como gestor aliado para Bogotá, Funza, Mosquera, Madrid y Cota, donde Red Verde ya recoge. Es volumen de RAEE sin tener que salir a venderlo puerta a puerta.",
+  },
+]
+
+const JUGADAS = { competir: "Competir", canal: "Canal", aliado: "Aliarse" }
+
 const modulos = [
   {
     n: "01", code: "CUSTODIA",
@@ -260,6 +297,12 @@ const fuentes = [
   { t: "RTVC: crecen los residuos electrónicos, avance de Colombia (15 oct. 2026)", u: "https://www.rtvcnoticias.com/actualidad/medio-ambiente/residuos-electronicos-crecen-cuanto-avanza-colombia" },
   { t: "El Colombiano: manejo de RAEE en Colombia (~20% de reciclaje)", u: "https://www.elcolombiano.com/medio-ambiente/colombia-avanza-en-manejo-de-residuos-electricos-y-electronicos-raee-MD15165797" },
   { t: "ANLA: Decreto 670 de 2025, programa Basura Cero", u: "https://www.anla.gov.co/wanla/eureka/normativa/decretos/decreto-reglamentario-670-de-2025-programa-basura-cero-servicio-publico-de-aseo-y-tema-ambiental-residuos-solidos-gestion-integral-de-residuos-solidos" },
+  { t: "Lito: sitio corporativo (servicios y sedes)", u: "https://lito.com.co/" },
+  { t: "Puntos Verdes Lito: programa posconsumo de RAEE", u: "https://puntosverdeslito.com/" },
+  { t: "EcoCómputo: sitio del programa posconsumo", u: "https://ecocomputo.com/" },
+  { t: "Portafolio: EcoCómputo y sus más de 25.200 toneladas gestionadas", u: "https://www.portafolio.co/contenido-patrocinado/ecocomputo-impulsa-una-nueva-cultura-del-reciclaje-tecnologico-495213" },
+  { t: "ANDI: el programa posconsumo EcoCómputo", u: "https://www.andi.com.co/Home/Noticia/17669-el-programa-posconsumo-ecocomputo-de-la" },
+  { t: "Red Verde: cobertura, jornadas y gestores aliados", u: "https://www.redverde.co/" },
   { t: "AKD: la directiva Omnibus I entra en vigor el 18 de marzo de 2026 (CSRD)", u: "https://www.akd.eu/insights/provisional-agreement-on-omnibus-i-changes-to-the-scope-and-reporting-obligations-under-the-csrd" },
 ]
 ---
@@ -487,6 +530,53 @@ const fuentes = [
     <p class="fit-note reveal">
       Nota interna: licencias, certificaciones y testimonios siguen sin publicarse en el sitio, retenidos por la guarda de <code>src/lib/credenciales.ts</code>. Para sostener el argumento de cumplimiento demostrable frente a un prospecto, esos documentos son el primer activo por cargar.
     </p>
+  </section>
+
+  <section class="section wrap">
+    <div class="section-head reveal">
+      <div>
+        <div class="eyebrow">Competencia y posicionamiento</div>
+        <h2>No ser el más grande,<br>ser el que <em>deja cumplido</em>.</h2>
+      </div>
+      <div class="meta">
+        Frente a jugadores con más tonelaje, más sedes o respaldo gremial, Ekosolv no gana en volumen. Gana en lo que el Decreto 766 y la ANLA están volviendo obligatorio: demostrar el cumplimiento con un certificado que un tercero pueda verificar.
+      </div>
+    </div>
+
+    <div class="rivals reveal">
+      {rivales.map(r => (
+        <article class="rival" data-jugada={r.jugada}>
+          <header class="rival-head">
+            <div class="rival-name">{r.nombre}</div>
+            <span class="jugada" data-jugada={r.jugada}>{JUGADAS[r.jugada]}</span>
+          </header>
+          <div class="rival-tipo">{r.tipo}</div>
+          <p class="rival-perfil">{r.perfil}</p>
+          <div class="rival-block">
+            <div class="lbl">Dónde es fuerte</div>
+            <p>{r.fuerte}</p>
+          </div>
+          <div class="rival-block">
+            <div class="lbl">Dónde gana Ekosolv</div>
+            <p>{r.gana}</p>
+          </div>
+          <div class="rival-block is-move">
+            <div class="lbl">Jugada</div>
+            <p>{r.accion}</p>
+          </div>
+          <blockquote class="rival-msg">{r.mensaje}</blockquote>
+        </article>
+      ))}
+    </div>
+
+    <div class="dont reveal">
+      <div class="lbl">Lo que no conviene hacer</div>
+      <ul>
+        <li>Competir por precio por kilo o por cobertura nacional: ahí Lito y los colectivos siempre ganan.</li>
+        <li>Salir a quitarle afiliados a un colectivo de la ANDI: son las marcas más grandes y las relaciones más viejas del sector.</li>
+        <li>Prometer certificados digitales antes de tenerlos: es el diferenciador, y quemarlo cuesta más que esperar a la Fase 1.</li>
+      </ul>
+    </div>
   </section>
 
   <section class="section wrap">
@@ -798,11 +888,105 @@ const fuentes = [
   }
   .change[data-estado="caducado"] li { color: var(--mute); }
 
+  /* ── Competencia ─────────────────────────────────────────────────────── */
+  .rivals {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 1px;
+    background: var(--line);
+    border: 1px solid var(--line);
+    border-radius: var(--r-lg);
+    overflow: hidden;
+  }
+  .rival {
+    background: var(--paper);
+    padding: clamp(22px, 2.2vw, 32px);
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    transition: background .3s ease;
+  }
+  .rival[data-jugada="competir"]:hover { background: color-mix(in oklab, var(--clay-2) 6%, #fff); }
+  .rival[data-jugada="canal"]:hover    { background: color-mix(in oklab, var(--deep) 5%, #fff); }
+  .rival[data-jugada="aliado"]:hover   { background: color-mix(in oklab, var(--forest) 6%, #fff); }
+  .rival-head { display: flex; align-items: center; justify-content: space-between; gap: 12px; }
+  .rival-name {
+    font-family: var(--font-display);
+    font-size: clamp(26px, 2.4vw, 34px);
+    letter-spacing: -0.02em;
+    line-height: 1;
+  }
+  .jugada {
+    display: inline-flex;
+    align-items: center;
+    gap: 7px;
+    font-family: var(--font-mono);
+    font-size: 11px;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    padding: 4px 10px;
+    border-radius: 999px;
+    background: var(--paper-warm);
+  }
+  .jugada::before { content: ""; width: 7px; height: 7px; border-radius: 50%; }
+  .jugada[data-jugada="competir"]::before { background: var(--clay-2); }
+  .jugada[data-jugada="canal"]::before    { background: var(--deep); }
+  .jugada[data-jugada="aliado"]::before   { background: var(--forest); }
+  .rival-tipo {
+    font-family: var(--font-mono);
+    font-size: 11.5px;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: var(--mute);
+    margin-top: -6px;
+  }
+  .rival-perfil { color: var(--ink-2); font-size: 14.5px; line-height: 1.55; }
+  .rival-block { padding-top: 14px; border-top: 1px solid var(--line); }
+  .rival-block .lbl, .dont .lbl {
+    font-family: var(--font-mono);
+    font-size: 11px;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--mute);
+    margin-bottom: 8px;
+  }
+  .rival-block p { color: var(--ink-2); font-size: 14.5px; line-height: 1.55; }
+  .rival-block.is-move .lbl { color: var(--clay-ink); }
+  .rival-block.is-move p { color: var(--ink); }
+  .rival-msg {
+    margin: auto 0 0;
+    padding: 14px 16px;
+    border-radius: 12px;
+    background: var(--paper-warm);
+    font-family: var(--font-display);
+    font-style: italic;
+    font-size: 18px;
+    line-height: 1.3;
+  }
+  .dont {
+    margin-top: clamp(22px, 2.5vw, 32px);
+    max-width: 78ch;
+  }
+  .dont ul { list-style: none; padding: 0; display: grid; gap: 10px; }
+  .dont li {
+    display: flex;
+    gap: 12px;
+    color: var(--ink-2);
+    font-size: 14.5px;
+    line-height: 1.55;
+  }
+  .dont li::before {
+    content: "×";
+    font-family: var(--font-mono);
+    color: var(--clay-ink);
+    flex: none;
+  }
+
   @media (max-width: 900px) {
     .process-row-wide { grid-template-columns: 1fr; gap: 10px; }
   }
   @media (max-width: 1000px) {
-    .changes { grid-template-columns: 1fr; }
+    .changes, .rivals { grid-template-columns: 1fr; }
     .lines, .caps { grid-template-columns: repeat(2, 1fr); }
     .fit-row { grid-template-columns: 1fr; }
   }

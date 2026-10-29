@@ -349,3 +349,119 @@ body.crm {
   .chips { flex-wrap: nowrap; overflow-x: auto; scrollbar-width: none; margin: 0 -16px; padding: 0 16px; width: calc(100% + 32px); }
   .chip { flex: none; }
 }
+
+/* ---------- Editores (paneles laterales) ---------- */
+.crm .drawer-bg { background: rgba(20, 28, 25, 0.32); backdrop-filter: blur(2px); }
+.crm .drawer-panel { width: min(620px, 100%); background: var(--bg); box-shadow: -16px 0 48px rgba(16, 40, 36, 0.16); }
+.crm .drawer-panel.drawer-ancho { width: min(780px, 100%); }
+.crm .drawer-panel.drawer-angosto { width: min(500px, 100%); }
+.crm .drawer-head { background: var(--paper); padding: 16px 22px; align-items: flex-start; }
+.drawer-kicker { margin: 0 0 2px; font-size: 11px; font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase; color: var(--deep); }
+.crm .drawer-head h3 { font-size: 18px; font-weight: 600; letter-spacing: -0.01em; }
+.crm .x {
+  width: 34px; height: 34px; border-radius: 9px; display: grid; place-items: center; font-size: 20px;
+  transition: background 0.12s, color 0.12s;
+}
+.crm .x:hover { background: var(--paper-2); color: var(--ink); }
+.crm .drawer-body { padding: 18px 22px 0; gap: 14px; flex: 1; }
+
+.grupo {
+  margin: 0; min-width: 0; border: 1px solid var(--line); border-radius: 14px;
+  background: var(--paper); box-shadow: var(--shadow-1);
+  padding: 16px 18px 18px; display: flex; flex-direction: column; gap: 14px;
+}
+.grupo legend {
+  float: left; width: 100%; padding: 0; margin: 0 0 2px;
+  font-size: 13px; font-weight: 600; color: var(--ink);
+}
+.grupo legend + * { clear: both; }
+.crm :is(.drawer-body, .card-form, .ia-card, .regla) label { color: var(--ink-2); font-weight: 500; font-size: 12.5px; }
+.crm :is(.drawer-body, .card-form, .ia-card, .regla) :is(input, textarea, select) { font-size: 13.5px; padding: 9px 11px; border-radius: 9px; background: var(--paper); }
+.crm :is(.drawer-body, .card-form, .ia-card, .regla) select {
+  appearance: none; padding-right: 32px; cursor: pointer;
+  background: var(--paper) url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%238a938f' stroke-width='2.4' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E") no-repeat right 11px center;
+}
+.crm :is(.drawer-body, .card-form, .ia-card, .regla) :is(input, textarea, select):hover:not(:focus) { border-color: color-mix(in oklab, var(--mute) 45%, var(--line)); }
+.input-grande { font-size: 16px !important; font-weight: 600; padding: 11px 12px !important; }
+.prefijo { display: flex; align-items: stretch; border: 1px solid var(--line); border-radius: 9px; background: var(--paper); overflow: hidden; transition: border-color 0.15s, box-shadow 0.15s; }
+.prefijo:focus-within { border-color: var(--deep); box-shadow: 0 0 0 3px color-mix(in oklab, var(--deep) 14%, transparent); }
+.prefijo > span { display: grid; place-items: center; padding: 0 4px 0 11px; font: 400 12.5px var(--mono); color: var(--mute); background: var(--paper-2); border-right: 1px solid var(--line); padding-right: 9px; }
+.crm .prefijo input { border: 0; border-radius: 0; box-shadow: none !important; font-family: var(--mono); font-size: 12.5px; }
+
+/* Interruptor: el checkbox sigue ahí (los formularios leen .checked), solo
+   se dibuja como un switch. */
+.switch { flex-direction: row !important; align-items: flex-start; gap: 12px !important; cursor: pointer; position: relative; }
+.switch input { position: absolute; opacity: 0; width: 1px; height: 1px; pointer-events: none; }
+.switch-ui {
+  flex: none; position: relative; width: 36px; height: 21px; border-radius: 99px; margin-top: 1px;
+  background: color-mix(in oklab, var(--ink) 16%, transparent); transition: background 0.18s;
+}
+.switch-ui::after {
+  content: ""; position: absolute; top: 2px; left: 2px; width: 17px; height: 17px; border-radius: 50%;
+  background: #fff; box-shadow: 0 1px 3px rgba(0, 0, 0, 0.2); transition: transform 0.18s cubic-bezier(.3,.7,.3,1);
+}
+.switch input:checked + .switch-ui { background: var(--deep); }
+.switch input:checked + .switch-ui::after { transform: translateX(15px); }
+.switch input:focus-visible + .switch-ui { box-shadow: 0 0 0 3px color-mix(in oklab, var(--deep) 25%, transparent); }
+.switch-txt { display: flex; flex-direction: column; gap: 1px; }
+.switch-txt b { font-weight: 600; color: var(--ink); font-size: 13px; }
+.switch-txt small { font-size: 12px; font-weight: 400; color: var(--mute); }
+
+/* Barra de guardar pegada abajo del panel mientras se desplaza el formulario. */
+.crm .drawer-actions {
+  position: sticky; bottom: 0; z-index: 2;
+  margin: auto -22px 0; padding: 14px 22px; border-top: 1px solid var(--line);
+  background: color-mix(in oklab, var(--paper) 92%, transparent); backdrop-filter: blur(8px);
+  justify-content: flex-end;
+}
+.crm .drawer-actions .form-error { margin: 0 auto 0 0; min-height: 0; }
+.crm .ia-card .drawer-actions, .crm .card-form .drawer-actions { position: static; margin: 0; padding: 14px 0 0; background: none; backdrop-filter: none; }
+
+/* Editor de contenido del artículo. */
+#sections { display: flex; flex-direction: column; gap: 10px; }
+#sections:empty { display: none; }
+.crm .sec-row {
+  grid-template-columns: 130px 1fr auto; padding: 10px; border-radius: 12px;
+  background: var(--paper-2); border: 1px solid transparent; transition: border-color 0.12s, background 0.12s;
+}
+.crm .sec-row:focus-within { background: var(--paper); border-color: color-mix(in oklab, var(--deep) 35%, var(--line)); }
+.crm .sec-row[data-type="h2"] .sec-text { font-weight: 600; font-size: 15px; }
+.crm .sec-row[data-type="pull"] .sec-text { font-style: italic; }
+.crm .sec-del { width: 30px; height: 30px; border-radius: 8px; }
+.crm .sec-del:hover { background: color-mix(in oklab, var(--danger) 8%, transparent); }
+.crm .add-sec button { border-style: dashed; background: transparent; padding: 7px 12px; border-radius: 9px; font-weight: 500; }
+.crm .add-sec button:hover { background: color-mix(in oklab, var(--deep) 6%, transparent); }
+
+@media (max-width: 560px) {
+  .crm .drawer-body { padding: 14px 14px 0; }
+  .crm .drawer-actions { margin: auto -14px 0; padding: 12px 14px; }
+  .grupo { padding: 14px; }
+  .crm .sec-row { grid-template-columns: 1fr auto; }
+  .crm .sec-row .sec-text { grid-column: 1 / -1; grid-row: 2; }
+}
+
+/* ---------- Subpestañas (Cumplimiento) ---------- */
+.subtabs { display: flex; gap: 2px; margin: -4px 0 20px; border-bottom: 1px solid var(--line); overflow-x: auto; scrollbar-width: none; }
+.subtab {
+  flex: none; display: inline-flex; align-items: center; gap: 7px;
+  font: 500 13.5px/1 var(--font); color: var(--mute); background: none; border: 0; cursor: pointer;
+  padding: 11px 12px 12px; margin-bottom: -1px; border-bottom: 2px solid transparent;
+  transition: color 0.12s, border-color 0.12s;
+}
+.subtab:hover { color: var(--ink); }
+.subtab.is-active { color: var(--ink); border-bottom-color: var(--deep); }
+.subtab .count { font: 500 11px/1 var(--mono); padding: 3px 6px; border-radius: 99px; background: color-mix(in oklab, var(--ink) 6%, transparent); color: var(--ink-2); }
+.subtab.is-active .count { background: color-mix(in oklab, var(--deep) 12%, transparent); color: var(--deep-2); }
+
+.btn-ico-txt { display: inline-flex; align-items: center; gap: 8px; }
+.btn-ico-txt .ico { width: 16px; height: 16px; }
+.toolbar .sp { margin-left: auto; }
+.mono { font-family: var(--mono); font-size: 0.92em; }
+.kpi-num i { font-style: normal; font-size: 14px; color: var(--mute); font-weight: 500; margin-left: 2px; }
+.btn-mini.is-main { background: var(--deep); border-color: var(--deep); color: #fff; }
+.btn-mini.is-main:hover { background: var(--deep-2); color: #fff; }
+.btn-mini.danger:hover { border-color: var(--danger); color: var(--danger); }
+a.btn-mini { text-decoration: none; display: inline-flex; align-items: center; }
+.tabla .t2.error { color: var(--danger); }
+.cuenta-alertas { display: inline-grid; place-items: center; min-width: 22px; height: 22px; padding: 0 6px; border-radius: 99px; background: color-mix(in oklab, var(--clay) 16%, transparent); color: #a5660a; font-weight: 600; }
+.c-procesado { --c: #46a85b; }
