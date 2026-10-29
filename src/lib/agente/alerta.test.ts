@@ -138,3 +138,20 @@ test('plazo en meses corre al hábil siguiente y respeta fin de mes', () => {
   assert.equal(venceMeses('2026-01-31', 1), '2026-03-02') // 28 feb es sábado
   assert.equal(venceMeses('2026-10-21', 2), '2026-12-21')
 })
+
+test('una obligación periódica no manda sobre el plazo del acto', () => {
+  // Caso real de la primera prueba en producción: "dentro de los cinco (5)
+  // primeros días de cada mes" se tomaba como 5 días hábiles desde la
+  // notificación y adelantaba el vencimiento.
+  const ext = normalizarExtraccion({
+    ...base,
+    obligaciones: [
+      { que: 'Caracterización 2025', plazo_cantidad: 30, plazo_unidad: 'dias_habiles', plazo_texto: 'treinta (30) días hábiles', periodica: false },
+      { que: 'Instalar medidor de caudal', plazo_cantidad: 15, plazo_unidad: 'dias_habiles', plazo_texto: 'quince (15) días hábiles', periodica: false },
+      { que: 'Reportes mensuales de caudal', plazo_cantidad: 5, plazo_unidad: 'dias_habiles', plazo_texto: 'dentro de los cinco (5) primeros días de cada mes', periodica: true },
+    ],
+  })
+  assert.equal(ext.obligaciones[2].plazo_unidad, 'sin_plazo')
+  assert.equal(ext.obligaciones[2].plazo_texto, 'dentro de los cinco (5) primeros días de cada mes')
+  assert.equal(obligacionPrincipal(ext.obligaciones, '2026-10-29')?.que, 'Instalar medidor de caudal')
+})

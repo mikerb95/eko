@@ -22,6 +22,7 @@ export interface Obligacion {
   plazo_cantidad: number
   plazo_unidad: UnidadPlazo
   plazo_texto: string
+  periodica: boolean
 }
 
 export interface Extraccion {
@@ -62,12 +63,16 @@ export const ESQUEMA_EXTRACCION = {
       items: {
         type: 'object',
         additionalProperties: false,
-        required: ['que', 'plazo_cantidad', 'plazo_unidad', 'plazo_texto'],
+        required: ['que', 'plazo_cantidad', 'plazo_unidad', 'plazo_texto', 'periodica'],
         properties: {
           que: { type: 'string', description: 'Qué debe hacer o entregar el titular.' },
           plazo_cantidad: { type: 'integer', description: 'Número del plazo. 0 si no tiene plazo.' },
           plazo_unidad: { type: 'string', enum: [...UNIDADES_PLAZO] },
           plazo_texto: { type: 'string', description: 'El plazo copiado literalmente del documento.' },
+          periodica: {
+            type: 'boolean',
+            description: 'true si la obligación se repite (reportes mensuales, informes anuales) y su plazo no se cuenta desde la notificación.',
+          },
         },
       },
     },
@@ -87,6 +92,7 @@ Reglas:
 - Extrae solo lo que dice el documento. Si un dato no aparece, déjalo vacío; no lo deduzcas ni lo inventes.
 - Los plazos son lo más importante. Copia en plazo_texto la frase exacta del plazo. Indica si son días hábiles, días calendario o meses según el texto; si el documento dice solo "días", en actos administrativos colombianos se entienden hábiles.
 - Si una obligación no tiene plazo, usa plazo_unidad "sin_plazo" y plazo_cantidad 0.
+- Si una obligación se repite (por ejemplo "dentro de los cinco primeros días de cada mes" o "un informe anual"), marca periodica true: ese plazo no corre desde la notificación.
 - tipo_acto: "requerimiento" si pide información o acciones; "sancionatorio" si abre o decide un proceso sancionatorio; "seguimiento" si es un control de seguimiento; "otorgamiento", "negacion" o "modificacion" si decide sobre un permiso o licencia; "cobro" si cobra evaluación o seguimiento; "archivo" si archiva el expediente; "otro" en cualquier otro caso.
 - confianza: "alta" solo si el documento se lee completo y los plazos y números son claros. Si hay páginas borrosas, escritura a mano, plazos ambiguos o números dudosos, usa "media" o "baja" y explica por qué en motivo_confianza.
 - Escribe en español de Colombia, claro y breve.`
@@ -109,13 +115,16 @@ function obligacion(v: any): Obligacion | null {
   if (!que) return null
   let unidad: UnidadPlazo = (UNIDADES_PLAZO as readonly string[]).includes(v.plazo_unidad) ? v.plazo_unidad : 'sin_plazo'
   let cantidad = Number.isInteger(v.plazo_cantidad) && v.plazo_cantidad > 0 ? v.plazo_cantidad : 0
-  // Un plazo sin cantidad no se puede calcular: se trata como sin plazo para
-  // no inventar un vencimiento.
-  if (cantidad === 0 || unidad === 'sin_plazo') {
+  const periodica = v.periodica === true
+  // Un plazo sin cantidad no se puede calcular, y el de una obligación
+  // periódica ("los cinco primeros días de cada mes") no corre desde la
+  // notificación: ambos se tratan como sin plazo para no inventar un
+  // vencimiento. El texto del plazo se conserva.
+  if (cantidad === 0 || unidad === 'sin_plazo' || periodica) {
     unidad = 'sin_plazo'
     cantidad = 0
   }
-  return { que, plazo_cantidad: cantidad, plazo_unidad: unidad, plazo_texto: texto(v.plazo_texto, 300) }
+  return { que, plazo_cantidad: cantidad, plazo_unidad: unidad, plazo_texto: texto(v.plazo_texto, 300), periodica }
 }
 
 /** Limpia la respuesta de la IA. Nunca lanza: lo inválido queda vacío. */

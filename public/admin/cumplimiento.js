@@ -107,7 +107,30 @@ const listaAlertas = crearLista({
   columnas: [],
   pintarPropio: (filas) => filas.map(tarjetaAlerta).join(''),
 })
-const renderAlertas = () => listaAlertas.pintar()
+// Los indicadores vienen pintados del servidor; se recalculan aquí para que
+// cambien al subir un acto o cerrar una alerta sin recargar la página.
+function pintarKpis() {
+  const abiertas = estado.alertas.filter(activa)
+  const n = {
+    activas: abiertas.length,
+    semana: abiertas.filter((a) => a.restantes !== null && a.restantes <= 5).length,
+    confirmar: abiertas.filter((a) => a.por_confirmar).length,
+    expedientes: estado.expedientes.filter((e) => e.activo).length,
+  }
+  const kpis = $$('.kpi .kpi-num')
+  if (kpis.length === 4) {
+    kpis[0].textContent = n.activas
+    kpis[1].textContent = n.semana
+    kpis[2].textContent = n.confirmar
+    kpis[3].firstChild.textContent = n.expedientes
+    kpis[1].closest('.kpi').classList.toggle('is-alerta', n.semana > 0)
+    kpis[2].closest('.kpi').classList.toggle('is-alerta', n.confirmar > 0)
+  }
+  const cuenta = (tab, v) => { const c = $(`.subtab[data-tab="${tab}"] .count`); if (c) c.textContent = v }
+  cuenta('alertas', n.activas)
+  cuenta('expedientes', n.expedientes)
+}
+const renderAlertas = () => { listaAlertas.pintar(); pintarKpis() }
 
 async function recargarAlertas() {
   const { alertas } = await api('/alertas')
