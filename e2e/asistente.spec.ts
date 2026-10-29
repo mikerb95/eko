@@ -98,7 +98,7 @@ test('en celular la caja y la tarjeta caben sin desplazamiento horizontal', asyn
 test('el enlace ?alerta= de cumplimiento lleva a la alerta aunque esté cerrada', async ({ page }) => {
   await entrar(page, 'admin', 'ekosolv2026*')
   await page.goto('/admin/cumplimiento?alerta=2')
-  await expect(page.locator('#alerta-filtro')).toHaveValue('')
+  await expect(page.locator('#alerta-chips .chip.is-on')).toHaveAttribute('data-chip', 'todas')
   const alerta = page.locator('#alerta-2')
   await expect(alerta).toHaveClass(/is-destacada/)
   await expect(alerta).toContainText('Seguimiento atendido')
@@ -106,7 +106,7 @@ test('el enlace ?alerta= de cumplimiento lleva a la alerta aunque esté cerrada'
 
   // Una alerta abierta no cambia el filtro.
   await page.goto('/admin/cumplimiento?alerta=1')
-  await expect(page.locator('#alerta-filtro')).toHaveValue('activas')
+  await expect(page.locator('#alerta-chips .chip.is-on')).toHaveAttribute('data-chip', 'activas')
   await expect(page.locator('#alerta-1')).toHaveClass(/is-destacada/)
 
   await page.goto('/admin/cumplimiento?alerta=999')
