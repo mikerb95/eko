@@ -91,6 +91,14 @@ const oportunidades = [
     when: "2027–2030",
     estado: "nueva",
   },
+  {
+    n: "06", code: "ENVASES",
+    title: "Metas de envases que suben cada año",
+    lede: "La meta de aprovechamiento de envases y empaques llega al 20% en 2026 y sube hasta 30% en 2030, medida en toneladas certificadas. Con la Resolución 803 de 2024 los planes de gestión además tuvieron que sumar los plásticos de un solo uso, y el informe de marzo de 2026 fue el primero con esas reglas. Cada punto de meta adicional es más tonelaje que los productores deben comprar a un sistema colectivo. Y el Decreto 772 de 2026 da prioridad a las rutas selectivas de reciclables, así que habrá más material separado en la fuente.",
+    tags: ["Res. 1407/2018 · 1342/2020", "Res. 803/2024", "Meta 30% en 2030"],
+    when: "Cada año hasta 2030",
+    estado: "vigente",
+  },
 ]
 
 const cambios = [
@@ -102,6 +110,7 @@ const cambios = [
       "La ANLA persigue evasores con la estrategia REP+ y ya tiene 32 impulsos sancionatorios.",
       "Res. 0799 de 2025 en vigor desde enero: sistema obligatorio para baterías de plomo-ácido.",
       "MinMinas pidió a MinAmbiente reglamentar los residuos de paneles solares.",
+      "Envases: primer informe anual con plásticos de un solo uso (marzo de 2026) y Decreto 772 de 2026 con rutas selectivas de reciclables.",
     ],
   },
   {
@@ -151,7 +160,7 @@ const lineas = [
     role: "Sistema colectivo de envases y empaques",
     body: "Sistema Colectivo de Recolección de Envases y Empaques avalado por la Resolución 1407 de 2018 (modificada por la 1342 de 2020), en operación desde 2021. Aporta la experiencia de reportar a la autoridad en nombre de terceros.",
     cap: "52 toneladas de empaques en su primer año",
-    atiende: "Oportunidad 02",
+    atiende: "Oportunidades 02 y 06",
   },
 ]
 
@@ -198,6 +207,13 @@ const encaje = [
     brecha: "Hay que confirmar si la licencia actual cubre baterías y paneles, y no existe un protocolo de prueba y clasificación de módulos para reúso.",
     cubre: "Módulo ITAD · Fase 2",
   },
+  {
+    op: "06 · ENVASES",
+    lineas: ["EKOPARTNER"],
+    tiene: "Sistema colectivo de envases avalado y en operación desde 2021, con 52 toneladas gestionadas en su primer año y la mecánica de reportar a la ANLA en nombre de sus productores.",
+    brecha: "Para crecer con las metas hay que sumar productores al colectivo y demostrarles el tonelaje con certificados de transformadores que cuadren. Hoy esa conciliación es manual.",
+    cubre: "Portal ESG · Fase 2 · Reportería automática · Fase 3",
+  },
 ]
 
 const modulos = [
@@ -235,6 +251,10 @@ const fuentes = [
   { t: "MinAmbiente: Colombia regula la gestión de baterías usadas (Res. 0799 de 2025)", u: "https://www.minambiente.gov.co/colombia-regula-la-gestion-responsable-de-baterias-usadas/" },
   { t: "ReSolar LATAM: residuos de paneles solares y la Resolución 40159 de 2026", u: "https://resolarlatam.com/resolucion-40159-2026-residuos-paneles-solares/" },
   { t: "CEPAL: segunda vida de baterías de vehículos eléctricos en Colombia", u: "https://www.cepal.org/sites/default/files/news/files/carlos_alvarez_-_colombia.pdf" },
+  { t: "Envapack: metas de aprovechamiento de envases en Colombia (20% en 2026, 30% en 2030)", u: "https://www.envapack.com/2026/08/empaque-sostenible-america-latina-2025/comment-page-1/" },
+  { t: "Asuntos Legales: cambios a los planes de envases y plásticos de un solo uso (Res. 803 de 2024)", u: "https://www.asuntoslegales.com.co/consultorio/cuales-son-las-principales-modificaciones-a-los-planes-de-gestion-de-residuos-de-envases-y-empaques-y-plasticos-de-un-solo-uso-3966197" },
+  { t: "ANLA: Plan de gestión ambiental de residuos de envases y empaques", u: "https://www.anla.gov.co/01_anla/permiso-y-autorizacion-plan-gestion-ambiental-residuos-envaces-y-empaques" },
+  { t: "CRA: Decreto 772 de 2026 (rutas selectivas de aprovechables)", u: "https://normas.cra.gov.co/Gestor/Docs/decreto_0772_2026.htm" },
   { t: "Infobae: borrador de decreto de licencia y consulta previa simultáneas (10 oct. 2026)", u: "https://www.infobae.com/colombia/2026/10/10/licencias-ambientales-y-consultas-previas-se-tramitarian-de-forma-simultanea-esto-dice-borrador-de-decreto-del-gobierno-de-la-espriella/" },
   { t: "Infobae: proyecto de facultades extraordinarias para fusionar entidades", u: "https://www.infobae.com/colombia/2026/09/18/abelardo-de-la-espriella-tendria-facultades-extraordinarias-por-seis-meses-para-fusionar-y-eliminar-ministerios-esta-es-la-iniciativa-que-estudiara-el-congreso/" },
   { t: "RTVC: crecen los residuos electrónicos, avance de Colombia (15 oct. 2026)", u: "https://www.rtvcnoticias.com/actualidad/medio-ambiente/residuos-electronicos-crecen-cuanto-avanza-colombia" },
@@ -366,7 +386,7 @@ const fuentes = [
     <div class="section-head reveal">
       <div>
         <div class="eyebrow">Oportunidades del sector</div>
-        <h2>Cinco frentes donde la demanda<br>crece <em>sin importar</em> el gobierno.</h2>
+        <h2>Seis frentes donde la demanda<br>crece <em>sin importar</em> el gobierno.</h2>
       </div>
       <div class="meta">
         El marco regulatorio del posconsumo (Ley 1672/2013, Decreto 284/2018, Resolución 0851/2022 y Decreto 670/2025 de Basura Cero) sigue en firme tras el cambio de gobierno y genera obligaciones que no dependen de quién gobierne.
@@ -403,7 +423,7 @@ const fuentes = [
         <h2>Cuatro líneas que ya <em>operan</em><br>sobre el marco vigente.</h2>
       </div>
       <div class="meta">
-        Las cinco oportunidades anteriores son del sector entero. Lo que sigue es la traducción a Ekosolv: qué línea de negocio atiende cada una, con qué capacidad instalada se sostiene hoy y qué hay que construir para capturarla.
+        Las seis oportunidades anteriores son del sector entero. Lo que sigue es la traducción a Ekosolv: qué línea de negocio atiende cada una, con qué capacidad instalada se sostiene hoy y qué hay que construir para capturarla.
       </div>
     </div>
 
@@ -438,7 +458,7 @@ const fuentes = [
         <h2>Dónde alcanza lo que hay<br>y dónde <em>falta</em> construir.</h2>
       </div>
       <div class="meta">
-        Ninguna de las cinco oportunidades se captura solo con la operación actual. En todas, la pieza faltante es la misma: convertir la operación en datos verificables por un tercero.
+        Ninguna de las seis oportunidades se captura solo con la operación actual. En todas, la pieza faltante es la misma: convertir la operación en datos verificables por un tercero.
       </div>
     </div>
 
