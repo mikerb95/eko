@@ -15,6 +15,7 @@ const form = $('#asis-form')
 const caja = $('#asis-q')
 const hilo = $('#asis-hilo')
 const resultados = $('#asis-resultados')
+const seccion = form.closest('.asis')
 
 let conversacion = null
 let ocupado = false
@@ -100,6 +101,10 @@ function nuevoTurno(pregunta) {
   }
   t.nodo.append(el('p', { class: 'asis-pregunta' }, pregunta), t.pasos, t.cuerpo)
   hilo.append(t.nodo)
+  // Con la conversación en marcha la caja baja debajo del hilo: la respuesta
+  // suele cerrar con una pregunta y se contesta justo ahí, como en un chat.
+  seccion.classList.add('is-chat')
+  form.scrollIntoView({ block: 'nearest' })
   return t
 }
 
@@ -340,7 +345,7 @@ if (ini) {
   }
   if (ini.propuesta && ultimo) tarjeta(ultimo, ini.propuesta, ini.ajena)
   if (ini.estado === 'fallida' && ini.error && ultimo) error(ultimo, `${ini.error} Empiece una conversación nueva.`)
-  if (ultimo) ultimo.nodo.scrollIntoView({ block: 'nearest' })
+  if (ultimo) form.scrollIntoView({ block: 'nearest' })
 }
 
 // ── Pestaña de límites y consumo (solo admin) ───────────────────────────
