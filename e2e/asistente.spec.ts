@@ -19,6 +19,12 @@ test('preguntar: ve los pasos y la respuesta', async ({ page }) => {
   await expect(page.locator('.asis-pasos li')).toContainText('Revisando las recolecciones')
   await expect(page.locator('.asis-respuesta')).toContainText('Hay 1 órdenes')
   await expect(page).toHaveURL(/[?&]c=/)
+
+  // Con conversación, la caja baja debajo del hilo para contestar ahí mismo.
+  await expect(page.locator('.asis-atajos')).toBeHidden()
+  const respuesta = await page.locator('.asis-respuesta').last().boundingBox()
+  const caja = await page.locator('#asis-form').boundingBox()
+  expect(caja!.y).toBeGreaterThan(respuesta!.y + respuesta!.height)
 })
 
 test('pedir un cambio: tarjeta con antes y después; aprobar lo guarda', async ({ page }) => {
