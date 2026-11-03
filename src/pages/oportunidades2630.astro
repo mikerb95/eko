@@ -253,6 +253,34 @@ const rivales = [
 
 const JUGADAS = { competir: "Competir", canal: "Canal", aliado: "Aliarse" }
 
+// Mapa de posicionamiento. Posiciones cualitativas (0 a 1), no medidas:
+// x = cumplimiento demostrable ante la ANLA, y = capacidad física y volumen.
+const MAPA = { w: 560, h: 420, pad: { l: 44, r: 20, t: 20, b: 44 } }
+const px = (x: number) => MAPA.pad.l + x * (MAPA.w - MAPA.pad.l - MAPA.pad.r)
+const py = (y: number) => MAPA.h - MAPA.pad.b - y * (MAPA.h - MAPA.pad.t - MAPA.pad.b)
+const puntos = [
+  { n: "Lito", x: 0.22, y: 0.86, r: 15, jugada: "competir", anchor: "start" },
+  { n: "EcoCómputo", x: 0.42, y: 0.70, r: 13, jugada: "canal", anchor: "start" },
+  { n: "Red Verde", x: 0.27, y: 0.50, r: 11, jugada: "aliado", anchor: "start" },
+]
+const ekoHoy = { x: 0.58, y: 0.24 }
+const ekoMeta = { x: 0.88, y: 0.32 }
+
+// Matriz de capacidades según lo que cada empresa publica (oct. 2026).
+// si · parcial · no · sd (sin dato público). "fase" marca lo que Ekosolv
+// tendría con la plataforma, todavía no.
+const matrizCols = ["Ekosolv", "Lito", "EcoCómputo", "Red Verde"]
+const matriz = [
+  { cap: "Recolección y disposición de RAEE", v: ["si", "si", "si", "si"] },
+  { cap: "Cobertura nacional", v: ["parcial", "si", "si", "parcial"] },
+  { cap: "Compra de excedentes o equipos", v: ["parcial", "si", "no", "no"] },
+  { cap: "Consultoría y licenciamiento ANLA", v: ["si", "no", "no", "no"] },
+  { cap: "Arma el sistema REP del productor", v: ["si", "no", "parcial", "parcial"] },
+  { cap: "Sistema colectivo de envases", v: ["si", "no", "no", "no"] },
+  { cap: "Certificado digital verificable (D. 766)", v: ["fase", "sd", "sd", "sd"], clave: true },
+]
+const MARCAS = { si: "Sí", parcial: "Parcial", no: "No", sd: "Sin dato público", fase: "Fase 1" }
+
 const modulos = [
   {
     n: "01", code: "CUSTODIA",
@@ -543,39 +571,114 @@ const fuentes = [
       </div>
     </div>
 
+    <div class="pos reveal">
+      <figure class="pos-map">
+        <svg viewBox={`0 0 ${MAPA.w} ${MAPA.h}`} role="img" aria-labelledby="pos-map-t">
+          <title id="pos-map-t">Mapa de posicionamiento: Lito, EcoCómputo y Red Verde concentran capacidad física; Ekosolv se mueve hacia el cumplimiento demostrable.</title>
+          <rect class="zona" x={px(0.62)} y={py(0.62)} width={px(1) - px(0.62)} height={py(0) - py(0.62)} rx="10" />
+          <text class="zona-t" x={px(0.97)} y={py(0.08)} text-anchor="end">Espacio libre</text>
+          <line class="eje" x1={px(0)} y1={py(0)} x2={px(1)} y2={py(0)} />
+          <line class="eje" x1={px(0)} y1={py(0)} x2={px(0)} y2={py(1)} />
+          <line class="guia" x1={px(0.5)} y1={py(0)} x2={px(0.5)} y2={py(1)} />
+          <line class="guia" x1={px(0)} y1={py(0.5)} x2={px(1)} y2={py(0.5)} />
+          <text class="eje-t" x={px(1)} y={py(0) + 30} text-anchor="end">Cumplimiento demostrable ante la ANLA →</text>
+          <text class="eje-t" transform={`translate(${px(0) - 18} ${py(0)}) rotate(-90)`}>Capacidad física y volumen →</text>
+          {puntos.map(p => (
+            <g class="pt" data-jugada={p.jugada}>
+              <circle cx={px(p.x)} cy={py(p.y)} r={p.r} />
+              <text x={px(p.x) + p.r + 8} y={py(p.y) + 5}>{p.n}</text>
+            </g>
+          ))}
+          <defs>
+            <marker id="pos-flecha" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+              <path d="M0 0L10 5L0 10z" class="flecha-p" />
+            </marker>
+          </defs>
+          <line class="ruta" x1={px(ekoHoy.x) + 12} y1={py(ekoHoy.y) - 2} x2={px(ekoMeta.x) - 16} y2={py(ekoMeta.y) + 3} marker-end="url(#pos-flecha)" />
+          <g class="eko is-hoy">
+            <circle cx={px(ekoHoy.x)} cy={py(ekoHoy.y)} r="10" />
+            <text x={px(ekoHoy.x)} y={py(ekoHoy.y) + 30} text-anchor="middle">Ekosolv hoy</text>
+          </g>
+          <g class="eko is-meta">
+            <circle cx={px(ekoMeta.x)} cy={py(ekoMeta.y)} r="13" />
+            <text x={px(ekoMeta.x)} y={py(ekoMeta.y) - 22} text-anchor="middle">Con Fase 1</text>
+          </g>
+        </svg>
+        <figcaption>Posiciones cualitativas, no medidas. El tamaño del punto sugiere la escala de cada operación.</figcaption>
+      </figure>
+
+      <div class="pos-mx">
+        <table class="mx">
+          <caption>Qué ofrece cada uno, según lo que publica</caption>
+          <thead>
+            <tr>
+              <th scope="col"><span class="sr-only">Capacidad</span></th>
+              {matrizCols.map((c, i) => <th scope="col" class={i === 0 ? 'is-eko' : ''}>{c}</th>)}
+            </tr>
+          </thead>
+          <tbody>
+            {matriz.map(r => (
+              <tr class={r.clave ? 'is-clave' : ''}>
+                <th scope="row">{r.cap}</th>
+                {r.v.map((v, i) => (
+                  <td class={i === 0 ? 'is-eko' : ''}>
+                    {v === 'fase'
+                      ? <span class="mk-fase">{MARCAS.fase}</span>
+                      : <span class="mk" data-v={v} title={MARCAS[v]}><span class="sr-only">{MARCAS[v]}</span></span>}
+                  </td>
+                ))}
+              </tr>
+            ))}
+          </tbody>
+        </table>
+        <ul class="mx-leyenda">
+          <li><span class="mk" data-v="si"></span>Sí</li>
+          <li><span class="mk" data-v="parcial"></span>Parcial</li>
+          <li><span class="mk" data-v="no"></span>No</li>
+          <li><span class="mk" data-v="sd"></span>Sin dato público</li>
+        </ul>
+        <p class="mx-nota">Nadie en el sector publica hoy un certificado verificable en línea. La última fila es la carrera que abre el Decreto 766.</p>
+      </div>
+    </div>
+
     <div class="rivals reveal">
       {rivales.map(r => (
         <article class="rival" data-jugada={r.jugada}>
           <header class="rival-head">
-            <div class="rival-name">{r.nombre}</div>
+            <div>
+              <div class="rival-name">{r.nombre}</div>
+              <div class="rival-tipo">{r.tipo}</div>
+            </div>
             <span class="jugada" data-jugada={r.jugada}>{JUGADAS[r.jugada]}</span>
           </header>
-          <div class="rival-tipo">{r.tipo}</div>
-          <p class="rival-perfil">{r.perfil}</p>
-          <div class="rival-block">
-            <div class="lbl">Dónde es fuerte</div>
-            <p>{r.fuerte}</p>
-          </div>
-          <div class="rival-block">
-            <div class="lbl">Dónde gana Ekosolv</div>
-            <p>{r.gana}</p>
-          </div>
-          <div class="rival-block is-move">
+          <blockquote class="rival-msg">{r.mensaje}</blockquote>
+          <div class="rival-move">
             <div class="lbl">Jugada</div>
             <p>{r.accion}</p>
           </div>
-          <blockquote class="rival-msg">{r.mensaje}</blockquote>
+          <details class="rival-more">
+            <summary>Perfil y argumentos</summary>
+            <p class="rival-perfil">{r.perfil}</p>
+            <div class="rival-block">
+              <div class="lbl">Dónde es fuerte</div>
+              <p>{r.fuerte}</p>
+            </div>
+            <div class="rival-block">
+              <div class="lbl">Dónde gana Ekosolv</div>
+              <p>{r.gana}</p>
+            </div>
+          </details>
         </article>
       ))}
     </div>
 
     <div class="dont reveal">
-      <div class="lbl">Lo que no conviene hacer</div>
-      <ul>
-        <li>Competir por precio por kilo o por cobertura nacional: ahí Lito y los colectivos siempre ganan.</li>
-        <li>Salir a quitarle afiliados a un colectivo de la ANDI: son las marcas más grandes y las relaciones más viejas del sector.</li>
-        <li>Prometer certificados digitales antes de tenerlos: es el diferenciador, y quemarlo cuesta más que esperar a la Fase 1.</li>
-      </ul>
+      <div class="dont-t">Lo que no conviene hacer</div>
+      <ol>
+        <li><strong>Pelear por precio o cobertura.</strong> Ahí Lito y los colectivos siempre ganan.</li>
+        <li><strong>Quitarle afiliados a la ANDI.</strong> Son las marcas más grandes y las relaciones más viejas del sector.</li>
+        <li><strong>Prometer el certificado digital antes de tenerlo.</strong> Es el diferenciador, y quemarlo cuesta más que esperar a la Fase 1.</li>
+      </ol>
     </div>
   </section>
 
@@ -888,7 +991,110 @@ const fuentes = [
   }
   .change[data-estado="caducado"] li { color: var(--mute); }
 
-  /* ── Competencia ─────────────────────────────────────────────────────── */
+  /* ── Competencia: mapa + matriz ──────────────────────────────────────── */
+  .sr-only {
+    position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px;
+    overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; border: 0;
+  }
+  .pos {
+    display: grid;
+    grid-template-columns: 1.05fr 1fr;
+    gap: clamp(28px, 4vw, 64px);
+    align-items: start;
+    margin-bottom: clamp(32px, 4vw, 56px);
+  }
+  .pos-map { margin: 0; }
+  .pos-map svg { width: 100%; height: auto; display: block; overflow: visible; }
+  .pos-map figcaption { margin-top: 10px; font-size: 13px; color: var(--mute); }
+  .pos-map .eje { stroke: var(--ink); stroke-width: 1.2; }
+  .pos-map .guia { stroke: var(--line-2); stroke-width: 1; stroke-dasharray: 3 5; }
+  .pos-map .eje-t { font-family: var(--font-mono); font-size: 11px; letter-spacing: 0.06em; fill: var(--mute); text-transform: uppercase; }
+  .pos-map .zona { fill: color-mix(in oklab, var(--forest) 9%, transparent); }
+  .pos-map .zona-t { font-family: var(--font-display); font-style: italic; font-size: 18px; fill: var(--forest); }
+  .pos-map .pt circle { fill-opacity: .18; stroke-width: 1.5; }
+  .pos-map .pt text { font-family: var(--font-sans); font-size: 14px; fill: var(--ink-2); }
+  .pos-map .pt[data-jugada="competir"] circle { fill: var(--clay-2); stroke: var(--clay-2); }
+  .pos-map .pt[data-jugada="canal"] circle    { fill: var(--deep); stroke: var(--deep); }
+  .pos-map .pt[data-jugada="aliado"] circle   { fill: var(--forest); stroke: var(--forest); }
+  .pos-map .eko text { font-family: var(--font-mono); font-size: 11.5px; letter-spacing: 0.04em; fill: var(--ink); }
+  .pos-map .eko.is-hoy circle { fill: var(--paper); stroke: var(--ink); stroke-width: 1.5; stroke-dasharray: 3 3; }
+  .pos-map .eko.is-meta circle { fill: var(--ink); }
+  .pos-map .ruta { stroke: var(--ink); stroke-width: 1.4; }
+  .pos-map .flecha-p { fill: var(--ink); }
+
+  .mx { width: 100%; border-collapse: collapse; font-size: 14px; }
+  .mx caption {
+    text-align: left;
+    font-family: var(--font-mono);
+    font-size: 11px;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--mute);
+    padding-bottom: 14px;
+  }
+  .mx thead th {
+    font-family: var(--font-mono);
+    font-size: 11px;
+    letter-spacing: 0.04em;
+    font-weight: 400;
+    color: var(--mute);
+    padding: 0 6px 10px;
+    text-align: center;
+    vertical-align: bottom;
+  }
+  .mx thead th.is-eko { color: var(--ink); }
+  .mx tbody th {
+    text-align: left;
+    font-weight: 400;
+    color: var(--ink-2);
+    padding: 12px 12px 12px 0;
+    line-height: 1.35;
+  }
+  .mx tbody tr { border-top: 1px solid var(--line); }
+  .mx td { text-align: center; padding: 12px 6px; }
+  .mx .is-eko { background: color-mix(in oklab, var(--forest) 8%, transparent); }
+  .mx thead th.is-eko { border-radius: 10px 10px 0 0; padding-top: 10px; }
+  .mx tbody tr:last-child td.is-eko { border-radius: 0 0 10px 10px; }
+  .mx tr.is-clave th { color: var(--ink); font-weight: 500; }
+  .mx tr.is-clave { background: color-mix(in oklab, var(--clay) 14%, transparent); }
+
+  .mk {
+    display: inline-block;
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+    border: 1.5px solid var(--ink);
+    vertical-align: middle;
+  }
+  .mk[data-v="si"] { background: var(--ink); }
+  .mk[data-v="parcial"] { background: linear-gradient(90deg, var(--ink) 50%, transparent 50%); }
+  .mk[data-v="no"] { border-color: var(--line-2); }
+  .mk[data-v="sd"] { width: 12px; height: 0; border-radius: 0; border-width: 1.5px 0 0; border-color: var(--mute); }
+  .mk-fase {
+    font-family: var(--font-mono);
+    font-size: 10.5px;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    white-space: nowrap;
+    padding: 3px 8px;
+    border-radius: 999px;
+    color: #fff;
+    background: var(--forest);
+  }
+  .mx-leyenda {
+    list-style: none;
+    padding: 0;
+    margin-top: 16px;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px 18px;
+    font-size: 12.5px;
+    color: var(--mute);
+  }
+  .mx-leyenda li { display: inline-flex; align-items: center; gap: 7px; }
+  .mx-nota { margin-top: 14px; font-size: 14px; line-height: 1.55; color: var(--ink-2); max-width: 52ch; }
+
+  /* ── Competencia: tarjetas ───────────────────────────────────────────── */
   .rivals {
     display: grid;
     grid-template-columns: repeat(3, 1fr);
@@ -900,21 +1106,29 @@ const fuentes = [
   }
   .rival {
     background: var(--paper);
-    padding: clamp(22px, 2.2vw, 32px);
+    padding: clamp(22px, 2.2vw, 30px);
     display: flex;
     flex-direction: column;
-    gap: 16px;
+    gap: 18px;
     transition: background .3s ease;
   }
   .rival[data-jugada="competir"]:hover { background: color-mix(in oklab, var(--clay-2) 6%, #fff); }
   .rival[data-jugada="canal"]:hover    { background: color-mix(in oklab, var(--deep) 5%, #fff); }
   .rival[data-jugada="aliado"]:hover   { background: color-mix(in oklab, var(--forest) 6%, #fff); }
-  .rival-head { display: flex; align-items: center; justify-content: space-between; gap: 12px; }
+  .rival-head { display: flex; align-items: flex-start; justify-content: space-between; gap: 12px; }
   .rival-name {
     font-family: var(--font-display);
-    font-size: clamp(26px, 2.4vw, 34px);
+    font-size: clamp(28px, 2.4vw, 36px);
     letter-spacing: -0.02em;
     line-height: 1;
+  }
+  .rival-tipo {
+    font-family: var(--font-mono);
+    font-size: 11px;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: var(--mute);
+    margin-top: 8px;
   }
   .jugada {
     display: inline-flex;
@@ -927,22 +1141,23 @@ const fuentes = [
     padding: 4px 10px;
     border-radius: 999px;
     background: var(--paper-warm);
+    white-space: nowrap;
   }
   .jugada::before { content: ""; width: 7px; height: 7px; border-radius: 50%; }
   .jugada[data-jugada="competir"]::before { background: var(--clay-2); }
   .jugada[data-jugada="canal"]::before    { background: var(--deep); }
   .jugada[data-jugada="aliado"]::before   { background: var(--forest); }
-  .rival-tipo {
-    font-family: var(--font-mono);
-    font-size: 11.5px;
-    letter-spacing: 0.06em;
-    text-transform: uppercase;
-    color: var(--mute);
-    margin-top: -6px;
+  .rival-msg {
+    margin: 0;
+    font-family: var(--font-display);
+    font-style: italic;
+    font-size: clamp(21px, 1.8vw, 25px);
+    line-height: 1.22;
+    letter-spacing: -0.01em;
+    color: var(--ink);
   }
-  .rival-perfil { color: var(--ink-2); font-size: 14.5px; line-height: 1.55; }
-  .rival-block { padding-top: 14px; border-top: 1px solid var(--line); }
-  .rival-block .lbl, .dont .lbl {
+  .rival-move { padding-top: 16px; border-top: 1px solid var(--line); }
+  .rival .lbl {
     font-family: var(--font-mono);
     font-size: 11px;
     letter-spacing: 0.08em;
@@ -950,47 +1165,94 @@ const fuentes = [
     color: var(--mute);
     margin-bottom: 8px;
   }
-  .rival-block p { color: var(--ink-2); font-size: 14.5px; line-height: 1.55; }
-  .rival-block.is-move .lbl { color: var(--clay-ink); }
-  .rival-block.is-move p { color: var(--ink); }
-  .rival-msg {
-    margin: auto 0 0;
-    padding: 14px 16px;
-    border-radius: 12px;
-    background: var(--paper-warm);
-    font-family: var(--font-display);
-    font-style: italic;
-    font-size: 18px;
-    line-height: 1.3;
+  .rival-move .lbl { color: var(--clay-ink); }
+  .rival-move p { font-size: 15px; line-height: 1.55; color: var(--ink); }
+  .rival-more { margin-top: auto; border-top: 1px solid var(--line); padding-top: 14px; }
+  .rival-more summary {
+    cursor: pointer;
+    list-style: none;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    font-family: var(--font-mono);
+    font-size: 11.5px;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: var(--ink-2);
   }
+  .rival-more summary::-webkit-details-marker { display: none; }
+  .rival-more summary::after {
+    content: "+";
+    width: 26px;
+    height: 26px;
+    display: grid;
+    place-items: center;
+    border-radius: 50%;
+    border: 1px solid var(--line-2);
+    font-size: 14px;
+    transition: transform .25s ease, background .2s ease, color .2s ease;
+  }
+  .rival-more[open] summary::after { transform: rotate(45deg); background: var(--ink); color: var(--paper); border-color: var(--ink); }
+  .rival-more summary:focus-visible { outline: 2px solid var(--deep); outline-offset: 4px; border-radius: 4px; }
+  .rival-perfil, .rival-block p { color: var(--ink-2); font-size: 14.5px; line-height: 1.55; }
+  .rival-perfil { margin-top: 14px; }
+  .rival-block { margin-top: 14px; padding-top: 12px; border-top: 1px dashed var(--line); }
+
   .dont {
     margin-top: clamp(22px, 2.5vw, 32px);
-    max-width: 78ch;
+    display: grid;
+    grid-template-columns: 200px 1fr;
+    gap: clamp(16px, 3vw, 40px);
+    padding: clamp(20px, 2.4vw, 30px);
+    border-radius: var(--r-lg);
+    background: color-mix(in oklab, var(--clay) 16%, var(--paper));
   }
-  .dont ul { list-style: none; padding: 0; display: grid; gap: 10px; }
+  .dont-t {
+    font-family: var(--font-display);
+    font-size: 24px;
+    line-height: 1.1;
+    letter-spacing: -0.015em;
+    color: var(--clay-ink);
+  }
+  .dont ol {
+    list-style: none;
+    padding: 0;
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: clamp(16px, 2vw, 28px);
+    counter-reset: dont;
+  }
   .dont li {
-    display: flex;
-    gap: 12px;
-    color: var(--ink-2);
+    counter-increment: dont;
     font-size: 14.5px;
-    line-height: 1.55;
+    line-height: 1.5;
+    color: var(--ink-2);
   }
   .dont li::before {
     content: "×";
-    font-family: var(--font-mono);
+    display: block;
+    font-family: var(--font-display);
+    font-size: 30px;
+    line-height: 1;
     color: var(--clay-ink);
-    flex: none;
+    margin-bottom: 8px;
   }
+  .dont li strong { display: block; color: var(--ink); font-weight: 500; margin-bottom: 4px; }
 
   @media (max-width: 900px) {
     .process-row-wide { grid-template-columns: 1fr; gap: 10px; }
   }
   @media (max-width: 1000px) {
-    .changes, .rivals { grid-template-columns: 1fr; }
+    .changes, .rivals, .pos { grid-template-columns: 1fr; }
+    .dont { grid-template-columns: 1fr; }
     .lines, .caps { grid-template-columns: repeat(2, 1fr); }
     .fit-row { grid-template-columns: 1fr; }
   }
   @media (max-width: 620px) {
     .lines, .caps { grid-template-columns: 1fr; }
+    .dont ol { grid-template-columns: 1fr; }
+    .mx { font-size: 13px; }
+    .mx thead th { font-size: 9.5px; letter-spacing: 0; padding-inline: 2px; }
+    .mx td { padding-inline: 2px; }
   }
 </style>
