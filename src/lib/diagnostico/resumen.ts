@@ -112,7 +112,33 @@ function resumirArea(area: (typeof AREAS)[number], filas: Fila[]): ResumenArea {
   }
 }
 
-export function resumir(filas: Fila[]): Resumen {
+const clavePersona = (nombre: string) =>
+  nombre.normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase().replace(/\s+/g, ' ').trim()
+
+/**
+ * Si una persona llenó la encuesta más de una vez, vale la última (así lo dice
+ * la pantalla final). Se reconoce por el nombre, sin tildes ni mayúsculas.
+ * Devuelve las vigentes y los ids de las reemplazadas.
+ */
+export function vigentes(filas: Fila[]): { filas: Fila[]; reemplazadas: Set<number> } {
+  const ordenadas = [...filas].sort((a, b) => (a.creado < b.creado ? 1 : a.creado > b.creado ? -1 : b.id - a.id))
+  const vistas = new Set<string>()
+  const quedan: Fila[] = []
+  const reemplazadas = new Set<number>()
+  for (const f of ordenadas) {
+    const k = clavePersona(f.nombre)
+    if (vistas.has(k)) reemplazadas.add(f.id)
+    else {
+      vistas.add(k)
+      quedan.push(f)
+    }
+  }
+  return { filas: quedan, reemplazadas }
+}
+
+/** Resume solo las respuestas vigentes (ver `vigentes`). */
+export function resumir(todas: Fila[]): Resumen {
+  const filas = vigentes(todas).filas
   const areas = AREAS.map((a) => resumirArea(a, filas))
   const fija = areas.find((a) => a.area === 'operaciones')!
   const resto = areas

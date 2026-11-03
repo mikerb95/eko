@@ -15,6 +15,9 @@ export const WRITE_RULES: ReadonlyArray<{ prefix: string; roles: readonly string
   // Agente de cumplimiento: expedientes, actos, alertas y reglas. Los
   // consultores son quienes atienden las alertas.
   { prefix: '/api/admin/cumplimiento', roles: ['admin', 'consultor'] },
+  // Diagnóstico de IA para la capacitación: abrir o cerrar la encuesta y
+  // borrar respuestas. Las lecturas también se restringen dentro del endpoint.
+  { prefix: '/api/admin/diagnostico', roles: ['admin'] },
   // La sincronización con Zoho escribe en un sistema externo: solo admin.
   { prefix: '/api/admin/zoho', roles: ['admin'] },
   // El asistente: cualquier sesión puede preguntar y decidir sus propuestas.
