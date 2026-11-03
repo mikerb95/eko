@@ -90,7 +90,7 @@ test('panel: resumen por área y respuesta individual', async ({ page }) => {
   await expect(ops).toContainText('Leer autos, resoluciones y requerimientos')
   await expect(ops).toContainText('Sacar obligaciones y plazos de un auto')
   // Lo del paso de Ventas que se vio y se abandonó no quedó guardado.
-  await expect(page.locator('.dx-area-card').filter({ hasText: 'Ventas' })).toContainText('Sin respuestas todavía')
+  await expect(page.locator('.dx-vacia').filter({ hasText: 'Ventas' })).toContainText('sin respuestas todavía')
   await page.screenshot({ path: 'test-results/diagnostico-panel.png', fullPage: true })
 
   const csv = await page.request.get('/api/admin/diagnostico?formato=csv')

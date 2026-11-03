@@ -74,14 +74,15 @@ export interface Resumen {
 const horasDe = (id: string) => HORAS.find((h) => h.id === id)?.valor ?? 0
 const redondear = (x: number) => Math.round(x * 10) / 10
 
-/** Cuenta cuántas veces aparece cada opción. `todas` deja también las de cero. */
+/** Cuenta cuántas veces aparece cada opción. `todas` deja también las de cero y no reordena. */
 function contar(valores: string[], lista: readonly Opcion[], todas = false): Conteo[] {
   const n = new Map<string, number>()
   for (const v of valores) n.set(v, (n.get(v) ?? 0) + 1)
   return lista
     .map((o) => ({ id: o.id, etiqueta: o.etiqueta, n: n.get(o.id) ?? 0 }))
     .filter((c) => todas || c.n > 0)
-    .sort((a, b) => b.n - a.n)
+    // Con `todas` es una distribución (nunca → diario): se deja el orden de la escala.
+    .sort((a, b) => (todas ? 0 : b.n - a.n))
 }
 
 const notas = (filas: Fila[], k: keyof Respuesta): Nota[] =>

@@ -47,6 +47,10 @@ const C_AREA: Record<string, string> = {
 }
 const C_USO: Record<string, string> = { nunca: '#d8453a', probado: '#e8920c', semanal: '#46a85b', diario: '#1f8a8a' }
 
+// Las áreas con respuestas, en el orden sugerido de los talleres; las vacías, aparte.
+const porOrden = r.orden.map((o) => r.areas.find((a) => a.area === o.area)!)
+const conDatos = porOrden.filter((a) => a.n > 0)
+const sinDatos = porOrden.filter((a) => a.n === 0)
 const maxHoras = Math.max(1, ...r.orden.map((o) => o.horasTotal))
 const fmtH = (h: number) => (Number.isInteger(h) ? String(h) : h.toFixed(1).replace('.', ','))
 const pct = (n: number, de: number) => (de ? (n / de) * 100 : 0)
@@ -145,7 +149,7 @@ const barras = (cs: Conteo[], de: number, color: (c: Conteo) => string) =>
                 <span class="dx-n">{i + 1}</span>
                 <span class="dx-area">{o.etiqueta}{o.fija && <small>fijo</small>}</span>
                 <span class="embudo-barra"><i style={`width:${pct(o.horasTotal, maxHoras)}%`}></i></span>
-                <b>{o.n ? `${fmtH(o.horasTotal)} h` : 'Sin datos'}</b>
+                {o.n ? <b>{fmtH(o.horasTotal)} h</b> : <b class="is-vacio">Sin datos</b>}
               </li>
             ))}
           </ol>
@@ -182,13 +186,7 @@ const barras = (cs: Conteo[], de: number, color: (c: Conteo) => string) =>
       <!-- POR ÁREA -->
       <h3 class="dx-titulo">Por área</h3>
       <div class="dx-areas">
-        {r.areas.map((a) =>
-          a.n === 0 ? (
-            <section class="dash-card dx-area-card is-vacia" style={`--c:${C_AREA[a.area]}`}>
-              <h3><span class="dx-punto" aria-hidden="true"></span>{a.etiqueta}</h3>
-              <p class="muted">Sin respuestas todavía.</p>
-            </section>
-          ) : (
+        {conDatos.map((a) => (
             <section class="dash-card dx-area-card" style={`--c:${C_AREA[a.area]}`}>
               <div class="dx-area-head">
                 <h3><span class="dx-punto" aria-hidden="true"></span>{a.etiqueta}</h3>
@@ -233,9 +231,15 @@ const barras = (cs: Conteo[], de: number, color: (c: Conteo) => string) =>
                 )}
               </details>
             </section>
-          ),
-        )}
+        ))}
       </div>
+      {sinDatos.length > 0 && (
+        <div class="dx-vacias">
+          {sinDatos.map((a) => (
+            <span class="dx-vacia" style={`--c:${C_AREA[a.area]}`}><span class="dx-punto" aria-hidden="true"></span>{a.etiqueta}<small>sin respuestas todavía</small></span>
+          ))}
+        </div>
+      )}
 
       <!-- RESPUESTAS -->
       <h3 class="dx-titulo">Respuestas <span class="muted">{respuestas.length}</span></h3>
