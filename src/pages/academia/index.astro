@@ -1,0 +1,194 @@
+---
+// Academia de IA: la ruta de cada persona (capacitación general + taller de
+// su área), su avance, los sábados y el estado del certificado.
+// docs/plan-academia.md
+export const prerender = false
+import AcademiaLayout from '../../layouts/AcademiaLayout.astro'
+import { hoyEnBogota } from '../../lib/agente/diasHabiles'
+import { estadoParticipante, resolverAcceso, type EstadoParticipante } from '../../lib/academia/datos'
+import { AREAS_ACADEMIA, nombreModulo, rutaDe, textoHoras } from '../../lib/academia/reglas'
+import { colorDe, ESTADO_ENTREGA, fechaLarga, horaTexto, primerNombre } from '../../lib/academia/ui'
+
+const role = String(Astro.locals.role || '')
+const nombreSesion = String(Astro.locals.user || '')
+const hoy = hoyEnBogota()
+
+let acceso: Awaited<ReturnType<typeof resolverAcceso>> | null = null
+let est: EstadoParticipante | null = null
+let errorCarga = ''
+try {
+  acceso = await resolverAcceso(String(Astro.locals.username || ''), role, nombreSesion, Astro.url.searchParams.get('area'))
+  if (acceso.tipo !== 'sin_inscripcion') {
+    est = await estadoParticipante(acceso.cuenta, acceso.area, hoy, acceso.tipo === 'vista_previa')
+  }
+} catch (e: any) {
+  console.error('[academia] carga', e?.stack || e)
+  errorCarga = 'No se pudo cargar la academia. Intente de nuevo en un momento.'
+}
+
+const nombre = acceso?.tipo === 'sin_inscripcion' ? acceso.nombre : (acceso?.cuenta?.nombre ?? nombreSesion)
+const vistas = new Set(est?.vistas ?? [])
+const entregaDe = new Map((est?.entregas ?? []).map((e) => [e.leccion_id, e]))
+const ruta = est ? rutaDe(est.persona.area) : []
+const porModulo = ruta.map((m) => ({ id: m, nombre: nombreModulo(m), lecciones: (est?.lecciones ?? []).filter((l) => l.modulo === m) }))
+const siguiente = est?.lecciones.find((l) => !vistas.has(l.id)) ?? null
+const proximas = (est?.sesiones ?? []).filter((s) => s.fecha >= hoy)
+const pasadas = (est?.sesiones ?? []).filter((s) => s.fecha < hoy)
+const a = est?.avance
+const sufijoPrevia = est?.vistaPrevia ? `?area=${est.persona.area}` : ''
+const dos = (n: number) => String(n).padStart(2, '0')
+---
+
+<AcademiaLayout titulo="Academia de IA · Ekosolv" activo="inicio" nombre={nombre} rol={role}>
+  {errorCarga && <p class="ac-error">{errorCarga}</p>}
+
+  {acceso?.tipo === 'sin_inscripcion' && (
+    <section class="ac-vacio">
+      <p class="ac-kicker">Academia de IA</p>
+      <h1>Hola, {primerNombre(nombre)}. Su cuenta todavía no está inscrita.</h1>
+      <p>Cuando lo inscriban en su área, aquí verá sus lecciones, los sábados y su avance. Si cree que es un error, avísele a quien coordina la capacitación.</p>
+      <a class="ac-btn ac-btn-sec" href="/ia">Ver el programa de la capacitación</a>
+    </section>
+  )}
+
+  {est && a && (
+    <>
+      {est.vistaPrevia && (
+        <div class="ac-previa" role="note">
+          <p><b>Vista previa.</b> Así ve la academia una persona del área elegida. Incluye las lecciones sin publicar (marcadas como borrador) y no permite enviar nada.</p>
+          <div class="ac-chips">
+            {AREAS_ACADEMIA.map((x) => (
+              <a class={`ac-chip${x.id === est!.persona.area ? ' is-on' : ''}`} href={`/academia?area=${x.id}`}>{x.etiqueta}</a>
+            ))}
+          </div>
+        </div>
+      )}
+
+      <section class="ac-hero">
+        <div class="ac-hero-txt">
+          <p class="ac-kicker">Su ruta · General + {est.persona.areaNombre}</p>
+          <h1>Hola, <span>{primerNombre(est.persona.nombre)}</span></h1>
+          <p class="ac-lede">
+            {a.lecciones === 0
+              ? 'Las lecciones se publican antes de cada sábado. Vuelva pronto.'
+              : a.vistas === a.lecciones
+                ? 'Ya vio todas las lecciones publicadas. Revise sus entregas y los próximos sábados.'
+                : `Lleva ${a.vistas} de ${a.lecciones} lecciones. Siga a su ritmo: cada una toma entre 10 y 45 minutos.`}
+          </p>
+          {siguiente && (
+            <a class="ac-btn" href={`/academia/leccion/${siguiente.id}${sufijoPrevia}`}>
+              {a.vistas ? 'Seguir con' : 'Empezar con'}: {siguiente.titulo}
+            </a>
+          )}
+        </div>
+        <div class="ac-medidor" style={`--p:${a.porcentaje}`} aria-label={`Avance ${a.porcentaje}%`}>
+          <svg viewBox="0 0 120 120" aria-hidden="true">
+            <circle cx="60" cy="60" r="52" class="ac-medidor-fondo" />
+            <circle cx="60" cy="60" r="52" class="ac-medidor-barra" pathLength="100" />
+          </svg>
+          <div class="ac-medidor-txt"><b>{a.porcentaje}%</b><span>de la ruta</span></div>
+        </div>
+      </section>
+
+      <section class="ac-cifras" aria-label="Su avance">
+        <div class="ac-cifra"><span>Lecciones vistas</span><b>{a.vistas}<small>/{a.lecciones}</small></b></div>
+        <div class="ac-cifra"><span>Entregas aprobadas</span><b>{a.aprobadas}<small>/{a.ejercicios}</small></b>{a.devueltas > 0 && <em class="ajustar">{a.devueltas} por ajustar</em>}{a.porRevisar > 0 && <em>{a.porRevisar} en revisión</em>}</div>
+        <div class="ac-cifra"><span>Sábados asistidos</span><b>{a.asistidas}<small>/{a.sesiones}</small></b><em>{a.sesiones ? 'bloques de su ruta' : 'sin programar'}</em></div>
+        <div class="ac-cifra"><span>Horas de taller</span><b>{a.horas.toLocaleString('es-CO')}</b><em>asistidas</em></div>
+      </section>
+
+      <div class="ac-grid">
+        <section class="ac-modulos" aria-label="Lecciones">
+          {porModulo.map((m) => (
+            <article class="ac-modulo" style={`--c:${colorDe(m.id)}`}>
+              <header>
+                <span class="ac-punto" aria-hidden="true"></span>
+                <h2>{m.id === 'general' ? 'Capacitación general' : `Taller de ${m.nombre}`}</h2>
+                <span class="ac-cuenta-mod">{m.lecciones.filter((l) => vistas.has(l.id)).length}/{m.lecciones.length}</span>
+              </header>
+              {m.lecciones.length === 0 ? (
+                <p class="ac-nada">Las lecciones de este módulo se publican antes de su sábado.</p>
+              ) : (
+                <ol class="ac-lecciones">
+                  {m.lecciones.map((l, i) => {
+                    const e = entregaDe.get(l.id)
+                    const vista = vistas.has(l.id)
+                    return (
+                      <li>
+                        <a href={`/academia/leccion/${l.id}${sufijoPrevia}`} class={vista ? 'is-vista' : ''}>
+                          <span class="ac-num">{vista ? '✓' : dos(i + 1)}</span>
+                          <span class="ac-lec-txt">
+                            <b>{l.titulo}</b>
+                            <span class="ac-etiquetas">
+                              {l.minutos > 0 && <span>{l.minutos} min</span>}
+                              {l.practica_consigna && <span class="ia">Práctica con IA</span>}
+                              {l.ejercicio && <span class="ej">Entrega</span>}
+                              {!l.publicada && <span class="borrador">Borrador</span>}
+                            </span>
+                          </span>
+                          {e && <span class={`ac-estado ${ESTADO_ENTREGA[e.estado]?.clase ?? ''}`}>{ESTADO_ENTREGA[e.estado]?.texto ?? e.estado}</span>}
+                        </a>
+                      </li>
+                    )
+                  })}
+                </ol>
+              )}
+            </article>
+          ))}
+        </section>
+
+        <aside class="ac-lado">
+          <section class="ac-caja">
+            <h2>Sábados</h2>
+            {est.sesiones.length === 0 && <p class="ac-nada">Las fechas se confirman con el diagnóstico. Aquí aparecerán apenas estén.</p>}
+            {proximas.length > 0 && (
+              <ul class="ac-sesiones">
+                {proximas.map((s) => (
+                  <li>
+                    <span class="ac-fecha">{fechaLarga(s.fecha, hoy)}{s.hora && ` · ${horaTexto(s.hora)}`}</span>
+                    <b>{s.titulo}</b>
+                    <span class="ac-meta">{textoHoras(s.horas)}{s.lugar && ` · ${s.lugar}`}</span>
+                  </li>
+                ))}
+              </ul>
+            )}
+            {pasadas.length > 0 && (
+              <details class="ac-pasadas">
+                <summary>Bloques anteriores ({pasadas.length})</summary>
+                <ul class="ac-sesiones">
+                  {pasadas.map((s) => (
+                    <li class={s.asistio ? 'asistio' : 'falto'}>
+                      <span class="ac-fecha">{fechaLarga(s.fecha, hoy)}</span>
+                      <b>{s.titulo}</b>
+                      <span class="ac-meta">{s.asistio ? 'Asistió' : 'Sin asistencia registrada'} · {textoHoras(s.horas)}</span>
+                    </li>
+                  ))}
+                </ul>
+              </details>
+            )}
+          </section>
+
+          <section class={`ac-caja ac-cert${est.certificado ? ' is-listo' : ''}`}>
+            <h2>Certificado</h2>
+            {est.certificado ? (
+              <>
+                <p>Ya tiene su certificado: {textoHoras(est.certificado.horas)} de capacitación.</p>
+                <a class="ac-btn" href="/academia/certificado">Ver y descargar</a>
+              </>
+            ) : est.requisitos.elegible ? (
+              <>
+                <p>Cumplió todo lo necesario. Su certificado está listo.</p>
+                <a class="ac-btn" href={`/academia/certificado${sufijoPrevia}`}>Obtener certificado</a>
+              </>
+            ) : (
+              <>
+                <p>Se entrega al asistir a todos los bloques de su ruta y tener aprobadas sus entregas.</p>
+                <ul class="ac-faltan">{est.requisitos.faltan.map((f) => <li>{f}</li>)}</ul>
+              </>
+            )}
+          </section>
+        </aside>
+      </div>
+    </>
+  )}
+</AcademiaLayout>
