@@ -132,3 +132,51 @@ test('campos libres: se guardan y salen en el resumen del área y en el CSV', ()
   assert.deepEqual(ops.comentarios.map((c) => c.texto), ['Hago visitas de campo', 'Otras herramientas o documentos: SharePoint', 'Otra preocupación: Que se caiga internet'])
   assert.ok(aCSV([fila({ ...r, nombre: 'Libre' })]).includes('Hago visitas de campo'))
 })
+
+// ── Asistente con IA de la encuesta ──────────────────────────────────────
+
+import { CAMPOS_IA, campoIA, mensajeIA, MAX_VUELTAS, pulirSalida, validarEntradaIA } from './ia.ts'
+import { CAMPOS_CON_IA } from './preguntas.ts'
+
+test('ia: los campos del asistente y los que guarda la respuesta son los mismos', () => {
+  assert.deepEqual(Object.keys(CAMPOS_IA).sort(), CAMPOS_CON_IA.map((c) => c.id).sort())
+})
+
+test('ia: otra_<área> cuenta como tarea_otra y un campo cualquiera no pasa', () => {
+  assert.equal(campoIA('otra_logistica'), 'tarea_otra')
+  assert.equal(campoIA('deseo'), 'deseo')
+  assert.equal(campoIA('nombre'), null)
+  assert.equal(validarEntradaIA({ campo: 'nombre', borrador: 'hola mundo' }), null)
+  assert.equal(validarEntradaIA({ campo: 'deseo', borrador: 'ab' }), null)
+  assert.equal(validarEntradaIA({ campo: 'deseo', borrador: 'leer autos', extra: 1 }), null)
+})
+
+test('ia: quita aclaraciones vacías y tapa correos y celulares antes del modelo', () => {
+  const e = validarEntradaIA({
+    campo: 'tarea_principal',
+    borrador: 'Llamo al gestor al 300 123 4567 o le escribo a juan@gestor.co',
+    contexto: { area: 'Logística', tareas: ['Pedir certificados'] },
+    aclaraciones: [{ pregunta: '¿Cada cuánto?', respuesta: '' }, { pregunta: '¿Cuánto tarda?', respuesta: 'una hora' }],
+  })!
+  assert.equal(e.aclaraciones.length, 1)
+  const m = mensajeIA(e)
+  assert.doesNotMatch(m, /300 123 4567|juan@gestor/)
+  assert.match(m, /\[dato oculto\]/)
+  assert.match(m, /Área: Logística/)
+  assert.match(m, /una hora/)
+})
+
+test('ia: la salida sale sin rayas ni voseo, con máximo dos preguntas y ninguna en la última vuelta', () => {
+  const s = { propuesta: 'Reviso autos — cada semana', preguntas: ['¿Cuánto tardás?', 'b', 'c'], nota: 'Ordené su respuesta.' }
+  const r = pulirSalida(s, 1)
+  assert.doesNotMatch(r.propuesta, /[—–]/)
+  assert.equal(r.preguntas.length, 2)
+  assert.doesNotMatch(r.preguntas[0]!, /tardás/)
+  assert.deepEqual(pulirSalida(s, MAX_VUELTAS).preguntas, [])
+})
+
+test('validar: guarda solo los campos con IA que existen', () => {
+  const r = validarRespuesta({ ...base, ia_campos: 'deseo, tarea_principal, nombre' })
+  assert.deepEqual(r.ia_campos, ['deseo', 'tarea_principal'])
+  assert.deepEqual(validarRespuesta(base).ia_campos, [])
+})
