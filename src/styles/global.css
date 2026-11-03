@@ -360,12 +360,12 @@ h3 { font-size: 22px; }
 /* ===== Hero ===== */
 /*
   Primera pantalla (skill above-the-fold). Reglas que la sostienen:
-  - .hero-fold ocupa el alto visible bajo el nav (con tope) y lo reparte: la fila
-    de arriba se estira, las cifras quedan al pie, dentro del pliegue.
+  - El alto lo pone el contenido, no la ventana: estirar el hero a 100svh deja
+    huecos en pantallas altas. Las cifras van justo debajo, dentro del pliegue.
   - Las dos columnas se estiran a la misma altura: el botón de la izquierda
     (margin-top: auto) termina alineado con el pie del selector en todo ancho.
   - El titular se mide contra su columna (cqi), no contra la ventana, y corta
-    siempre en el mismo sitio (.br-ancho), así no pasa de 2 a 4 renglones.
+    siempre en el mismo sitio (.br-ancho): 3 renglones en todo escritorio.
 */
 .hero {
   padding-top: clamp(20px, 3vw, 40px);
@@ -382,7 +382,7 @@ h3 { font-size: 22px; }
 .hero-fold > .exige { grid-area: exige; }
 .hero-fold > .hero-stats { grid-area: stats; }
 .hero-main > .eyebrow { margin-bottom: clamp(18px, 2.4vw, 28px); }
-.hero-title { font-size: clamp(46px, 13.4cqi, 104px); }
+.hero-title { font-size: clamp(46px, 16.4cqi, 108px); }
 .br-ancho { display: none; }
 .hero-sub {
   margin-top: clamp(20px, 2.4vw, 30px);
@@ -425,11 +425,8 @@ h3 { font-size: 22px; }
 @media (min-width: 1080px) {
   .hero-fold {
     grid-template-columns: minmax(0, 1.08fr) minmax(0, 1fr);
-    grid-template-rows: 1fr auto;
     grid-template-areas: "main exige" "stats stats";
     column-gap: clamp(40px, 4vw, 72px); row-gap: clamp(24px, 3.2vh, 40px);
-    /* 72px del nav + el padding superior del hero. */
-    min-height: min(calc(100svh - 72px - clamp(20px, 3vw, 40px)), 920px);
   }
   .br-ancho { display: inline; }
   .hero-accion { margin-top: auto; padding-top: clamp(24px, 3vw, 36px); }
