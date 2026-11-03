@@ -19,6 +19,8 @@ interface Norma {
   /** Código canónico de normativas.json, si el visible está traducido. */
   ref?: string
   title: string
+  /** Título corto para la fila (el oficial va dentro de la ficha). Sin él, la fila usa `title`. */
+  corto?: string
   body: string
 }
 
@@ -48,9 +50,12 @@ const { normas, perfiles, href, inicial = 'importadora', textos } = Astro.props
 const lista = ordenar(normas.map((n) => ({ ...n, visible: n.code, code: n.ref ?? n.code })), inicial)
 const enlace = (p: Perfil) => `${href}?sector=${encodeURIComponent(perfiles[p].sector)}`
 const esBase = (code: string) => (BASE as readonly string[]).includes(code)
+// La lista reserva el alto del perfil con más normas: así el panel no cambia de
+// tamaño al pasar de un perfil a otro y el hero no salta.
+const maxFilas = Math.max(...PERFILES.map((p) => normasDe(p).length))
 ---
 
-<div class="exige" data-exige>
+<div class="exige" id="exige" data-exige style={`--ex-filas: ${maxFilas}`}>
   <div class="ex-head">
     <div class="ex-rotulo"><span class="ex-pulso" aria-hidden="true"></span>{textos.rotulo}</div>
     <div class="ex-aviso">{textos.aviso}</div>
@@ -79,14 +84,14 @@ const esBase = (code: string) => (BASE as readonly string[]).includes(code)
           <summary>
             <span class="ex-punto" aria-hidden="true"></span>
             <span class="ex-code">{n.visible}</span>
-            <span class="ex-titulo">{n.title}</span>
+            <span class="ex-titulo">{n.corto ?? n.title}</span>
             {esBase(n.code) && <span class="ex-todas">{textos.todas}</span>}
             <span class="sr-only ex-sr">{textos.aplica}</span>
             <svg class="ex-chev" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true">
               <path d="M6 9l6 6 6-6" />
             </svg>
           </summary>
-          <p>{n.body}</p>
+          <p>{n.corto && n.corto !== n.title && <strong>{n.title}. </strong>}{n.body}</p>
         </details>
       </li>
     ))}
