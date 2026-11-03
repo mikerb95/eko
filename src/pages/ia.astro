@@ -16,6 +16,8 @@ import type { TFStep, TFOption } from '../components/TypeformFlow.astro'
 import {
   AREAS,
   AREAS_PROPUESTAS,
+  CERTIFICADO_MIN,
+  CERTIFICADOS_MES,
   DOCUMENTO_REAL,
   DOCUMENTOS,
   HERRAMIENTAS,
@@ -123,6 +125,34 @@ const steps: TFStep[] = [
         options: PROPUESTAS_MES.map((h) => ({ value: h.id, label: h.etiqueta })),
       },
       { type: 'textarea', name: 'propuesta_demora', label: '¿Qué parte de la propuesta le toma más tiempo?', placeholder: 'Opcional' },
+    ],
+  },
+  {
+    title: 'Sobre los certificados',
+    subtitle: 'Los de recolección y los de disposición final que Ekosolv emite a sus clientes. Un cálculo aproximado basta.',
+    when: { field: 'area', equals: 'logistica' },
+    fields: [
+      {
+        type: 'choice',
+        name: 'certificados_mes',
+        label: '¿Cuántos certificados emite al mes, contando los dos tipos?',
+        required: true,
+        options: CERTIFICADOS_MES.map((h) => ({ value: h.id, label: h.etiqueta })),
+      },
+      {
+        type: 'choice',
+        name: 'certificado_min',
+        label: '¿Cuánto le toma cada uno, desde que tiene los datos o el certificado del gestor?',
+        required: true,
+        options: CERTIFICADO_MIN.map((h) => ({ value: h.id, label: h.etiqueta })),
+      },
+      {
+        type: 'choice',
+        name: 'seguimiento_gestores',
+        label: '¿Cuántas horas a la semana le dedica a pedir certificados y hacer seguimiento a los gestores?',
+        options: HORAS.map((h) => ({ value: h.id, label: h.etiqueta })),
+      },
+      { type: 'textarea', name: 'certificado_demora', label: '¿Qué parte le toma más tiempo?', placeholder: 'Opcional' },
     ],
   },
   {

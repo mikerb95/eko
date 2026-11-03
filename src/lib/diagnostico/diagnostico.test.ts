@@ -109,3 +109,18 @@ test('resumir: horas al mes en propuestas, volumen y horas por propuesta', () =>
   assert.equal(r.agente.deOperaciones, 2)
   assert.equal(r.agente.horasSemana, 7.5)
 })
+
+test('certificados: solo Logística, obligatorios para ella, y horas al mes', () => {
+  const base_log = { ...base, area: 'logistica', tareas_logistica: 'cert_disposicion' }
+  assert.throws(() => validarRespuesta(base_log), /certificados/)
+  const r = validarRespuesta({ ...base_log, certificados_mes: '31_60', certificado_min: '30_60', seguimiento_gestores: '2_5' })
+  assert.equal(r.certificado_min, '30_60')
+  const ops = validarRespuesta({ ...base, certificados_mes: '31_60', certificado_min: '30_60' })
+  assert.equal(ops.certificados_mes, '')
+  const res = resumir([fila({ ...r, nombre: 'Log' })])
+  // 45 certificados × 45 min = 33,75 h; 3,5 h/semana × 4,33
+  assert.equal(res.certificados.certificadosMes, 45)
+  assert.equal(res.certificados.horasMesEmision, 33.8)
+  assert.equal(res.certificados.minutosPorCertificado, 45)
+  assert.equal(res.certificados.horasMesSeguimiento, 15.2)
+})

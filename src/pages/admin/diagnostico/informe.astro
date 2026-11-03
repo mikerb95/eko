@@ -26,6 +26,8 @@ try {
 }
 const r = resumir(respuestas)
 const p = r.propuestas
+const cert = r.certificados
+const horasMesCert = Math.round((cert.horasMesEmision + cert.horasMesSeguimiento) * 10) / 10
 const horasMesRep = Math.round(r.horasTotal * SEMANAS_MES)
 
 // Mensualidad de la automatización por volumen, meses 1 a 18. Fuente: la
@@ -41,7 +43,7 @@ const EXCEDENTE = 25_000
 const fmt = (n: number) => n.toLocaleString('es-CO', { maximumFractionDigits: 1 })
 const hoy = new Date().toLocaleDateString('es-CO', { day: 'numeric', month: 'long', year: 'numeric', timeZone: 'America/Bogota' })
 const areasTexto = r.areas.filter((a) => a.n > 0).map((a) => a.etiqueta).join(', ')
-const datos = { horasMesProp: p.horasMes, horasMesRep, volumen: p.volumen, planes: PLANES, excedente: EXCEDENTE }
+const datos = { horasMesCert, horasMesProp: p.horasMes, horasMesRep, volumen: p.volumen, planes: PLANES, excedente: EXCEDENTE }
 ---
 
 <!doctype html>
@@ -159,7 +161,33 @@ const datos = { horasMesProp: p.horasMes, horasMesRep, volumen: p.volumen, plane
           </section>
 
           <section>
-            <h2><span>03</span> Tiempo en tareas repetitivas por área</h2>
+            <h2><span>03</span> Certificados de Logística</h2>
+            {cert.personas === 0 ? (
+              <p>Nadie de Logística ha respondido todavía.</p>
+            ) : (
+              <>
+                <p>
+                  Logística emite unos <b>{fmt(cert.certificadosMes)} certificados al mes</b> entre recolección y disposición final, y
+                  cada uno le toma cerca de <b>{fmt(cert.minutosPorCertificado)} minutos</b>: <b>{fmt(cert.horasMesEmision)} horas al mes</b>.
+                  {cert.horasMesSeguimiento > 0 && <> A eso se suman <b>{fmt(cert.horasMesSeguimiento)} horas al mes</b> pidiendo certificados a los gestores y haciéndoles seguimiento.</>}
+                </p>
+                {cert.demoras.length > 0 && (
+                  <>
+                    <h3>Lo que más demora, en palabras del equipo</h3>
+                    <ul class="citas">{cert.demoras.map((d) => <li>{d.texto}</li>)}</ul>
+                  </>
+                )}
+                <p class="nota">
+                  En total, <b>{fmt(horasMesCert)} horas al mes</b><span class="dinero" hidden>, que a costo de nómina valen <b data-v="valor-cert"></b></span>.
+                  La emisión de certificados no está en el alcance actual de la automatización: es candidata para una siguiente fase,
+                  y la capacitación de Logística ya ataca parte de ese tiempo.
+                </p>
+              </>
+            )}
+          </section>
+
+          <section>
+            <h2><span>04</span> Tiempo en tareas repetitivas por área</h2>
             <table>
               <thead><tr><th>Área</th><th class="n">Personas</th><th class="n">Horas por semana</th><th class="n">Horas al mes</th><th>Tarea más común</th></tr></thead>
               <tbody>
@@ -179,7 +207,7 @@ const datos = { horasMesProp: p.horasMes, horasMesRep, volumen: p.volumen, plane
           </section>
 
           <section class="plan" hidden>
-            <h2><span>04</span> Frente a la mensualidad</h2>
+            <h2><span>05</span> Frente a la mensualidad</h2>
             <p>
               Con {fmt(p.volumen)} propuestas al mes corresponde el plan de <b data-v="plan-nombre"></b>, con una mensualidad de
               <b data-v="plan-valor"></b>. Equivale a <b data-v="plan-horas"></b> del equipo al mes; la automatización le
@@ -228,6 +256,7 @@ const datos = { horasMesProp: p.horasMes, horasMesRep, volumen: p.volumen, plane
           poner('horas-rec', horas(rec))
           poner('costo', pesos(c))
           poner('valor-rec', pesos(rec * c))
+          poner('valor-cert', pesos(datos.horasMesCert * c))
           document.querySelectorAll('.dinero').forEach((el) => (el.hidden = !c))
           const p = planDe(datos.volumen)
           poner('plan-nombre', p.nombre)

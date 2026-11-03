@@ -10,6 +10,8 @@
  */
 import {
   AREAS,
+  CERTIFICADO_MIN,
+  CERTIFICADOS_MES,
   DOCUMENTO_REAL,
   DOCUMENTOS,
   HERRAMIENTAS,
@@ -97,6 +99,18 @@ export interface ResumenAgente {
   horasSemana: number
 }
 
+export interface ResumenCertificados {
+  /** Personas de Logística que dieron volumen y tiempo. */
+  personas: number
+  certificadosMes: number
+  minutosPorCertificado: number
+  /** Horas al mes emitiendo certificados. */
+  horasMesEmision: number
+  /** Horas al mes pidiendo certificados y haciendo seguimiento a gestores. */
+  horasMesSeguimiento: number
+  demoras: Nota[]
+}
+
 export interface Resumen {
   total: number
   areasConRespuesta: number
@@ -109,6 +123,7 @@ export interface Resumen {
   areas: ResumenArea[]
   propuestas: ResumenPropuestas
   agente: ResumenAgente
+  certificados: ResumenCertificados
   /** Áreas en el orden sugerido para los talleres. */
   orden: { area: AreaId; etiqueta: string; horasTotal: number; n: number; fija: boolean }[]
 }
@@ -136,6 +151,20 @@ function resumirPropuestas(filas: Fila[]): ResumenPropuestas {
     volumen,
     horasPorPropuesta: volumen ? redondear(horasMes / volumen) : 0,
     demoras: notas(participan, 'propuesta_demora'),
+  }
+}
+
+function resumirCertificados(filas: Fila[]): ResumenCertificados {
+  const log = filas.filter((f) => f.area === 'logistica' && f.certificados_mes && f.certificado_min)
+  const certificadosMes = log.reduce((s, f) => s + valorDe(CERTIFICADOS_MES, f.certificados_mes), 0)
+  const minutos = log.reduce((s, f) => s + valorDe(CERTIFICADOS_MES, f.certificados_mes) * valorDe(CERTIFICADO_MIN, f.certificado_min), 0)
+  return {
+    personas: log.length,
+    certificadosMes,
+    minutosPorCertificado: certificadosMes ? Math.round(minutos / certificadosMes) : 0,
+    horasMesEmision: redondear(minutos / 60),
+    horasMesSeguimiento: redondear(log.reduce((s, f) => s + horasDe(f.seguimiento_gestores), 0) * SEMANAS_MES),
+    demoras: notas(log, 'certificado_demora'),
   }
 }
 
@@ -245,6 +274,7 @@ export function resumir(todas: Fila[]): Resumen {
     ias: contar(filas.flatMap((f) => f.ias), IAS),
     propuestas: resumirPropuestas(filas),
     agente: resumirAgente(filas),
+    certificados: resumirCertificados(filas),
     areas,
     orden,
   }
@@ -265,6 +295,10 @@ export function aCSV(filas: Fila[]): string {
     ['Horas por propuesta', (f) => (f.propuesta_horas ? etiqueta(PROPUESTA_HORAS, f.propuesta_horas) : '')],
     ['Propuestas al mes', (f) => (f.propuestas_mes ? etiqueta(PROPUESTAS_MES, f.propuestas_mes) : '')],
     ['Lo que más demora de la propuesta', (f) => f.propuesta_demora],
+    ['Certificados al mes', (f) => (f.certificados_mes ? etiqueta(CERTIFICADOS_MES, f.certificados_mes) : '')],
+    ['Tiempo por certificado', (f) => (f.certificado_min ? etiqueta(CERTIFICADO_MIN, f.certificado_min) : '')],
+    ['Seguimiento a gestores por semana', (f) => (f.seguimiento_gestores ? etiqueta(HORAS, f.seguimiento_gestores) : '')],
+    ['Lo que más demora del certificado', (f) => f.certificado_demora],
     ['Documentos', (f) => f.documentos.map((d) => etiqueta(DOCUMENTOS, d)).join(' | ')],
     ['Herramientas', (f) => f.herramientas.map((h) => etiqueta(HERRAMIENTAS, h)).join(' | ')],
     ['Uso de IA', (f) => etiqueta(USO_IA, f.uso_ia)],

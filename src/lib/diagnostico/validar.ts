@@ -11,6 +11,8 @@
  */
 import {
   AREA_IDS,
+  CERTIFICADO_MIN,
+  CERTIFICADOS_MES,
   AREAS_PROPUESTAS,
   PROPUESTA_HORAS,
   PROPUESTA_ROL,
@@ -65,6 +67,10 @@ export function validarRespuesta(b: Record<string, unknown>): Respuesta {
     propuesta_horas: '',
     propuestas_mes: '',
     propuesta_demora: '',
+    certificados_mes: '',
+    certificado_min: '',
+    seguimiento_gestores: '',
+    certificado_demora: '',
     documentos: varias(b, 'documentos', DOCUMENTOS),
     herramientas: varias(b, 'herramientas', HERRAMIENTAS),
     uso_ia: una(b, 'uso_ia', USO_IA),
@@ -85,6 +91,17 @@ export function validarRespuesta(b: Record<string, unknown>): Respuesta {
       r.propuesta_horas = una(b, 'propuesta_horas', PROPUESTA_HORAS)
       r.propuestas_mes = una(b, 'propuestas_mes', PROPUESTAS_MES)
       r.propuesta_demora = texto(b, 'propuesta_demora', 800)
+    }
+  }
+
+  // Certificados: solo Logística.
+  if (area === 'logistica') {
+    r.certificados_mes = una(b, 'certificados_mes', CERTIFICADOS_MES)
+    r.certificado_min = una(b, 'certificado_min', CERTIFICADO_MIN)
+    r.seguimiento_gestores = una(b, 'seguimiento_gestores', HORAS)
+    r.certificado_demora = texto(b, 'certificado_demora', 800)
+    if (!r.certificados_mes || !r.certificado_min) {
+      throw new ErrorDiagnostico('Indique cuántos certificados emite al mes y cuánto le toma cada uno.')
     }
   }
 

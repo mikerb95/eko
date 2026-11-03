@@ -8,6 +8,8 @@ import { ico } from '../../lib/admin/iconos'
 import { leerEstado, listarRespuestas, type EstadoEncuesta } from '../../lib/diagnostico/datos'
 import { resumir, vigentes, type Conteo, type Fila, type Resumen } from '../../lib/diagnostico/resumen'
 import {
+  CERTIFICADO_MIN,
+  CERTIFICADOS_MES,
   DOCUMENTO_REAL,
   DOCUMENTOS,
   HERRAMIENTAS,
@@ -260,6 +262,8 @@ const barras = (cs: Conteo[], de: number, color: (c: Conteo) => string) =>
               <dt>Más tiempo le quita</dt><dd>{f.tarea_principal}</dd>
               {f.propuesta_rol && <><dt>Propuestas</dt><dd>{etiqueta(PROPUESTA_ROL, f.propuesta_rol)}{f.propuesta_horas ? ` · ${etiqueta(PROPUESTA_HORAS, f.propuesta_horas).toLowerCase()} cada una · ${etiqueta(PROPUESTAS_MES, f.propuestas_mes).toLowerCase()} al mes` : ''}</dd></>}
               {f.propuesta_demora && <><dt>Lo que más demora</dt><dd>{f.propuesta_demora}</dd></>}
+              {f.certificados_mes && <><dt>Certificados</dt><dd>{etiqueta(CERTIFICADOS_MES, f.certificados_mes).toLowerCase()} al mes · {etiqueta(CERTIFICADO_MIN, f.certificado_min).toLowerCase()} cada uno{f.seguimiento_gestores ? ` · seguimiento a gestores: ${etiqueta(HORAS, f.seguimiento_gestores).toLowerCase()} por semana` : ''}</dd></>}
+              {f.certificado_demora && <><dt>Lo que más demora</dt><dd>{f.certificado_demora}</dd></>}
               <dt>Documentos</dt><dd>{lista(f.documentos, DOCUMENTOS)}</dd>
               <dt>Herramientas</dt><dd>{lista(f.herramientas, HERRAMIENTAS)}</dd>
               <dt>Uso de IA</dt><dd>{etiqueta(USO_IA, f.uso_ia)}{f.ias.length ? ` (${lista(f.ias, IAS)})` : ''}</dd>

@@ -145,6 +145,28 @@ export const PROPUESTAS_MES = [
   { id: 'mas_40', etiqueta: 'Más de 40', valor: 45 },
 ] as const
 
+/**
+ * Certificados de Logística: cuántos emite Ekosolv al mes (recolección y
+ * disposición final) y cuánto tarda cada uno, más el tiempo de perseguir a los
+ * gestores. Con esto el informe calcula las horas que se van en certificados.
+ * `valor`: certificados al mes (punto medio) o minutos por certificado.
+ */
+export const CERTIFICADOS_MES = [
+  { id: '1_10', etiqueta: 'Entre 1 y 10', valor: 5 },
+  { id: '11_30', etiqueta: 'Entre 11 y 30', valor: 20 },
+  { id: '31_60', etiqueta: 'Entre 31 y 60', valor: 45 },
+  { id: '61_100', etiqueta: 'Entre 61 y 100', valor: 80 },
+  { id: 'mas_100', etiqueta: 'Más de 100', valor: 120 },
+] as const
+
+export const CERTIFICADO_MIN = [
+  { id: 'menos_15', etiqueta: 'Menos de 15 minutos', valor: 10 },
+  { id: '15_30', etiqueta: 'Entre 15 y 30 minutos', valor: 22.5 },
+  { id: '30_60', etiqueta: 'Entre 30 minutos y 1 hora', valor: 45 },
+  { id: '1_2h', etiqueta: 'Entre 1 y 2 horas', valor: 90 },
+  { id: 'mas_2h', etiqueta: 'Más de 2 horas', valor: 150 },
+] as const
+
 export const DOCUMENTOS: Opcion[] = [
   { id: 'pdf_escaneado', etiqueta: 'PDF escaneados (autos, resoluciones, certificados)' },
   { id: 'pdf_digital', etiqueta: 'PDF digitales' },
@@ -217,6 +239,10 @@ export interface Respuesta {
   propuesta_horas: string
   propuestas_mes: string
   propuesta_demora: string
+  certificados_mes: string
+  certificado_min: string
+  seguimiento_gestores: string
+  certificado_demora: string
   documentos: string[]
   herramientas: string[]
   uso_ia: string
