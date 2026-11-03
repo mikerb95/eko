@@ -1,0 +1,266 @@
+---
+// Una lección de la academia: contenido, instrucciones para copiar, recursos,
+// práctica con el revisor de IA y la entrega del ejercicio.
+export const prerender = false
+import AcademiaLayout from '../../../layouts/AcademiaLayout.astro'
+import { hoyEnBogota } from '../../../lib/agente/diasHabiles'
+import { estadoParticipante, practicasRecientes, resolverAcceso, type EstadoParticipante, type Practica } from '../../../lib/academia/datos'
+import { nombreModulo, renderContenido } from '../../../lib/academia/reglas'
+import { MAX_INSTRUCCION, PRACTICAS_DIA } from '../../../lib/academia/practica'
+import { colorDe, ESTADO_ENTREGA } from '../../../lib/academia/ui'
+
+const role = String(Astro.locals.role || '')
+const id = Number(Astro.params.id)
+const hoy = hoyEnBogota()
+
+let est: EstadoParticipante | null = null
+let historial: Practica[] = []
+try {
+  const acceso = await resolverAcceso(String(Astro.locals.username || ''), role, String(Astro.locals.user || ''), Astro.url.searchParams.get('area'))
+  if (acceso.tipo === 'sin_inscripcion') return Astro.redirect('/academia')
+  est = await estadoParticipante(acceso.cuenta, acceso.area, hoy, acceso.tipo === 'vista_previa')
+} catch (e: any) {
+  console.error('[academia/leccion] carga', e?.stack || e)
+  return new Response('No se pudo cargar la lección.', { status: 500 })
+}
+
+const i = est.lecciones.findIndex((l) => l.id === id)
+if (i < 0) return Astro.redirect(est.vistaPrevia ? `/academia?area=${est.persona.area}` : '/academia')
+const l = est.lecciones[i]!
+const anterior = est.lecciones[i - 1] ?? null
+const siguiente = est.lecciones[i + 1] ?? null
+const vista = est.vistas.includes(l.id)
+const entrega = est.entregas.find((e) => e.leccion_id === l.id) ?? null
+const soloVer = est.vistaPrevia
+if (!soloVer && l.practica_consigna) historial = await practicasRecientes(est.persona.usuario_id, l.id).catch(() => [])
+const sufijo = soloVer ? `?area=${est.persona.area}` : ''
+const html = renderContenido(l.contenido)
+const modulo = l.modulo === 'general' ? 'Capacitación general' : `Taller de ${nombreModulo(l.modulo)}`
+const delModulo = est.lecciones.filter((x) => x.modulo === l.modulo)
+const posicion = delModulo.findIndex((x) => x.id === l.id) + 1
+const nombre = est.persona.nombre
+---
+
+<AcademiaLayout titulo={`${l.titulo} · Academia de IA`} nombre={nombre} rol={role}>
+  <article class="ac-leccion" style={`--c:${colorDe(l.modulo)}`} data-leccion={l.id} data-solo-ver={soloVer ? '1' : ''}>
+    <nav class="ac-miga" aria-label="Ubicación">
+      <a href={`/academia${sufijo}`}>Mi ruta</a><span>/</span><span class="ac-miga-mod"><i class="ac-punto" aria-hidden="true"></i>{modulo}</span><span>/</span><span>Lección {posicion} de {delModulo.length}</span>
+    </nav>
+
+    {soloVer && <p class="ac-previa ac-previa-corta"><b>Vista previa{!l.publicada && ' de un borrador'}.</b> Los botones de enviar están desactivados.</p>}
+
+    <header class="ac-lec-head">
+      <h1>{l.titulo}</h1>
+      {l.resumen && <p class="ac-lede">{l.resumen}</p>}
+      <p class="ac-etiquetas">
+        {l.minutos > 0 && <span>{l.minutos} min</span>}
+        {l.practica_consigna && <span class="ia">Práctica con IA</span>}
+        {l.ejercicio && <span class="ej">Entrega</span>}
+        {vista && <span class="ok">Vista</span>}
+      </p>
+    </header>
+
+    {html && <div class="ac-texto" set:html={html} />}
+
+    {l.prompts.length > 0 && (
+      <section class="ac-bloque">
+        <h2>Instrucciones listas para usar</h2>
+        <p class="ac-nota">Cópielas, cambie lo que está entre corchetes y péguelas en Claude.</p>
+        <div class="ac-prompts">
+          {l.prompts.map((p) => (
+            <figure class="ac-prompt">
+              <figcaption>
+                <b>{p.titulo || 'Instrucción'}</b>
+                <button type="button" class="ac-copiar" data-copiar>Copiar</button>
+              </figcaption>
+              <pre>{p.texto}</pre>
+            </figure>
+          ))}
+        </div>
+      </section>
+    )}
+
+    {l.recursos.length > 0 && (
+      <section class="ac-bloque">
+        <h2>Material de apoyo</h2>
+        <ul class="ac-recursos">
+          {l.recursos.map((r) => (
+            <li>
+              {r.href ? (
+                <a href={r.href} target="_blank" rel="noopener noreferrer">{r.titulo}<span aria-hidden="true">↗</span></a>
+              ) : (
+                <span class="pendiente">{r.titulo}<em>Después del taller</em></span>
+              )}
+            </li>
+          ))}
+        </ul>
+      </section>
+    )}
+
+    {l.practica_consigna && (
+      <section class="ac-bloque ac-practica" id="practica">
+        <div class="ac-bloque-head">
+          <span class="ac-sello ia">Práctica con IA</span>
+          <h2>Revise su instrucción antes de usarla</h2>
+        </div>
+        <p class="ac-consigna">{l.practica_consigna}</p>
+        <p class="ac-nota">La IA le dice qué tiene y qué le falta según el método: contexto, tarea, formato y ejemplos. También ve qué respondería con su instrucción tal como está. No escriba datos personales: los correos y números de documento o teléfono se ocultan antes de enviarla.</p>
+        <form class="ac-form" id="practica-form">
+          <label class="ac-oculto" for="practica-txt">Su instrucción</label>
+          <textarea id="practica-txt" name="instruccion" rows="6" maxlength={MAX_INSTRUCCION} placeholder="Contexto: soy… Tarea: … Formato: …" disabled={soloVer}></textarea>
+          <div class="ac-form-pie">
+            <p class="ac-err" id="practica-err" role="alert"></p>
+            <span class="ac-limite">Hasta {PRACTICAS_DIA} prácticas al día</span>
+            <button type="submit" class="ac-btn" disabled={soloVer}><span class="t">Revisar mi instrucción</span></button>
+          </div>
+        </form>
+        <div id="practica-res" class="ac-revision" hidden></div>
+        {historial.length > 0 && (
+          <details class="ac-historial">
+            <summary>Sus prácticas anteriores en esta lección ({historial.length})</summary>
+            <ol>
+              {historial.map((p) => (
+                <li><pre>{p.instruccion}</pre><button type="button" class="ac-link" data-reusar>Usar de nuevo</button></li>
+              ))}
+            </ol>
+          </details>
+        )}
+      </section>
+    )}
+
+    {l.ejercicio && (
+      <section class="ac-bloque ac-ejercicio" id="entrega">
+        <div class="ac-bloque-head">
+          <span class="ac-sello ej">Entrega</span>
+          <h2>{l.ejercicio}</h2>
+        </div>
+        {l.entregable && <p class="ac-consigna">{l.entregable}</p>}
+        {entrega && (
+          <div class={`ac-entrega-estado ${ESTADO_ENTREGA[entrega.estado]?.clase ?? ''}`}>
+            <b>{ESTADO_ENTREGA[entrega.estado]?.texto ?? entrega.estado}</b>
+            {entrega.comentario && <p><span>Comentario de {entrega.revisado_por || 'el capacitador'}:</span> {entrega.comentario}</p>}
+            {entrega.estado === 'enviada' && <p>Ya llegó. Puede corregirla mientras no esté revisada.</p>}
+          </div>
+        )}
+        {entrega?.estado !== 'aprobada' && (
+          <form class="ac-form" id="entrega-form">
+            <label>Qué hizo y qué verificó
+              <textarea name="texto" rows="7" maxlength="6000" placeholder="La instrucción que usó, un resumen del resultado y qué tuvo que corregir." disabled={soloVer}>{entrega?.texto ?? ''}</textarea>
+            </label>
+            <label>Enlace al resultado (opcional)
+              <input name="enlace" type="url" placeholder="https://drive.google.com/…" value={entrega?.enlace ?? ''} disabled={soloVer} />
+              <small>Compártalo con permiso de lectura. Revise que no traiga datos personales de clientes.</small>
+            </label>
+            <div class="ac-form-pie">
+              <p class="ac-err" id="entrega-err" role="alert"></p>
+              <button type="submit" class="ac-btn" disabled={soloVer}><span class="t">{entrega ? 'Enviar de nuevo' : 'Enviar entrega'}</span></button>
+            </div>
+          </form>
+        )}
+        {entrega?.estado === 'aprobada' && entrega.texto && <details class="ac-historial"><summary>Ver lo que entregó</summary><pre>{entrega.texto}</pre>{entrega.enlace && <a href={entrega.enlace} target="_blank" rel="noopener noreferrer">{entrega.enlace}</a>}</details>}
+      </section>
+    )}
+
+    <footer class="ac-lec-pie">
+      {anterior ? <a class="ac-btn ac-btn-sec" href={`/academia/leccion/${anterior.id}${sufijo}`}>← Anterior</a> : <span></span>}
+      <button type="button" class="ac-btn" id="marcar" data-siguiente={siguiente ? `/academia/leccion/${siguiente.id}${sufijo}` : `/academia${sufijo}`} disabled={soloVer}>
+        {vista ? (siguiente ? 'Siguiente lección →' : 'Volver a mi ruta') : siguiente ? 'Marcar como vista y seguir →' : 'Marcar como vista'}
+      </button>
+    </footer>
+  </article>
+
+  <script>
+    import { pintarRevision } from '../../../scripts/academia/revision'
+
+    const art = document.querySelector<HTMLElement>('.ac-leccion')!
+    const leccion_id = Number(art.dataset.leccion)
+    const soloVer = !!art.dataset.soloVer
+
+    async function enviar(accion: string, datos: Record<string, unknown>) {
+      const r = await fetch('/api/academia', { method: 'POST', headers: { 'content-type': 'application/json' }, body: JSON.stringify({ accion, leccion_id, ...datos }) })
+      const j = await r.json().catch(() => ({}))
+      if (!r.ok) throw new Error(j.error || 'Ocurrió un error')
+      return j
+    }
+
+    async function ocupado(btn: HTMLButtonElement | null, err: HTMLElement | null, fn: () => Promise<void>) {
+      if (err) err.textContent = ''
+      if (btn) btn.disabled = true
+      try {
+        await fn()
+      } catch (e: any) {
+        if (err) err.textContent = e.message
+      } finally {
+        if (btn) btn.disabled = false
+      }
+    }
+
+    // Copiar instrucciones
+    document.addEventListener('click', async (e) => {
+      const b = (e.target as HTMLElement).closest<HTMLButtonElement>('[data-copiar]')
+      if (!b) return
+      const texto = b.closest('figure')?.querySelector('pre')?.textContent ?? ''
+      try {
+        await navigator.clipboard.writeText(texto)
+        b.textContent = 'Copiada'
+      } catch {
+        b.textContent = 'Selecciónela y copie'
+      }
+      setTimeout(() => (b.textContent = 'Copiar'), 1800)
+    })
+
+    // Marcar como vista y seguir
+    const marcar = document.querySelector<HTMLButtonElement>('#marcar')
+    marcar?.addEventListener('click', () =>
+      ocupado(marcar, null, async () => {
+        if (!soloVer) await enviar('marcar_vista', {})
+        location.href = marcar.dataset.siguiente || '/academia'
+      }),
+    )
+
+    // Práctica con IA
+    const pf = document.querySelector<HTMLFormElement>('#practica-form')
+    const txt = document.querySelector<HTMLTextAreaElement>('#practica-txt')
+    const res = document.querySelector<HTMLElement>('#practica-res')
+    pf?.addEventListener('submit', (e) => {
+      e.preventDefault()
+      const btn = pf.querySelector<HTMLButtonElement>('button[type=submit]')
+      const t = btn?.querySelector('.t')
+      ocupado(btn, document.querySelector('#practica-err'), async () => {
+        if (t) t.textContent = 'Revisando…'
+        try {
+          const r = await enviar('practicar', { instruccion: txt?.value ?? '' })
+          if (res) {
+            res.hidden = false
+            res.innerHTML = pintarRevision(r)
+            res.scrollIntoView({ behavior: 'smooth', block: 'start' })
+          }
+        } finally {
+          if (t) t.textContent = 'Revisar mi instrucción'
+        }
+      })
+    })
+    document.addEventListener('click', (e) => {
+      const el = e.target as HTMLElement
+      const usar = el.closest('[data-usar-mejorada]')
+      const reusar = el.closest('[data-reusar]')
+      if (!usar && !reusar || !txt) return
+      txt.value = (usar ? res?.querySelector('.ac-mejorada pre') : reusar?.parentElement?.querySelector('pre'))?.textContent ?? ''
+      txt.focus()
+      txt.scrollIntoView({ behavior: 'smooth', block: 'center' })
+    })
+
+    // Entrega
+    const ef = document.querySelector<HTMLFormElement>('#entrega-form')
+    ef?.addEventListener('submit', (e) => {
+      e.preventDefault()
+      const f = new FormData(ef)
+      ocupado(ef.querySelector('button[type=submit]'), document.querySelector('#entrega-err'), async () => {
+        await enviar('entregar', { texto: f.get('texto'), enlace: f.get('enlace') })
+        location.hash = 'entrega'
+        location.reload()
+      })
+    })
+
+  </script>
+</AcademiaLayout>

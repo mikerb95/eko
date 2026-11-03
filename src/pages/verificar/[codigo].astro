@@ -1,0 +1,64 @@
+---
+// Verificación pública de un certificado de la academia de IA. El código va
+// impreso en el certificado; quien lo reciba (por ejemplo, un cliente o una
+// auditoría) puede confirmar aquí que es auténtico. No muestra nada más que lo
+// que ya dice el certificado.
+export const prerender = false
+import '../../styles/global.css'
+import '../../styles/academia.css'
+import { certificadoPorCodigo, type Certificado } from '../../lib/academia/datos'
+import { esCodigo, nombreModulo, textoHoras } from '../../lib/academia/reglas'
+import { fechaLarga } from '../../lib/academia/ui'
+
+const codigo = String(Astro.params.codigo || '').toUpperCase()
+let cert: Certificado | null = null
+let falla = false
+try {
+  cert = esCodigo(codigo) ? await certificadoPorCodigo(codigo) : null
+} catch (e: any) {
+  console.error('[verificar]', e?.message || e)
+  falla = true
+}
+if (!cert && !falla) Astro.response.status = 404
+const vigente = cert && !cert.revocado_at
+---
+
+<!DOCTYPE html>
+<html lang="es">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="robots" content="noindex, nofollow, noarchive" />
+    <link rel="icon" href="/favicon.ico" sizes="any" />
+    <title>Verificar certificado · Ekosolv</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,400..700&family=Geist:wght@300..700&family=Geist+Mono:wght@300..500&display=swap" rel="stylesheet" />
+  </head>
+  <body class="ac">
+    <main class="ac-verificar">
+      <img src="/brand/ekosolv-horizontal.png" alt="EKOSOLV" width="200" height="58" />
+      <section class={`ac-ver-caja ${vigente ? 'ok' : 'mal'}`}>
+        <p class="ac-kicker">Verificación de certificado</p>
+        {falla && <h1>No se pudo verificar ahora</h1>}
+        {falla && <p>Intente de nuevo en unos minutos.</p>}
+        {!falla && !cert && <h1>No encontramos ese certificado</h1>}
+        {!falla && !cert && <p>Revise que el código esté escrito tal como aparece en el certificado, por ejemplo EKO-IA-ABCD-2345.</p>}
+        {cert && (
+          <>
+            <h1>{vigente ? 'Certificado válido' : 'Certificado revocado'}</h1>
+            <dl>
+              <div><dt>Nombre</dt><dd>{cert.nombre}</dd></div>
+              <div><dt>Capacitación</dt><dd>Inteligencia artificial aplicada al trabajo · Taller de {nombreModulo(cert.area)}</dd></div>
+              <div><dt>Intensidad</dt><dd>{textoHoras(cert.horas)} de taller presencial</dd></div>
+              <div><dt>Emitido</dt><dd>{fechaLarga(cert.emitido_at.slice(0, 10))}</dd></div>
+              <div><dt>Código</dt><dd class="mono">{cert.codigo}</dd></div>
+            </dl>
+            {!vigente && <p>Este certificado fue revocado el {fechaLarga(cert.revocado_at.slice(0, 10))} y ya no es válido.</p>}
+          </>
+        )}
+      </section>
+      <p class="ac-ver-pie">Emitido por Ekosolv S.A.S. y Code by Mike</p>
+    </main>
+  </body>
+</html>

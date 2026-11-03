@@ -1,0 +1,91 @@
+---
+// Certificado de la academia. Se emite solo al abrir esta página cuando la
+// persona cumple los requisitos (asistencia a todos los bloques de su ruta y
+// entregas aprobadas) y queda guardado con su código. Se descarga en PDF con
+// la impresión del navegador (hoja A4 horizontal).
+export const prerender = false
+import AcademiaLayout from '../../layouts/AcademiaLayout.astro'
+import { hoyEnBogota } from '../../lib/agente/diasHabiles'
+import { emitirCertificado, estadoParticipante, resolverAcceso, type Certificado, type EstadoParticipante } from '../../lib/academia/datos'
+import { nombreModulo, textoHoras } from '../../lib/academia/reglas'
+import { fechaLarga } from '../../lib/academia/ui'
+import { SITE_URL } from '../../lib/site'
+
+const role = String(Astro.locals.role || '')
+const hoy = hoyEnBogota()
+let est: EstadoParticipante | null = null
+let cert: Certificado | null = null
+let muestra = false
+let errorCarga = ''
+try {
+  const acceso = await resolverAcceso(String(Astro.locals.username || ''), role, String(Astro.locals.user || ''), Astro.url.searchParams.get('area'))
+  if (acceso.tipo === 'sin_inscripcion') return Astro.redirect('/academia')
+  est = await estadoParticipante(acceso.cuenta, acceso.area, hoy, acceso.tipo === 'vista_previa')
+  cert = est.certificado
+  if (!cert && acceso.tipo === 'inscrito' && est.requisitos.elegible) {
+    cert = await emitirCertificado(acceso.cuenta.id, 'Academia (al cumplir los requisitos)', hoy)
+  }
+  if (!cert && est.vistaPrevia) {
+    // El admin ve cómo luce, con datos de ejemplo y la marca de muestra.
+    muestra = true
+    cert = { codigo: 'EKO-IA-XXXX-XXXX', usuario_id: 0, nombre: 'Nombre de la persona', area: est.persona.area, horas: 0, emitido_at: new Date().toISOString(), emitido_por: '', revocado_at: '' }
+  }
+} catch (e: any) {
+  console.error('[academia/certificado]', e?.stack || e)
+  errorCarga = 'No se pudo cargar el certificado. Intente de nuevo en un momento.'
+}
+
+const fecha = cert ? fechaLarga(cert.emitido_at.slice(0, 10)) : ''
+const verificar = cert ? `${SITE_URL}/verificar/${cert.codigo}` : ''
+const area = cert ? nombreModulo(cert.area) : ''
+---
+
+<AcademiaLayout titulo="Certificado · Academia de IA" activo="certificado" nombre={est?.persona.nombre ?? ''} rol={role} ancho>
+  {errorCarga && <p class="ac-error">{errorCarga}</p>}
+
+  {est && !cert && (
+    <section class="ac-vacio">
+      <p class="ac-kicker">Certificado</p>
+      <h1>Su certificado aún no está listo</h1>
+      <p>Se entrega al asistir a todos los bloques de los sábados de su ruta y tener aprobadas sus entregas. Le falta:</p>
+      <ul class="ac-faltan ac-faltan-grande">{est.requisitos.faltan.map((f) => <li>{f}</li>)}</ul>
+      <a class="ac-btn ac-btn-sec" href="/academia">Volver a mi ruta</a>
+    </section>
+  )}
+
+  {cert && (
+    <>
+      <div class="ac-cert-acciones">
+        <p>{muestra ? 'Vista previa con datos de ejemplo.' : 'Para guardarlo en PDF, use Imprimir y elija "Guardar como PDF", hoja horizontal.'}</p>
+        <button type="button" class="ac-btn" id="imprimir">Descargar en PDF</button>
+      </div>
+
+      <section class={`ac-diploma${muestra ? ' is-muestra' : ''}`} aria-label="Certificado">
+        <div class="ac-dip-marco">
+          <header class="ac-dip-logos">
+            <img src="/brand/ekosolv-horizontal.png" alt="EKOSOLV" />
+            <img src="/brand/codebymike-logo-light.svg" alt="Code by Mike" class="cbm" />
+          </header>
+          <p class="ac-dip-kicker">Certificado de participación</p>
+          <p class="ac-dip-otorga">Ekosolv S.A.S. y Code by Mike certifican que</p>
+          <h1 class="ac-dip-nombre">{cert.nombre}</h1>
+          <p class="ac-dip-texto">
+            completó la <b>Capacitación en inteligencia artificial aplicada al trabajo</b>, con la ruta de capacitación
+            general y el taller de <b>{area}</b>, con <b>{cert.horas > 0 ? textoHoras(cert.horas) : 'N horas'}</b> de taller presencial y
+            sus ejercicios prácticos aprobados.
+          </p>
+          <footer class="ac-dip-pie">
+            <div><span>Fecha</span><b>{fecha}</b></div>
+            <div class="ac-dip-firma"><span class="linea"></span><b>Ekosolv S.A.S.</b></div>
+            <div class="ac-dip-firma"><span class="linea"></span><b>Code by Mike</b><span>Capacitador</span></div>
+            <div><span>Código</span><b class="mono">{cert.codigo}</b><small>{verificar.replace(/^https?:\/\//, '')}</small></div>
+          </footer>
+        </div>
+      </section>
+    </>
+  )}
+
+  <script is:inline>
+    document.getElementById('imprimir')?.addEventListener('click', () => window.print())
+  </script>
+</AcademiaLayout>
