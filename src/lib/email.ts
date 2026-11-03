@@ -248,3 +248,46 @@ export async function notifyResumenTalento(r: Resumen): Promise<SendResult> {
   }\n\nAbrir en el panel: ${cta}\n`
   return send({ subject: `[Ekosolv] ${r.asunto}`, html, text, to: talentoRecipients() })
 }
+
+// ---------------------------------------------------------- propuesta en línea
+
+/**
+ * Los avisos de /propuesta van solo a PROPUESTA_EMAIL (Mike), nunca a
+ * NOTIFY_EMAIL: la propuesta es de codebymike.net a Ekosolv y lo que pregunta
+ * o elige el gerente no es para la bandeja del equipo. Sin la variable, el
+ * aviso no sale y todo queda en /admin/propuesta.
+ */
+export async function notifyPropuestaPregunta(p: { pregunta: string; respuesta: string; motivo: string }): Promise<SendResult> {
+  const rows: Row[] = [
+    ['Pregunta', p.pregunta],
+    ['Qué pide', p.motivo],
+    ['Lo que respondió la IA', p.respuesta],
+  ]
+  const title = 'El gerente tiene una pregunta para usted'
+  const cta = `${SITE_URL}/admin/propuesta`
+  return send({
+    subject: '[Propuesta Ekosolv] Pregunta para Mike',
+    html: layout(title, rows, 'Ver en el panel', cta, 'La IA no la respondió porque no está en la propuesta o es una negociación. Respóndale directamente.'),
+    text: plain(title, rows, cta),
+    to: recipients('PROPUESTA_EMAIL'),
+  })
+}
+
+export async function notifyPropuestaEleccion(e: { resumen: string; nombre: string; cargo: string; comentario: string; mensual: string; alFirmar: string }): Promise<SendResult> {
+  const rows: Row[] = [
+    ['Elección', e.resumen],
+    ['Mensualidad', e.mensual],
+    ['Al empezar', e.alFirmar],
+    ['Nombre', e.nombre],
+    ['Cargo', e.cargo],
+    ['Comentario', e.comentario],
+  ]
+  const title = 'Ekosolv eligió un plan en la propuesta'
+  const cta = `${SITE_URL}/admin/propuesta`
+  return send({
+    subject: `[Propuesta Ekosolv] Plan elegido: ${e.resumen}`,
+    html: layout(title, rows, 'Ver en el panel', cta, 'No es un contrato firmado: es el aviso para formalizar.'),
+    text: plain(title, rows, cta),
+    to: recipients('PROPUESTA_EMAIL'),
+  })
+}

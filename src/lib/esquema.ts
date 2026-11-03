@@ -270,6 +270,35 @@ export const TABLAS: readonly string[] = [
     creado TEXT NOT NULL
   )`,
 
+  // ── Propuesta comercial en línea (/propuesta) ───────────────────────────
+  // Una fila por pregunta del gerente al chat de la propuesta, con la
+  // respuesta de la IA. `a_mike` = 1 cuando la IA no la pudo responder o era
+  // negociación (llega también por correo). Si la página está publicada vive
+  // en `ajustes` (clave 'propuesta').
+  `CREATE TABLE IF NOT EXISTS propuesta_preguntas (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    sesion TEXT NOT NULL,
+    pregunta TEXT NOT NULL,
+    respuesta TEXT NOT NULL DEFAULT '',
+    a_mike INTEGER NOT NULL DEFAULT 0,
+    motivo TEXT NOT NULL DEFAULT '',
+    costo_usd REAL NOT NULL DEFAULT 0,
+    creado TEXT NOT NULL
+  )`,
+
+  // El plan que el gerente marca como elegido al final de la página. No es
+  // un contrato: es el aviso para que Mike formalice.
+  `CREATE TABLE IF NOT EXISTS propuesta_elecciones (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    plan TEXT NOT NULL DEFAULT '',
+    capacitacion TEXT NOT NULL DEFAULT '',
+    nombre TEXT NOT NULL DEFAULT '',
+    cargo TEXT NOT NULL DEFAULT '',
+    comentario TEXT NOT NULL DEFAULT '',
+    calculo TEXT NOT NULL DEFAULT '{}',
+    creado TEXT NOT NULL
+  )`,
+
   // ── Asistente con IA del panel (docs/plan-asistente.md) ─────────────────
   // Una fila por conversación: es el estado del bucle (src/lib/asistente/
   // bucle.ts). `mensajes` es el historial de la API, solo por anexión.
@@ -616,6 +645,8 @@ export const TABLAS_ESPERADAS: readonly string[] = [
   'order_events',
   'orders',
   'posts',
+  'propuesta_elecciones',
+  'propuesta_preguntas',
   'reglas_agente',
   'taller_casos',
   'th_cargos',
