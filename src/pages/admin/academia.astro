@@ -1,0 +1,264 @@
+---
+// Academia de IA desde el panel: participantes, entregas por revisar,
+// lecciones, sábados (con asistencia) y certificados. Solo admin.
+// docs/plan-academia.md. Todo se carga en el servidor; academia.js pinta y
+// envía los cambios a /api/admin/academia, que devuelve el estado completo.
+export const prerender = false
+import AdminLayout from '../../layouts/AdminLayout.astro'
+import { ico } from '../../lib/admin/iconos'
+import { hoyEnBogota } from '../../lib/agente/diasHabiles'
+import { estadoAdmin, type EstadoAdmin } from '../../lib/academia/datos'
+import { MODULOS_ACADEMIA } from '../../lib/academia/reglas'
+import { COLOR } from '../../lib/academia/ui'
+import { SITE_URL } from '../../lib/site'
+
+const role = Astro.locals.role || ''
+if (role !== 'admin') return Astro.redirect('/admin')
+
+const hoy = hoyEnBogota()
+let estado: EstadoAdmin | null = null
+let errorCarga = ''
+try {
+  estado = await estadoAdmin(hoy)
+} catch (e: any) {
+  console.error('[admin/academia] carga', e?.stack || e)
+  errorCarga = 'No se pudo cargar la academia.'
+}
+const porRevisar = estado ? estado.entregas.filter((e) => e.estado === 'enviada').length : 0
+const cuentas = { academia: estado?.personas.length ?? 0, academiaRevisar: porRevisar }
+const catalogos = { modulos: MODULOS_ACADEMIA, colores: COLOR, sitio: SITE_URL }
+---
+
+<AdminLayout titulo="Academia IA · EKOSOLV" activo="academia" css={['/admin/cumplimiento.css', '/admin/talento.css', '/admin/academia.css']} cuentas={cuentas}>
+  <Fragment slot="avisos">
+    {errorCarga && <div class="banner-error">{errorCarga}</div>}
+  </Fragment>
+
+  <div class="panel-head">
+    <div>
+      <h2>Academia de IA</h2>
+      <p class="panel-sub">Donde el equipo estudia los talleres. Usted inscribe a las personas, publica las lecciones, lleva la asistencia de los sábados y revisa las entregas.</p>
+    </div>
+    <div class="ac-acciones-head">
+      <a class="btn-ghost" href="/academia" target="_blank">Ver como participante<Fragment set:html={ico('externo', 'ext')} /></a>
+      <button class="btn-primary" type="button" id="nueva-inscripcion">+ Inscribir persona</button>
+    </div>
+  </div>
+
+  <nav class="subtabs" aria-label="Secciones de la academia">
+    <button class="subtab is-active" data-tab="personas">Participantes <span class="count" data-cuenta="personas">{estado?.personas.length ?? 0}</span></button>
+    <button class="subtab" data-tab="entregas">Entregas <span class="count" data-cuenta="entregas">{porRevisar}</span></button>
+    <button class="subtab" data-tab="lecciones">Lecciones</button>
+    <button class="subtab" data-tab="sesiones">Sábados</button>
+    <button class="subtab" data-tab="certificados">Certificados</button>
+  </nav>
+
+  <!-- PARTICIPANTES -->
+  <section id="panel-personas" class="panel is-active">
+    <div class="kpi-grid" id="ac-kpis"></div>
+    <div class="toolbar">
+      <label class="buscar"><Fragment set:html={ico('buscar')} /><input type="search" id="persona-q" placeholder="Buscar por nombre, usuario o área" aria-label="Buscar participantes" /></label>
+      <div class="chips" id="persona-chips"></div>
+    </div>
+    <div id="persona-list"></div>
+    <p class="muted th-nota">El certificado se emite solo cuando la persona asistió a todos los bloques de su ruta y tiene aprobadas sus entregas. Al emitirse, queda registrado en <a href="/admin/talento">Talento humano</a> como curso realizado.</p>
+  </section>
+
+  <!-- ENTREGAS -->
+  <section id="panel-entregas" class="panel">
+    <div class="toolbar">
+      <label class="buscar"><Fragment set:html={ico('buscar')} /><input type="search" id="entrega-q" placeholder="Buscar por persona o lección" aria-label="Buscar entregas" /></label>
+      <div class="chips" id="entrega-chips"></div>
+    </div>
+    <div id="entrega-list"></div>
+  </section>
+
+  <!-- LECCIONES -->
+  <section id="panel-lecciones" class="panel">
+    <div class="toolbar">
+      <div class="chips" id="leccion-chips"></div>
+      <button class="btn-ghost sp" type="button" id="previa-modulo">Vista previa</button>
+      <button class="btn-primary" type="button" id="nueva-leccion">+ Nueva lección</button>
+    </div>
+    <div id="leccion-list"></div>
+    <p class="muted th-nota">Las lecciones arrancan como borrador, sembradas desde el programa por área. Solo las publicadas le aparecen al equipo. Las de la capacitación general ya traen contenido; las de cada área traen el tema y la entrega, y falta escribirles el contenido.</p>
+  </section>
+
+  <!-- SÁBADOS -->
+  <section id="panel-sesiones" class="panel">
+    <div class="toolbar">
+      <p class="muted th-intro">Cada sábado se arma con bloques. Un bloque es un tramo con su duración y los módulos que asisten, por ejemplo "Certificados, 1 h, Operaciones y Logística". Las horas del certificado salen de los bloques asistidos.</p>
+      <button class="btn-primary sp" type="button" id="nueva-sesion">+ Nuevo bloque</button>
+    </div>
+    <div id="sesion-list"></div>
+  </section>
+
+  <!-- CERTIFICADOS -->
+  <section id="panel-certificados" class="panel">
+    <div id="cert-list"></div>
+    <p class="muted th-nota">Cualquiera puede comprobar un certificado con su código en <code>/verificar/&lt;código&gt;</code>. Revocar lo marca como no válido allí.</p>
+  </section>
+
+  <Fragment slot="fuera">
+    <!-- INSCRIPCIÓN -->
+    <div class="drawer" id="insc-drawer" hidden>
+      <div class="drawer-bg" data-close></div>
+      <div class="drawer-panel drawer-angosto">
+        <div class="drawer-head"><div><p class="drawer-kicker">Academia</p><h3 id="insc-titulo">Inscribir persona</h3></div><button class="x" data-close aria-label="Cerrar">×</button></div>
+        <form id="insc-form" class="drawer-body">
+          <div class="seg ac-seg" role="group" aria-label="Tipo de cuenta" id="insc-modo">
+            <button type="button" class="is-on" data-modo="nueva">Cuenta nueva</button>
+            <button type="button" data-modo="existente">Cuenta existente</button>
+          </div>
+          <fieldset class="grupo" data-solo="nueva">
+            <legend>Cuenta de participante</legend>
+            <label>Nombre completo<input name="name" autocomplete="off" /></label>
+            <label>Usuario para entrar<input name="username" placeholder="nombre.apellido" autocomplete="off" /></label>
+            <label>Contraseña inicial<input name="password" type="text" placeholder="Mín. 8 caracteres" autocomplete="off" /><small>Entréguesela por un canal privado. Con esta cuenta solo se entra a la academia, no al panel.</small></label>
+          </fieldset>
+          <fieldset class="grupo" data-solo="existente" hidden>
+            <legend>Cuenta del panel</legend>
+            <label>Persona<select name="usuario_id"></select><small>Conserva su rol en el panel; solo se le agrega la academia.</small></label>
+          </fieldset>
+          <fieldset class="grupo">
+            <legend>Ruta</legend>
+            <label>Área<select name="area" required></select><small>Estudia la capacitación general y el taller de esta área.</small></label>
+          </fieldset>
+          <p class="muted" id="insc-acceso">Dirección para entrar: <b>{SITE_URL.replace(/^https?:\/\//, '')}/academia</b></p>
+          <div class="drawer-actions">
+            <p class="form-error" id="insc-err"></p>
+            <button type="button" class="btn-ghost danger-txt" id="insc-quitar" hidden>Quitar de la academia</button>
+            <button type="button" class="btn-ghost" data-close>Cancelar</button>
+            <button type="submit" class="btn-primary"><span class="t">Inscribir</span></button>
+          </div>
+        </form>
+      </div>
+    </div>
+
+    <!-- ENTREGA -->
+    <div class="drawer" id="entrega-drawer" hidden>
+      <div class="drawer-bg" data-close></div>
+      <div class="drawer-panel drawer-angosto">
+        <div class="drawer-head"><div><p class="drawer-kicker" id="entrega-kicker">Entrega</p><h3 id="entrega-titulo">Entrega</h3><p class="th-sub" id="entrega-sub"></p></div><button class="x" data-close aria-label="Cerrar">×</button></div>
+        <form id="entrega-form" class="drawer-body">
+          <input type="hidden" name="id" />
+          <div id="entrega-cuerpo" class="ac-entrega-cuerpo"></div>
+          <fieldset class="grupo">
+            <legend>Su revisión</legend>
+            <label>Comentario para la persona<textarea name="comentario" rows="5" placeholder="Qué quedó bien y, si la devuelve, qué debe ajustar."></textarea><small>Lo ve la persona en su lección. Al devolver es obligatorio.</small></label>
+          </fieldset>
+          <div class="drawer-actions">
+            <p class="form-error" id="entrega-err"></p>
+            <button type="button" class="btn-ghost" data-close>Cerrar</button>
+            <button type="button" class="btn-ghost" data-revisar="devuelta">Devolver para ajustar</button>
+            <button type="button" class="btn-primary" data-revisar="aprobada"><span class="t">Aprobar</span></button>
+          </div>
+        </form>
+      </div>
+    </div>
+
+    <!-- LECCIÓN -->
+    <div class="drawer" id="leccion-drawer" hidden>
+      <div class="drawer-bg" data-close></div>
+      <div class="drawer-panel drawer-ancho">
+        <div class="drawer-head"><div><p class="drawer-kicker">Lección</p><h3 id="leccion-titulo">Nueva lección</h3></div><button class="x" data-close aria-label="Cerrar">×</button></div>
+        <form id="leccion-form" class="drawer-body">
+          <input type="hidden" name="id" />
+          <fieldset class="grupo">
+            <legend>Lo básico</legend>
+            <div class="grid2">
+              <label>Módulo<select name="modulo"></select></label>
+              <label>Minutos estimados<input name="minutos" type="number" min="0" max="600" /></label>
+            </div>
+            <label>Título<input name="titulo" required maxlength="160" /></label>
+            <label>Resumen<input name="resumen" maxlength="400" placeholder="Una frase que diga para qué sirve la lección" /></label>
+          </fieldset>
+          <fieldset class="grupo">
+            <legend>Contenido</legend>
+            <label>Texto de la lección<textarea name="contenido" rows="14" class="ac-mono"></textarea>
+              <small>Separe los párrafos con una línea en blanco. "## " al inicio de una línea es un subtítulo, "- " o "1. " arma una lista y **así** queda en negrita.</small>
+            </label>
+          </fieldset>
+          <fieldset class="grupo">
+            <legend>Instrucciones listas para copiar</legend>
+            <div id="leccion-prompts" class="ac-repetidor"></div>
+            <div class="add-sec"><button type="button" id="prompt-mas">+ Instrucción</button></div>
+          </fieldset>
+          <fieldset class="grupo">
+            <legend>Material de apoyo</legend>
+            <div id="leccion-recursos" class="ac-repetidor"></div>
+            <div class="add-sec"><button type="button" id="recurso-mas">+ Material</button></div>
+            <small class="muted">Sin enlace se muestra como "Después del taller".</small>
+          </fieldset>
+          <fieldset class="grupo">
+            <legend>Práctica con IA</legend>
+            <label>Consigna del revisor de instrucciones<textarea name="practica_consigna" rows="2" placeholder="Ej.: Escriba la instrucción que usaría para extraer las obligaciones de un auto."></textarea><small>Si la deja vacía, la lección no trae práctica con IA.</small></label>
+          </fieldset>
+          <fieldset class="grupo">
+            <legend>Entrega</legend>
+            <label>Ejercicio<input name="ejercicio" maxlength="1000" placeholder="Qué debe hacer la persona" /><small>Si lo deja vacío, la lección no pide entrega. Las entregas aprobadas son requisito del certificado.</small></label>
+            <label>Qué debe entregar<textarea name="entregable" rows="2"></textarea></label>
+          </fieldset>
+          <label class="switch">
+            <input type="checkbox" name="publicada" />
+            <span class="switch-ui" aria-hidden="true"></span>
+            <span class="switch-txt"><b>Publicada</b><small>Visible para las personas de la ruta. Necesita contenido o un ejercicio.</small></span>
+          </label>
+          <div class="drawer-actions">
+            <p class="form-error" id="leccion-err"></p>
+            <button type="button" class="btn-ghost danger-txt" id="leccion-borrar" hidden>Eliminar</button>
+            <a class="btn-ghost" id="leccion-previa" target="_blank" hidden>Vista previa</a>
+            <button type="button" class="btn-ghost" data-close>Cancelar</button>
+            <button type="submit" class="btn-primary"><span class="t">Guardar</span></button>
+          </div>
+        </form>
+      </div>
+    </div>
+
+    <!-- BLOQUE DE SÁBADO -->
+    <div class="drawer" id="sesion-drawer" hidden>
+      <div class="drawer-bg" data-close></div>
+      <div class="drawer-panel drawer-angosto">
+        <div class="drawer-head"><div><p class="drawer-kicker">Sábado</p><h3 id="sesion-titulo">Nuevo bloque</h3></div><button class="x" data-close aria-label="Cerrar">×</button></div>
+        <form id="sesion-form" class="drawer-body">
+          <input type="hidden" name="id" />
+          <fieldset class="grupo">
+            <legend>Bloque</legend>
+            <label>Título<input name="titulo" required maxlength="160" placeholder="Ej.: Capacitación general" /></label>
+            <div class="grid3">
+              <label>Fecha<input type="date" name="fecha" required /></label>
+              <label>Hora<input type="time" name="hora" /></label>
+              <label>Horas<input name="horas" type="number" min="0.25" max="12" step="0.25" required /></label>
+            </div>
+            <label>Lugar<input name="lugar" maxlength="200" placeholder="Ej.: Oficina Ekosolv, sala principal" /></label>
+            <div class="ac-modulos-check" id="sesion-modulos"></div>
+            <label>Notas<textarea name="notas" rows="2"></textarea></label>
+          </fieldset>
+          <div class="drawer-actions">
+            <p class="form-error" id="sesion-err"></p>
+            <button type="button" class="btn-ghost danger-txt" id="sesion-borrar" hidden>Eliminar</button>
+            <button type="button" class="btn-ghost" data-close>Cancelar</button>
+            <button type="submit" class="btn-primary"><span class="t">Guardar</span></button>
+          </div>
+        </form>
+        <form id="asis-form" class="drawer-body ac-asis" hidden>
+          <fieldset class="grupo">
+            <legend>Asistencia</legend>
+            <p class="muted" id="asis-nota"></p>
+            <div class="ac-asis-lista" id="asis-lista"></div>
+          </fieldset>
+          <div class="drawer-actions">
+            <p class="form-error" id="asis-err"></p>
+            <button type="button" class="btn-ghost" id="asis-todos">Marcar a todos</button>
+            <button type="submit" class="btn-primary"><span class="t">Guardar asistencia</span></button>
+          </div>
+        </form>
+      </div>
+    </div>
+
+    <script is:inline define:vars={{ estado, catalogos }}>
+      window.__ACADEMIA__ = { estado, catalogos }
+    </script>
+    <script src="/admin/academia.js" type="module"></script>
+  </Fragment>
+</AdminLayout>
