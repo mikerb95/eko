@@ -83,3 +83,29 @@ test('aCSV: etiquetas legibles, comillas escapadas y BOM', () => {
   assert.ok(csv.includes('Leer autos, resoluciones y requerimientos'))
   assert.ok(!csv.includes('línea 1\nlínea 2'))
 })
+
+test('validar: propuestas solo para las áreas que las hacen y si participa', () => {
+  const r = validarRespuesta({ ...base, area: 'ventas', tareas_ventas: 'brief', propuesta_rol: 'arma', propuesta_horas: '3_6', propuestas_mes: '11_20' })
+  assert.equal(r.propuesta_horas, '3_6')
+  const fin = validarRespuesta({ ...base, area: 'finanzas', tareas_finanzas: 'cartera', propuesta_rol: 'arma', propuesta_horas: '3_6' })
+  assert.equal(fin.propuesta_rol, '')
+  const no = validarRespuesta({ ...base, propuesta_rol: 'no', propuesta_horas: '3_6' })
+  assert.equal(no.propuesta_horas, '')
+})
+
+test('resumir: horas al mes en propuestas, volumen y horas por propuesta', () => {
+  const r = resumir([
+    fila({ nombre: 'Vende', area: 'ventas', propuesta_rol: 'arma', propuesta_horas: '3_6', propuestas_mes: '11_20' }),
+    fila({ nombre: 'Gerente', area: 'gerencia', propuesta_rol: 'revisa', propuesta_horas: 'menos_1', propuestas_mes: '11_20' }),
+    fila({ nombre: 'Técnica', area: 'operaciones', tareas: ['autos', 'ica'], horas: '5_10', propuesta_rol: 'tecnica', propuesta_horas: '1_3', propuestas_mes: '6_10' }),
+    fila({ nombre: 'Otra', area: 'operaciones', tareas: ['ica'], propuesta_rol: 'no' }),
+  ])
+  // 4,5×15 + 0,5×15 + 2×8 = 67,5 + 7,5 + 16
+  assert.equal(r.propuestas.horasMes, 91)
+  assert.equal(r.propuestas.volumen, 15)
+  assert.equal(r.propuestas.horasPorPropuesta, 6.1)
+  assert.equal(r.propuestas.personas.length, 3)
+  assert.equal(r.agente.personas, 1)
+  assert.equal(r.agente.deOperaciones, 2)
+  assert.equal(r.agente.horasSemana, 7.5)
+})

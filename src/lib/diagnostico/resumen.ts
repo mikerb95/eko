@@ -17,6 +17,9 @@ import {
   IAS,
   MODALIDAD,
   PREOCUPACIONES,
+  PROPUESTA_HORAS,
+  PROPUESTA_ROL,
+  PROPUESTAS_MES,
   TAREAS,
   USO_IA,
   etiqueta,
@@ -57,6 +60,43 @@ export interface ResumenArea {
   restricciones: Nota[]
 }
 
+/** Semanas por mes, para pasar horas semanales a mensuales. */
+export const SEMANAS_MES = 4.33
+
+/** Tareas de Operaciones que cubre el agente de cumplimiento de la automatización. */
+export const TAREAS_AGENTE = ['autos', 'obligaciones', 'vencimientos', 'normativa']
+
+export interface PersonaPropuestas {
+  nombre: string
+  area: AreaId
+  rol: string
+  horasPorPropuesta: number
+  propuestasMes: number
+  horasMes: number
+}
+
+export interface ResumenPropuestas {
+  /** Personas que participan en propuestas y dieron horas y volumen. */
+  personas: PersonaPropuestas[]
+  porRol: Conteo[]
+  /** Horas-persona al mes que se van en propuestas, sumando a todos. */
+  horasMes: number
+  /** Propuestas al mes: el mayor volumen que reporta quien las arma (o cualquiera, si nadie las arma). */
+  volumen: number
+  /** Horas-persona que cuesta una propuesta de principio a fin. */
+  horasPorPropuesta: number
+  demoras: Nota[]
+}
+
+export interface ResumenAgente {
+  /** Personas de Operaciones que hacen cada semana alguna tarea que cubre el agente. */
+  personas: number
+  deOperaciones: number
+  tareas: Conteo[]
+  /** Horas semanales repetitivas de esas personas (no todas son del agente). */
+  horasSemana: number
+}
+
 export interface Resumen {
   total: number
   areasConRespuesta: number
@@ -67,11 +107,51 @@ export interface Resumen {
   modalidad: Conteo[]
   ias: Conteo[]
   areas: ResumenArea[]
+  propuestas: ResumenPropuestas
+  agente: ResumenAgente
   /** Áreas en el orden sugerido para los talleres. */
   orden: { area: AreaId; etiqueta: string; horasTotal: number; n: number; fija: boolean }[]
 }
 
 const horasDe = (id: string) => HORAS.find((h) => h.id === id)?.valor ?? 0
+const valorDe = (lista: readonly { id: string; valor: number }[], id: string) => lista.find((h) => h.id === id)?.valor ?? 0
+
+function resumirPropuestas(filas: Fila[]): ResumenPropuestas {
+  const participan = filas.filter((f) => f.propuesta_rol && f.propuesta_rol !== 'no')
+  const personas: PersonaPropuestas[] = participan
+    .map((f) => {
+      const horasPorPropuesta = valorDe(PROPUESTA_HORAS, f.propuesta_horas)
+      const propuestasMes = valorDe(PROPUESTAS_MES, f.propuestas_mes)
+      return { nombre: f.nombre, area: f.area, rol: f.propuesta_rol, horasPorPropuesta, propuestasMes, horasMes: horasPorPropuesta * propuestasMes }
+    })
+    .filter((p) => p.horasMes > 0)
+    .sort((a, b) => b.horasMes - a.horasMes)
+  const horasMes = redondear(personas.reduce((s, p) => s + p.horasMes, 0))
+  const armadores = personas.filter((p) => p.rol === 'arma')
+  const volumen = Math.max(0, ...(armadores.length ? armadores : personas).map((p) => p.propuestasMes))
+  return {
+    personas,
+    porRol: contar(participan.map((f) => f.propuesta_rol), PROPUESTA_ROL),
+    horasMes,
+    volumen,
+    horasPorPropuesta: volumen ? redondear(horasMes / volumen) : 0,
+    demoras: notas(participan, 'propuesta_demora'),
+  }
+}
+
+function resumirAgente(filas: Fila[]): ResumenAgente {
+  const ops = filas.filter((f) => f.area === 'operaciones')
+  const tocan = ops.filter((f) => f.tareas.some((t) => TAREAS_AGENTE.includes(t)))
+  return {
+    personas: tocan.length,
+    deOperaciones: ops.length,
+    tareas: contar(
+      tocan.flatMap((f) => f.tareas.filter((t) => TAREAS_AGENTE.includes(t))),
+      TAREAS.operaciones,
+    ),
+    horasSemana: redondear(tocan.reduce((s, f) => s + horasDe(f.horas), 0)),
+  }
+}
 const redondear = (x: number) => Math.round(x * 10) / 10
 
 /** Cuenta cuántas veces aparece cada opción. `todas` deja también las de cero y no reordena. */
@@ -163,6 +243,8 @@ export function resumir(todas: Fila[]): Resumen {
     preocupaciones: contar(filas.flatMap((f) => f.preocupaciones), PREOCUPACIONES),
     modalidad: contar(filas.map((f) => f.modalidad), MODALIDAD, true),
     ias: contar(filas.flatMap((f) => f.ias), IAS),
+    propuestas: resumirPropuestas(filas),
+    agente: resumirAgente(filas),
     areas,
     orden,
   }
@@ -179,6 +261,10 @@ export function aCSV(filas: Fila[]): string {
     ['Otra tarea', (f) => f.tarea_otra],
     ['Horas por semana', (f) => etiqueta(HORAS, f.horas)],
     ['Tarea que más tiempo le quita', (f) => f.tarea_principal],
+    ['Papel en propuestas', (f) => (f.propuesta_rol ? etiqueta(PROPUESTA_ROL, f.propuesta_rol) : '')],
+    ['Horas por propuesta', (f) => (f.propuesta_horas ? etiqueta(PROPUESTA_HORAS, f.propuesta_horas) : '')],
+    ['Propuestas al mes', (f) => (f.propuestas_mes ? etiqueta(PROPUESTAS_MES, f.propuestas_mes) : '')],
+    ['Lo que más demora de la propuesta', (f) => f.propuesta_demora],
     ['Documentos', (f) => f.documentos.map((d) => etiqueta(DOCUMENTOS, d)).join(' | ')],
     ['Herramientas', (f) => f.herramientas.map((h) => etiqueta(HERRAMIENTAS, h)).join(' | ')],
     ['Uso de IA', (f) => etiqueta(USO_IA, f.uso_ia)],
