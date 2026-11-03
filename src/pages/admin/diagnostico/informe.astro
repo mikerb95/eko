@@ -1,0 +1,332 @@
+---
+// Informe para Gerencia: lo que dice el diagnóstico en horas y en pesos.
+//
+// Convierte la encuesta de la capacitación en el argumento de la
+// automatización: cuánto tiempo se va hoy en propuestas y en tareas
+// repetitivas, y cuánto se recupera, con los datos del propio equipo. Se
+// imprime a PDF desde el navegador (Ctrl+P); la barra de supuestos no sale.
+//
+// Los supuestos (costo por hora y cuánto reduce la automatización el tiempo de
+// una propuesta) los pone quien prepara el informe. Sin costo por hora, el
+// informe habla solo en horas.
+export const prerender = false
+import { listarRespuestas } from '../../../lib/diagnostico/datos'
+import { resumir, SEMANAS_MES, type Fila } from '../../../lib/diagnostico/resumen'
+import { PROPUESTA_ROL, TAREAS, etiqueta, nombreArea } from '../../../lib/diagnostico/preguntas'
+
+if ((Astro.locals.role || '') !== 'admin') return Astro.redirect('/admin')
+
+let respuestas: Fila[] = []
+let errorCarga = ''
+try {
+  respuestas = await listarRespuestas()
+} catch (e: any) {
+  console.error('[admin/diagnostico/informe] carga', e?.stack || e)
+  errorCarga = 'No se pudo cargar el diagnóstico.'
+}
+const r = resumir(respuestas)
+const p = r.propuestas
+const horasMesRep = Math.round(r.horasTotal * SEMANAS_MES)
+
+// Mensualidad de la automatización por volumen, meses 1 a 18. Fuente: la
+// propuesta vigente (propuesta_ekosolv_ia.html y sección 7 de
+// oferta_automatizacion_ekosolv.md). Si cambian allá, cambiarlas aquí.
+const PLANES = [
+  { hasta: 20, mensual: 1_185_000 },
+  { hasta: 40, mensual: 1_400_000 },
+  { hasta: 80, mensual: 1_700_000 },
+]
+const EXCEDENTE = 25_000
+
+const fmt = (n: number) => n.toLocaleString('es-CO', { maximumFractionDigits: 1 })
+const hoy = new Date().toLocaleDateString('es-CO', { day: 'numeric', month: 'long', year: 'numeric', timeZone: 'America/Bogota' })
+const areasTexto = r.areas.filter((a) => a.n > 0).map((a) => a.etiqueta).join(', ')
+const datos = { horasMesProp: p.horasMes, horasMesRep, volumen: p.volumen, planes: PLANES, excedente: EXCEDENTE }
+---
+
+<!doctype html>
+<html lang="es">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="robots" content="noindex, nofollow" />
+    <title>Diagnóstico de IA · Informe para Gerencia · Ekosolv</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Geist:wght@300..700&family=Geist+Mono:wght@400..500&display=swap" rel="stylesheet" />
+  </head>
+  <body>
+    <!-- Barra de quien prepara el informe; no se imprime. -->
+    <aside class="barra">
+      <a href="/admin/diagnostico" class="volver">← Diagnóstico</a>
+      <label>Costo por hora del equipo
+        <span class="campo"><i>$</i><input id="s-costo" type="number" min="0" step="1000" placeholder="Sin definir" /></span>
+      </label>
+      <label>La automatización reduce el tiempo de una propuesta en
+        <span class="campo"><input id="s-red" type="number" min="0" max="100" step="5" value="60" /><i>%</i></span>
+      </label>
+      <label class="check"><input id="s-plan" type="checkbox" /> Comparar con la mensualidad</label>
+      <button type="button" onclick="window.print()">Imprimir o guardar PDF</button>
+    </aside>
+
+    <main class="hoja">
+      <header class="cab">
+        <img src="/brand/ekosolv-horizontal.svg" alt="EKOSOLV" />
+        <div>
+          <p class="kicker">Diagnóstico de IA · Informe para Gerencia</p>
+          <p class="fecha">{hoy}</p>
+        </div>
+      </header>
+
+      {errorCarga && <p class="aviso">{errorCarga}</p>}
+      {r.total === 0 ? (
+        <p class="aviso">Todavía no hay respuestas en el diagnóstico.</p>
+      ) : (
+        <>
+          <h1>Dónde se va el tiempo del equipo, <em>y cuánto se puede recuperar</em></h1>
+          <p class="lede">
+            Basado en las respuestas de {r.total} {r.total === 1 ? 'persona' : 'personas'} de {areasTexto}, recogidas en la
+            encuesta previa a la capacitación en IA.
+          </p>
+
+          <section class="cifras">
+            <div><b>{fmt(horasMesRep)} h</b><span>al mes en tareas que se repiten, todo el equipo</span></div>
+            <div><b>{p.horasMes ? `${fmt(p.horasMes)} h` : 'Sin datos'}</b><span>al mes armando, revisando y aprobando propuestas</span></div>
+            <div><b>{p.horasPorPropuesta ? `${fmt(p.horasPorPropuesta)} h` : 'Sin datos'}</b><span>de trabajo por cada propuesta, sumando a todos los que participan</span></div>
+            <div class="dinero" hidden><b data-v="valor-rec"></b><span>al mes vale el tiempo que se recupera en propuestas</span></div>
+          </section>
+
+          <section>
+            <h2><span>01</span> Propuestas comerciales</h2>
+            {p.personas.length === 0 ? (
+              <p>Nadie de Ventas, Gerencia u Operaciones ha dado todavía horas y volumen de propuestas.</p>
+            ) : (
+              <>
+                <p>
+                  Pasan por el equipo unas <b>{fmt(p.volumen)} propuestas al mes</b>. Cada una cuesta cerca de
+                  <b> {fmt(p.horasPorPropuesta)} horas</b> de trabajo entre quienes la arman, aportan la parte técnica y la
+                  revisan: <b>{fmt(p.horasMes)} horas al mes</b> en total.
+                </p>
+                <table>
+                  <thead><tr><th>Área</th><th>Papel</th><th class="n">Horas por propuesta</th><th class="n">Propuestas al mes</th><th class="n">Horas al mes</th></tr></thead>
+                  <tbody>
+                    {p.personas.map((x) => (
+                      <tr><td>{nombreArea(x.area)}</td><td>{etiqueta(PROPUESTA_ROL, x.rol)}</td><td class="n">{fmt(x.horasPorPropuesta)}</td><td class="n">{fmt(x.propuestasMes)}</td><td class="n">{fmt(x.horasMes)}</td></tr>
+                    ))}
+                  </tbody>
+                </table>
+                {p.demoras.length > 0 && (
+                  <>
+                    <h3>Lo que más demora, en palabras del equipo</h3>
+                    <ul class="citas">{p.demoras.map((d) => <li>{d.texto}</li>)}</ul>
+                  </>
+                )}
+                <div class="caja">
+                  <h3>Con la automatización</h3>
+                  <p>
+                    La propuesta sale del Brief de Zoho CRM como borrador completo el mismo día, y la persona revisa y ajusta en
+                    vez de armarla desde cero. Si eso reduce el tiempo de cada propuesta en un <b data-v="red"></b>, el equipo
+                    recupera <b data-v="horas-rec"></b> al mes<span class="dinero" hidden>, que a costo de nómina valen <b data-v="valor-rec"></b></span>.
+                  </p>
+                </div>
+              </>
+            )}
+          </section>
+
+          <section>
+            <h2><span>02</span> Cumplimiento ambiental</h2>
+            {r.agente.deOperaciones === 0 ? (
+              <p>Nadie de Operaciones ha respondido todavía.</p>
+            ) : (
+              <>
+                <p>
+                  <b>{r.agente.personas} de {r.agente.deOperaciones}</b> personas de Operaciones hacen cada semana alguna de las
+                  tareas que cubre el agente de cumplimiento. Entre ellas suman <b>{fmt(r.agente.horasSemana)} horas por semana</b> en
+                  tareas que se repiten.
+                </p>
+                {r.agente.tareas.length > 0 && (
+                  <ul class="lista">
+                    {r.agente.tareas.map((t) => <li><span>{t.etiqueta}</span><b>{t.n} de {r.agente.deOperaciones}</b></li>)}
+                  </ul>
+                )}
+                <p class="nota">
+                  El agente lee cada auto o resolución al llegar, saca obligaciones, plazos y norma, y avisa antes de cada
+                  vencimiento. El consultor decide y firma. No se calcula aquí un ahorro en horas porque la encuesta no separa el
+                  tiempo de cada tarea.
+                </p>
+              </>
+            )}
+          </section>
+
+          <section>
+            <h2><span>03</span> Tiempo en tareas repetitivas por área</h2>
+            <table>
+              <thead><tr><th>Área</th><th class="n">Personas</th><th class="n">Horas por semana</th><th class="n">Horas al mes</th><th>Tarea más común</th></tr></thead>
+              <tbody>
+                {r.orden.filter((o) => o.n > 0).map((o) => {
+                  const a = r.areas.find((x) => x.area === o.area)!
+                  return (
+                    <tr>
+                      <td>{a.etiqueta}</td><td class="n">{a.n}</td><td class="n">{fmt(a.horasTotal)}</td>
+                      <td class="n">{fmt(Math.round(a.horasTotal * SEMANAS_MES))}</td>
+                      <td>{a.tareas[0] ? etiqueta(TAREAS[a.area], a.tareas[0].id) : 'Sin datos'}</td>
+                    </tr>
+                  )
+                })}
+              </tbody>
+            </table>
+            <p class="nota">La capacitación ataca este tiempo en todas las áreas. La automatización se concentra en propuestas y cumplimiento.</p>
+          </section>
+
+          <section class="plan" hidden>
+            <h2><span>04</span> Frente a la mensualidad</h2>
+            <p>
+              Con {fmt(p.volumen)} propuestas al mes corresponde el plan de <b data-v="plan-nombre"></b>, con una mensualidad de
+              <b data-v="plan-valor"></b>. Equivale a <b data-v="plan-horas"></b> del equipo al mes; la automatización le
+              devuelve <b data-v="horas-rec"></b> en propuestas, que valen <b data-v="valor-rec"></b>.
+            </p>
+            <p class="resultado" data-v="plan-balance"></p>
+          </section>
+
+          <footer class="metodo">
+            <b>Cómo se calculó.</b> Cada persona respondió con rangos; se toma el punto medio de cada uno (por ejemplo, "entre 3 y
+            6 horas" cuenta como 4,5). Un mes son {String(SEMANAS_MES).replace('.', ',')} semanas. Si alguien respondió dos veces,
+            cuenta la última. Son cifras declaradas por el equipo, útiles para decidir, no una medición.
+            <span class="dinero" hidden>Costo por hora usado: <b data-v="costo"></b>.</span>
+            Reducción supuesta del tiempo por propuesta: <b data-v="red"></b>.
+          </footer>
+        </>
+      )}
+    </main>
+
+    <script is:inline define:vars={{ datos }}>
+      ;(() => {
+        const $ = (s) => document.querySelector(s)
+        const pesos = (n) => '$' + Math.round(n).toLocaleString('es-CO')
+        const horas = (n) => `${n.toLocaleString('es-CO', { maximumFractionDigits: 0 })} horas`
+        const poner = (k, t) => document.querySelectorAll(`[data-v="${k}"]`).forEach((el) => (el.textContent = t))
+        const costo = $('#s-costo'), red = $('#s-red'), plan = $('#s-plan')
+
+        // Los supuestos viajan en la URL para que el PDF y el enlace digan lo mismo.
+        const q = new URLSearchParams(location.search)
+        if (q.get('costo')) costo.value = q.get('costo')
+        if (q.get('red')) red.value = q.get('red')
+        plan.checked = q.get('plan') === '1'
+
+        function planDe(vol) {
+          const p = datos.planes.find((x) => vol <= x.hasta)
+          if (p) return { nombre: `hasta ${p.hasta} propuestas al mes`, valor: p.mensual }
+          const ultimo = datos.planes[datos.planes.length - 1]
+          return { nombre: `hasta ${ultimo.hasta} propuestas al mes más ${vol - ultimo.hasta} adicionales`, valor: ultimo.mensual + (vol - ultimo.hasta) * datos.excedente }
+        }
+
+        function calcular() {
+          const c = Math.max(0, Number(costo.value) || 0)
+          const pr = Math.min(100, Math.max(0, Number(red.value) || 0))
+          const rec = datos.horasMesProp * (pr / 100)
+          poner('red', `${pr}%`)
+          poner('horas-rec', horas(rec))
+          poner('costo', pesos(c))
+          poner('valor-rec', pesos(rec * c))
+          document.querySelectorAll('.dinero').forEach((el) => (el.hidden = !c))
+          const p = planDe(datos.volumen)
+          poner('plan-nombre', p.nombre)
+          poner('plan-valor', pesos(p.valor))
+          poner('plan-horas', c ? horas(p.valor / c) : '')
+          const saldo = rec * c - p.valor
+          poner('plan-balance', saldo >= 0
+            ? `El tiempo recuperado vale ${pesos(saldo)} más que la mensualidad, cada mes.`
+            : `El tiempo recuperado en propuestas cubre el ${Math.round((rec * c / p.valor) * 100)}% de la mensualidad, sin contar el agente de cumplimiento ni el resto de tareas.`)
+          const sec = $('.plan')
+          if (sec) sec.hidden = !(plan.checked && c && datos.volumen)
+          const u = new URLSearchParams()
+          if (c) u.set('costo', String(c))
+          if (pr !== 60) u.set('red', String(pr))
+          if (plan.checked) u.set('plan', '1')
+          history.replaceState(null, '', location.pathname + (u.toString() ? `?${u}` : ''))
+        }
+        ;[costo, red, plan].forEach((el) => el.addEventListener('input', calcular))
+        calcular()
+      })()
+    </script>
+
+    <style>
+      :root {
+        --ink: #0e1c26; --ink-2: #33414c; --mute: #6b7580; --line: #d9d5cf; --paper: #f5f2ee;
+        --deep: #124e7d; --forest: #179c91;
+        --serif: "Instrument Serif", serif; --sans: "Geist", system-ui, sans-serif; --mono: "Geist Mono", monospace;
+      }
+      * { box-sizing: border-box; }
+      body { margin: 0; background: #e9e6e1; color: var(--ink); font: 15px/1.55 var(--sans); }
+      [hidden] { display: none !important; }
+
+      .barra {
+        position: sticky; top: 0; z-index: 2; display: flex; flex-wrap: wrap; align-items: end; gap: 14px 22px;
+        padding: 14px 24px; background: #fff; border-bottom: 1px solid var(--line); font-size: 13px;
+      }
+      .barra label { display: flex; flex-direction: column; gap: 5px; color: var(--ink-2); }
+      .barra .check { flex-direction: row; align-items: center; gap: 8px; padding-bottom: 8px; }
+      .campo { display: inline-flex; align-items: center; gap: 6px; border: 1px solid var(--line); border-radius: 8px; padding: 6px 10px; background: #fff; }
+      .campo i { font-style: normal; color: var(--mute); }
+      .campo input { border: 0; outline: 0; font: inherit; width: 120px; }
+      .barra button {
+        margin-left: auto; font: 500 13px var(--sans); color: #fff; background: var(--deep); border: 0;
+        padding: 10px 16px; border-radius: 999px; cursor: pointer;
+      }
+      .volver { color: var(--deep); text-decoration: none; padding-bottom: 8px; }
+
+      .hoja { max-width: 820px; margin: 28px auto 64px; background: #fff; padding: 56px 64px; box-shadow: 0 8px 30px rgba(14, 28, 38, .08); }
+      .cab { display: flex; justify-content: space-between; align-items: center; padding-bottom: 18px; border-bottom: 1px solid var(--line); }
+      .cab img { height: 30px; }
+      .cab div { text-align: right; }
+      .kicker { margin: 0; font: 500 11px var(--mono); letter-spacing: .1em; text-transform: uppercase; color: var(--forest); }
+      .fecha { margin: 2px 0 0; font-size: 12.5px; color: var(--mute); }
+      h1 { font: 400 42px/1.05 var(--serif); letter-spacing: -.02em; margin: 34px 0 0; }
+      h1 em { color: var(--deep); }
+      .lede { color: var(--ink-2); font-size: 16px; margin: 14px 0 0; max-width: 60ch; }
+
+      .cifras { display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; margin: 28px 0 8px; }
+      .cifras div { background: var(--paper); border-radius: 12px; padding: 16px 18px; }
+      .cifras b { display: block; font: 400 34px/1 var(--serif); color: var(--deep); }
+      .cifras span { display: block; margin-top: 6px; font-size: 13px; color: var(--ink-2); }
+
+      section { margin-top: 34px; break-inside: avoid-page; }
+      h2 { font-size: 18px; font-weight: 600; margin: 0 0 10px; display: flex; gap: 10px; align-items: baseline; }
+      h2 span { font: 500 12px var(--mono); color: var(--forest); }
+      h3 { font-size: 13.5px; font-weight: 600; margin: 18px 0 8px; }
+      section p { margin: 0 0 10px; color: var(--ink-2); }
+      section p b { color: var(--ink); }
+      table { width: 100%; border-collapse: collapse; font-size: 13.5px; margin: 12px 0; }
+      th { text-align: left; font: 500 10.5px var(--mono); letter-spacing: .06em; text-transform: uppercase; color: var(--mute); padding: 8px 10px; border-bottom: 1px solid var(--line); }
+      td { padding: 9px 10px; border-bottom: 1px solid #ece8e3; }
+      .n { text-align: right; font-variant-numeric: tabular-nums; }
+      .citas { margin: 0; padding: 0; list-style: none; display: grid; gap: 6px; }
+      .citas li { background: var(--paper); border-radius: 10px; padding: 9px 12px; font-size: 13.5px; color: var(--ink-2); }
+      .citas li::before { content: '“'; color: var(--forest); margin-right: 2px; }
+      .citas li::after { content: '”'; color: var(--forest); }
+      .caja { margin-top: 16px; padding: 16px 18px; border-radius: 12px; background: color-mix(in oklab, var(--deep) 6%, #fff); }
+      .caja h3 { margin-top: 0; color: var(--deep); }
+      .caja p { margin: 0; }
+      .lista { list-style: none; margin: 8px 0 12px; padding: 0; }
+      .lista li { display: flex; justify-content: space-between; padding: 7px 0; border-bottom: 1px solid #ece8e3; font-size: 13.5px; }
+      .nota { font-size: 13px; color: var(--mute) !important; }
+      .resultado { font-weight: 600; color: var(--deep) !important; }
+      .metodo { margin-top: 40px; padding-top: 16px; border-top: 1px solid var(--line); font-size: 12px; color: var(--mute); }
+      .metodo b { color: var(--ink-2); }
+      .aviso { margin: 30px 0; color: var(--ink-2); }
+
+      @media (max-width: 760px) {
+        .hoja { padding: 28px 20px; margin: 0; }
+        .cifras { grid-template-columns: 1fr; }
+        h1 { font-size: 32px; }
+        table { font-size: 12.5px; }
+      }
+      @media print {
+        @page { size: A4; margin: 16mm; }
+        body { background: #fff; }
+        .barra { display: none; }
+        .hoja { margin: 0; padding: 0; box-shadow: none; max-width: none; }
+      }
+    </style>
+  </body>
+</html>

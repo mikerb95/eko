@@ -77,3 +77,6 @@
   .dx-resp .datos-ficha { grid-template-columns: 1fr; }
   .dx-url { flex-direction: column; }
 }
+
+.dx-head-acc { display: flex; gap: 8px; flex-wrap: wrap; }
+.dx-head-acc a { text-decoration: none; }

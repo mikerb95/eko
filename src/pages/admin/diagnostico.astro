@@ -72,7 +72,10 @@ const barras = (cs: Conteo[], de: number, color: (c: Conteo) => string) =>
       <p class="panel-sub">La encuesta previa a la capacitación. Define el orden de los talleres, los ejercicios y las fechas.</p>
     </div>
     {respuestas.length > 0 && (
-      <a class="btn-ghost btn-sm" href="/api/admin/diagnostico?formato=csv" download>Descargar CSV</a>
+      <div class="dx-head-acc">
+        <a class="btn-ghost btn-sm" href="/api/admin/diagnostico?formato=csv" download>Descargar CSV</a>
+        <a class="btn-primary btn-sm" href="/admin/diagnostico/informe">Informe para Gerencia</a>
+      </div>
     )}
   </div>
 
