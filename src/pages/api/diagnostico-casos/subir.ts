@@ -4,7 +4,7 @@ import { json } from '../../../lib/apiError'
 import { checkRateLimit, clientIp } from '../../../lib/rateLimit'
 import { MAX_BYTES, TIPOS_PERMITIDOS, rutaValida, tipoDe } from '../../../lib/diagnostico/casos'
 import { casosAbiertos } from '../../../lib/diagnostico/casosDatos'
-import { guardarLocal, modo } from '../../../lib/diagnostico/almacen'
+import { guardarLocal, modo, tokenBlob } from '../../../lib/diagnostico/almacen'
 
 export const prerender = false
 
@@ -51,6 +51,7 @@ export const POST: APIRoute = async (context) => {
     const r = await handleUpload({
       body,
       request: context.request,
+      token: tokenBlob(),
       onBeforeGenerateToken: async (pathname) => {
         if (!rutaValida(pathname) || !tipoDe(pathname)) throw new Error('ruta')
         return {

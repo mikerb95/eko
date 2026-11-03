@@ -22,6 +22,12 @@ function env(key: string): string {
   return (import.meta.env as any)?.[key] || (process.env as any)?.[key] || ''
 }
 
+/**
+ * Token de la tienda, pasado explícito a cada llamada. La librería solo mira
+ * `process.env`, y `astro dev` deja lo de `.env.local` en `import.meta.env`.
+ */
+export const tokenBlob = () => env('BLOB_READ_WRITE_TOKEN') || undefined
+
 export type Modo = 'blob' | 'local'
 
 export function modo(): Modo {
@@ -50,7 +56,7 @@ export async function verificar(ruta: string): Promise<{ tamano: number } | null
   if (!rutaValida(ruta)) return null
   try {
     if (modo() === 'local') return { tamano: (await stat(rutaLocal(ruta))).size }
-    const h = await head(ruta)
+    const h = await head(ruta, { token: tokenBlob() })
     return { tamano: h.size }
   } catch {
     return null
@@ -62,7 +68,7 @@ export async function leer(ruta: string): Promise<BodyInit | null> {
   if (!rutaValida(ruta)) return null
   try {
     if (modo() === 'local') return new Uint8Array(await readFile(rutaLocal(ruta)))
-    const r = await get(ruta, { access: 'private' })
+    const r = await get(ruta, { access: 'private', token: tokenBlob() })
     return r?.statusCode === 200 ? r.stream : null
   } catch {
     return null
@@ -76,7 +82,7 @@ export async function borrar(rutas: string[]): Promise<void> {
     await Promise.all(validas.map((r) => rm(rutaLocal(r), { force: true })))
     return
   }
-  await del(validas)
+  await del(validas, { token: tokenBlob() })
 }
 
 /** Borra TODO lo del taller, también lo que quedó huérfano. Devuelve cuántos archivos borró. */
@@ -88,9 +94,9 @@ export async function borrarTodo(): Promise<number> {
   let total = 0
   let cursor: string | undefined
   do {
-    const r = await list({ prefix: PREFIJO, cursor, limit: 1000 })
+    const r = await list({ prefix: PREFIJO, cursor, limit: 1000, token: tokenBlob() })
     if (r.blobs.length) {
-      await del(r.blobs.map((b) => b.pathname))
+      await del(r.blobs.map((b) => b.pathname), { token: tokenBlob() })
       total += r.blobs.length
     }
     cursor = r.hasMore ? r.cursor : undefined

@@ -736,3 +736,24 @@ export async function revocarCertificado(codigo: unknown): Promise<void> {
 }
 
 export const etiquetaRol = (rol: string) => ROLE_LABELS[rol as Role] ?? rol
+
+export type Acceso =
+  | { tipo: 'inscrito'; cuenta: Cuenta; area: string }
+  | { tipo: 'vista_previa'; cuenta: Cuenta | null; area: string }
+  | { tipo: 'sin_inscripcion'; nombre: string }
+
+/**
+ * Quién entra a /academia. Un inscrito ve su ruta. Un admin sin inscripción
+ * ve la academia en vista previa, como si fuera del área que elija (con los
+ * borradores incluidos y sin poder enviar nada). Los demás, sin inscripción,
+ * ven un aviso.
+ */
+export async function resolverAcceso(username: string, role: string, nombre: string, areaPedida: string | null): Promise<Acceso> {
+  const cuenta = await cuentaDe(username)
+  if (cuenta) {
+    const area = await areaInscrita(cuenta.id)
+    if (area && !(role === 'admin' && areaPedida)) return { tipo: 'inscrito', cuenta, area }
+  }
+  if (role === 'admin') return { tipo: 'vista_previa', cuenta, area: esArea(areaPedida) ? areaPedida : AREAS_ACADEMIA[0]!.id }
+  return { tipo: 'sin_inscripcion', nombre: cuenta?.nombre || nombre }
+}
