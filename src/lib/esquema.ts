@@ -235,6 +235,21 @@ export const TABLAS: readonly string[] = [
     actualizado TEXT NOT NULL
   )`,
 
+  // ── Diagnóstico de IA por área (capacitación) ──────────────────────────
+  // Una fila por respuesta a la encuesta de /diagnostico-ia. `datos` es la
+  // respuesta completa ya validada (src/lib/diagnostico/validar.ts); `area` y
+  // `nombre` van aparte para listar y filtrar sin abrir el JSON. El enlace y si
+  // la encuesta está abierta viven en `ajustes` (clave 'diagnostico').
+  `CREATE TABLE IF NOT EXISTS diagnostico_respuestas (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    area TEXT NOT NULL,
+    nombre TEXT NOT NULL DEFAULT '',
+    datos TEXT NOT NULL DEFAULT '{}',
+    consent_at TEXT NOT NULL DEFAULT '',
+    consent_version TEXT NOT NULL DEFAULT '',
+    creado TEXT NOT NULL
+  )`,
+
   // ── Asistente con IA del panel (docs/plan-asistente.md) ─────────────────
   // Una fila por conversación: es el estado del bucle (src/lib/asistente/
   // bucle.ts). `mensajes` es el historial de la API, solo por anexión.
@@ -327,6 +342,7 @@ export const TABLAS_ESPERADAS: readonly string[] = [
   'asistente_consumo',
   'asistente_conversaciones',
   'contacts',
+  'diagnostico_respuestas',
   'expedientes',
   'normativas',
   'order_events',
