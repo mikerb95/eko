@@ -51,7 +51,7 @@ const SECURITY_HEADERS = {
 // autoriza a cachés intermedias a guardar HTML con datos de una sesión ajena.
 // `noindex` porque `robots.txt` es una petición, no un control: pide no rastrear
 // pero no impide que la URL termine indexada si alguien la enlaza.
-const PRIVATE_PATHS = '/(admin|docs|oportunidades2630|api/admin)(/.*)?'
+const PRIVATE_PATHS = '/(admin|docs|oportunidades2630|propuesta|api/admin|api/propuesta)(/.*)?'
 
 const PRIVATE_HEADERS = {
   'Cache-Control': 'no-store, max-age=0, must-revalidate',

@@ -21,6 +21,7 @@ interface Cuentas {
   talentoAvisos?: number
   academia?: number
   academiaRevisar?: number
+  propuesta?: number
 }
 interface Props {
   titulo: string
@@ -56,7 +57,7 @@ const grupos: { titulo: string; items: Item[] }[] = [
     ],
   },
   ...(isAdmin
-    ? [{ titulo: 'Administración', items: [{ id: 'usuarios', lbl: 'Usuarios', n: cuentas.usuarios }, { id: 'talento', lbl: 'Talento humano', href: '/admin/talento', n: cuentas.talento, alerta: cuentas.talentoAvisos, alertaTitulo: 'Vencidos o por vencer en 15 días' }, { id: 'ia', lbl: 'Asistente IA' }, { id: 'diagnostico', lbl: 'Diagnóstico IA', href: '/admin/diagnostico', n: cuentas.diagnostico }, { id: 'academia', lbl: 'Academia IA', href: '/admin/academia', n: cuentas.academia, alerta: cuentas.academiaRevisar, alertaTitulo: 'Entregas por revisar' }] }]
+    ? [{ titulo: 'Administración', items: [{ id: 'usuarios', lbl: 'Usuarios', n: cuentas.usuarios }, { id: 'talento', lbl: 'Talento humano', href: '/admin/talento', n: cuentas.talento, alerta: cuentas.talentoAvisos, alertaTitulo: 'Vencidos o por vencer en 15 días' }, { id: 'ia', lbl: 'Asistente IA' }, { id: 'diagnostico', lbl: 'Diagnóstico IA', href: '/admin/diagnostico', n: cuentas.diagnostico }, { id: 'academia', lbl: 'Academia IA', href: '/admin/academia', n: cuentas.academia, alerta: cuentas.academiaRevisar, alertaTitulo: 'Entregas por revisar' }, { id: 'propuesta', lbl: 'Propuesta', href: '/admin/propuesta', n: cuentas.propuesta }] }]
     : []),
 ]
 const crumb = grupos.flatMap((g) => g.items).find((i) => i.id === activo)?.lbl ?? ''

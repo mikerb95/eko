@@ -1,0 +1,173 @@
+---
+// La propuesta comercial en línea (/propuesta): publicarla o retirarla, el
+// plan que eligió el gerente y lo que le preguntó al chat. Solo admin.
+export const prerender = false
+import AdminLayout from '../../layouts/AdminLayout.astro'
+import { ico } from '../../lib/admin/iconos'
+import { listarElecciones, listarPreguntas, propuestaPublicada, type ElegidoPlan, type Pregunta } from '../../lib/propuesta/almacen'
+import { pesos } from '../../lib/propuesta/datos'
+
+const role = Astro.locals.role || ''
+if (role !== 'admin') return Astro.redirect('/admin')
+
+let errorCarga = ''
+let publicada = false
+let preguntas: Pregunta[] = []
+let elecciones: ElegidoPlan[] = []
+try {
+  ;[publicada, preguntas, elecciones] = await Promise.all([propuestaPublicada(), listarPreguntas(), listarElecciones()])
+} catch (e: any) {
+  console.error('[admin/propuesta] carga', e?.stack || e)
+  errorCarga = 'No se pudo cargar la propuesta.'
+}
+const url = `${Astro.url.origin}/propuesta`
+const paraMike = preguntas.filter((p) => p.aMike)
+const sesiones = new Set(preguntas.map((p) => p.sesion)).size
+const fecha = (iso: string) =>
+  new Date(iso).toLocaleString('es-CO', { day: 'numeric', month: 'short', hour: 'numeric', minute: '2-digit', timeZone: 'America/Bogota' })
+const resumen = (e: ElegidoPlan) =>
+  [e.calculo?.plan?.etiqueta, e.calculo?.capacitacion && `capacitación de ${e.calculo.capacitacion.sabados} sábados`].filter(Boolean).join(' + ') || 'Sin datos'
+---
+
+<AdminLayout titulo="Propuesta · EKOSOLV" activo="propuesta" css={['/admin/diagnostico.css']} cuentas={{ propuesta: preguntas.length }}>
+  <Fragment slot="avisos">
+    {errorCarga && <div class="banner-error">{errorCarga}</div>}
+  </Fragment>
+
+  <div class="panel-head">
+    <div>
+      <h2>Propuesta en línea</h2>
+      <p class="panel-sub">La propuesta de codebymike.net con simulador, chat con IA y elección de plan. Los avisos llegan a PROPUESTA_EMAIL.</p>
+    </div>
+  </div>
+
+  <section class="dash-card dx-enlace">
+    <div class="dash-head">
+      <div>
+        <h3>
+          <span class={`dx-punto${publicada ? ' is-on' : ''}`} aria-hidden="true"></span>
+          {publicada ? 'Propuesta publicada' : 'Propuesta sin publicar'}
+        </h3>
+        <p>
+          {publicada
+            ? 'Quien tenga el enlace la ve. No está en el menú, el sitemap ni los buscadores.'
+            : 'La página dice que la propuesta no está disponible y el chat no responde.'}
+        </p>
+      </div>
+    </div>
+    <div class="dx-url">
+      <input id="dx-url" type="text" readonly value={url} aria-label="Dirección de la propuesta" />
+      <button class="btn-primary btn-sm" type="button" id="dx-copiar">Copiar</button>
+      <a class="btn-ghost btn-sm" href="/propuesta" target="_blank">Ver página<Fragment set:html={ico('externo', 'ext')} /></a>
+    </div>
+    <div class="dx-acciones">
+      {publicada
+        ? <button class="btn-ghost btn-sm" data-accion="retirar">Retirar propuesta</button>
+        : <button class="btn-primary btn-sm" data-accion="publicar">Publicar propuesta</button>}
+      <p class="form-error" id="dx-err"></p>
+    </div>
+  </section>
+
+  <div class="kpi-grid">
+    <div class="kpi" style="--c:#2f80c9">
+      <span class="kpi-lbl">Preguntas al chat</span><span class="kpi-num">{preguntas.length}</span>
+      <span class="kpi-sub">{sesiones ? `En ${sesiones} visita(s)` : 'Todavía ninguna'}</span>
+    </div>
+    <div class={`kpi${paraMike.length ? ' is-alerta' : ''}`} style="--c:#e8920c">
+      <span class="kpi-lbl">Para responder usted</span><span class="kpi-num">{paraMike.length}</span>
+      <span class="kpi-sub">La IA no las respondió: negociación o fuera de la propuesta</span>
+    </div>
+    <div class="kpi" style="--c:#46a85b">
+      <span class="kpi-lbl">Planes elegidos</span><span class="kpi-num">{elecciones.length}</span>
+      <span class="kpi-sub">{elecciones[0] ? resumen(elecciones[0]) : 'Ninguno todavía'}</span>
+    </div>
+  </div>
+
+  {elecciones.length > 0 && (
+    <div class="dash-card">
+      <div class="dash-head"><div><h3>Planes elegidos</h3><p>No es un contrato: es el aviso para formalizar.</p></div></div>
+      {elecciones.map((e) => (
+        <details class="dash-card dx-resp" open>
+          <summary>
+            <b>{resumen(e)}</b>
+            <span>{e.nombre}{e.cargo && ` · ${e.cargo}`}</span>
+            <time>{fecha(e.creado)}</time>
+          </summary>
+          <div class="dx-resp-cuerpo" style="padding:0 18px 14px">
+            {e.calculo && (
+              <p>
+                {e.calculo.plan && <>Mensualidad {pesos(e.calculo.mensual)} (meses 1 a 18), {pesos(e.calculo.mensualDespues)} desde el mes 19. </>}
+                {e.calculo.capacitacion && <>Capacitación {pesos(e.calculo.valorCapacitacion)}. </>}
+                Al empezar {pesos(e.calculo.alFirmar)}. Total de los primeros 18 meses {pesos(e.calculo.total18)}.
+              </p>
+            )}
+            {e.comentario && <p><b>Comentario:</b> {e.comentario}</p>}
+          </div>
+          <div class="dx-resp-pie">
+            <button class="btn-ghost btn-sm" data-borrar={e.id} data-tipo="eleccion"><Fragment set:html={ico('borrar')} />Eliminar</button>
+          </div>
+        </details>
+      ))}
+    </div>
+  )}
+
+  {preguntas.length === 0 ? (
+    <div class="vacio"><b>Todavía no hay preguntas</b>Cuando el gerente use el chat de la propuesta, aquí aparece cada pregunta con la respuesta de la IA.</div>
+  ) : (
+    <div class="dash-card">
+      <div class="dash-head"><div><h3>Preguntas al chat</h3><p>Las marcadas "Para usted" le llegaron también por correo.</p></div></div>
+      {preguntas.map((p) => (
+        <details class="dash-card dx-resp" open={p.aMike}>
+          <summary>
+            {p.aMike && <span class="badge" style="background:#fdf0dc;color:#9a5b00;padding:2px 8px;border-radius:999px;font-size:12px">Para usted</span>}
+            <b>{p.pregunta}</b>
+            <time>{fecha(p.creado)}</time>
+          </summary>
+          <div style="padding:0 18px 14px">
+            {p.motivo && <p><b>Qué pide:</b> {p.motivo}</p>}
+            <p><b>Respondió la IA:</b> {p.respuesta}</p>
+          </div>
+          <div class="dx-resp-pie">
+            <button class="btn-ghost btn-sm" data-borrar={p.id} data-tipo="pregunta"><Fragment set:html={ico('borrar')} />Eliminar</button>
+          </div>
+        </details>
+      ))}
+    </div>
+  )}
+
+  <Fragment slot="fuera">
+    <script is:inline>
+      ;(() => {
+        const err = document.getElementById('dx-err')
+        async function enviar(metodo, url, cuerpo) {
+          const res = await fetch(url, {
+            method: metodo,
+            headers: cuerpo ? { 'content-type': 'application/json' } : undefined,
+            body: cuerpo ? JSON.stringify(cuerpo) : undefined,
+          })
+          const j = await res.json().catch(() => ({}))
+          if (!res.ok) throw new Error(j.error || 'No se pudo completar la acción.')
+          return j
+        }
+        document.getElementById('dx-copiar')?.addEventListener('click', async (e) => {
+          const b = e.currentTarget
+          const input = document.getElementById('dx-url')
+          try { await navigator.clipboard.writeText(input.value) } catch { input.select(); return }
+          b.textContent = 'Copiado'
+          setTimeout(() => { b.textContent = 'Copiar' }, 1600)
+        })
+        document.querySelectorAll('[data-accion]').forEach((b) => b.addEventListener('click', async () => {
+          b.disabled = true
+          try { await enviar('POST', '/api/admin/propuesta', { accion: b.dataset.accion }); location.reload() }
+          catch (ex) { if (err) err.textContent = ex.message; b.disabled = false }
+        }))
+        document.querySelectorAll('[data-borrar]').forEach((b) => b.addEventListener('click', async () => {
+          if (!window.confirm('¿Eliminar este registro? No se puede deshacer.')) return
+          b.disabled = true
+          try { await enviar('DELETE', `/api/admin/propuesta?id=${b.dataset.borrar}&tipo=${b.dataset.tipo}`); location.reload() }
+          catch (ex) { if (err) err.textContent = ex.message; b.disabled = false }
+        }))
+      })()
+    </script>
+  </Fragment>
+</AdminLayout>
