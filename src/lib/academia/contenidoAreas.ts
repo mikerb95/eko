@@ -88,8 +88,7 @@ Copiar en un informe para el cliente el número de resolución que dio la IA, si
         texto: 'Te pego el texto oficial y vigente del [artículo X de la norma Y]. Con base solo en este texto, dime qué obligaciones tiene el cliente en este caso: [caso]. Si el texto no alcanza para concluir algo, dilo.',
       },
     ],
-    minutos_extra: undefined as never,
-  } as ContenidoLeccion,
+  },
   'operaciones:3': {
     resumen: 'Revisar un ICA, un PMA o un EIA contra una lista de chequeo, punto por punto.',
     minutos: 20,
@@ -372,7 +371,7 @@ Pedirle que "arregle la tabla". Puede cambiar datos correctos para que se vean "
 1. Los datos del certificado de disposición final de Ekosolv, sacados con IA del certificado real de un gestor, y el borrador en la plantilla de la empresa.
 2. La conciliación de un lote de recolecciones contra los certificados de los gestores, con las diferencias encontradas.
 
-Cuente qué instrucción usó, qué diferencias apareció la IA y cuáles verificó usted en el documento original.`,
+Cuente qué instrucción usó, qué diferencias encontró la IA y cuáles verificó usted en el documento original.`,
     prompts: [],
   },
 

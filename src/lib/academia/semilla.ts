@@ -3,15 +3,16 @@
  * (src/lib/capacitacion.ts). Módulo PURO.
  *
  * - Capacitación general: lecciones completas, escritas para el primer sábado.
- * - Talleres por área: una lección por tema de "Qué aprende", con el título y
- *   sin contenido, y al final la entrega del taller con el ejercicio que pide
- *   el programa ("demuestra") y su material. Mike completa el contenido en
- *   /admin/academia antes de publicarlas.
+ * - Talleres por área: una lección por tema de "Qué aprende", con el título
+ *   del programa y el contenido de contenidoAreas.ts, y al final la entrega
+ *   del taller con el ejercicio que pide el programa ("demuestra") y su
+ *   material.
  *
  * Todo se siembra SIN publicar: nada le llega al equipo sin que Mike lo revise.
  * `semilla` es la clave que evita sembrar dos veces la misma lección.
  */
 import { GENERAL, MODULOS } from '../capacitacion.ts'
+import { CONTENIDO_AREAS } from './contenidoAreas.ts'
 
 export interface Prompt {
   titulo: string
@@ -190,34 +191,36 @@ export function leccionesSemilla(): LeccionSemilla[] {
   const lista: LeccionSemilla[] = GENERALES.map((l, i) => ({ ...l, modulo: 'general', orden: i + 1, semilla: `general:${i + 1}` }))
   for (const m of MODULOS) {
     m.aprende.forEach((tema, i) => {
+      const c = CONTENIDO_AREAS[`${m.id}:${i + 1}`]
       lista.push({
         semilla: `${m.id}:tema:${i + 1}`,
         modulo: m.id,
         orden: i + 1,
         titulo: comoTitulo(tema),
-        resumen: '',
-        contenido: '',
-        prompts: [],
+        resumen: c?.resumen ?? '',
+        contenido: c?.contenido ?? '',
+        prompts: c?.prompts ?? [],
         recursos: [],
         ejercicio: '',
         entregable: '',
-        practica_consigna: '',
-        minutos: 15,
+        practica_consigna: c?.practica_consigna ?? '',
+        minutos: c?.minutos ?? 15,
       })
     })
+    const e = CONTENIDO_AREAS[`${m.id}:entrega`]
     lista.push({
       semilla: `${m.id}:entrega`,
       modulo: m.id,
       orden: m.aprende.length + 1,
       titulo: `Entrega del taller de ${m.titulo}`,
       resumen: m.demuestra,
-      contenido: '',
-      prompts: [],
+      contenido: e?.contenido ?? '',
+      prompts: e?.prompts ?? [],
       recursos: m.material.map((x) => ({ titulo: x.titulo, href: x.href ?? '' })),
       ejercicio: m.demuestra,
       entregable: 'Comparta el enlace al resultado (Drive o WorkDrive) y explique en pocas líneas la instrucción que usó y qué verificó.',
       practica_consigna: `Escriba la instrucción que usaría para lograr esto: ${m.demuestra}`,
-      minutos: 45,
+      minutos: e?.minutos ?? 45,
     })
   }
   return lista
