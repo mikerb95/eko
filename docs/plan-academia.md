@@ -9,7 +9,7 @@
 | Alcance | Solo Ekosolv, dentro de este sitio. Convive con `/ia`, que sigue pública (encuesta y programa). |
 | Acceso | Cuenta por persona. Rol nuevo `participante`: solo entra a la academia. Quien ya usa el panel entra con su misma cuenta. |
 | Ruta | Capacitación general + taller de su área (módulos de `src/lib/capacitacion.ts`). |
-| Contenido | Editor en el panel. Arranca sembrado y sin publicar: general con contenido completo, áreas con tema y entrega. |
+| Contenido | Editor en el panel. Arranca sembrado y sin publicar: 34 lecciones con contenido (general en `semilla.ts`, áreas en `contenidoAreas.ts`). |
 | Práctica | Revisor de instrucciones: ejecuta la instrucción y la revisa con contexto, tarea, formato y ejemplos. Haiku, tope `ACADEMIA_IA_TOPE_DIARIO_USD` (3 USD por defecto) y 25 prácticas por persona al día. |
 | Certificado | Asistencia a todos los bloques de su ruta + todas las entregas aprobadas. Se emite al abrirlo o desde el panel, con código verificable en `/verificar/<código>`, y se registra en Talento humano (cursos general y del área). |
 
@@ -32,6 +32,8 @@
 
 ## Pendientes
 
-- Escribir el contenido de las lecciones por área y publicar.
+- Revisar el contenido sembrado (sobre todo las referencias a normas) y publicar.
+- La siembra solo crea lo que falta: si una base ya tiene las lecciones, cambiar `contenidoAreas.ts` no las actualiza; se editan en el panel.
+- `/verificar/<código>` también está reservado en docs/plan-panel-operaciones.md para los certificados de recolección: cuando se construyan, compartir la página distinguiendo por formato de código.
 - Crear las cuentas del equipo y programar los sábados cuando el diagnóstico fije las fechas.
 - Probar la práctica con IA real en producción (la clave ya está en Vercel Production).
