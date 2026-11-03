@@ -749,6 +749,201 @@ const steps: TFStep[] = [
       iniciar()
     </script>
 
+    <script>
+      // Casos para el taller (src/lib/diagnostico/casos.ts). Cada archivo se
+      // sube apenas se elige, directo al almacén: en producción a Vercel Blob
+      // privado con un token de un solo uso (no pasa por la función, que no
+      // acepta más de 4,5 MB); en pruebas, a la carpeta local. Al enviar, el
+      // caso viaja con las rutas y la API confirma cada archivo.
+      import { upload } from '@vercel/blob/client'
+      import { MAX_ARCHIVOS, MAX_BYTES, MAX_MB, nombreSeguro, tipoDe } from '../lib/diagnostico/casos'
+
+      type Item = {
+        file: File
+        li: HTMLLIElement
+        barra: HTMLElement
+        estado: HTMLElement
+        ctrl: AbortController
+        ruta?: string
+        error?: string
+        promesa: Promise<void>
+      }
+
+      const raiz = document.getElementById('ia-casos')
+      const form = document.getElementById('caso-form') as HTMLFormElement | null
+      if (raiz && form) {
+        const modo = raiz.dataset.modo === 'blob' ? 'blob' : 'local'
+        const input = document.getElementById('cx-input') as HTMLInputElement
+        const zona = document.getElementById('cx-zona')!
+        const listaEl = document.getElementById('cx-lista')!
+        const errorEl = document.getElementById('cx-error')!
+        const listo = document.getElementById('caso-listo')!
+        const enviarBtn = form.querySelector<HTMLButtonElement>('.cx-enviar')!
+        let lote = crypto.randomUUID()
+        let items: Item[] = []
+
+        const MEM = 'ia-casos-persona'
+        try {
+          const m = JSON.parse(localStorage.getItem(MEM) || '{}')
+          if (m.nombre) (form.elements.namedItem('nombre') as HTMLInputElement).value = m.nombre
+          if (m.area) (form.elements.namedItem('area') as HTMLSelectElement).value = m.area
+        } catch {
+          // Sin almacenamiento: la persona escribe su nombre de nuevo.
+        }
+
+        const peso = (b: number) => (b < 1024 * 1024 ? `${Math.max(1, Math.round(b / 1024))} KB` : `${(b / 1024 / 1024).toFixed(1).replace('.', ',')} MB`)
+        const mostrarError = (m: string) => { errorEl.textContent = m }
+
+        async function subirLocal(ruta: string, file: File, signal: AbortSignal): Promise<string> {
+          const r = await fetch(`/api/diagnostico-casos/subir?ruta=${encodeURIComponent(ruta)}`, { method: 'PUT', body: file, signal })
+          const j = await r.json().catch(() => ({}))
+          if (!r.ok) throw new Error(j.error || 'No se pudo subir.')
+          return j.pathname
+        }
+
+        function agregar(file: File) {
+          if (items.length >= MAX_ARCHIVOS) return mostrarError(`Máximo ${MAX_ARCHIVOS} archivos por caso. Si tiene más, envíe este y agregue otro caso.`)
+          const tipo = tipoDe(file.name)
+          if (!tipo) return mostrarError(`"${file.name}" no es un tipo de archivo aceptado.`)
+          if (file.size > MAX_BYTES) return mostrarError(`"${file.name}" pesa más de ${MAX_MB} MB.`)
+          if (items.some((x) => x.file.name === file.name && x.file.size === file.size)) return
+          mostrarError('')
+
+          const li = document.createElement('li')
+          li.className = 'cx-arch is-subiendo'
+          const nombre = document.createElement('span')
+          nombre.className = 'cx-arch-nombre'
+          nombre.textContent = file.name
+          const estado = document.createElement('small')
+          estado.className = 'cx-arch-estado'
+          estado.textContent = `${peso(file.size)} · subiendo…`
+          const quitar = document.createElement('button')
+          quitar.type = 'button'
+          quitar.className = 'cx-quitar'
+          quitar.setAttribute('aria-label', `Quitar ${file.name}`)
+          quitar.innerHTML = '<svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M18 6 6 18M6 6l12 12"/></svg>'
+          const pista = document.createElement('span')
+          pista.className = 'cx-arch-pista'
+          const barra = document.createElement('span')
+          barra.className = 'cx-arch-barra'
+          pista.appendChild(barra)
+          li.append(nombre, estado, quitar, pista)
+          listaEl.appendChild(li)
+
+          const ctrl = new AbortController()
+          const item = { file, li, barra, estado, ctrl } as Item
+          const ruta = `taller/${lote}/${nombreSeguro(file.name)}`
+          item.promesa = (async () => {
+            try {
+              item.ruta =
+                modo === 'blob'
+                  ? (
+                      await upload(ruta, file, {
+                        access: 'private',
+                        handleUploadUrl: '/api/diagnostico-casos/subir',
+                        contentType: tipo,
+                        multipart: file.size > 8 * 1024 * 1024,
+                        abortSignal: ctrl.signal,
+                        onUploadProgress: (p) => { barra.style.width = `${p.percentage}%` },
+                      })
+                    ).pathname
+                  : await subirLocal(ruta, file, ctrl.signal)
+              barra.style.width = '100%'
+              li.classList.replace('is-subiendo', 'is-listo')
+              estado.textContent = `${peso(file.size)} · listo`
+            } catch (e: any) {
+              if (ctrl.signal.aborted) return
+              item.error = /token|tipo|accept/i.test(String(e?.message)) ? 'No se pudo subir este archivo.' : (e?.message || 'No se pudo subir.')
+              li.classList.replace('is-subiendo', 'is-error')
+              estado.textContent = `${item.error} Quítelo e intente de nuevo.`
+            }
+          })()
+          quitar.addEventListener('click', () => {
+            ctrl.abort()
+            items = items.filter((x) => x !== item)
+            li.remove()
+          })
+          items.push(item)
+        }
+
+        input.addEventListener('change', () => {
+          Array.from(input.files ?? []).forEach(agregar)
+          input.value = ''
+        })
+        ;['dragenter', 'dragover'].forEach((ev) => zona.addEventListener(ev, (e) => { e.preventDefault(); zona.classList.add('is-sobre') }))
+        ;['dragleave', 'drop'].forEach((ev) => zona.addEventListener(ev, () => zona.classList.remove('is-sobre')))
+        zona.addEventListener('drop', (e) => {
+          e.preventDefault()
+          Array.from((e as DragEvent).dataTransfer?.files ?? []).forEach(agregar)
+        })
+
+        form.addEventListener('submit', async (e) => {
+          e.preventDefault()
+          mostrarError('')
+          const f = new FormData(form)
+          const val = (k: string) => String(f.get(k) ?? '').trim()
+          if (val('nombre').length < 3) return mostrarError('Escriba su nombre.')
+          if (!val('area')) return mostrarError('Elija su área.')
+          if (!items.length) return mostrarError('Agregue al menos un archivo.')
+          if (val('contexto').length < 20) return mostrarError('Cuente un poco más qué hace con estos archivos.')
+          if (!val('privacidad')) return mostrarError('Indique si los archivos tienen datos de clientes.')
+          if (!f.get('consent')) return mostrarError('Falta marcar la autorización.')
+
+          enviarBtn.disabled = true
+          enviarBtn.textContent = items.some((x) => !x.ruta && !x.error) ? 'Terminando de subir…' : 'Enviando…'
+          await Promise.all(items.map((x) => x.promesa))
+          if (items.some((x) => x.error || !x.ruta)) {
+            enviarBtn.disabled = false
+            enviarBtn.textContent = 'Enviar caso'
+            return mostrarError('Uno de los archivos no se subió. Quítelo y vuelva a agregarlo.')
+          }
+          enviarBtn.textContent = 'Enviando…'
+          try {
+            const r = await fetch('/api/diagnostico-casos', {
+              method: 'POST',
+              headers: { 'content-type': 'application/json' },
+              body: JSON.stringify({
+                nombre: val('nombre'),
+                area: val('area'),
+                contexto: val('contexto'),
+                fuentes: val('fuentes'),
+                resultados: f.getAll('resultados').map(String),
+                privacidad: val('privacidad'),
+                consent: 'true',
+                website: val('website'),
+                archivos: items.map((x) => ({ ruta: x.ruta, nombre: x.file.name })),
+              }),
+            })
+            const j = await r.json().catch(() => ({}))
+            if (!r.ok) throw new Error(j.error || 'No se pudo enviar el caso.')
+            try { localStorage.setItem(MEM, JSON.stringify({ nombre: val('nombre'), area: val('area') })) } catch { /* sin almacenamiento */ }
+            form.hidden = true
+            listo.hidden = false
+            listo.scrollIntoView({ behavior: 'smooth', block: 'center' })
+          } catch (ex: any) {
+            mostrarError(ex?.message || 'No se pudo enviar el caso.')
+          } finally {
+            enviarBtn.disabled = false
+            enviarBtn.textContent = 'Enviar caso'
+          }
+        })
+
+        document.getElementById('caso-otro')?.addEventListener('click', () => {
+          const nombre = (form.elements.namedItem('nombre') as HTMLInputElement).value
+          const area = (form.elements.namedItem('area') as HTMLSelectElement).value
+          form.reset()
+          ;(form.elements.namedItem('nombre') as HTMLInputElement).value = nombre
+          ;(form.elements.namedItem('area') as HTMLSelectElement).value = area
+          items = []
+          listaEl.innerHTML = ''
+          lote = crypto.randomUUID()
+          listo.hidden = true
+          form.hidden = false
+          form.querySelector<HTMLTextAreaElement>('textarea')?.focus()
+        })
+      }
+    </script>
+
     <footer class="ia-pie ia-wrap">Página interna del equipo de Ekosolv. Si tiene dudas sobre la capacitación, escríbale a Gerencia.</footer>
 
     <style>
