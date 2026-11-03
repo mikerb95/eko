@@ -33,6 +33,8 @@ export interface Contact {
    * de que la suscripción la pidió él y no se la inventó el sitio.
    */
   marketing_at: string
+  /** Persona del equipo que atiende el mensaje. Vacío = sin responsable. */
+  assigned_to: string
   created_at?: string
   updated_at?: string
 }
@@ -59,6 +61,7 @@ function rowToContact(r: any): Contact {
     consent_version: r.consent_version ?? '',
     consent_ip: r.consent_ip ?? '',
     marketing_at: r.marketing_at ?? '',
+    assigned_to: r.assigned_to ?? '',
     created_at: r.created_at,
     updated_at: r.updated_at,
   }
@@ -112,12 +115,25 @@ export async function getContactById(id: number): Promise<Contact | null> {
   return res.rows.length ? rowToContact(res.rows[0]) : null
 }
 
-export async function updateContactStatus(id: number, status: ContactStatus): Promise<Contact | null> {
+export interface ContactPatch {
+  status?: ContactStatus
+  assigned_to?: string
+}
+
+/** Cambia el estado, el responsable o ambos. Lo que no venga se conserva. */
+export async function updateContact(id: number, patch: ContactPatch): Promise<Contact | null> {
   await ensureSchema()
-  if (!(CONTACT_STATUSES as readonly string[]).includes(status)) return getContactById(id)
+  const current = await getContactById(id)
+  if (!current) return null
+  const status = patch.status && (CONTACT_STATUSES as readonly string[]).includes(patch.status) ? patch.status : current.status
+  const assigned_to = patch.assigned_to !== undefined ? patch.assigned_to.trim().slice(0, 100) : current.assigned_to
   await client().execute({
-    sql: 'UPDATE contacts SET status = ?, updated_at = ? WHERE id = ?',
-    args: [status, now(), id],
+    sql: 'UPDATE contacts SET status = ?, assigned_to = ?, updated_at = ? WHERE id = ?',
+    args: [status, assigned_to, now(), id],
   })
   return getContactById(id)
+}
+
+export async function updateContactStatus(id: number, status: ContactStatus): Promise<Contact | null> {
+  return updateContact(id, { status })
 }

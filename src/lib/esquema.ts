@@ -70,6 +70,7 @@ export const TABLAS: readonly string[] = [
     consent_version TEXT NOT NULL DEFAULT '',
     consent_ip TEXT NOT NULL DEFAULT '',
     marketing_at TEXT NOT NULL DEFAULT '',
+    assigned_to TEXT NOT NULL DEFAULT '',
     created_at TEXT NOT NULL DEFAULT '',
     updated_at TEXT NOT NULL DEFAULT ''
   )`,
@@ -320,6 +321,8 @@ export const COLUMNAS: readonly (readonly [tabla: string, columna: string])[] = 
   ['contacts', 'consent_version'],
   ['contacts', 'consent_ip'],
   ['contacts', 'marketing_at'],
+  // Persona del equipo que atiende el mensaje (texto libre, como en las órdenes).
+  ['contacts', 'assigned_to'],
   ['orders', 'waste_type'],
   ['orders', 'estimated_quantity'],
   ['orders', 'consent_at'],
