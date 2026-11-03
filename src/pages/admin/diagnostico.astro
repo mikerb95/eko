@@ -41,6 +41,8 @@ try {
 const r: Resumen = resumir(respuestas)
 const { reemplazadas } = vigentes(respuestas)
 const url = `${Astro.url.origin}/ia`
+// Cuántas personas aceptaron al menos una versión del asistente con IA de la encuesta.
+const conIA = vigentes(respuestas).filas.filter((f) => f.ia_campos?.length).length
 
 // Colores de las barras: los mismos tintes del panel.
 const C_AREA: Record<string, string> = {
@@ -182,6 +184,7 @@ const barras = (cs: Conteo[], de: number, color: (c: Conteo) => string) =>
           <p class="dx-pie">
             Modalidad: {r.modalidad.filter((m) => m.n).map((m) => `${m.etiqueta.toLowerCase()} ${m.n}`).join(' · ') || 'sin respuesta'}
             {r.ias.length > 0 && <><br />Han usado: {r.ias.map((c) => `${c.etiqueta} ${c.n}`).join(' · ')}</>}
+            {r.total > 0 && <><br />Aceptaron la ayuda del asistente de la encuesta: {conIA} de {r.total}</>}
           </p>
         </section>
       </div>

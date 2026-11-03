@@ -21,6 +21,12 @@ export type TFField =
       label: string
       placeholder?: string
       required?: boolean
+      /**
+       * Marca el campo para que la página le agregue un asistente con IA
+       * (data-ia). El componente no hace nada más con esto: el asistente lo
+       * monta la página que lo necesite, como /ia.
+       */
+      ia?: boolean
     }
   | {
       type: 'choice'
@@ -226,6 +232,7 @@ const selectedValues = (f: Extract<TFField, { type: 'choice' }>) =>
                         name={f.name}
                         placeholder={f.placeholder}
                         data-required={f.required ? 'true' : 'false'}
+                        data-ia={f.ia ? 'true' : undefined}
                       />
                     </label>
                   )

@@ -82,6 +82,7 @@ const steps: TFStep[] = [
           name: `otra_${a.id}`,
           label: '¿Otra tarea que repita y no esté en la lista?',
           placeholder: 'Opcional',
+          ia: true,
         },
       ],
     }),
@@ -103,6 +104,7 @@ const steps: TFStep[] = [
         label: 'La tarea que más tiempo le quita',
         placeholder: 'Qué hace, con qué documentos y cuánto le toma cada vez',
         required: true,
+        ia: true,
       },
     ],
   },
@@ -124,7 +126,7 @@ const steps: TFStep[] = [
         label: 'Si participa: propuestas que pasan por usted al mes',
         options: PROPUESTAS_MES.map((h) => ({ value: h.id, label: h.etiqueta })),
       },
-      { type: 'textarea', name: 'propuesta_demora', label: '¿Qué parte de la propuesta le toma más tiempo?', placeholder: 'Opcional' },
+      { type: 'textarea', name: 'propuesta_demora', label: '¿Qué parte de la propuesta le toma más tiempo?', placeholder: 'Opcional', ia: true },
     ],
   },
   {
@@ -152,7 +154,7 @@ const steps: TFStep[] = [
         label: '¿Cuántas horas a la semana le dedica a pedir certificados y hacer seguimiento a los gestores?',
         options: HORAS.map((h) => ({ value: h.id, label: h.etiqueta })),
       },
-      { type: 'textarea', name: 'certificado_demora', label: '¿Qué parte le toma más tiempo?', placeholder: 'Opcional' },
+      { type: 'textarea', name: 'certificado_demora', label: '¿Qué parte le toma más tiempo?', placeholder: 'Opcional', ia: true },
     ],
   },
   {
@@ -191,6 +193,7 @@ const steps: TFStep[] = [
         label: 'La tarea que le gustaría resolver',
         placeholder: 'Por ejemplo, sacar las obligaciones y plazos de un auto sin leerlo completo',
         required: true,
+        ia: true,
       },
       {
         type: 'choice',
