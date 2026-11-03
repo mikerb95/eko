@@ -226,7 +226,7 @@ const rivales = [
     perfil: "Gestor industrial con más de 20 años, sedes en Bogotá, Medellín, Cali y Barranquilla y más de 150 empresas asociadas. Compra excedentes y chatarra, desmonta plantas, tiene plantas propias para luminarias y equipos con PCB, y opera Puntos Verdes, un programa de RAEE con puntos canjeables para empresas.",
     fuerte: "Capacidad física, cobertura nacional y precio por volumen. Es la opción natural para la planta que quiere vender chatarra y desocupar bodega.",
     gana: "Ekosolv deja al cliente cumplido, no solo con el residuo recogido: licencia, recolección, certificado e informe ante la ANLA con un solo responsable. En su sitio Lito no ofrece consultoría ambiental ni certificados verificables en línea.",
-    mensaje: "\"Lito le compra la chatarra. Nosotros le respondemos a la ANLA.\"",
+    mensaje: "“Lito le compra la chatarra. Nosotros le respondemos a la ANLA.”",
     accion: "No pelear por tonelada ni por cobertura. Ir por el cliente que tiene un requerimiento, una auditoría o un informe encima, y llegar primero con el certificado digital del Decreto 766. En corrientes donde Lito tiene planta propia (luminarias, PCB), puede ser proveedor de Ekosolv y no solo rival.",
   },
   {
@@ -236,7 +236,7 @@ const rivales = [
     perfil: "Programa posconsumo de computadores y periféricos de la ANDI (Grupo Retorna). Reporta más de 25.200 toneladas gestionadas, entre 40 y 51 marcas afiliadas, ISO 9001 y 14001 y una plataforma B2B para agendar recolecciones.",
     fuerte: "Las marcas grandes ya están adentro, tiene el respaldo gremial y la recolección no le cuesta nada al consumidor.",
     gana: "EcoCómputo atiende a sus afiliados, no al importador mediano que la ANLA está encontrando como evasor. Y su servicio es recoger, no armarle al productor el sistema ni el informe ante la ANLA.",
-    mensaje: "\"Si no cabe en un colectivo de la ANDI, le armamos el sistema.\"",
+    mensaje: "“Si no cabe en un colectivo de la ANDI, le armamos el sistema.”",
     accion: "No competir por las marcas afiliadas. Ofrecer EKONSULTING al importador que recibe el oficio de la ANLA y no está en un colectivo. Y explorar ser gestor de EcoCómputo en la Sabana con certificados digitales que su informe anual pueda usar.",
   },
   {
@@ -246,7 +246,7 @@ const rivales = [
     perfil: "Corporación posconsumo de electrodomésticos grandes y pequeños, con recolección puerta a puerta en unas 30 ciudades y municipios y jornadas con otros sistemas. Opera con gestores aliados por ciudad: hoy publica uno solo en Bogotá (Fontibón).",
     fuerte: "Llega al hogar y a las alcaldías con jornadas y logística de recolección que Ekosolv no tiene.",
     gana: "Necesita gestores licenciados que certifiquen, y en Bogotá y la Sabana tiene poca red. El Decreto 766 le va a exigir certificados electrónicos a cada gestor que use.",
-    mensaje: "\"Su gestor en la Sabana, con certificado digital desde el primer kilo.\"",
+    mensaje: "“Su gestor en la Sabana, con certificado digital desde el primer kilo.”",
     accion: "Postularse como gestor aliado para Bogotá, Funza, Mosquera, Madrid y Cota, donde Red Verde ya recoge. Es volumen de RAEE sin tener que salir a venderlo puerta a puerta.",
   },
 ]
@@ -1251,6 +1251,11 @@ const fuentes = [
   @media (max-width: 620px) {
     .lines, .caps { grid-template-columns: 1fr; }
     .dont ol { grid-template-columns: 1fr; }
+    /* El SVG se escala a ~0,6: se compensa el tamaño del texto. */
+    .pos-map .pt text { font-size: 21px; }
+    .pos-map .eko text { font-size: 18px; }
+    .pos-map .eje-t { font-size: 15px; letter-spacing: 0.02em; }
+    .pos-map .zona-t { font-size: 26px; }
     .mx { font-size: 13px; }
     .mx thead th { font-size: 9.5px; letter-spacing: 0; padding-inline: 2px; }
     .mx td { padding-inline: 2px; }
