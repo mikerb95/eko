@@ -290,7 +290,10 @@ const datos = { horasMesProp: p.horasMes, horasMesRep, volumen: p.volumen, plane
       .cifras b { display: block; font: 600 30px/1 var(--display); letter-spacing: -0.02em; color: var(--deep); }
       .cifras span { display: block; margin-top: 6px; font-size: 13px; color: var(--ink-2); }
 
-      section { margin-top: 34px; break-inside: avoid-page; }
+      section { margin-top: 34px; }
+      /* Al imprimir se cortan las secciones, pero no una tabla, una caja ni un título suelto. */
+      table, .caja, .cifras > div, .citas li, .lista { break-inside: avoid; }
+      h2, h3 { break-after: avoid; }
       h2 { font-size: 18px; font-weight: 600; margin: 0 0 10px; display: flex; gap: 10px; align-items: baseline; }
       h2 span { font: 500 12px var(--mono); color: var(--forest); }
       h3 { font-size: 13.5px; font-weight: 600; margin: 18px 0 8px; }
@@ -323,7 +326,7 @@ const datos = { horasMesProp: p.horasMes, horasMesRep, volumen: p.volumen, plane
       }
       @media print {
         @page { size: A4; margin: 16mm; }
-        body { background: #fff; }
+        body { background: #fff; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
         .barra { display: none; }
         .hoja { margin: 0; padding: 0; box-shadow: none; max-width: none; }
       }
