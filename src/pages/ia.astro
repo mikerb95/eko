@@ -1110,20 +1110,20 @@ const steps: TFStep[] = [
       .cx-zona-ico { width: 44px; height: 44px; border-radius: 50%; display: grid; place-items: center; color: var(--deep); background: #fff; box-shadow: 0 2px 8px rgba(14, 28, 38, .08); margin-bottom: 4px; }
       .cx-lista { list-style: none; margin: 4px 0 0; padding: 0; display: grid; gap: 8px; }
       .cx-lista:empty { display: none; }
-      .cx-arch {
+      .cx-lista :global(.cx-arch) {
         display: grid; grid-template-columns: minmax(0, 1fr) auto; grid-template-areas: 'n q' 'e q' 'p p'; gap: 2px 10px;
         padding: 11px 12px 0 14px; border-radius: 10px; background: color-mix(in oklab, var(--paper-warm) 60%, #fff); overflow: hidden;
       }
-      .cx-arch-nombre { grid-area: n; font-size: 14.5px; color: var(--ink); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-      .cx-arch-estado { grid-area: e; font: 400 12px/1.5 var(--font-mono); color: var(--mute); padding-bottom: 9px; }
-      .cx-arch.is-listo .cx-arch-estado { color: var(--forest); }
-      .cx-arch.is-error .cx-arch-estado { color: #b04a2e; }
-      .cx-quitar { grid-area: q; align-self: center; width: 30px; height: 30px; border-radius: 50%; display: grid; place-items: center; color: var(--mute); cursor: pointer; background: transparent; transition: background .18s, color .18s; }
-      .cx-quitar:hover { background: color-mix(in oklab, var(--ink) 7%, transparent); color: var(--ink); }
-      .cx-arch-pista { grid-area: p; height: 3px; margin: 0 -12px 0 -14px; background: color-mix(in oklab, var(--deep) 10%, transparent); }
-      .cx-arch-barra { display: block; height: 100%; width: 0; background: var(--deep); transition: width .2s; }
-      .cx-arch.is-listo .cx-arch-barra { background: var(--forest); }
-      .cx-arch.is-error .cx-arch-barra { background: #b04a2e; width: 100%; }
+      .cx-lista :global(.cx-arch-nombre) { grid-area: n; font-size: 14.5px; color: var(--ink); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+      .cx-lista :global(.cx-arch-estado) { grid-area: e; font: 400 12px/1.5 var(--font-mono); color: var(--mute); padding-bottom: 9px; }
+      .cx-lista :global(.cx-arch.is-listo .cx-arch-estado) { color: var(--forest); }
+      .cx-lista :global(.cx-arch.is-error .cx-arch-estado) { color: #b04a2e; }
+      .cx-lista :global(.cx-quitar) { grid-area: q; align-self: center; width: 30px; height: 30px; border-radius: 50%; display: grid; place-items: center; color: var(--mute); cursor: pointer; background: transparent; transition: background .18s, color .18s; }
+      .cx-lista :global(.cx-quitar:hover) { background: color-mix(in oklab, var(--ink) 7%, transparent); color: var(--ink); }
+      .cx-lista :global(.cx-arch-pista) { grid-area: p; height: 3px; margin: 0 -12px 0 -14px; background: color-mix(in oklab, var(--deep) 10%, transparent); }
+      .cx-lista :global(.cx-arch-barra) { display: block; height: 100%; width: 0; background: var(--deep); transition: width .2s; }
+      .cx-lista :global(.cx-arch.is-listo .cx-arch-barra) { background: var(--forest); }
+      .cx-lista :global(.cx-arch.is-error .cx-arch-barra) { background: #b04a2e; width: 100%; }
       .cx-chips { display: flex; flex-wrap: wrap; gap: 8px; }
       .cx-chip input, .cx-radio input { position: absolute; opacity: 0; pointer-events: none; }
       .cx-chip span {

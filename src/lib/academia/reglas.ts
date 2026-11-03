@@ -66,11 +66,14 @@ export const esEstadoRevision = (v: unknown): v is 'aprobada' | 'devuelta' => v 
 
 // ---------- Ruta, progreso y certificado ----------
 
-/** Lecciones publicadas de la ruta, en orden: módulo según la ruta y luego `orden`. */
-export function leccionesDeRuta<T extends LeccionBase>(lecciones: T[], area: string): T[] {
+/**
+ * Lecciones publicadas de la ruta, en orden: módulo según la ruta y luego
+ * `orden`. Con `borradores` también salen las no publicadas (vista previa).
+ */
+export function leccionesDeRuta<T extends LeccionBase>(lecciones: T[], area: string, borradores = false): T[] {
   const ruta = rutaDe(area)
   return lecciones
-    .filter((l) => l.publicada && ruta.includes(l.modulo))
+    .filter((l) => (borradores || l.publicada) && ruta.includes(l.modulo))
     .sort((a, b) => ruta.indexOf(a.modulo) - ruta.indexOf(b.modulo) || a.orden - b.orden || a.id - b.id)
 }
 
