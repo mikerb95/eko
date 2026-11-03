@@ -53,6 +53,25 @@ const COLOR: Record<string, string> = {
 }
 const modulos: ModuloCapacitacion[] = [GENERAL, ...MODULOS]
 
+// Íconos de trazo (estilo Lucide) para cada tarjeta del programa.
+const ICONO: Record<string, string> = {
+  general:
+    '<path d="M9.94 15.5A2 2 0 0 0 8.5 14.06l-6.14-1.58a.5.5 0 0 1 0-.96L8.5 9.94A2 2 0 0 0 9.94 8.5l1.58-6.14a.5.5 0 0 1 .96 0l1.58 6.14a2 2 0 0 0 1.44 1.44l6.14 1.58a.5.5 0 0 1 0 .96l-6.14 1.58a2 2 0 0 0-1.44 1.44l-1.58 6.14a.5.5 0 0 1-.96 0z"/><path d="M20 3v4M22 5h-4"/>',
+  operaciones:
+    '<rect x="8" y="2" width="8" height="4" rx="1"/><path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"/><path d="m9 14 2 2 4-4"/>',
+  logistica:
+    '<path d="M14 18V6a2 2 0 0 0-2-2H4a2 2 0 0 0-2 2v11a1 1 0 0 0 1 1h2"/><path d="M15 18H9"/><path d="M19 18h2a1 1 0 0 0 1-1v-3.65a1 1 0 0 0-.22-.62l-3.48-4.35A1 1 0 0 0 17.52 8H14"/><circle cx="17" cy="18" r="2"/><circle cx="7" cy="18" r="2"/>',
+  ventas: '<rect x="2" y="6" width="20" height="14" rx="2"/><path d="M16 20V4a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"/>',
+  mercadeo: '<path d="m3 11 18-5v12L3 14v-3z"/><path d="M11.6 16.8a3 3 0 1 1-5.8-1.6"/>',
+  gerencia:
+    '<circle cx="12" cy="12" r="10"/><path d="m16.24 7.76-1.8 5.41a2 2 0 0 1-1.27 1.27L7.76 16.24l1.8-5.41a2 2 0 0 1 1.27-1.27z"/>',
+  finanzas: '<path d="M3 3v16a2 2 0 0 0 2 2h16"/><path d="m19 9-5 5-4-4-3 3"/>',
+}
+const svg = (inner: string, cls = '') =>
+  `<svg class="${cls}" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${inner}</svg>`
+const ICO_ENTREGABLE = '<path d="M15 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7Z"/><path d="M14 2v4a2 2 0 0 0 2 2h4"/><path d="m9 15 2 2 4-4"/>'
+const dos = (n: number) => String(n).padStart(2, '0')
+
 const ops = (lista: readonly Opcion[]): TFOption[] => lista.map((o) => ({ value: o.id, label: o.etiqueta, hint: o.hint }))
 
 const steps: TFStep[] = [
@@ -324,20 +343,53 @@ const steps: TFStep[] = [
             Cada taller termina con un ejercicio sobre un documento real. Las fechas se fijan con el diagnóstico.
           </p>
         </div>
-        <div class="ia-modulos">
+        <nav class="ia-atajos" aria-label="Ir a un área">
           {modulos.map((m) => (
-            <article class={`ia-card ia-modulo${m.id === 'general' ? ' is-general' : ''}`} id={`area-${m.id}`} style={`--c:${COLOR[m.id]}`}>
-              <h3><span class="ia-punto" aria-hidden="true"></span>{m.titulo}</h3>
-              <p class="ia-quien">{m.quien}</p>
-              <p class="ia-mini">Al terminar, podrá</p>
-              <ul class="ia-podra">{m.podra.map((x) => <li>{x}</li>)}</ul>
-              <details class="ia-aprende">
-                <summary>Qué aprende</summary>
-                <ul>{m.aprende.map((x) => <li>{x}</li>)}</ul>
-              </details>
-              <p class="ia-demuestra"><b>Lo demuestra con</b> {m.demuestra}</p>
-            </article>
+            <a href={`#area-${m.id}`} style={`--c:${COLOR[m.id]}`}>
+              <Fragment set:html={svg(ICONO[m.id])} />
+              {m.id === 'general' ? 'General' : m.titulo}
+            </a>
           ))}
+        </nav>
+        <div class="ia-modulos">
+          {modulos.map((m) => {
+            const [quien, ...meta] = m.quien.split(' · ')
+            return (
+              <article class={`ia-modulo${m.id === 'general' ? ' is-general' : ''}`} id={`area-${m.id}`} style={`--c:${COLOR[m.id]}`}>
+                <header class="ia-mod-head">
+                  <span class="ia-ico"><Fragment set:html={svg(ICONO[m.id])} /></span>
+                  <div class="ia-mod-tit">
+                    <h3>{m.titulo}</h3>
+                    <p class="ia-quien">{quien}</p>
+                  </div>
+                  {meta.length > 0 && (
+                    <ul class="ia-meta">{meta.map((x) => <li>{x}</li>)}</ul>
+                  )}
+                  <Fragment set:html={svg(ICONO[m.id], 'ia-marca')} />
+                </header>
+                <div class="ia-mod-body">
+                  <p class="ia-mini">Al terminar, podrá <span>{m.podra.length} logros</span></p>
+                  <ol class="ia-podra">
+                    {m.podra.map((x, i) => (
+                      <li><b>{dos(i + 1)}</b><span>{x}</span></li>
+                    ))}
+                  </ol>
+                  <details class="ia-aprende">
+                    <summary>
+                      <span>Qué aprende</span>
+                      <em>{m.aprende.length} temas</em>
+                      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m6 9 6 6 6-6" /></svg>
+                    </summary>
+                    <ul>{m.aprende.map((x) => <li>{x}</li>)}</ul>
+                  </details>
+                </div>
+                <footer class="ia-demuestra">
+                  <span class="ia-demuestra-ico"><Fragment set:html={svg(ICO_ENTREGABLE)} /></span>
+                  <p><b>Lo demuestra con</b>{m.demuestra}</p>
+                </footer>
+              </article>
+            )
+          })}
         </div>
       </section>
 
@@ -695,32 +747,138 @@ const steps: TFStep[] = [
       }
 
       .ia-punto { display: inline-block; width: 9px; height: 9px; border-radius: 50%; background: var(--c); margin-right: 10px; vertical-align: 2px; }
-      .ia-modulos { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 16px; align-items: start; }
-      .ia-modulo { padding: 26px 28px; }
-      .ia-modulo.is-general { grid-column: 1 / -1; background: color-mix(in oklab, var(--deep) 5%, #fff); }
-      .ia-modulo.is-general .ia-podra { columns: 2; column-gap: 36px; }
-      .ia-modulo h3 { font-size: 21px; font-weight: 600; letter-spacing: -0.01em; margin: 0; }
-      .ia-quien { font-size: 13.5px; color: var(--mute); margin: 6px 0 0; }
-      .ia-mini { font-family: var(--font-mono); font-size: 11px; letter-spacing: .1em; text-transform: uppercase; color: var(--mute); margin: 20px 0 10px; }
+      /* Programa por área */
+      .ia-atajos { display: flex; flex-wrap: wrap; gap: 8px; margin: 0 0 22px; }
+      .ia-atajos a {
+        display: inline-flex; align-items: center; gap: 7px; padding: 7px 13px 7px 10px; border-radius: 999px;
+        font-size: 14px; color: var(--ink-2); text-decoration: none; background: #fff; border: 1px solid var(--line);
+        transition: background .18s, color .18s, border-color .18s;
+      }
+      .ia-atajos a :global(svg) { width: 16px; height: 16px; color: var(--c); }
+      .ia-atajos a:hover { color: var(--ink); border-color: color-mix(in oklab, var(--c) 45%, var(--line)); background: color-mix(in oklab, var(--c) 8%, #fff); }
+
+      .ia-modulos { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 18px; align-items: stretch; }
+      .ia-modulo {
+        --tint: color-mix(in oklab, var(--c) 9%, #fff);
+        display: flex; flex-direction: column; overflow: hidden; scroll-margin-top: 24px;
+        background: #fff; border-radius: var(--r-lg); border: 1px solid color-mix(in oklab, var(--c) 14%, var(--line));
+        box-shadow: 0 1px 2px rgba(14, 28, 38, .04), 0 10px 28px rgba(14, 28, 38, .05);
+        transition: transform .25s cubic-bezier(.2,.7,.2,1), box-shadow .25s, border-color .25s;
+      }
+      .ia-modulo:hover {
+        transform: translateY(-3px); border-color: color-mix(in oklab, var(--c) 35%, var(--line));
+        box-shadow: 0 2px 4px rgba(14, 28, 38, .04), 0 22px 44px color-mix(in oklab, var(--c) 16%, transparent);
+      }
+      .ia-modulo:target { border-color: var(--c); box-shadow: 0 0 0 3px color-mix(in oklab, var(--c) 22%, transparent); }
+
+      .ia-mod-head {
+        position: relative; display: grid; grid-template-columns: auto 1fr; align-items: center; gap: 4px 16px;
+        padding: 24px 28px 22px; isolation: isolate;
+        background:
+          radial-gradient(120% 140% at 100% 0%, color-mix(in oklab, var(--c) 18%, transparent), transparent 60%),
+          var(--tint);
+      }
+      .ia-ico {
+        width: 48px; height: 48px; border-radius: 14px; display: grid; place-items: center; color: #fff;
+        background: linear-gradient(145deg, color-mix(in oklab, var(--c) 82%, #fff), var(--c));
+        box-shadow: 0 8px 18px color-mix(in oklab, var(--c) 32%, transparent), inset 0 1px 0 rgba(255,255,255,.35);
+      }
+      .ia-ico :global(svg) { width: 24px; height: 24px; }
+      .ia-mod-head :global(.ia-marca) {
+        position: absolute; right: -18px; bottom: -34px; width: 150px; height: 150px; z-index: -1;
+        color: var(--c); opacity: .09; stroke-width: 1.2; transform: rotate(-8deg);
+      }
+      .ia-mod-tit { min-width: 0; }
+      .ia-modulo h3 { font-size: 22px; font-weight: 600; letter-spacing: -0.015em; margin: 0; line-height: 1.15; }
+      .ia-quien { font-size: 14px; color: var(--ink-2); margin: 4px 0 0; line-height: 1.4; }
+      .ia-meta { grid-column: 1 / -1; list-style: none; display: flex; flex-wrap: wrap; gap: 6px; margin: 12px 0 0; padding: 0; }
+      .ia-meta li {
+        font: 500 11px/1.3 var(--font-mono); letter-spacing: .06em; text-transform: uppercase;
+        color: color-mix(in oklab, var(--c) 70%, var(--ink)); background: rgba(255,255,255,.75);
+        border: 1px solid color-mix(in oklab, var(--c) 20%, transparent); padding: 5px 9px; border-radius: 999px;
+      }
+
+      .ia-mod-body { padding: 22px 28px 6px; flex: 1; }
+      .ia-mini {
+        display: flex; align-items: center; justify-content: space-between; gap: 12px;
+        font-family: var(--font-mono); font-size: 11px; letter-spacing: .1em; text-transform: uppercase; color: var(--mute); margin: 0 0 6px;
+      }
+      .ia-mini span { color: color-mix(in oklab, var(--c) 75%, var(--ink)); }
       .ia-podra, .ia-aprende ul { list-style: none; margin: 0; padding: 0; }
-      .ia-podra li, .ia-aprende li {
-        position: relative; padding-left: 26px; font-size: 15px; line-height: 1.5; color: var(--ink-2); margin-bottom: 10px; break-inside: avoid;
+      .ia-podra li {
+        display: grid; grid-template-columns: 34px 1fr; gap: 0 4px; padding: 13px 0; break-inside: avoid;
+        font-size: 15px; line-height: 1.5; color: var(--ink-2);
       }
-      .ia-podra li::before {
-        content: ''; position: absolute; left: 0; top: 4px; width: 16px; height: 16px; border-radius: 50%;
-        background: color-mix(in oklab, var(--c) 14%, #fff)
-          url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23124E7D' stroke-width='3' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M6 12.5l4 4L18 8'/%3E%3C/svg%3E")
-          center / 10px no-repeat;
+      .ia-podra li + li { border-top: 1px dashed color-mix(in oklab, var(--c) 22%, var(--line)); }
+      .ia-podra b {
+        font: 500 13px/1.6 var(--font-mono); color: var(--c); letter-spacing: .02em;
       }
-      .ia-aprende { margin-top: 6px; }
-      .ia-aprende summary { cursor: pointer; font-size: 14px; font-weight: 500; color: var(--deep); padding: 6px 0; }
-      .ia-aprende ul { margin-top: 8px; }
-      .ia-aprende li::before { content: ''; position: absolute; left: 6px; top: 10px; width: 5px; height: 5px; border-radius: 50%; background: var(--c); }
+
+      .ia-aprende { margin: 6px 0 16px; border-radius: var(--r-md); background: color-mix(in oklab, var(--c) 5%, var(--paper-warm)); }
+      .ia-aprende summary {
+        list-style: none; cursor: pointer; display: flex; align-items: center; gap: 10px; padding: 12px 14px;
+        font-size: 14.5px; font-weight: 500; color: var(--ink); border-radius: var(--r-md); transition: background .18s;
+      }
+      .ia-aprende summary::-webkit-details-marker { display: none; }
+      .ia-aprende summary:hover { background: color-mix(in oklab, var(--c) 9%, transparent); }
+      .ia-aprende summary em {
+        font-style: normal; font: 500 11px/1 var(--font-mono); letter-spacing: .06em; text-transform: uppercase;
+        color: var(--mute); margin-right: auto;
+      }
+      .ia-aprende summary svg { width: 18px; height: 18px; color: var(--c); transition: transform .25s; }
+      .ia-aprende[open] summary svg { transform: rotate(180deg); }
+      .ia-aprende ul { padding: 2px 14px 12px; display: grid; gap: 8px; }
+      .ia-aprende li { position: relative; padding-left: 18px; font-size: 14.5px; line-height: 1.5; color: var(--ink-2); }
+      .ia-aprende li::before { content: ''; position: absolute; left: 2px; top: 9px; width: 6px; height: 6px; border-radius: 2px; background: var(--c); transform: rotate(45deg); }
+
       .ia-demuestra {
-        margin: 16px 0 0; padding: 12px 14px; border-radius: var(--r-md); font-size: 14px; line-height: 1.5; color: var(--ink-2);
-        background: color-mix(in oklab, var(--c) 7%, var(--paper-warm));
+        display: flex; gap: 14px; align-items: flex-start; margin: 0; padding: 18px 28px 22px;
+        background: var(--tint); border-top: 1px solid color-mix(in oklab, var(--c) 14%, transparent);
       }
-      .ia-demuestra b { display: block; font-family: var(--font-mono); font-weight: 400; font-size: 11px; letter-spacing: .1em; text-transform: uppercase; color: var(--mute); margin-bottom: 4px; }
+      .ia-demuestra-ico {
+        flex: none; width: 36px; height: 36px; border-radius: 10px; display: grid; place-items: center;
+        background: #fff; color: var(--c); box-shadow: 0 2px 6px color-mix(in oklab, var(--c) 18%, transparent);
+      }
+      .ia-demuestra-ico :global(svg) { width: 19px; height: 19px; }
+      .ia-demuestra p { margin: 0; font-size: 14.5px; line-height: 1.5; color: var(--ink); }
+      .ia-demuestra b {
+        display: block; font-family: var(--font-mono); font-weight: 500; font-size: 11px; letter-spacing: .1em; text-transform: uppercase;
+        color: color-mix(in oklab, var(--c) 75%, var(--ink)); margin-bottom: 3px;
+      }
+
+      /* La general: tarjeta principal en azul profundo, para todo el equipo. */
+      .ia-modulo.is-general {
+        grid-column: 1 / -1; --c: #7fd6cf; color: #fff; border-color: transparent;
+        background:
+          radial-gradient(90% 120% at 100% 0%, rgba(23, 156, 145, .45), transparent 55%),
+          radial-gradient(70% 90% at 0% 100%, rgba(47, 128, 201, .35), transparent 60%),
+          var(--deep-2);
+      }
+      .ia-modulo.is-general:hover { box-shadow: 0 2px 4px rgba(14, 28, 38, .06), 0 24px 50px rgba(14, 58, 92, .35); }
+      .is-general .ia-mod-head { background: none; padding-bottom: 8px; }
+      .is-general .ia-ico { color: var(--deep-2); background: linear-gradient(145deg, #c9f1ec, #7fd6cf); box-shadow: 0 8px 22px rgba(0,0,0,.25); }
+      .is-general :global(.ia-marca) { opacity: .1; width: 220px; height: 220px; bottom: -70px; }
+      .is-general h3 { font-family: var(--font-display); font-weight: var(--display-weight); font-size: clamp(24px, 2.6vw, 30px); }
+      .is-general .ia-quien { color: rgba(255,255,255,.72); }
+      .is-general .ia-mini { color: rgba(255,255,255,.55); }
+      .is-general .ia-mini span { color: var(--c); }
+      .is-general .ia-podra { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 0 36px; }
+      .is-general .ia-podra li { color: rgba(255,255,255,.9); border-top: 1px dashed rgba(255,255,255,.16); }
+      .is-general .ia-podra li:nth-child(-n+2) { border-top: 0; }
+      .is-general .ia-aprende { background: rgba(255,255,255,.07); }
+      .is-general .ia-aprende summary { color: #fff; }
+      .is-general .ia-aprende summary:hover { background: rgba(255,255,255,.06); }
+      .is-general .ia-aprende summary em { color: rgba(255,255,255,.55); }
+      .is-general .ia-aprende li { color: rgba(255,255,255,.85); }
+      .is-general .ia-demuestra { background: rgba(0,0,0,.18); border-top-color: rgba(255,255,255,.1); }
+      .is-general .ia-demuestra-ico { background: rgba(255,255,255,.1); box-shadow: none; }
+      .is-general .ia-demuestra p { color: #fff; }
+      .is-general .ia-demuestra b { color: var(--c); }
+
+      @media (prefers-reduced-motion: reduce) {
+        .ia-modulo, .ia-aprende summary svg { transition: none; }
+        .ia-modulo:hover { transform: none; }
+      }
 
       .ia-material { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 14px; }
       .ia-mat { background: #fff; border-radius: var(--r-md); padding: 18px 20px; border: 1px solid var(--line); }
@@ -738,7 +896,8 @@ const steps: TFStep[] = [
 
       @media (max-width: 860px) {
         .ia-modulos, .ia-material { grid-template-columns: 1fr; }
-        .ia-modulo.is-general .ia-podra { columns: 1; }
+        .is-general .ia-podra { grid-template-columns: 1fr; }
+        .is-general .ia-podra li:nth-child(2) { border-top: 1px dashed rgba(255,255,255,.16); }
       }
       @media (max-width: 560px) {
         /* En el celular la encuesta tiene que quedar a la vista sin mucho scroll. */
@@ -753,7 +912,15 @@ const steps: TFStep[] = [
         .ia-pasos b { width: 20px; height: 20px; font-size: 11px; }
         .ia-pasos i { display: none; }
         .ia-sec { padding-top: 40px; }
-        .ia-modulo { padding: 22px 20px; }
+        .ia-atajos { flex-wrap: nowrap; overflow-x: auto; margin: 0 calc(var(--pad) * -1) 18px; padding: 0 var(--pad) 4px; scrollbar-width: none; }
+        .ia-atajos a { flex: none; font-size: 13px; }
+        .ia-mod-head { padding: 20px 20px 18px; gap: 4px 14px; }
+        .ia-ico { width: 42px; height: 42px; border-radius: 12px; }
+        .ia-ico :global(svg) { width: 21px; height: 21px; }
+        .ia-modulo h3 { font-size: 20px; }
+        .ia-mod-body { padding: 18px 20px 4px; }
+        .ia-podra li { font-size: 14.5px; grid-template-columns: 30px 1fr; }
+        .ia-demuestra { padding: 16px 20px 20px; }
         .ia-encuesta { padding: 22px 18px; border-radius: var(--r-md); }
       }
     </style>

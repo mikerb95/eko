@@ -1,5 +1,6 @@
 import type { APIRoute } from 'astro'
 import { json, fail } from '../../../lib/apiError'
+import { tieneFicha } from '../../../lib/talento/datos'
 import { listUsers, upsertUser, deleteUser, ROLES, type Role, type UserInput } from '../../../lib/users'
 
 export const prerender = false
@@ -65,6 +66,11 @@ export const DELETE: APIRoute = async ({ url, locals }) => {
   const self = (await listUsers()).find((x) => x.username === locals.username)
   if (self && self.id === id) return json({ error: 'No puedes eliminar tu propia cuenta' }, 400)
   try {
+    // La ficha de talento humano cuelga de la cuenta: borrarla dejaría el
+    // historial laboral huérfano. Se desactiva en vez de borrar.
+    if (await tieneFicha(id)) {
+      return json({ error: 'Esta persona tiene ficha en Talento humano. Desactive la cuenta en vez de borrarla para conservar su historial.' }, 409)
+    }
     await deleteUser(id)
     return json({ ok: true })
   } catch (e: any) {

@@ -18,6 +18,9 @@ export const WRITE_RULES: ReadonlyArray<{ prefix: string; roles: readonly string
   // Diagnóstico de IA para la capacitación: abrir o cerrar la encuesta y
   // borrar respuestas. Las lecturas también se restringen dentro del endpoint.
   { prefix: '/api/admin/diagnostico', roles: ['admin'] },
+  // Talento humano: datos laborales y salariales. Las lecturas también se
+  // restringen a admin (middleware y endpoint).
+  { prefix: '/api/admin/talento', roles: ['admin'] },
   // La sincronización con Zoho escribe en un sistema externo: solo admin.
   { prefix: '/api/admin/zoho', roles: ['admin'] },
   // El asistente: cualquier sesión puede preguntar y decidir sus propuestas.

@@ -17,6 +17,8 @@ interface Cuentas {
   normativas?: number
   usuarios?: number
   diagnostico?: number
+  talento?: number
+  talentoAvisos?: number
 }
 interface Props {
   titulo: string
@@ -52,7 +54,7 @@ const grupos: { titulo: string; items: Item[] }[] = [
     ],
   },
   ...(isAdmin
-    ? [{ titulo: 'Administración', items: [{ id: 'usuarios', lbl: 'Usuarios', n: cuentas.usuarios }, { id: 'ia', lbl: 'Asistente IA' }, { id: 'diagnostico', lbl: 'Diagnóstico IA', href: '/admin/diagnostico', n: cuentas.diagnostico }] }]
+    ? [{ titulo: 'Administración', items: [{ id: 'usuarios', lbl: 'Usuarios', n: cuentas.usuarios }, { id: 'talento', lbl: 'Talento humano', href: '/admin/talento', n: cuentas.talento, alerta: cuentas.talentoAvisos, alertaTitulo: 'Vencidos o por vencer en 15 días' }, { id: 'ia', lbl: 'Asistente IA' }, { id: 'diagnostico', lbl: 'Diagnóstico IA', href: '/admin/diagnostico', n: cuentas.diagnostico }] }]
     : []),
 ]
 const crumb = grupos.flatMap((g) => g.items).find((i) => i.id === activo)?.lbl ?? ''

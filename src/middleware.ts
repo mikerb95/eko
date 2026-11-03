@@ -105,8 +105,9 @@ export const onRequest = defineMiddleware(async (context, next) => {
       headers: { 'content-type': 'application/json' },
     })
   }
-  // El listado de usuarios expone información sensible: solo admin, incluso en GET.
-  if (pathname.startsWith('/api/admin/users') && session.r !== 'admin') {
+  // El listado de usuarios y talento humano (salarios, contratos, documentos)
+  // exponen información sensible: solo admin, incluso en GET.
+  if ((pathname.startsWith('/api/admin/users') || pathname.startsWith('/api/admin/talento')) && session.r !== 'admin') {
     return new Response(JSON.stringify({ error: 'Solo administradores' }), {
       status: 403,
       headers: { 'content-type': 'application/json' },
