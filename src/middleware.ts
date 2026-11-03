@@ -3,11 +3,10 @@ import { SESSION_COOKIE, verifySession } from './lib/auth'
 import { canWrite } from './lib/reglasEscritura'
 
 const PUBLIC_ADMIN_PATHS = new Set(['/admin/login'])
-const PUBLIC_API_PATHS = new Set(['/api/admin/login'])
-
-// El rol `participante` solo estudia en la academia de IA. Del panel solo
-// puede usar la salida; cualquier otra página de /admin lo lleva a /academia.
-const PARTICIPANTE_API = new Set(['/api/admin/logout'])
+// La salida es pública: sin regla en reglasEscritura.ts, su POST caía en
+// "solo admin" y a los demás roles les respondía 403 sin borrar la cookie.
+// Cerrar una sesión que no existe no hace daño.
+const PUBLIC_API_PATHS = new Set(['/api/admin/login', '/api/admin/logout'])
 
 // Páginas internas del proyecto (las del pie de página, columna "Proyecto").
 // No son parte del sitio público: exigen sesión igual que /admin.
@@ -99,9 +98,11 @@ export const onRequest = defineMiddleware(async (context, next) => {
     return context.redirect(`/admin/login?next=${encodeURIComponent(next)}`)
   }
 
+  // El rol `participante` solo estudia en la academia de IA: cualquier página
+  // del panel lo lleva a /academia y la API del panel le queda cerrada.
   if (session.r === 'participante') {
     if (isAdminPage) return context.redirect('/academia')
-    if (isAdminApi && !PARTICIPANTE_API.has(pathname)) {
+    if (isAdminApi) {
       return new Response(JSON.stringify({ error: 'Tu cuenta solo tiene acceso a la academia' }), {
         status: 403,
         headers: { 'content-type': 'application/json' },

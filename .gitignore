@@ -5,6 +5,7 @@ dist/
 # local CMS database (libSQL/SQLite)
 data/*.db
 data/*.db-*
+data/taller/
 # generated types
 .astro/
 
