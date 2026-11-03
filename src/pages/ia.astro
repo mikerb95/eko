@@ -51,7 +51,7 @@ const ops = (lista: readonly Opcion[]): TFOption[] => lista.map((o) => ({ value:
 const steps: TFStep[] = [
   {
     title: 'Empecemos por usted',
-    subtitle: 'Son unos 15 minutos. Con sus respuestas se arma el taller de su área con casos de su trabajo real.',
+    subtitle: 'Así sabemos para quién es cada ejercicio del taller.',
     row: true,
     fields: [
       { type: 'text', name: 'nombre', label: 'Nombre', placeholder: 'Su nombre', required: true, autocomplete: 'name' },
@@ -163,3 +163,231 @@ const steps: TFStep[] = [
   },
 ]
 ---
+
+<!doctype html>
+<html lang="es">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="robots" content="noindex, nofollow, noarchive" />
+    <link rel="icon" href="/favicon.ico" sizes="any" />
+    <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32.png" />
+    <title>Capacitación en IA · Ekosolv</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Geist:wght@300..700&family=Geist+Mono:wght@300..500&display=swap"
+      rel="stylesheet"
+    />
+  </head>
+  <body class="ia">
+    <header class="ia-top">
+      <img src="/brand/ekosolv-horizontal.svg" alt="EKOSOLV" height="28" />
+      <span class="ia-tag">Capacitación en IA</span>
+    </header>
+
+    <main>
+      <section class="ia-hero ia-wrap">
+        <p class="ia-kicker">Equipo Ekosolv</p>
+        <h1>La inteligencia artificial, <em>aplicada a su trabajo</em></h1>
+        <p class="ia-lede">
+          Todo lo de la capacitación queda en esta página. Primero, la encuesta de diagnóstico. Después de cada taller,
+          aquí encontrará el material de su área: guías, plantillas e instrucciones listas para usar.
+        </p>
+        <nav class="ia-pasos" aria-label="Secciones">
+          <a href="#encuesta"><b>1</b>Encuesta{estado.abierta && <i>Ahora</i>}</a>
+          <a href="#programa"><b>2</b>Programa por área</a>
+          <a href="#material"><b>3</b>Material de apoyo</a>
+        </nav>
+      </section>
+
+      <!-- 1. ENCUESTA -->
+      <section id="encuesta" class="ia-sec ia-wrap">
+        <div class="ia-sec-head">
+          <p class="ia-kicker">Paso 1 · {estado.abierta ? 'Ahora' : 'Diagnóstico'}</p>
+          <h2>Encuesta de diagnóstico</h2>
+          <p>Unos 15 minutos. Con sus respuestas se arma el taller de su área, con casos de su trabajo real, y se fijan las fechas.</p>
+        </div>
+        <div class="ia-card ia-encuesta">
+          {
+            estado.abierta ? (
+              <TypeformFlow
+                formId="diagnostico-ia"
+                endpoint="/api/diagnostico"
+                submitLabel="Enviar respuestas"
+                successTitle="Gracias, quedó registrado"
+                successBody="Con las respuestas de todo el equipo se arma el cronograma y el taller de cada área. Si se le olvidó algo, puede volver a llenar la encuesta: se tiene en cuenta la última."
+                steps={steps}
+              />
+            ) : (
+              <div class="ia-cerrada">
+                <h3>{estado.usada ? 'La encuesta ya cerró' : 'La encuesta se abre pronto'}</h3>
+                <p>
+                  {estado.usada
+                    ? 'Gracias a quienes respondieron. Abajo está el programa y, después de cada taller, el material de su área.'
+                    : 'Vuelva a esta página cuando Gerencia le avise. Mientras tanto, abajo puede ver lo que aprenderá su área.'}
+                </p>
+              </div>
+            )
+          }
+        </div>
+      </section>
+
+      <!-- 2. PROGRAMA -->
+      <section id="programa" class="ia-sec ia-wrap">
+        <div class="ia-sec-head">
+          <p class="ia-kicker">Paso 2 · Los sábados</p>
+          <h2>Lo que aprende cada área</h2>
+          <p>
+            Sábados de 4 horas. Primero, la capacitación general con todo el equipo; después, el taller de cada área.
+            Cada taller termina con un ejercicio sobre un documento real. Las fechas se fijan con el diagnóstico.
+          </p>
+        </div>
+        <div class="ia-modulos">
+          {modulos.map((m) => (
+            <article class={`ia-card ia-modulo${m.id === 'general' ? ' is-general' : ''}`} id={`area-${m.id}`} style={`--c:${COLOR[m.id]}`}>
+              <h3><span class="ia-punto" aria-hidden="true"></span>{m.titulo}</h3>
+              <p class="ia-quien">{m.quien}</p>
+              <p class="ia-mini">Al terminar, podrá</p>
+              <ul class="ia-podra">{m.podra.map((x) => <li>{x}</li>)}</ul>
+              <details class="ia-aprende">
+                <summary>Qué aprende</summary>
+                <ul>{m.aprende.map((x) => <li>{x}</li>)}</ul>
+              </details>
+              <p class="ia-demuestra"><b>Lo demuestra con</b> {m.demuestra}</p>
+            </article>
+          ))}
+        </div>
+      </section>
+
+      <!-- 3. MATERIAL -->
+      <section id="material" class="ia-sec ia-wrap">
+        <div class="ia-sec-head">
+          <p class="ia-kicker">Paso 3 · Después de cada taller</p>
+          <h2>Material de apoyo</h2>
+          <p>Aquí se publica el material de cada taller para que lo tenga a mano cuando lo necesite en el día a día.</p>
+        </div>
+        <div class="ia-material">
+          {modulos.map((m) => (
+            <div class="ia-mat" style={`--c:${COLOR[m.id]}`}>
+              <h3><span class="ia-punto" aria-hidden="true"></span>{m.titulo}</h3>
+              <ul>
+                {m.material.map((x) => (
+                  <li>
+                    <span>{x.titulo}</span>
+                    {x.href ? <a href={x.href} target="_blank" rel="noopener">Abrir</a> : <small>Después del taller</small>}
+                  </li>
+                ))}
+              </ul>
+            </div>
+          ))}
+        </div>
+      </section>
+    </main>
+
+    <footer class="ia-pie ia-wrap">Página interna del equipo de Ekosolv. Si tiene dudas sobre la capacitación, escríbale a Gerencia.</footer>
+
+    <style>
+      .ia { min-height: 100vh; background: var(--paper-warm); color: var(--ink); }
+      .ia-wrap { max-width: 1080px; margin: 0 auto; padding-left: var(--pad); padding-right: var(--pad); }
+      .ia-top {
+        display: flex; align-items: center; gap: 14px; flex-wrap: wrap;
+        padding: 22px var(--pad); border-bottom: 1px solid var(--line);
+      }
+      .ia-top img { height: 28px; width: auto; }
+      .ia-tag, .ia-kicker {
+        font-family: var(--font-mono); font-size: 11.5px; letter-spacing: 0.1em; text-transform: uppercase; color: var(--forest);
+      }
+      .ia-tag { background: color-mix(in oklab, var(--forest) 10%, transparent); padding: 4px 9px; border-radius: 6px; }
+      .ia-kicker { margin: 0; }
+
+      .ia-hero { padding-top: clamp(40px, 8vw, 96px); padding-bottom: clamp(24px, 4vw, 40px); }
+      .ia-hero h1 {
+        font-family: var(--font-display); font-weight: 400; font-size: clamp(40px, 6.4vw, 76px);
+        line-height: 1; letter-spacing: -0.025em; margin: 16px 0 0; max-width: 15ch;
+      }
+      .ia-hero h1 em { color: var(--deep); }
+      .ia-lede { font-size: clamp(17px, 1.6vw, 19px); line-height: 1.55; color: var(--ink-2); max-width: 58ch; margin: 22px 0 0; }
+      .ia-pasos { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 30px; }
+      .ia-pasos a {
+        display: inline-flex; align-items: center; gap: 10px; text-decoration: none; color: var(--ink);
+        padding: 10px 16px 10px 10px; border-radius: 999px; background: #fff; border: 1px solid var(--line);
+        font-size: 15px; transition: border-color .18s, transform .18s;
+      }
+      .ia-pasos a:hover { border-color: var(--deep); transform: translateY(-1px); }
+      .ia-pasos b {
+        width: 26px; height: 26px; border-radius: 50%; display: grid; place-items: center;
+        font: 500 12px/1 var(--font-mono); background: color-mix(in oklab, var(--deep) 10%, #fff); color: var(--deep);
+      }
+      .ia-pasos i {
+        font-style: normal; font: 500 10.5px/1 var(--font-mono); letter-spacing: .08em; text-transform: uppercase;
+        color: #fff; background: var(--forest); padding: 4px 7px; border-radius: 999px;
+      }
+
+      .ia-sec { padding-top: clamp(48px, 7vw, 88px); scroll-margin-top: 12px; }
+      .ia-sec-head { max-width: 640px; margin-bottom: 26px; }
+      .ia-sec-head h2 {
+        font-family: var(--font-display); font-weight: 400; font-size: clamp(32px, 4.2vw, 48px);
+        line-height: 1.04; letter-spacing: -0.02em; margin: 10px 0 0;
+      }
+      .ia-sec-head p:last-child { color: var(--ink-2); font-size: 16.5px; line-height: 1.55; margin: 14px 0 0; }
+
+      .ia-card {
+        background: #fff; border-radius: var(--r-lg);
+        box-shadow: 0 1px 2px rgba(14, 28, 38, .04), 0 12px 32px rgba(14, 28, 38, .06);
+      }
+      .ia-encuesta { padding: clamp(24px, 5vw, 56px); }
+      .ia-encuesta :global(.tf-flow) { max-width: 720px; margin: 0 auto; }
+      .ia-cerrada h3 { font-family: var(--font-display); font-weight: 400; font-size: clamp(26px, 3vw, 34px); margin: 0; }
+      .ia-cerrada p { color: var(--ink-2); font-size: 16.5px; line-height: 1.55; max-width: 52ch; margin: 12px 0 0; }
+
+      .ia-punto { display: inline-block; width: 9px; height: 9px; border-radius: 50%; background: var(--c); margin-right: 10px; vertical-align: 2px; }
+      .ia-modulos { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 16px; align-items: start; }
+      .ia-modulo { padding: 26px 28px; }
+      .ia-modulo.is-general { grid-column: 1 / -1; background: color-mix(in oklab, var(--deep) 5%, #fff); }
+      .ia-modulo.is-general .ia-podra { columns: 2; column-gap: 36px; }
+      .ia-modulo h3 { font-size: 21px; font-weight: 600; letter-spacing: -0.01em; margin: 0; }
+      .ia-quien { font-size: 13.5px; color: var(--mute); margin: 6px 0 0; }
+      .ia-mini { font-family: var(--font-mono); font-size: 11px; letter-spacing: .1em; text-transform: uppercase; color: var(--mute); margin: 20px 0 10px; }
+      .ia-podra, .ia-aprende ul { list-style: none; margin: 0; padding: 0; }
+      .ia-podra li, .ia-aprende li {
+        position: relative; padding-left: 26px; font-size: 15px; line-height: 1.5; color: var(--ink-2); margin-bottom: 10px; break-inside: avoid;
+      }
+      .ia-podra li::before {
+        content: ''; position: absolute; left: 0; top: 4px; width: 16px; height: 16px; border-radius: 50%;
+        background: color-mix(in oklab, var(--c) 14%, #fff)
+          url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23124E7D' stroke-width='3' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M6 12.5l4 4L18 8'/%3E%3C/svg%3E")
+          center / 10px no-repeat;
+      }
+      .ia-aprende { margin-top: 6px; }
+      .ia-aprende summary { cursor: pointer; font-size: 14px; font-weight: 500; color: var(--deep); padding: 6px 0; }
+      .ia-aprende ul { margin-top: 8px; }
+      .ia-aprende li::before { content: ''; position: absolute; left: 6px; top: 10px; width: 5px; height: 5px; border-radius: 50%; background: var(--c); }
+      .ia-demuestra {
+        margin: 16px 0 0; padding: 12px 14px; border-radius: var(--r-md); font-size: 14px; line-height: 1.5; color: var(--ink-2);
+        background: color-mix(in oklab, var(--c) 7%, var(--paper-warm));
+      }
+      .ia-demuestra b { display: block; font-family: var(--font-mono); font-weight: 400; font-size: 11px; letter-spacing: .1em; text-transform: uppercase; color: var(--mute); margin-bottom: 4px; }
+
+      .ia-material { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 14px; }
+      .ia-mat { background: #fff; border-radius: var(--r-md); padding: 18px 20px; border: 1px solid var(--line); }
+      .ia-mat h3 { font-size: 16px; font-weight: 600; margin: 0 0 10px; }
+      .ia-mat ul { list-style: none; margin: 0; padding: 0; }
+      .ia-mat li { display: flex; justify-content: space-between; align-items: baseline; gap: 12px; padding: 8px 0; font-size: 14px; color: var(--ink-2); }
+      .ia-mat li + li { border-top: 1px solid color-mix(in oklab, var(--line) 70%, transparent); }
+      .ia-mat small { flex: none; font-family: var(--font-mono); font-size: 10.5px; letter-spacing: .06em; text-transform: uppercase; color: var(--mute); }
+      .ia-mat a { flex: none; color: var(--deep); font-weight: 500; }
+
+      .ia-pie { padding-top: 64px; padding-bottom: 48px; font-size: 13.5px; color: var(--mute); }
+
+      @media (max-width: 860px) {
+        .ia-modulos, .ia-material { grid-template-columns: 1fr; }
+        .ia-modulo.is-general .ia-podra { columns: 1; }
+      }
+      @media (max-width: 560px) {
+        .ia-modulo { padding: 22px 20px; }
+        .ia-encuesta { padding: 22px 18px; border-radius: var(--r-md); }
+      }
+    </style>
+  </body>
+</html>

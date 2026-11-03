@@ -5,7 +5,7 @@
 export const prerender = false
 import AdminLayout from '../../layouts/AdminLayout.astro'
 import { ico } from '../../lib/admin/iconos'
-import { leerEnlace, listarRespuestas, type EstadoEnlace } from '../../lib/diagnostico/datos'
+import { leerEstado, listarRespuestas, type EstadoEncuesta } from '../../lib/diagnostico/datos'
 import { resumir, vigentes, type Conteo, type Fila, type Resumen } from '../../lib/diagnostico/resumen'
 import {
   DOCUMENTO_REAL,
@@ -25,17 +25,17 @@ const role = Astro.locals.role || ''
 if (role !== 'admin') return Astro.redirect('/admin')
 
 let errorCarga = ''
-let enlace: EstadoEnlace = { codigo: '', abierta: false }
+let enlace: EstadoEncuesta = { abierta: false, usada: false }
 let respuestas: Fila[] = []
 try {
-  ;[enlace, respuestas] = await Promise.all([leerEnlace(), listarRespuestas()])
+  ;[enlace, respuestas] = await Promise.all([leerEstado(), listarRespuestas()])
 } catch (e: any) {
   console.error('[admin/diagnostico] carga', e?.stack || e)
   errorCarga = 'No se pudo cargar el diagnóstico.'
 }
 const r: Resumen = resumir(respuestas)
 const { reemplazadas } = vigentes(respuestas)
-const url = enlace.codigo ? `${Astro.url.origin}/diagnostico-ia?c=${enlace.codigo}` : ''
+const url = `${Astro.url.origin}/ia`
 
 // Colores de las barras: los mismos tintes del panel.
 const C_AREA: Record<string, string> = {
@@ -82,32 +82,26 @@ const barras = (cs: Conteo[], de: number, color: (c: Conteo) => string) =>
       <div>
         <h3>
           <span class={`dx-punto${enlace.abierta ? ' is-on' : ''}`} aria-hidden="true"></span>
-          {enlace.abierta ? 'Encuesta abierta' : enlace.codigo ? 'Encuesta cerrada' : 'Encuesta sin abrir'}
+          {enlace.abierta ? 'Encuesta abierta' : enlace.usada ? 'Encuesta cerrada' : 'Encuesta sin abrir'}
         </h3>
         <p>
           {enlace.abierta
-            ? 'Comparta este enlace con el equipo. Quien no lo tenga no puede responder.'
-            : enlace.codigo
-              ? 'El enlace no recibe respuestas mientras esté cerrada.'
-              : 'Al abrirla se crea el enlace para enviarle al equipo.'}
+            ? 'El equipo la encuentra de primera en esta dirección, junto con el programa por área.'
+            : enlace.usada
+              ? 'La página sigue mostrando el programa y el material, pero ya no recibe respuestas.'
+              : 'La página ya muestra el programa por área. Al abrir la encuesta, aparece de primera.'}
         </p>
       </div>
     </div>
-    {url && (
-      <div class="dx-url">
-        <input id="dx-url" type="text" readonly value={url} aria-label="Enlace de la encuesta" />
-        <button class="btn-primary btn-sm" type="button" id="dx-copiar">Copiar</button>
-      </div>
-    )}
+    <div class="dx-url">
+      <input id="dx-url" type="text" readonly value={url} aria-label="Dirección de la página de capacitación" />
+      <button class="btn-primary btn-sm" type="button" id="dx-copiar">Copiar</button>
+      <a class="btn-ghost btn-sm" href="/ia" target="_blank">Ver página<Fragment set:html={ico('externo', 'ext')} /></a>
+    </div>
     <div class="dx-acciones">
       {enlace.abierta
         ? <button class="btn-ghost btn-sm" data-accion="cerrar">Cerrar encuesta</button>
         : <button class="btn-primary btn-sm" data-accion="abrir">Abrir encuesta</button>}
-      {enlace.codigo && (
-        <button class="btn-ghost btn-sm" data-accion="regenerar" data-confirmar="El enlace actual dejará de funcionar. ¿Generar uno nuevo?">
-          Generar enlace nuevo
-        </button>
-      )}
       <p class="form-error" id="dx-err"></p>
     </div>
   </section>

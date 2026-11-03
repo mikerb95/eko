@@ -12,25 +12,31 @@ test.describe.configure({ mode: 'serial' })
 
 let enlace = ''
 
-test('sin código válido la encuesta no se muestra', async ({ page }) => {
-  await page.goto('/diagnostico-ia?c=inventado')
-  await expect(page.getByRole('heading', { name: 'Este enlace no está activo' })).toBeVisible()
-  const r = await page.request.post('/api/diagnostico?c=inventado', { data: { nombre: 'X' } })
+test('sin abrir, /ia muestra el programa pero no la encuesta', async ({ page }) => {
+  await page.goto('/ia')
+  await expect(page.getByRole('heading', { name: 'La encuesta se abre pronto' })).toBeVisible()
+  await expect(page.locator('#area-operaciones')).toContainText('matriz de obligaciones')
+  await expect(page.locator('#material')).toContainText('Después del taller')
+  const r = await page.request.post('/api/diagnostico', { data: { nombre: 'X' } })
   expect(r.status()).toBe(403)
+  // La dirección vieja lleva a la nueva.
+  await page.goto('/diagnostico-ia?c=viejo')
+  await expect(page).toHaveURL(/\/ia$/)
 })
 
-test('panel: abrir la encuesta crea el enlace', async ({ page }) => {
+test('panel: abrir la encuesta', async ({ page }) => {
   await entrar(page)
   await page.goto('/admin/diagnostico')
   await expect(page.getByRole('heading', { name: 'Encuesta sin abrir' })).toBeVisible()
   await page.getByRole('button', { name: 'Abrir encuesta' }).click()
   await expect(page.getByRole('heading', { name: 'Encuesta abierta' })).toBeVisible()
   enlace = await page.locator('#dx-url').inputValue()
-  expect(enlace).toMatch(/\/diagnostico-ia\?c=[\w-]+$/)
+  expect(enlace).toMatch(/\/ia$/)
 })
 
 test('equipo: responde la encuesta con el paso de su área', async ({ page }) => {
-  await page.goto(new URL(enlace).pathname + new URL(enlace).search)
+  await page.goto('/ia')
+  await page.screenshot({ path: 'test-results/ia-inicio.png', fullPage: true })
   const siguiente = () => page.locator('.tf-next').click()
   const activo = page.locator('.tf-step.is-active')
 
@@ -101,11 +107,11 @@ test('panel: resumen por área y respuesta individual', async ({ page }) => {
   expect(await csv.text()).toContain('Laura Gómez')
 })
 
-test('panel: cerrar la encuesta deja el enlace inactivo', async ({ page }) => {
+test('panel: cerrar la encuesta la quita de /ia', async ({ page }) => {
   await entrar(page)
   await page.goto('/admin/diagnostico')
   await page.getByRole('button', { name: 'Cerrar encuesta' }).click()
   await expect(page.getByRole('heading', { name: 'Encuesta cerrada' })).toBeVisible()
-  await page.goto(new URL(enlace).pathname + new URL(enlace).search)
-  await expect(page.getByRole('heading', { name: 'Este enlace no está activo' })).toBeVisible()
+  await page.goto('/ia')
+  await expect(page.getByRole('heading', { name: 'La encuesta ya cerró' })).toBeVisible()
 })
