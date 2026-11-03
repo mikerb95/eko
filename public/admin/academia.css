@@ -1,7 +1,9 @@
 /* Academia de IA en el panel (/admin/academia). Usa las piezas de crm.css y
    talento.css; aquí solo lo propio. Sin franjas de color a la izquierda. */
 
-.ac-acciones-head { display: flex; gap: 8px; flex-wrap: wrap; align-items: center; }
+.ac-acciones-head { display: flex; gap: 8px; align-items: center; flex: none; }
+.ac-acciones-head a { text-decoration: none; white-space: nowrap; }
+@media (max-width: 760px) { .ac-acciones-head { flex-wrap: wrap; } }
 .ac-dot { display: inline-block; width: 8px; height: 8px; border-radius: 50%; background: var(--c); margin-right: 7px; flex: none; }
 .ac-area { display: inline-flex; align-items: center; margin-right: 10px; white-space: nowrap; }
 .ac-kpi-txt { font-size: 22px !important; }
