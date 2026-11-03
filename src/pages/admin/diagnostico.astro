@@ -15,6 +15,9 @@ import {
   IAS,
   MODALIDAD,
   PREOCUPACIONES,
+  PROPUESTA_HORAS,
+  PROPUESTA_ROL,
+  PROPUESTAS_MES,
   TAREAS,
   USO_IA,
   etiqueta,
@@ -254,6 +257,8 @@ const barras = (cs: Conteo[], de: number, color: (c: Conteo) => string) =>
               {f.tarea_otra && <><dt>Otra tarea</dt><dd>{f.tarea_otra}</dd></>}
               <dt>Horas por semana</dt><dd>{etiqueta(HORAS, f.horas)}</dd>
               <dt>Más tiempo le quita</dt><dd>{f.tarea_principal}</dd>
+              {f.propuesta_rol && <><dt>Propuestas</dt><dd>{etiqueta(PROPUESTA_ROL, f.propuesta_rol)}{f.propuesta_horas ? ` · ${etiqueta(PROPUESTA_HORAS, f.propuesta_horas).toLowerCase()} cada una · ${etiqueta(PROPUESTAS_MES, f.propuestas_mes).toLowerCase()} al mes` : ''}</dd></>}
+              {f.propuesta_demora && <><dt>Lo que más demora</dt><dd>{f.propuesta_demora}</dd></>}
               <dt>Documentos</dt><dd>{lista(f.documentos, DOCUMENTOS)}</dd>
               <dt>Herramientas</dt><dd>{lista(f.herramientas, HERRAMIENTAS)}</dd>
               <dt>Uso de IA</dt><dd>{etiqueta(USO_IA, f.uso_ia)}{f.ias.length ? ` (${lista(f.ias, IAS)})` : ''}</dd>

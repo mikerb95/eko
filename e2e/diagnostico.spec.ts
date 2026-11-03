@@ -47,9 +47,9 @@ test('equipo: responde la encuesta con el paso de su área', async ({ page }) =>
   // Elegir el área avanza solo y muestra las tareas de esa área.
   await activo.getByRole('button', { name: /Ventas/ }).click()
   await expect(activo).toContainText('Pasar un Brief de Zoho CRM a propuesta')
-  await expect(activo.locator('.tf-step-count')).toContainText('03 / 09')
+  await expect(activo.locator('.tf-step-count')).toContainText('03 / 10')
   await page.locator('.tf-back').click()
-  await expect(activo.locator('.tf-step-count')).toContainText('02 / 09')
+  await expect(activo.locator('.tf-step-count')).toContainText('02 / 10')
   await activo.getByRole('button', { name: /Ventas/ }).click()
   await page.locator('.tf-back').click()
   await activo.getByRole('button', { name: /Operaciones/ }).click()
@@ -61,6 +61,14 @@ test('equipo: responde la encuesta con el paso de su área', async ({ page }) =>
 
   await activo.getByRole('button', { name: 'Entre 5 y 10 horas' }).click()
   await activo.getByLabel(/La tarea que más tiempo le quita/).fill('Leer autos de la CAR y pasar los plazos a Excel')
+  await siguiente()
+
+  // Operaciones también ve el paso de propuestas (parte técnica).
+  await expect(activo).toContainText('¿Participa en las propuestas comerciales?')
+  await activo.getByRole('button', { name: 'Aporto la parte técnica o el diagnóstico' }).click()
+  await activo.getByRole('button', { name: 'Entre 1 y 3 horas' }).click()
+  await activo.getByRole('button', { name: 'Entre 6 y 10' }).click()
+  await activo.getByLabel(/le toma más tiempo/).fill('Calcular el alcance técnico')
   await siguiente()
 
   await activo.getByRole('button', { name: /PDF escaneados/ }).click()
@@ -105,6 +113,21 @@ test('panel: resumen por área y respuesta individual', async ({ page }) => {
   const csv = await page.request.get('/api/admin/diagnostico?formato=csv')
   expect(csv.headers()['content-type']).toContain('text/csv')
   expect(await csv.text()).toContain('Laura Gómez')
+})
+
+test('informe para Gerencia: horas y valor con los supuestos', async ({ page }) => {
+  await entrar(page)
+  await page.goto('/admin/diagnostico/informe')
+  // 2 horas por propuesta × 8 propuestas al mes.
+  await expect(page.locator('.cifras')).toContainText('16 h')
+  await expect(page.locator('.caja')).toContainText('10 horas')
+  await page.locator('#s-costo').fill('50000')
+  // 16 h × 60% × $50.000
+  await expect(page.locator('.caja')).toContainText('$480.000')
+  await page.locator('#s-plan').check()
+  await expect(page.locator('.plan')).toContainText('$1.185.000')
+  await expect(page).toHaveURL(/costo=50000/)
+  await page.screenshot({ path: 'test-results/diagnostico-informe.png', fullPage: true })
 })
 
 test('panel: cerrar la encuesta la quita de /ia', async ({ page }) => {
