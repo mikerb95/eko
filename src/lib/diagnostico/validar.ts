@@ -73,15 +73,18 @@ export function validarRespuesta(b: Record<string, unknown>): Respuesta {
     certificado_demora: '',
     documentos: varias(b, 'documentos', DOCUMENTOS),
     herramientas: varias(b, 'herramientas', HERRAMIENTAS),
+    otras_herramientas: texto(b, 'otras_herramientas', 400),
     uso_ia: una(b, 'uso_ia', USO_IA),
     ias: varias(b, 'ias', IAS),
     para_que: texto(b, 'para_que', 800),
     preocupaciones: varias(b, 'preocupaciones', PREOCUPACIONES),
+    otra_preocupacion: texto(b, 'otra_preocupacion', 600),
     deseo: texto(b, 'deseo', 1000),
     documento_real: una(b, 'documento_real', DOCUMENTO_REAL),
     documento_cual: texto(b, 'documento_cual', 300),
     modalidad: una(b, 'modalidad', MODALIDAD),
     restricciones: texto(b, 'restricciones', 300),
+    comentarios: texto(b, 'comentarios', 2000),
   }
 
   // Propuestas: solo para las áreas que las hacen, y solo si participa.

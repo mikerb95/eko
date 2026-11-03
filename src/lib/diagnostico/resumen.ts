@@ -60,6 +60,8 @@ export interface ResumenArea {
   tareasPrincipales: Nota[]
   documentos: (Nota & { disponible: string })[]
   restricciones: Nota[]
+  /** Lo que la persona agregó por su cuenta: otras herramientas, otras preocupaciones y comentarios. */
+  comentarios: Nota[]
 }
 
 /** Semanas por mes, para pasar horas semanales a mensuales. */
@@ -219,6 +221,11 @@ function resumirArea(area: (typeof AREAS)[number], filas: Fila[]): ResumenArea {
       .filter((f) => f.documento_real !== 'no' && (f.documento_cual || f.documento_real))
       .map((f) => ({ nombre: f.nombre, texto: f.documento_cual, disponible: f.documento_real })),
     restricciones: notas(delArea, 'restricciones'),
+    comentarios: [
+      ...notas(delArea, 'comentarios'),
+      ...notas(delArea, 'otras_herramientas').map((n) => ({ ...n, texto: `Otras herramientas o documentos: ${n.texto}` })),
+      ...notas(delArea, 'otra_preocupacion').map((n) => ({ ...n, texto: `Otra preocupación: ${n.texto}` })),
+    ],
   }
 }
 
@@ -301,15 +308,18 @@ export function aCSV(filas: Fila[]): string {
     ['Lo que más demora del certificado', (f) => f.certificado_demora],
     ['Documentos', (f) => f.documentos.map((d) => etiqueta(DOCUMENTOS, d)).join(' | ')],
     ['Herramientas', (f) => f.herramientas.map((h) => etiqueta(HERRAMIENTAS, h)).join(' | ')],
+    ['Otros documentos o herramientas', (f) => f.otras_herramientas],
     ['Uso de IA', (f) => etiqueta(USO_IA, f.uso_ia)],
     ['IA que ha usado', (f) => f.ias.map((i) => etiqueta(IAS, i)).join(' | ')],
     ['Para qué la usa', (f) => f.para_que],
     ['Preocupaciones', (f) => f.preocupaciones.map((p) => etiqueta(PREOCUPACIONES, p)).join(' | ')],
+    ['Otra preocupación', (f) => f.otra_preocupacion],
     ['Tarea que quiere resolver con IA', (f) => f.deseo],
     ['Documento real para el taller', (f) => etiqueta(DOCUMENTO_REAL, f.documento_real)],
     ['Cuál documento', (f) => f.documento_cual],
     ['Modalidad', (f) => etiqueta(MODALIDAD, f.modalidad)],
     ['Sábados que no puede', (f) => f.restricciones],
+    ['Comentarios', (f) => f.comentarios],
   ]
   const celda = (s: string) => `"${String(s ?? '').replace(/"/g, '""').replace(/\r?\n/g, ' ')}"`
   const lineas = [cols.map(([t]) => celda(t)).join(';'), ...filas.map((f) => cols.map(([, g]) => celda(g(f))).join(';'))]

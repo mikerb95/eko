@@ -213,7 +213,7 @@ const barras = (cs: Conteo[], de: number, color: (c: Conteo) => string) =>
               <ul class="dx-notas">{a.deseos.map((d) => <li><p>{d.texto}</p><small>{d.nombre}</small></li>)}</ul>
 
               <details class="dx-mas">
-                <summary>Tareas que más tiempo quitan, documentos y fechas</summary>
+                <summary>Tareas que más tiempo quitan, documentos, comentarios y fechas</summary>
                 <h4 class="dx-sub">Tareas que más tiempo quitan</h4>
                 <ul class="dx-notas">{a.tareasPrincipales.map((d) => <li><p>{d.texto}</p><small>{d.nombre}</small></li>)}</ul>
                 <h4 class="dx-sub">Documento para el ejercicio</h4>
@@ -224,6 +224,12 @@ const barras = (cs: Conteo[], de: number, color: (c: Conteo) => string) =>
                   <>
                     <h4 class="dx-sub">Herramientas</h4>
                     <p class="dx-tags">{a.herramientas.map((h) => <span class="dx-tag">{h.etiqueta} <b>{h.n}</b></span>)}</p>
+                  </>
+                )}
+                {a.comentarios.length > 0 && (
+                  <>
+                    <h4 class="dx-sub">Lo que agregaron por su cuenta</h4>
+                    <ul class="dx-notas">{a.comentarios.map((d) => <li><p>{d.texto}</p><small>{d.nombre}</small></li>)}</ul>
                   </>
                 )}
                 {a.restricciones.length > 0 && (
@@ -266,13 +272,16 @@ const barras = (cs: Conteo[], de: number, color: (c: Conteo) => string) =>
               {f.certificado_demora && <><dt>Lo que más demora</dt><dd>{f.certificado_demora}</dd></>}
               <dt>Documentos</dt><dd>{lista(f.documentos, DOCUMENTOS)}</dd>
               <dt>Herramientas</dt><dd>{lista(f.herramientas, HERRAMIENTAS)}</dd>
+              {f.otras_herramientas && <><dt>Otras herramientas</dt><dd>{f.otras_herramientas}</dd></>}
               <dt>Uso de IA</dt><dd>{etiqueta(USO_IA, f.uso_ia)}{f.ias.length ? ` (${lista(f.ias, IAS)})` : ''}</dd>
               {f.para_que && <><dt>Para qué la usa</dt><dd>{f.para_que}</dd></>}
               <dt>Preocupaciones</dt><dd>{lista(f.preocupaciones, PREOCUPACIONES)}</dd>
+              {f.otra_preocupacion && <><dt>Otra preocupación</dt><dd>{f.otra_preocupacion}</dd></>}
               <dt>Quiere resolver</dt><dd>{f.deseo}</dd>
               <dt>Documento real</dt><dd>{etiqueta(DOCUMENTO_REAL, f.documento_real)}{f.documento_cual ? `: ${f.documento_cual}` : ''}</dd>
               <dt>Modalidad</dt><dd>{etiqueta(MODALIDAD, f.modalidad) || 'Sin respuesta'}</dd>
               {f.restricciones && <><dt>No puede</dt><dd>{f.restricciones}</dd></>}
+              {f.comentarios && <><dt>Comentarios</dt><dd>{f.comentarios}</dd></>}
             </dl>
             <div class="dx-resp-pie">
               <button class="btn-ghost btn-sm" data-borrar={f.id} data-nombre={f.nombre}><Fragment set:html={ico('borrar')} />Eliminar</button>

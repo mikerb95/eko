@@ -249,15 +249,18 @@ export interface Respuesta {
   certificado_demora: string
   documentos: string[]
   herramientas: string[]
+  otras_herramientas: string
   uso_ia: string
   ias: string[]
   para_que: string
   preocupaciones: string[]
+  otra_preocupacion: string
   deseo: string
   documento_real: string
   documento_cual: string
   modalidad: string
   restricciones: string
+  comentarios: string
 }
 
 /** Busca la etiqueta de una opción; si no está, devuelve el id tal cual. */

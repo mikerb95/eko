@@ -161,6 +161,7 @@ const steps: TFStep[] = [
     fields: [
       { type: 'choice', name: 'documentos', label: 'Documentos', multiple: true, options: ops(DOCUMENTOS) },
       { type: 'choice', name: 'herramientas', label: 'Herramientas', multiple: true, options: ops(HERRAMIENTAS) },
+      { type: 'text', name: 'otras_herramientas', label: '¿Otro documento o herramienta?', placeholder: 'Opcional' },
     ],
   },
   {
@@ -175,7 +176,10 @@ const steps: TFStep[] = [
   {
     title: '¿Qué le preocupa de usarla en su trabajo?',
     subtitle: 'Marque todas las que apliquen. Cada una se trabaja en la capacitación general.',
-    fields: [{ type: 'choice', name: 'preocupaciones', label: 'Preocupaciones', multiple: true, options: ops(PREOCUPACIONES) }],
+    fields: [
+      { type: 'choice', name: 'preocupaciones', label: 'Preocupaciones', multiple: true, options: ops(PREOCUPACIONES) },
+      { type: 'textarea', name: 'otra_preocupacion', label: '¿Otra preocupación?', placeholder: 'Opcional' },
+    ],
   },
   {
     title: 'Si la IA le resolviera una sola tarea, ¿cuál sería?',
@@ -208,6 +212,12 @@ const steps: TFStep[] = [
         name: 'restricciones',
         label: '¿Hay algún sábado de las próximas semanas en que no pueda?',
         placeholder: 'Opcional',
+      },
+      {
+        type: 'textarea',
+        name: 'comentarios',
+        label: '¿Algo más que quiera contarnos?',
+        placeholder: 'Lo que no le preguntamos y le parece importante para su taller. Opcional',
       },
       {
         type: 'consent',

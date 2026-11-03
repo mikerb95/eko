@@ -124,3 +124,11 @@ test('certificados: solo Logística, obligatorios para ella, y horas al mes', ()
   assert.equal(res.certificados.minutosPorCertificado, 45)
   assert.equal(res.certificados.horasMesSeguimiento, 15.2)
 })
+
+test('campos libres: se guardan y salen en el resumen del área y en el CSV', () => {
+  const r = validarRespuesta({ ...base, otras_herramientas: 'SharePoint', otra_preocupacion: 'Que se caiga internet', comentarios: 'Hago visitas de campo' })
+  const res = resumir([fila({ ...r, nombre: 'Libre' })])
+  const ops = res.areas.find((a) => a.area === 'operaciones')!
+  assert.deepEqual(ops.comentarios.map((c) => c.texto), ['Hago visitas de campo', 'Otras herramientas o documentos: SharePoint', 'Otra preocupación: Que se caiga internet'])
+  assert.ok(aCSV([fila({ ...r, nombre: 'Libre' })]).includes('Hago visitas de campo'))
+})
