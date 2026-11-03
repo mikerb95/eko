@@ -17,6 +17,7 @@
 import type { Order } from './ops'
 import type { Contact } from './contactos'
 import { SITE_URL } from './site'
+import type { Resumen } from './talento/resumen'
 
 const RESEND_ENDPOINT = 'https://api.resend.com/emails'
 const TIMEOUT_MS = 8000
@@ -26,11 +27,25 @@ function env(key: string): string {
 }
 
 /** Destinatarios internos, tolerante a comas y espacios sueltos. */
-function recipients(): string[] {
-  return env('NOTIFY_EMAIL')
+function recipients(variable = 'NOTIFY_EMAIL'): string[] {
+  return env(variable)
     .split(',')
     .map((s) => s.trim())
     .filter(Boolean)
+}
+
+/**
+ * Destinatarios del resumen de talento humano: `TALENTO_EMAIL` si existe
+ * (RR.HH. no tiene por qué recibir las recolecciones), si no `NOTIFY_EMAIL`.
+ */
+function talentoRecipients(): string[] {
+  const propios = recipients('TALENTO_EMAIL')
+  return propios.length ? propios : recipients()
+}
+
+/** ¿Hay con qué enviar el resumen de talento humano? */
+export function talentoEmailConfigured(): boolean {
+  return Boolean(env('RESEND_API_KEY') && env('NOTIFY_FROM') && talentoRecipients().length)
 }
 
 /** ¿Está la notificación por email lista para usarse? */
@@ -49,10 +64,12 @@ interface SendInput {
   text: string
   /** Responder al cliente directamente desde la bandeja del equipo. */
   replyTo?: string
+  /** Destinatarios; por defecto, los de NOTIFY_EMAIL. */
+  to?: string[]
 }
 
-async function send({ subject, html, text, replyTo }: SendInput): Promise<SendResult> {
-  if (!emailConfigured()) {
+async function send({ subject, html, text, replyTo, to = recipients() }: SendInput): Promise<SendResult> {
+  if (!env('RESEND_API_KEY') || !env('NOTIFY_FROM') || !to.length) {
     console.warn('[email] sin configurar (RESEND_API_KEY / NOTIFY_FROM / NOTIFY_EMAIL); no se envía:', subject)
     return { sent: false, reason: 'not_configured' }
   }
@@ -66,7 +83,7 @@ async function send({ subject, html, text, replyTo }: SendInput): Promise<SendRe
       },
       body: JSON.stringify({
         from: env('NOTIFY_FROM'),
-        to: recipients(),
+        to,
         subject,
         html,
         text,
@@ -185,4 +202,49 @@ export async function notifyNewContact(contact: Contact): Promise<SendResult> {
     text: plain(title, rows, cta),
     replyTo: contact.email || undefined,
   })
+}
+
+/**
+ * Resumen semanal de talento humano: vencimientos, ausencias y solicitudes.
+ * Va a TALENTO_EMAIL (o a NOTIFY_EMAIL si no existe).
+ */
+export async function notifyResumenTalento(r: Resumen): Promise<SendResult> {
+  const cta = `${SITE_URL}/admin/talento`
+  const bloques = r.secciones
+    .map(
+      (s) => `
+      <h2 style="margin:22px 0 8px;font-size:14px;color:#16261e">${escapeHtml(s.titulo)}</h2>
+      <table role="presentation" cellpadding="0" cellspacing="0" style="width:100%;border-collapse:collapse">${s.filas
+        .map(
+          ([n, d]) => `
+        <tr>
+          <td style="padding:6px 16px 6px 0;color:#16261e;font-size:13px;font-weight:600;white-space:nowrap;vertical-align:top">${escapeHtml(n)}</td>
+          <td style="padding:6px 0;color:#3d4b44;font-size:13px">${escapeHtml(d)}</td>
+        </tr>`,
+        )
+        .join('')}</table>`,
+    )
+    .join('')
+  const cuerpo = r.vacio
+    ? '<p style="margin:0;color:#3d4b44;font-size:14px">No hay vencimientos, ausencias ni solicitudes pendientes esta semana.</p>'
+    : bloques
+  const html = `<div style="margin:0;padding:24px;background:#f4f6f4;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Helvetica,Arial,sans-serif">
+  <div style="max-width:600px;margin:0 auto;background:#ffffff;border-radius:12px;box-shadow:0 1px 3px rgba(22,38,30,.08);overflow:hidden">
+    <div style="padding:20px 24px;background:#16261e">
+      <span style="color:#ffffff;font-size:15px;font-weight:600;letter-spacing:.02em">Ekosolv · Talento humano</span>
+    </div>
+    <div style="padding:24px">
+      <h1 style="margin:0 0 4px;font-size:18px;line-height:1.35;color:#16261e">Resumen de la semana</h1>
+      ${cuerpo}
+      <p style="margin:24px 0 0">
+        <a href="${escapeHtml(cta)}" style="display:inline-block;padding:11px 20px;background:#2f7d4f;color:#ffffff;border-radius:8px;text-decoration:none;font-size:14px;font-weight:600">Abrir talento humano</a>
+      </p>
+      <p style="margin:20px 0 0;color:#5b6b62;font-size:12px;line-height:1.5">Llega cada lunes. Los datos sensibles (salarios, documentos, contactos) no viajan por correo: están solo en el panel.</p>
+    </div>
+  </div>
+</div>`
+  const text = `Resumen de talento humano\n\n${
+    r.vacio ? 'Sin pendientes esta semana.' : r.secciones.map((s) => `${s.titulo}\n${s.filas.map(([n, d]) => `- ${n}: ${d}`).join('\n')}`).join('\n\n')
+  }\n\nAbrir en el panel: ${cta}\n`
+  return send({ subject: `[Ekosolv] ${r.asunto}`, html, text, to: talentoRecipients() })
 }
