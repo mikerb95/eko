@@ -382,7 +382,7 @@ h3 { font-size: 22px; }
 .hero-fold > .exige { grid-area: exige; }
 .hero-fold > .hero-stats { grid-area: stats; }
 .hero-main > .eyebrow { margin-bottom: clamp(18px, 2.4vw, 28px); }
-.hero-title { font-size: clamp(46px, 16.4cqi, 108px); }
+.hero-title { font-size: clamp(42px, 13.5cqi, 72px); }
 .br-ancho { display: none; }
 .hero-sub {
   margin-top: clamp(20px, 2.4vw, 30px);
@@ -428,6 +428,7 @@ h3 { font-size: 22px; }
     grid-template-areas: "main exige" "stats stats";
     column-gap: clamp(40px, 4vw, 72px); row-gap: clamp(24px, 3.2vh, 40px);
   }
+  .hero-title { font-size: clamp(64px, 16.4cqi, 108px); }
   .br-ancho { display: inline; }
   .hero-accion { margin-top: auto; padding-top: clamp(24px, 3vw, 36px); }
   .hero-salto { display: none; }

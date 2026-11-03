@@ -41,6 +41,8 @@ interface Props {
     aplica: string
     /** Etiqueta de las normas que aplican a todos. */
     todas: string
+    /** Línea bajo la lista: cómo se usa y por qué es orientativo. */
+    ayuda: string
     cta: string
   }
 }
@@ -96,6 +98,7 @@ const maxFilas = Math.max(...PERFILES.map((p) => normasDe(p).length))
       </li>
     ))}
   </ol>
+  <p class="ex-ayuda">{textos.ayuda}</p>
 
   <div class="ex-pie">
     <div class="ex-cuenta" data-exige-cuenta>
@@ -173,7 +176,6 @@ const maxFilas = Math.max(...PERFILES.map((p) => normasDe(p).length))
   .ex-lista {
     --ex-fila: 37px;
     list-style: none; margin-top: 14px; border-top: 1px solid var(--line);
-    flex: 1 0 auto;
     min-height: calc(var(--ex-filas, 8) * var(--ex-fila));
   }
   .ex-norma { display: none; border-bottom: 1px solid var(--line); }
@@ -205,6 +207,7 @@ const maxFilas = Math.max(...PERFILES.map((p) => normasDe(p).length))
     font-size: 14px; line-height: 1.5; color: var(--ink-2); max-width: 62ch;
   }
   .ex-norma details p strong { font-weight: 500; color: var(--ink); }
+  .ex-ayuda { margin-top: 10px; font-size: 13px; line-height: 1.45; color: var(--mute); max-width: 52ch; }
 
   /* Encendido: una regla por perfil, porque el CSS no puede leer el valor del radio. */
   .exige:has(input[value="importadora"]:checked) .p-importadora,
@@ -216,7 +219,7 @@ const maxFilas = Math.max(...PERFILES.map((p) => normasDe(p).length))
   /* Pie: la cifra manda; la salida es un enlace secundario, porque la acción
      principal del hero es el botón de diagnóstico de la columna de texto. */
   .ex-pie {
-    margin-top: 14px; padding-top: 2px;
+    margin-top: auto; padding-top: 14px;
     display: flex; align-items: center; justify-content: space-between; gap: 16px; flex-wrap: wrap;
   }
   .ex-n, .ex-cta { display: none; }

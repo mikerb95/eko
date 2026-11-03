@@ -34,10 +34,14 @@ import {
 } from '../lib/diagnostico/preguntas'
 import { leerEstado, type EstadoEncuesta } from '../lib/diagnostico/datos'
 import { GENERAL, MODULOS, type ModuloCapacitacion } from '../lib/capacitacion'
+import { leerEstadoCasos, type EstadoCasos } from '../lib/diagnostico/casosDatos'
+import { EXTENSIONES, MAX_ARCHIVOS, MAX_MB, PRIVACIDAD, RESULTADOS } from '../lib/diagnostico/casos'
+import { modo as modoAlmacen } from '../lib/diagnostico/almacen'
 
 let estado: EstadoEncuesta = { abierta: false, usada: false }
+let casos: EstadoCasos = { abierto: false, usado: false }
 try {
-  estado = await leerEstado()
+  ;[estado, casos] = await Promise.all([leerEstado(), leerEstadoCasos()])
 } catch (e: any) {
   console.error('[ia] carga', e?.message || e)
 }
@@ -284,8 +288,9 @@ const steps: TFStep[] = [
         </p>
         <nav class="ia-pasos" aria-label="Secciones">
           <a href="#encuesta"><b>1</b>Encuesta{estado.abierta && <i>Ahora</i>}</a>
-          <a href="#programa"><b>2</b>Programa por área</a>
-          <a href="#material"><b>3</b>Material de apoyo</a>
+          <a href="#casos"><b>2</b>Sus casos{casos.abierto && !estado.abierta && <i>Ahora</i>}</a>
+          <a href="#programa"><b>3</b>Programa por área</a>
+          <a href="#material"><b>4</b>Material de apoyo</a>
         </nav>
       </section>
 
@@ -333,10 +338,137 @@ const steps: TFStep[] = [
         </div>
       </section>
 
+      <!-- 2. CASOS PARA EL TALLER -->
+      <section id="casos" class="ia-sec ia-wrap">
+        <div class="ia-sec-head">
+          <p class="ia-kicker">Paso 2 · Cuando quiera</p>
+          <h2>Sus casos para el taller</h2>
+          <p>
+            Deje aquí archivos de su trabajo real y cuente qué hace con ellos. Con eso se arman los ejercicios del taller
+            presencial. Puede dejar varios casos, antes o después de la encuesta.
+          </p>
+        </div>
+        {casos.abierto ? (
+          <div class="ia-casos" id="ia-casos" data-modo={modoAlmacen()}>
+            <form class="ia-card ia-caso" id="caso-form" novalidate>
+              <div class="cx-fila">
+                <label class="cx-campo">
+                  <span>Su nombre</span>
+                  <input name="nombre" type="text" autocomplete="name" maxlength="120" required />
+                </label>
+                <label class="cx-campo">
+                  <span>Su área</span>
+                  <select name="area" required>
+                    <option value="">Elija…</option>
+                    {AREAS.map((a) => <option value={a.id}>{a.etiqueta}</option>)}
+                  </select>
+                </label>
+              </div>
+
+              <div class="cx-campo">
+                <span id="cx-arch-lbl">Archivos</span>
+                <label class="cx-zona" id="cx-zona">
+                  <input
+                    id="cx-input"
+                    type="file"
+                    multiple
+                    accept={EXTENSIONES.map((e) => `.${e}`).join(',')}
+                    aria-labelledby="cx-arch-lbl"
+                  />
+                  <span class="cx-zona-ico" aria-hidden="true">
+                    <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 15V3"/><path d="m7 8 5-5 5 5"/><path d="M20 15v4a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2v-4"/></svg>
+                  </span>
+                  <b>Arrastre los archivos aquí o <u>elíjalos</u></b>
+                  <small>PDF, Word, Excel, PowerPoint, CSV o fotos. Hasta {MAX_ARCHIVOS} archivos de {MAX_MB} MB cada uno.</small>
+                </label>
+                <ul class="cx-lista" id="cx-lista"></ul>
+              </div>
+
+              <label class="cx-campo">
+                <span>¿Qué hace con estos archivos?</span>
+                <textarea
+                  name="contexto"
+                  rows="5"
+                  maxlength="4000"
+                  required
+                  placeholder="Ejemplo: con este Excel de recolecciones cruzo los kilos contra los certificados de los gestores, reviso en la página de la CAR que la licencia del gestor esté vigente y al final armo un correo al cliente y el reporte del mes para Gerencia."
+                ></textarea>
+                <small>Cuéntelo paso a paso, como se lo explicaría a alguien nuevo: qué revisa, qué cruza, qué escribe.</small>
+              </label>
+
+              <label class="cx-campo">
+                <span>¿Consulta páginas web o sistemas en el camino? <em>Opcional</em></span>
+                <input name="fuentes" type="text" maxlength="1000" placeholder="VITAL, la página de la CAR, el portal del gestor, Zoho CRM…" />
+              </label>
+
+              <fieldset class="cx-campo">
+                <legend>¿Qué tiene que entregar al final? <em>Puede marcar varias</em></legend>
+                <div class="cx-chips">
+                  {RESULTADOS.map((r) => (
+                    <label class="cx-chip"><input type="checkbox" name="resultados" value={r.id} /><span>{r.etiqueta}</span></label>
+                  ))}
+                </div>
+              </fieldset>
+
+              <fieldset class="cx-campo">
+                <legend>¿Los archivos tienen datos de clientes?</legend>
+                <div class="cx-radios">
+                  {PRIVACIDAD.map((p) => (
+                    <label class="cx-radio"><input type="radio" name="privacidad" value={p.id} required /><span>{p.etiqueta}</span></label>
+                  ))}
+                </div>
+                <small>Si puede, tape nombres, NIT y cifras sensibles antes de subirlos. Si el ejercicio necesita el documento tal cual, súbalo así: solo lo ve Gerencia.</small>
+              </fieldset>
+
+              <label class="cx-consent">
+                <input type="checkbox" name="consent" value="true" required />
+                <span>Autorizo que Ekosolv use estos archivos solo para preparar los ejercicios de la capacitación. Se borran al terminar la capacitación.</span>
+              </label>
+              <input class="cx-hp" type="text" name="website" tabindex="-1" autocomplete="off" aria-hidden="true" />
+
+              <div class="cx-pie">
+                <button class="cx-enviar" type="submit">Enviar caso</button>
+                <p class="cx-error" id="cx-error" role="alert"></p>
+              </div>
+            </form>
+
+            <div class="ia-card ia-caso cx-listo" id="caso-listo" hidden>
+              <span class="cx-listo-ico" aria-hidden="true">
+                <svg viewBox="0 0 24 24" width="26" height="26" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg>
+              </span>
+              <h3>Caso recibido</h3>
+              <p>Gracias. Con sus archivos se prepara un ejercicio del taller de su área. Si tiene otro proceso que le quite tiempo, déjelo también.</p>
+              <button class="cx-enviar" type="button" id="caso-otro">Agregar otro caso</button>
+            </div>
+
+            <aside class="cx-guia">
+              <p class="ia-kicker">Qué sirve más</p>
+              <ul>
+                <li><b>Un proceso que repite</b> cada semana o cada mes, no un caso raro.</li>
+                <li><b>Los archivos de entrada</b>: el auto, el Excel, el certificado o el correo con el que arranca.</li>
+                <li><b>Lo que entrega al final</b>, si tiene un ejemplo ya hecho: el informe, la presentación o el correo.</li>
+                <li><b>Dónde se demora</b>: qué cruza a mano, qué busca en la web, qué copia de un lado a otro.</li>
+              </ul>
+            </aside>
+          </div>
+        ) : (
+          <div class="ia-card ia-encuesta">
+            <div class="ia-cerrada">
+              <h3>{casos.usado ? 'Ya no se reciben casos' : 'Pronto podrá dejar sus casos aquí'}</h3>
+              <p>
+                {casos.usado
+                  ? 'Gracias a quienes dejaron sus archivos. Con ellos se prepararon los ejercicios de los talleres.'
+                  : 'Aquí podrá subir archivos de su trabajo y contar qué hace con ellos, para que el taller use casos reales.'}
+              </p>
+            </div>
+          </div>
+        )}
+      </section>
+
       <!-- 2. PROGRAMA -->
       <section id="programa" class="ia-sec ia-wrap">
         <div class="ia-sec-head">
-          <p class="ia-kicker">Paso 2 · Los sábados</p>
+          <p class="ia-kicker">Paso 3 · Los sábados</p>
           <h2>Lo que aprende cada área</h2>
           <p>
             Sábados de 4 horas. Primero, la capacitación general con todo el equipo; después, el taller de cada área.
@@ -396,7 +528,7 @@ const steps: TFStep[] = [
       <!-- 3. MATERIAL -->
       <section id="material" class="ia-sec ia-wrap">
         <div class="ia-sec-head">
-          <p class="ia-kicker">Paso 3 · Después de cada taller</p>
+          <p class="ia-kicker">Paso 4 · Después de cada taller</p>
           <h2>Material de apoyo</h2>
           <p>Aquí se publica el material de cada taller para que lo tenga a mano cuando lo necesite en el día a día.</p>
         </div>
