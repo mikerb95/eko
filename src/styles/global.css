@@ -18,7 +18,8 @@
   --clay-2: #B8926F;
   --clay-ink: #7A5B38; /* arena de marca, tono legible para texto sobre papel */
 
-  --font-display: "Instrument Serif", "Times New Roman", serif;
+  --font-display: "Bricolage Grotesque", "Geist", ui-sans-serif, system-ui, sans-serif;
+  --display-weight: 600;
   --font-sans: "Geist", ui-sans-serif, system-ui, -apple-system, "Helvetica Neue", sans-serif;
   --font-mono: "Geist Mono", ui-monospace, Menlo, monospace;
 
@@ -317,6 +318,8 @@ main { position: relative; z-index: 2; }
 }
 .display em { color: var(--forest); }
 .display .thin { color: var(--mute); }
+h1 em, h2 em, h3 em, h4 em, .display em,
+.hero-card .big em, .hero-stats .n em { font-style: normal; }
 .display .clay { color: var(--clay-ink); }
 
 h1, h2, h3, h4 { font-weight: 500; letter-spacing: -0.02em; line-height: 1.1; }

@@ -54,7 +54,7 @@ export function montarPagina(selector: string, montar: (raiz: HTMLElement) => Li
         delete raiz.dataset.motion
       }
     }
-    // Las medidas cambian cuando llegan las fuentes (Instrument Serif es ancha).
+    // Las medidas cambian cuando llegan las fuentes (Bricolage Grotesque es ancha).
     document.fonts?.ready.then(() => ScrollTrigger.refresh())
   }
 

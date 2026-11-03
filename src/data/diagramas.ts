@@ -438,7 +438,7 @@ export const COMPONENTES: Componente[] = [
     zona: 'terceros',
     nombre: 'Google Fonts',
     tipo: 'externo',
-    detalle: 'Geist y Instrument Serif. Permitido explícitamente en style-src y font-src de la CSP.',
+    detalle: 'Geist y Bricolage Grotesque. Permitido explícitamente en style-src y font-src de la CSP.',
   },
   {
     id: 'yt',
