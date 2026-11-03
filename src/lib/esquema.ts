@@ -456,6 +456,113 @@ export const TABLAS: readonly string[] = [
   )`,
 
   `CREATE INDEX IF NOT EXISTS th_evaluaciones_usuario ON th_evaluaciones (usuario_id, fecha)`,
+
+  // ── Academia de IA (/academia, /admin/academia; docs/plan-academia.md) ──
+  // Quién estudia y en qué área. La ruta de cada persona es la capacitación
+  // general más el taller de su área (src/lib/capacitacion.ts).
+  `CREATE TABLE IF NOT EXISTS ac_inscripciones (
+    usuario_id INTEGER PRIMARY KEY,
+    area TEXT NOT NULL,
+    created_at TEXT NOT NULL,
+    updated_at TEXT NOT NULL
+  )`,
+
+  // modulo: 'general' o el id de un área. prompts y recursos son JSON
+  // [{ titulo, texto }] y [{ titulo, href }]. Si practica_consigna no está
+  // vacía, la lección trae el revisor de instrucciones con IA. semilla marca
+  // las lecciones creadas desde el programa, para no sembrarlas dos veces.
+  `CREATE TABLE IF NOT EXISTS ac_lecciones (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    modulo TEXT NOT NULL,
+    orden INTEGER NOT NULL DEFAULT 0,
+    titulo TEXT NOT NULL,
+    resumen TEXT NOT NULL DEFAULT '',
+    contenido TEXT NOT NULL DEFAULT '',
+    prompts TEXT NOT NULL DEFAULT '[]',
+    recursos TEXT NOT NULL DEFAULT '[]',
+    ejercicio TEXT NOT NULL DEFAULT '',
+    entregable TEXT NOT NULL DEFAULT '',
+    practica_consigna TEXT NOT NULL DEFAULT '',
+    minutos INTEGER NOT NULL DEFAULT 0,
+    publicada INTEGER NOT NULL DEFAULT 0,
+    semilla TEXT NOT NULL DEFAULT '',
+    created_at TEXT NOT NULL,
+    updated_at TEXT NOT NULL
+  )`,
+
+  `CREATE TABLE IF NOT EXISTS ac_progreso (
+    usuario_id INTEGER NOT NULL,
+    leccion_id INTEGER NOT NULL,
+    vista_at TEXT NOT NULL,
+    PRIMARY KEY (usuario_id, leccion_id)
+  )`,
+
+  // Una entrega por persona y lección; al reenviar se reemplaza y vuelve a
+  // 'enviada'. estado: enviada | aprobada | devuelta.
+  `CREATE TABLE IF NOT EXISTS ac_entregas (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    usuario_id INTEGER NOT NULL,
+    leccion_id INTEGER NOT NULL,
+    texto TEXT NOT NULL DEFAULT '',
+    enlace TEXT NOT NULL DEFAULT '',
+    estado TEXT NOT NULL DEFAULT 'enviada',
+    comentario TEXT NOT NULL DEFAULT '',
+    revisado_por TEXT NOT NULL DEFAULT '',
+    revisado_at TEXT NOT NULL DEFAULT '',
+    created_at TEXT NOT NULL,
+    updated_at TEXT NOT NULL,
+    UNIQUE (usuario_id, leccion_id)
+  )`,
+
+  // Historial del revisor de instrucciones. revision es el JSON que devolvió
+  // la IA (criterios, resumen y versión mejorada).
+  `CREATE TABLE IF NOT EXISTS ac_practicas (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    usuario_id INTEGER NOT NULL,
+    leccion_id INTEGER NOT NULL,
+    instruccion TEXT NOT NULL,
+    respuesta TEXT NOT NULL DEFAULT '',
+    revision TEXT NOT NULL DEFAULT '{}',
+    created_at TEXT NOT NULL
+  )`,
+
+  `CREATE INDEX IF NOT EXISTS ac_practicas_usuario ON ac_practicas (usuario_id, created_at)`,
+
+  // Bloques de los sábados. Un sábado puede tener varios bloques (por ejemplo
+  // Operaciones y luego Logística). modulos: JSON con los módulos que asisten.
+  `CREATE TABLE IF NOT EXISTS ac_sesiones (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    titulo TEXT NOT NULL,
+    fecha TEXT NOT NULL,
+    hora TEXT NOT NULL DEFAULT '',
+    horas REAL NOT NULL DEFAULT 0,
+    modulos TEXT NOT NULL DEFAULT '[]',
+    lugar TEXT NOT NULL DEFAULT '',
+    notas TEXT NOT NULL DEFAULT '',
+    created_at TEXT NOT NULL,
+    updated_at TEXT NOT NULL
+  )`,
+
+  `CREATE TABLE IF NOT EXISTS ac_asistencia (
+    sesion_id INTEGER NOT NULL,
+    usuario_id INTEGER NOT NULL,
+    created_at TEXT NOT NULL,
+    PRIMARY KEY (sesion_id, usuario_id)
+  )`,
+
+  // Copia de los datos al emitir: cambiar después el nombre o las horas no
+  // altera un certificado ya entregado. La verificación pública es
+  // /verificar/<codigo>.
+  `CREATE TABLE IF NOT EXISTS ac_certificados (
+    codigo TEXT PRIMARY KEY,
+    usuario_id INTEGER NOT NULL,
+    nombre TEXT NOT NULL,
+    area TEXT NOT NULL,
+    horas REAL NOT NULL DEFAULT 0,
+    emitido_at TEXT NOT NULL,
+    emitido_por TEXT NOT NULL DEFAULT '',
+    revocado_at TEXT NOT NULL DEFAULT ''
+  )`,
 ]
 
 /**
@@ -487,6 +594,14 @@ export const COLUMNAS: readonly (readonly [tabla: string, columna: string])[] = 
 
 /** Tablas que deben existir al terminar. Sirve para verificar tras migrar. */
 export const TABLAS_ESPERADAS: readonly string[] = [
+  'ac_asistencia',
+  'ac_certificados',
+  'ac_entregas',
+  'ac_inscripciones',
+  'ac_lecciones',
+  'ac_practicas',
+  'ac_progreso',
+  'ac_sesiones',
   'actos',
   'actos_archivos',
   'ajustes',

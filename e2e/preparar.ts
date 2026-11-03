@@ -5,6 +5,7 @@ import { COLUMNAS, TABLAS } from '../src/lib/esquema.ts'
 
 export default async function preparar() {
   for (const sufijo of ['', '-wal', '-shm']) rmSync(`./data/e2e.db${sufijo}`, { force: true })
+  rmSync('./data/taller', { recursive: true, force: true })
   const db = createClient({ url: 'file:./data/e2e.db' })
   for (const sql of TABLAS) await db.execute(sql)
   for (const [tabla, columna] of COLUMNAS) {

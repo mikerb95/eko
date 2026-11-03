@@ -30,6 +30,8 @@ export default defineConfig({
     url: `http://localhost:${PUERTO}/admin/login`,
     reuseExistingServer: false,
     timeout: 120_000,
-    env: { DATABASE_URL: BASE, ASISTENTE_MODELO_FALSO: '1' },
+    // CASOS_ALMACEN=local: los archivos de los casos del taller van a data/taller
+    // y no a la tienda Blob real, que es la misma para todos los ambientes.
+    env: { DATABASE_URL: BASE, ASISTENTE_MODELO_FALSO: '1', CASOS_ALMACEN: 'local' },
   },
 })
