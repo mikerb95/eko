@@ -115,9 +115,11 @@ const maxFilas = Math.max(...PERFILES.map((p) => normasDe(p).length))
 </div>
 
 <style is:global>
-  /* Una hoja de expediente sobre el papel: clara, para no competir con el radar oscuro de abajo. */
+  /* Una hoja de expediente sobre el papel: clara, para no competir con el radar oscuro de abajo.
+     Columna flexible: en el hero se estira al alto de la fila y el pie queda abajo. */
   .exige {
     position: relative;
+    display: flex; flex-direction: column;
     background: color-mix(in oklab, #fff 72%, var(--paper-warm));
     border: 1px solid var(--line);
     border-radius: var(--r-lg);
@@ -130,7 +132,6 @@ const maxFilas = Math.max(...PERFILES.map((p) => normasDe(p).length))
 
   .ex-head {
     display: flex; justify-content: space-between; align-items: center; gap: 12px; flex-wrap: wrap;
-    padding-bottom: 14px; border-bottom: 1px dashed var(--line-2);
   }
   .ex-rotulo {
     display: flex; align-items: center; gap: 10px;
@@ -143,15 +144,15 @@ const maxFilas = Math.max(...PERFILES.map((p) => normasDe(p).length))
     background: color-mix(in oklab, var(--clay) 22%, transparent);
   }
 
-  .ex-perfiles { border: 0; margin-top: 14px; min-width: 0; }
+  .ex-perfiles { border: 0; margin-top: 12px; min-width: 0; }
   .ex-pregunta {
-    font-family: var(--font-display); font-weight: var(--display-weight); font-size: clamp(22px, 2vw, 26px); letter-spacing: -0.01em;
+    font-family: var(--font-display); font-weight: var(--display-weight); font-size: clamp(21px, 1.8vw, 24px); letter-spacing: -0.01em;
     color: var(--ink); margin-bottom: 10px; padding: 0;
   }
-  .ex-chips { display: flex; flex-wrap: wrap; gap: 7px; }
+  .ex-chips { display: flex; flex-wrap: wrap; gap: 6px; }
   .ex-chip {
     position: relative; overflow: hidden; cursor: pointer;
-    padding: 6px 13px; border-radius: 999px;
+    padding: 6px 12px; border-radius: 999px;
     border: 1px solid var(--line-2); background: transparent;
     font-size: 13.5px; line-height: 1.2; color: var(--ink-2); white-space: nowrap;
     transition: background .25s ease, color .25s ease, border-color .25s ease;
@@ -167,70 +168,74 @@ const maxFilas = Math.max(...PERFILES.map((p) => normasDe(p).length))
     background: var(--aqua); transform: scaleX(0); transform-origin: left;
   }
 
-  .ex-lista { list-style: none; margin-top: 16px; border-top: 1px solid var(--line); }
-  .ex-norma { border-bottom: 1px solid var(--line); }
+  /* Solo se listan las normas del perfil elegido: nada de filas apagadas de relleno.
+     El alto mínimo reserva el perfil más largo (--ex-filas) para que el panel no salte. */
+  .ex-lista {
+    --ex-fila: 37px;
+    list-style: none; margin-top: 14px; border-top: 1px solid var(--line);
+    flex: 1 0 auto;
+    min-height: calc(var(--ex-filas, 8) * var(--ex-fila));
+  }
+  .ex-norma { display: none; border-bottom: 1px solid var(--line); }
   .ex-norma summary {
     list-style: none; cursor: pointer;
-    display: grid; grid-template-columns: 8px 150px minmax(0, 1fr) auto auto; align-items: center; gap: 12px;
-    padding: 7px 6px; border-radius: 8px;
-    opacity: .42; transition: opacity .35s ease, background .25s ease;
+    display: grid; grid-template-columns: 8px 140px minmax(0, 1fr) auto auto; align-items: center; gap: 12px;
+    min-height: calc(var(--ex-fila) - 1px);
+    padding: 4px 6px; border-radius: 8px;
+    transition: background .25s ease;
   }
   .ex-norma summary::-webkit-details-marker { display: none; }
-  .ex-norma summary:hover { background: color-mix(in oklab, var(--aqua) 7%, transparent); opacity: .8; }
+  .ex-norma summary:hover { background: color-mix(in oklab, var(--aqua) 7%, transparent); }
   .ex-norma summary:focus-visible { outline: 2px solid var(--forest); outline-offset: 1px; }
   .ex-punto {
     width: 8px; height: 8px; border-radius: 50%;
-    border: 1.5px solid var(--mute); transition: background .35s ease, border-color .35s ease, box-shadow .35s ease;
+    background: var(--aqua);
+    box-shadow: 0 0 0 4px color-mix(in oklab, var(--aqua) 18%, transparent);
   }
   .ex-code { font-family: var(--font-mono); font-size: 12px; letter-spacing: 0.04em; color: var(--ink-2); white-space: nowrap; }
-  .ex-titulo { font-size: 14.5px; color: var(--ink); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .ex-titulo { font-size: 14.5px; line-height: 1.3; color: var(--ink); }
   .ex-todas {
     font-family: var(--font-mono); font-size: 10px; letter-spacing: 0.08em; text-transform: uppercase;
     color: var(--mute); padding: 2px 6px; border: 1px solid var(--line-2); border-radius: 999px;
   }
-  .ex-sr { display: none; }
   .ex-chev { color: var(--mute); transition: transform .25s ease; grid-column: 5; }
   .ex-norma details[open] .ex-chev { transform: rotate(180deg); }
-  .ex-norma details[open] .ex-titulo { white-space: normal; }
   .ex-norma details p {
-    padding: 0 6px 14px calc(8px + 12px + 6px);
+    padding: 0 6px 12px calc(8px + 12px + 6px);
     font-size: 14px; line-height: 1.5; color: var(--ink-2); max-width: 62ch;
   }
+  .ex-norma details p strong { font-weight: 500; color: var(--ink); }
 
   /* Encendido: una regla por perfil, porque el CSS no puede leer el valor del radio. */
   .exige:has(input[value="importadora"]:checked) .p-importadora,
   .exige:has(input[value="productora"]:checked) .p-productora,
   .exige:has(input[value="telco"]:checked) .p-telco,
   .exige:has(input[value="datacenter"]:checked) .p-datacenter,
-  .exige:has(input[value="retail"]:checked) .p-retail {
-    & summary { opacity: 1; }
-    & .ex-punto {
-      background: var(--aqua); border-color: var(--aqua);
-      box-shadow: 0 0 0 4px color-mix(in oklab, var(--aqua) 18%, transparent);
-    }
-    & .ex-sr { display: inline; }
-  }
+  .exige:has(input[value="retail"]:checked) .p-retail { display: block; }
 
+  /* Pie: la cifra manda; la salida es un enlace secundario, porque la acción
+     principal del hero es el botón de diagnóstico de la columna de texto. */
   .ex-pie {
-    margin-top: 16px;
+    margin-top: 14px; padding-top: 2px;
     display: flex; align-items: center; justify-content: space-between; gap: 16px; flex-wrap: wrap;
   }
   .ex-n, .ex-cta { display: none; }
   .ex-n { font-family: var(--font-mono); font-size: 12px; letter-spacing: 0.08em; text-transform: uppercase; color: var(--mute); align-items: baseline; gap: 10px; }
   .ex-n b {
-    font-family: var(--font-display); font-weight: var(--display-weight); font-size: 42px; line-height: 1;
+    font-family: var(--font-display); font-weight: var(--display-weight); font-size: 40px; line-height: 1;
     letter-spacing: -0.03em; color: var(--ink); text-transform: none; display: inline-block;
   }
   .ex-cta {
-    align-items: center; gap: 10px;
-    padding: 11px 18px 11px 20px; border-radius: 999px;
-    background: var(--ink); color: var(--paper); font-size: 15px; white-space: nowrap;
-    transition: background .2s ease, transform .2s ease;
+    align-items: center; gap: 8px;
+    padding: 6px 2px; color: var(--ink); font-size: 15px; font-weight: 500; white-space: nowrap;
+    text-decoration: underline; text-decoration-color: color-mix(in oklab, var(--aqua) 70%, transparent);
+    text-decoration-thickness: 2px; text-underline-offset: 5px;
+    transition: color .2s ease, text-decoration-color .2s ease;
   }
-  .ex-cta:hover { background: var(--deep); transform: translateY(-1px); }
+  .ex-cta:hover { color: var(--deep); text-decoration-color: var(--aqua); }
   .ex-cta svg { transition: transform .2s ease; }
   .ex-cta:hover svg { transform: translateX(3px); }
-  .ex-cta:focus-visible { outline: 2px solid var(--forest); outline-offset: 3px; }
+  .ex-cta:focus-visible { outline: 2px solid var(--forest); outline-offset: 3px; border-radius: 4px; }
 
   .exige:has(input[value="importadora"]:checked) [data-p="importadora"],
   .exige:has(input[value="productora"]:checked) [data-p="productora"],
@@ -239,12 +244,12 @@ const maxFilas = Math.max(...PERFILES.map((p) => normasDe(p).length))
   .exige:has(input[value="retail"]:checked) [data-p="retail"] { display: inline-flex; }
 
   @media (max-width: 600px) {
-    .ex-norma summary { grid-template-columns: 8px minmax(0, 1fr) auto auto; row-gap: 2px; padding-block: 9px; }
+    .ex-lista { --ex-fila: 54px; }
+    .ex-norma summary { grid-template-columns: 8px minmax(0, 1fr) auto auto; row-gap: 2px; padding-block: 8px; }
     .ex-code { grid-column: 2; }
     .ex-titulo { grid-column: 2 / 4; grid-row: 2; font-size: 14px; }
     .ex-todas { grid-column: 3; grid-row: 1; justify-self: end; }
     .ex-chev { grid-column: 4; grid-row: 1 / 3; }
-    .ex-n b { font-size: 40px; }
-    .ex-cta { width: 100%; justify-content: center; }
+    .ex-n b { font-size: 38px; }
   }
 </style>
