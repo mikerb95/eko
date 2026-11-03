@@ -1,0 +1,1115 @@
+---
+// Propuesta comercial de codebymike.net a Ekosolv, en línea: /propuesta.
+//
+// La misma propuesta de propuesta_ekosolv_ia_con_logistica.pdf, pero viva:
+// un simulador de plan, un chat con IA que responde dudas con lo que dice la
+// propuesta (y le pasa a Mike lo que no sabe o es negociación) y un
+// formulario para marcar el plan elegido.
+//
+// No es una página del sitio de Ekosolv: no está en src/lib/rutas.ts (ni en el
+// sitemap ni en llms.txt), va con noindex y no usa el Layout del sitio. Se
+// publica y se retira desde /admin/propuesta. Todas las cifras salen de
+// src/lib/propuesta/datos.ts.
+export const prerender = false
+import '../styles/global.css'
+import { propuestaPublicada } from '../lib/propuesta/almacen'
+import {
+  ANTICIPO,
+  CAPACITACION,
+  CUOTA_CONSTRUCCION,
+  EXCEDENTE,
+  EXPEDIENTES_ADICIONALES,
+  FUNCIONAMIENTO,
+  INFRAESTRUCTURA,
+  MESES_CONSTRUCCION,
+  PLANES,
+  pesos,
+  REVISION_ADICIONAL,
+  SEMANAS_DESARROLLO,
+} from '../lib/propuesta/datos'
+
+let publicada = false
+try {
+  publicada = await propuestaPublicada()
+} catch (e: any) {
+  console.error('[propuesta] carga', e?.message || e)
+}
+if (!publicada) Astro.response.status = 404
+
+const NAV = [
+  ['resumen', 'Resumen'],
+  ['capacitacion', 'Capacitación'],
+  ['automatizacion', 'Automatización'],
+  ['agente', 'Agente'],
+  ['cronograma', 'Cronograma'],
+  ['inversion', 'Inversión'],
+  ['simulador', 'Simulador'],
+  ['condiciones', 'Condiciones'],
+] as const
+
+const AREAS = [
+  { n: 'Diagnóstico por área', d: 'Encuesta y entrevistas por área; fija prioridades y fechas.', s4: ['S1', 1], s5: ['S1', 1], c: 'var(--mute)' },
+  { n: 'Capacitación general', d: 'Alcances y límites de la IA, cómo pedirle bien, datos que no se suben.', s4: ['S1', 3], s5: ['S1', 3], c: 'var(--deep)' },
+  { n: 'Operaciones', d: 'Autos, resoluciones, EIA, PMA e ICA con verificación; 1 h de certificados y cifras junto con Logística.', s4: ['S2 y S3', 5], s5: ['S2 y S3', 6.5], c: '#1f8a8a' },
+  { n: 'Logística', d: 'Certificados de recolección y de disposición final, seguimiento a gestores y cifras en Zoho, además de la hora compartida.', s4: ['S3', 1.5], s5: ['S3', 1.5], c: '#46a85b' },
+  { n: 'Ventas y Mercadeo', d: 'Propuestas, seguimiento a clientes, contenidos y redes.', s4: ['S3 y S4', 3], s5: ['S4', 4], c: '#2f80c9' },
+  { n: 'Gerencia y Finanzas', d: 'Informes para decidir, indicadores y conciliaciones.', s4: ['S4', 2.5], s5: ['S5', 4], c: '#8b5cf6' },
+] as const
+const fmtH = (h: number) => String(h).replace('.', ',')
+
+const PASOS = [
+  ['Brief en Zoho CRM', 'El consultor lo registra como hoy. Con el NIT, el sistema completa razón social, sector y ubicación.', 'Ficha del cliente'],
+  ['Diagnóstico', 'Cruza el sector, la actividad y la ubicación con la norma: qué servicios aplican, ante qué autoridad y con qué periodicidad.', 'Servicios con su norma'],
+  ['Borrador de propuesta', 'Redacta sobre las plantillas de Ekosolv: alcance, metodología, entregables y tiempos, con el tono de la empresa.', 'Documento en Word'],
+  ['Estimación en Zoho Books', 'Arma la cotización con el catálogo de precios de Ekosolv, lista para aprobar.', 'Estimación en Books'],
+  ['Carpeta en WorkDrive', 'Crea la estructura de cotización y costeo y guarda ahí todo lo generado.', 'Carpeta organizada'],
+  ['Presentación', 'PowerPoint con la marca de Ekosolv para la reunión con el cliente.', 'Presentación lista'],
+] as const
+
+const AJUSTES = [
+  ['Se agrega el documento o la nota', 'El consultor lo sube a la misma propuesta, en Zoho CRM o en WorkDrive, en cualquier momento.'],
+  ['El sistema lo lee una sola vez', 'Saca una ficha con la autoridad, las obligaciones, los plazos y los datos clave.'],
+  ['Muestra qué cambia', 'Antes de reescribir, indica qué servicios, valores o secciones se modifican.'],
+  ['El consultor aprueba', 'Solo se actualizan las secciones afectadas. La versión enviada queda guardada.'],
+] as const
+
+const CICLO = [
+  ['Vigila', 'Revisa cada día normativa, expedientes y documentos.'],
+  ['Filtra', 'Descarta lo que no aplica a ningún cliente.'],
+  ['Lee', 'Saca la obligación, el plazo y el expediente.'],
+  ['Aplica reglas', 'Usa reglas de la norma validadas por Ekosolv.'],
+  ['Avisa', 'Alerta al consultor con resumen y acción sugerida.'],
+] as const
+
+const FRENTES = [
+  ['Normativa nueva', 'Decretos, resoluciones y circulares de MinAmbiente, la ANLA y las CAR.', '“Nueva resolución cambia los límites de vertimiento: afecta a 4 clientes.”'],
+  ['Autos de los clientes', 'Autos, requerimientos y resoluciones en sus expedientes.', '“La CAR requiere información adicional al cliente X: 15 días hábiles.”'],
+  ['Documentos', 'ICA, PMA, permisos e informes frente a la norma. Hasta 10 al mes.', '“Al ICA del cliente Y le faltan los monitoreos de ruido del semestre.”'],
+  ['Vencimientos', 'Permisos, informes periódicos y obligaciones de cada cliente.', '“El permiso de emisiones del cliente Z vence en 60 días.”'],
+] as const
+
+const GANTT = [
+  ['Levantamiento', 1, 2, 'Plantillas, catálogo de precios en Books, matriz de servicios, tabla de expedientes y reglas del agente con el equipo técnico.'],
+  ['Flujo de propuestas', 2, 4, 'Integración con Zoho CRM, Books y WorkDrive; diagnóstico, borradores, costeo y presentación.'],
+  ['Panel web y agente', 3, 6, 'Panel de administración, conexión con el buzón de notificaciones y las fuentes públicas, reglas y alertas.'],
+  ['Piloto con casos reales', 5, 7, 'Propuestas reales en paralelo al proceso actual, ajustes de calidad y medición de la línea base.'],
+  ['Chat con IA en la web', 6, 7, 'Base de conocimiento de Ekosolv, pruebas de respuestas y paso a consultor.'],
+  ['Entrega y medición', 8, 8, 'Puesta en funcionamiento, 2 horas de capacitación con el agente y comparación contra la línea base.'],
+] as const
+
+const COND_CAP = [
+  'Pago del 50% al confirmar la fecha de inicio y 50% al terminar la última sesión.',
+  'Hasta 12 participantes, presencial en la oficina de Ekosolv o virtual, por el mismo valor.',
+  'Fechas y horario bajo acuerdo; se pueden mover con una semana de aviso.',
+  'Cada participante necesita un puesto del plan Team de Claude (USD 20 por persona al mes con pago anual o USD 25 con pago mensual), contratado por Ekosolv antes de la primera sesión y no incluido en el valor de la capacitación.',
+  'Para la modalidad presencial: sala con proyector e internet, y cada participante con su computador.',
+  'Ekosolv comparte 3 o 4 documentos de trabajo una semana antes de empezar.',
+]
+const COND_AUT = [
+  'Plazo mínimo de 18 meses. Si el contrato termina antes, se liquida el saldo pendiente de la construcción.',
+  'Soporte por correo o el panel, sin atención inmediata. Los errores urgentes se revisan dentro de las 12 horas hábiles siguientes al reporte; el soporte normal, dentro de las 24 horas hábiles.',
+  'Las 8 h de soporte no son acumulables y cubren errores y ajustes. Las funciones nuevas se cotizan aparte, bajo acuerdo previo.',
+  'El plan se elige al firmar y se cambia con un mes de aviso.',
+  'Las tarifas se confirman con el consumo real de las primeras 4 semanas de operación.',
+  'Ajuste anual por IPC. Si la TRM varía más del 10% o el proveedor de IA cambia sus tarifas, el consumo de IA se ajusta en la misma proporción.',
+  'El sistema genera borradores y alertas. La decisión técnica y el envío al cliente son del consultor.',
+  'Las reglas del diagnóstico y del agente las valida el equipo técnico de Ekosolv antes de entrar en uso.',
+  'El agente vigila hasta 50 expedientes y revisa hasta 10 documentos al mes; lo adicional se cobra según la tabla de inversión. Donde una autoridad no publica en línea, la cobertura es parcial.',
+  'El chat solo usa información aprobada por Ekosolv, sin datos personales de clientes.',
+  'Propuesta y presentación en español, en PowerPoint. Inglés y Zoho Show se cotizan aparte.',
+  'No incluye migración de datos históricos, prospección en frío ni compra de bases de datos.',
+]
+
+const PASOS_FINALES = [
+  ['Para la capacitación', ['Opción elegida (4 o 5 sábados), fecha de inicio y participantes', 'Un puesto del plan Team de Claude por participante', '3 o 4 documentos de trabajo, una semana antes', 'Sala con proyector e internet, si es presencial']],
+  ['Para la automatización', ['Propuestas al mes y horas que toma cada una', '3 a 5 propuestas recientes con presentación y costeo', 'Plantillas de propuesta, presentación y costeo', 'Dónde están hoy los precios: Books, Excel u otro', 'Administrador de Zoho CRM y usuario de integración', 'Responsable técnico para validar las reglas (4 a 6 h)']],
+  ['Para el agente de cumplimiento', ['Tabla de expedientes: cliente, autoridad, número y consultor responsable', 'Buzón de correo para las notificaciones de los clientes', 'Cláusula de autorización de notificaciones en los contratos de Ekosolv', 'Autoridades y fuentes públicas que se deben vigilar']],
+] as const
+
+const SUGERIDAS = [
+  '¿Qué pasa si un mes hacemos más propuestas que el plan?',
+  '¿Qué incluye la mensualidad?',
+  '¿Por qué baja la mensualidad desde el mes 19?',
+  '¿Podemos empezar solo con la capacitación?',
+]
+
+// Lo que necesita el simulador en el navegador: las mismas cifras de datos.ts.
+const DATOS_CLIENTE = {
+  planes: PLANES.map((p) => ({ id: p.id, propuestas: p.propuestas, mensual: p.mensual, despues: p.mensualDespues })),
+  cap: CAPACITACION.map((c) => ({ id: c.id, sabados: c.sabados, horas: c.horas, con: c.conAutomatizacion, sola: c.sola })),
+  anticipo: ANTICIPO,
+  meses: MESES_CONSTRUCCION,
+}
+const maxMensual = Math.max(...PLANES.map((p) => p.mensual))
+---
+
+<!doctype html>
+<html lang="es">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="robots" content="noindex, nofollow, noarchive" />
+    <link rel="icon" href="/favicon.ico" sizes="any" />
+    <title>Propuesta para Ekosolv · codebymike.net</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,400..700&family=Geist:wght@300..700&family=Geist+Mono:wght@300..500&display=swap"
+      rel="stylesheet"
+    />
+  </head>
+  <body class="pp">
+    {!publicada ? (
+      <main class="pp-cerrada">
+        <p class="pp-eyebrow">codebymike.net</p>
+        <h1>Esta propuesta no está disponible</h1>
+        <p>Si la necesita, escríbale a Mike a <a href="mailto:0368dev@gmail.com">0368dev@gmail.com</a>.</p>
+      </main>
+    ) : (
+      <>
+        <header class="pp-top">
+          <div class="pp-top-in">
+            <a class="pp-marca" href="#resumen"><b>Ekosolv</b><span>Propuesta de codebymike.net</span></a>
+            <nav class="pp-nav" aria-label="Secciones">
+              {NAV.map(([id, t]) => <a href={`#${id}`} data-nav={id}>{t}</a>)}
+            </nav>
+            <button class="pp-btn pp-btn-sm" type="button" data-abrir-chat>Preguntar</button>
+          </div>
+        </header>
+
+        <main>
+          <!-- RESUMEN -->
+          <section class="pp-hero" id="resumen">
+            <div class="pp-wrap">
+              <p class="pp-eyebrow">Propuesta comercial · Noviembre de 2026</p>
+              <h1>Capacitación en IA y <span class="pp-acento">automatización de propuestas</span></h1>
+              <p class="pp-lede">Dos servicios en una propuesta: capacitación para el equipo, con pago único, y automatización de propuestas con agente de cumplimiento, con una mensualidad según el volumen.</p>
+              <div class="pp-hero-cards">
+                <a class="pp-hcard" href="#capacitacion">
+                  <span class="pp-hcard-k"><i class="pp-dot" style="--c:#46a85b"></i>Capacitación en IA · pago único</span>
+                  <b>desde {pesos(CAPACITACION[0]!.conAutomatizacion)}</b>
+                  <span>4 o 5 sábados de 4 horas, hasta 12 personas, con talleres por área.</span>
+                </a>
+                <a class="pp-hcard" href="#inversion">
+                  <span class="pp-hcard-k"><i class="pp-dot" style="--c:var(--deep)"></i>Automatización · mensualidad</span>
+                  <b>desde {pesos(PLANES[0]!.mensual)} <small>/ mes</small></b>
+                  <span>Propuestas desde el Brief en Zoho, agente de cumplimiento, panel web y chat con IA en el sitio.</span>
+                </a>
+              </div>
+              <div class="pp-hero-acc">
+                <a class="pp-btn" href="#simulador">Simular un plan</a>
+                <button class="pp-btn pp-btn-ghost" type="button" data-abrir-chat>Hacer una pregunta</button>
+              </div>
+              <p class="pp-nota">La capacitación tiene precio especial al contratarla con la automatización. La automatización inicia con un anticipo de {pesos(ANTICIPO)} y la mensualidad se cobra desde que el sistema entra en funcionamiento. Valores en pesos colombianos.</p>
+            </div>
+          </section>
+
+          <!-- CAPACITACIÓN -->
+          <section class="pp-sec" id="capacitacion">
+            <div class="pp-wrap">
+              <p class="pp-num">01 · Capacitación en IA</p>
+              <h2>Dos opciones de capacitación los sábados</h2>
+              <p class="pp-intro">Práctica sobre documentos reales de Ekosolv: resoluciones, informes y propuestas. Cada sesión es 30% explicación y 70% trabajo en computador.</p>
+
+              <div class="pp-opciones">
+                {CAPACITACION.map((c) => (
+                  <article class="pp-card">
+                    <h3><i class="pp-dot" style="--c:#46a85b"></i>{c.sabados} sábados</h3>
+                    <p class="pp-card-sub">{c.etiqueta} · hasta 12 participantes</p>
+                    <div class="pp-precio">
+                      <div><span>Con la automatización</span><b>{pesos(c.conAutomatizacion)}</b></div>
+                      <div class="is-sec"><span>Contratada sola</span><b>{pesos(c.sola)}</b></div>
+                    </div>
+                    <p class="pp-card-pie">{c.sabados === 4 ? 'Diagnóstico por área, guía de uso y biblioteca de instrucciones de Ekosolv.' : 'Lo mismo, con más tiempo de práctica en cada taller por área.'}</p>
+                  </article>
+                ))}
+              </div>
+
+              <div class="pp-card pp-tiempos">
+                <div class="pp-tiempos-head">
+                  <h3>Contenido y tiempos</h3>
+                  <div class="pp-toggle" role="group" aria-label="Opción de capacitación">
+                    <button type="button" data-cap="s4" aria-pressed="true">4 sábados</button>
+                    <button type="button" data-cap="s5" aria-pressed="false">5 sábados</button>
+                  </div>
+                </div>
+                <ul class="pp-areas">
+                  {AREAS.map((a) => (
+                    <li style={`--c:${a.c}`} data-s4={a.s4[1]} data-s5={a.s5[1]} data-s4d={a.s4[0]} data-s5d={a.s5[0]}>
+                      <div class="pp-area-t"><b>{a.n}</b><span>{a.d}</span></div>
+                      <div class="pp-area-bar"><i style={`width:${(a.s4[1] / 6.5) * 100}%`}></i></div>
+                      <div class="pp-area-h"><b>{fmtH(a.s4[1])} h</b><span>{a.s4[0]}</span></div>
+                    </li>
+                  ))}
+                </ul>
+                <p class="pp-total">Total: <b data-cap-total>16 h</b></p>
+              </div>
+            </div>
+          </section>
+
+          <!-- AUTOMATIZACIÓN -->
+          <section class="pp-sec pp-sec-alt" id="automatizacion">
+            <div class="pp-wrap">
+              <p class="pp-num">02 · Automatización de propuestas</p>
+              <h2>Del Brief a la propuesta lista para revisar</h2>
+              <p class="pp-intro">Todo funciona sobre el Zoho One que Ekosolv ya usa. El consultor registra el Brief como hoy y, el mismo día, encuentra la propuesta armada para revisar, ajustar y enviar.</p>
+              <ol class="pp-flujo">
+                {PASOS.map(([t, d, r], i) => (
+                  <li>
+                    <span class="pp-flujo-n">{i + 1}</span>
+                    <b>{t}</b>
+                    <p>{d}</p>
+                    <span class="pp-chip">{r}</span>
+                  </li>
+                ))}
+              </ol>
+              <div class="pp-antes">
+                <div class="pp-card">
+                  <h3><i class="pp-dot" style="--c:#d8453a"></i>Hoy</h3>
+                  <ul><li>Buscar la norma que aplica a cada cliente.</li><li>Copiar y adaptar una propuesta anterior.</li><li>Cotizar a mano y pasarlo a Books.</li><li>Armar carpeta y presentación por separado.</li></ul>
+                </div>
+                <div class="pp-card is-bueno">
+                  <h3><i class="pp-dot" style="--c:#46a85b"></i>Con el sistema</h3>
+                  <ul><li>El consultor revisa un paquete ya armado.</li><li>Todas las propuestas salen con la misma estructura y calidad.</li><li>Cada servicio llega con su norma de soporte.</li><li>El equipo dedica su tiempo al criterio técnico.</li></ul>
+                </div>
+              </div>
+            </div>
+          </section>
+
+          <!-- AJUSTES -->
+          <section class="pp-sec" id="ajustes">
+            <div class="pp-wrap">
+              <p class="pp-num">03 · Ajustes y documentos</p>
+              <h2>Cuando llegan más documentos o cambia el alcance</h2>
+              <p class="pp-intro">El sistema incorpora documentos, notas o servicios que faltaban sin empezar de cero y sin perder lo que ya se envió.</p>
+              <ol class="pp-pasos4">
+                {AJUSTES.map(([t, d], i) => <li><span class="pp-flujo-n">{i + 1}</span><b>{t}</b><p>{d}</p></li>)}
+              </ol>
+              <div class="pp-dos">
+                <div class="pp-card">
+                  <h3>Documentos escaneados y fotos</h3>
+                  <ul>
+                    <li>Los escaneos y las fotos se convierten a texto una sola vez.</li>
+                    <li>Las páginas borrosas, cortadas o escritas a mano se señalan para cargar una mejor copia.</li>
+                    <li>Fechas, plazos, números de expediente y cifras de un escaneo quedan “por confirmar” y el consultor los revisa junto al recorte del original.</li>
+                  </ul>
+                </div>
+                <div class="pp-card">
+                  <h3>Rondas de ajuste incluidas</h3>
+                  <ul>
+                    <li><b>2 rondas por propuesta</b> durante 30 días desde su creación.</li>
+                    <li>La tercera ronda, o un cambio que convierta la propuesta en otro proyecto, cuenta como una propuesta nueva.</li>
+                    <li>Las páginas agregadas suman para la regla de las 100 páginas.</li>
+                  </ul>
+                </div>
+              </div>
+            </div>
+          </section>
+
+          <!-- AGENTE -->
+          <section class="pp-sec pp-sec-alt" id="agente">
+            <div class="pp-wrap">
+              <p class="pp-num">04 · Agente de cumplimiento</p>
+              <h2>Un agente que vigila el cumplimiento de cada cliente</h2>
+              <p class="pp-intro">Revisa todos los días lo que puede afectar a los clientes de Ekosolv y avisa al consultor responsable. No responde a la autoridad ni decide: prepara la información para que el consultor actúe a tiempo.</p>
+              <ol class="pp-ciclo">
+                {CICLO.map(([t, d], i) => <li><span class="pp-flujo-n">{i + 1}</span><b>{t}</b><p>{d}</p></li>)}
+              </ol>
+              <div class="pp-agente">
+                <div class="pp-frentes">
+                  {FRENTES.map(([t, d, e]) => (
+                    <div class="pp-frente">
+                      <b>{t}</b>
+                      <p>{d}</p>
+                      <q>{e.replace(/[“”]/g, '')}</q>
+                    </div>
+                  ))}
+                </div>
+                <figure class="pp-alerta" aria-label="Ejemplo ilustrativo de una alerta">
+                  <div class="pp-alerta-top"><span class="pp-prio">Prioridad alta</span><span>Autos de los clientes · hace 2 horas</span></div>
+                  <h4>Requerimiento de información adicional al Cliente de ejemplo S.A.S.</h4>
+                  <dl>
+                    <dt>Autoridad</dt><dd>CAR de la jurisdicción · expediente del permiso de vertimientos</dd>
+                    <dt>Qué pide</dt><dd>Caracterización actualizada del vertimiento y ajustes al plan de manejo.</dd>
+                    <dt>Norma</dt><dd>Decreto 1076 de 2015, sección de vertimientos</dd>
+                    <dt>Plazo</dt><dd>15 días hábiles desde la notificación · <b>quedan 12</b></dd>
+                    <dt>Acción sugerida</dt><dd>Asignar al consultor del permiso, programar muestreo y preparar la respuesta.</dd>
+                  </dl>
+                  <figcaption>Ejemplo ilustrativo. El plazo se cuenta en días hábiles con los festivos de Colombia; si el auto es un escaneo, queda por confirmar.</figcaption>
+                </figure>
+              </div>
+              <div class="pp-dos pp-quien">
+                <div class="pp-card"><h3><i class="pp-dot" style="--c:var(--deep)"></i>El agente</h3><p>Vigila, lee, calcula plazos y avisa. Los autos llegan por el buzón de notificaciones (fuente principal) y por gacetas públicas (complemento, con cobertura parcial).</p></div>
+                <div class="pp-card"><h3><i class="pp-dot" style="--c:#46a85b"></i>El consultor</h3><p>Confirma los datos de escaneos, decide y responde a la autoridad. Nadie más tiene que vigilar portales, correos ni calendarios.</p></div>
+              </div>
+            </div>
+          </section>
+
+          <!-- PANEL Y CHAT -->
+          <section class="pp-sec" id="panel">
+            <div class="pp-wrap">
+              <p class="pp-num">05 · Panel web, chat y oportunidades</p>
+              <h2>Todo en un panel, y un chat que atiende la web</h2>
+              <div class="pp-tres">
+                <div class="pp-card"><h3>Panel web</h3><p>Una página privada donde el equipo ve alertas, expedientes, vencimientos (avisos a 60, 30 y 7 días), propuestas y el consumo del plan del mes, para que no haya sorpresas al facturar.</p></div>
+                <div class="pp-card" id="chat"><h3>Chat con IA en el sitio</h3><p>Atiende al instante con información aprobada: normativa, casos sin datos personales y la base de conocimiento de Ekosolv. No da precios ni conceptos técnicos: pasa la conversación a un consultor.</p></div>
+                <div class="pp-card"><h3>Detección de oportunidades</h3><p>Las consultas de la web y WhatsApp entran al flujo de propuestas, el sistema señala servicios cruzados entre líneas y una norma nueva se vuelve oportunidad para cada cliente afectado.</p></div>
+              </div>
+            </div>
+          </section>
+
+          <!-- CRONOGRAMA -->
+          <section class="pp-sec pp-sec-alt" id="cronograma">
+            <div class="pp-wrap">
+              <p class="pp-num">06 · Cronograma</p>
+              <h2>{SEMANAS_DESARROLLO} semanas de desarrollo</h2>
+              <p class="pp-intro">Arranca con el anticipo y la primera mensualidad se cobra cuando el sistema entra en funcionamiento. Indicador principal: horas de preparación por propuesta, medidas antes y después.</p>
+              <div class="pp-card pp-gantt">
+                <div class="pp-gantt-head"><span></span>{Array.from({ length: SEMANAS_DESARROLLO }, (_, i) => <span>S{i + 1}</span>)}</div>
+                {GANTT.map(([t, a, b, d]) => (
+                  <details class="pp-gantt-fila">
+                    <summary>
+                      <span class="pp-gantt-t">{t}</span>
+                      <span class="pp-gantt-pista"><i style={`grid-column:${a} / ${b + 1}`}></i></span>
+                    </summary>
+                    <p>{d}</p>
+                  </details>
+                ))}
+                <p class="pp-gantt-pie">Toque una etapa para ver qué se hace.</p>
+              </div>
+            </div>
+          </section>
+
+          <!-- INVERSIÓN -->
+          <section class="pp-sec" id="inversion">
+            <div class="pp-wrap">
+              <p class="pp-num">07 · Inversión</p>
+              <h2>Una mensualidad según el plan</h2>
+              <p class="pp-intro">Los tres planes incluyen lo mismo: agente, panel, chat y soporte. Lo único que cambia es cuántas propuestas se procesan al mes.</p>
+              <div class="pp-card pp-incluido">
+                <b>Incluido en los tres planes</b>
+                <span>Agente de cumplimiento (50 expedientes y 10 revisiones de documentos al mes) · panel web · chat con IA en el sitio web · detección de oportunidades · 8 h de soporte al mes · 2 horas de capacitación en el panel y el agente</span>
+              </div>
+              <div class="pp-planes">
+                {PLANES.map((p) => (
+                  <article class="pp-plan">
+                    <span class="pp-plan-k">Hasta</span>
+                    <b class="pp-plan-n">{p.propuestas}</b>
+                    <span class="pp-plan-k">propuestas al mes</span>
+                    <div class="pp-plan-p"><span>Meses 1 a 18</span><b>{pesos(p.mensual)}<small> / mes</small></b></div>
+                    <div class="pp-plan-p is-sec"><span>Desde el mes 19</span><b>{pesos(p.mensualDespues)}<small> / mes</small></b></div>
+                    <button class="pp-btn pp-btn-ghost pp-btn-sm" type="button" data-simular={p.id}>Simular este plan</button>
+                  </article>
+                ))}
+              </div>
+              <div class="pp-extras">
+                <div><span>Excedente</span><b>{pesos(EXCEDENTE)}</b><small>por propuesta sobre el plan</small></div>
+                <div><span>Expedientes adicionales</span><b>{pesos(EXPEDIENTES_ADICIONALES)}</b><small>al mes por cada 25</small></div>
+                <div><span>Revisión adicional</span><b>{pesos(REVISION_ADICIONAL)}</b><small>por documento</small></div>
+              </div>
+              <p class="pp-nota">Cada propuesta incluye 2 rondas de ajuste en 30 días; la tercera cuenta como propuesta nueva. Una propuesta con más de 100 páginas de documentos, sumando los agregados, cuenta como 2.</p>
+
+              <div class="pp-card pp-desglose" id="desglose">
+                <h3>Qué paga la mensualidad</h3>
+                <p class="pp-card-sub">Tres partes fijas y una que depende del plan. En el mes 19 la construcción ya está pagada y la mensualidad baja.</p>
+                <div class="pp-leyenda">
+                  <span><i style="--c:var(--deep)"></i>Construcción {pesos(CUOTA_CONSTRUCCION)} ({MESES_CONSTRUCCION} cuotas)</span>
+                  <span><i style="--c:#2f80c9"></i>Infraestructura {pesos(INFRAESTRUCTURA)}</span>
+                  <span><i style="--c:#1f8a8a"></i>Funcionamiento y soporte {pesos(FUNCIONAMIENTO)}</span>
+                  <span><i style="--c:#46a85b"></i>Consumo de IA</span>
+                </div>
+                {PLANES.map((p) => (
+                  <div class="pp-barra">
+                    <span class="pp-barra-t">Hasta {p.propuestas}</span>
+                    <span class="pp-barra-pista" style={`width:${(p.mensual / maxMensual) * 100}%`}>
+                      <i style={`--c:var(--deep);flex:${CUOTA_CONSTRUCCION}`} title={`Construcción ${pesos(CUOTA_CONSTRUCCION)}`}></i>
+                      <i style={`--c:#2f80c9;flex:${INFRAESTRUCTURA}`} title={`Infraestructura ${pesos(INFRAESTRUCTURA)}`}></i>
+                      <i style={`--c:#1f8a8a;flex:${FUNCIONAMIENTO}`} title={`Funcionamiento ${pesos(FUNCIONAMIENTO)}`}></i>
+                      <i style={`--c:#46a85b;flex:${p.consumoIA}`} title={`Consumo de IA ${pesos(p.consumoIA)}`}></i>
+                    </span>
+                    <b>{pesos(p.mensual)}</b>
+                  </div>
+                ))}
+              </div>
+            </div>
+          </section>
+
+          <!-- SIMULADOR -->
+          <section class="pp-sec pp-sec-alt" id="simulador">
+            <div class="pp-wrap">
+              <p class="pp-num">08 · Simulador</p>
+              <h2>Arme su combinación y vea cuánto paga</h2>
+              <div class="pp-sim">
+                <div class="pp-card pp-sim-in">
+                  <fieldset>
+                    <legend>Automatización</legend>
+                    <div class="pp-seg">
+                      {PLANES.map((p, i) => <label><input type="radio" name="plan" value={p.id} checked={i === 0} /><span>Hasta {p.propuestas}</span></label>)}
+                      <label><input type="radio" name="plan" value="ninguno" /><span>Sin automatización</span></label>
+                    </div>
+                  </fieldset>
+                  <fieldset>
+                    <legend>Capacitación</legend>
+                    <div class="pp-seg">
+                      <label><input type="radio" name="cap" value="ninguna" /><span>Sin capacitación</span></label>
+                      {CAPACITACION.map((c, i) => <label><input type="radio" name="cap" value={c.id} checked={i === 0} /><span>{c.sabados} sábados</span></label>)}
+                    </div>
+                  </fieldset>
+                  <p class="pp-sim-aviso" data-sim-aviso hidden></p>
+                </div>
+                <div class="pp-card pp-sim-out" aria-live="polite">
+                  <div class="pp-sim-big"><span>Mensualidad, meses 1 a 18</span><b data-o="mensual"></b><small data-o="despues"></small></div>
+                  <dl class="pp-sim-dl">
+                    <div><dt>Al empezar</dt><dd data-o="alFirmar"></dd><small data-o="alFirmarD"></small></div>
+                    <div><dt>Capacitación</dt><dd data-o="cap"></dd><small data-o="capD"></small></div>
+                    <div><dt>Total de los primeros 18 meses</dt><dd data-o="total"></dd><small>Anticipo, 18 mensualidades y capacitación</small></div>
+                  </dl>
+                  <div class="pp-linea" data-o="linea" aria-hidden="true"></div>
+                  <button class="pp-btn" type="button" data-ir-elegir>Elegir esta combinación</button>
+                </div>
+              </div>
+            </div>
+          </section>
+
+          <!-- PAGO Y CONDICIONES -->
+          <section class="pp-sec" id="pago">
+            <div class="pp-wrap">
+              <p class="pp-num">09 · Esquema de pago</p>
+              <h2>Cómo se paga</h2>
+              <ol class="pp-timeline">
+                <li><span>Al firmar</span><b>{pesos(ANTICIPO)}</b><p>Anticipo único para iniciar el desarrollo, igual en los tres planes.</p></li>
+                <li><span>Semanas 1 a {SEMANAS_DESARROLLO}</span><b>$0</b><p>Desarrollo del sistema. No se cobra mensualidad mientras se construye.</p></li>
+                <li><span>Meses 1 a 18</span><b>Mensualidad del plan</b><p>Desde el primer mes de funcionamiento. Incluye la cuota de construcción.</p></li>
+                <li><span>Desde el mes 19</span><b>Baja la mensualidad</b><p>La construcción ya está pagada; quedan infraestructura, funcionamiento e IA.</p></li>
+              </ol>
+              <p class="pp-nota">La capacitación se paga 50% al confirmar la fecha y 50% al terminar la última sesión.</p>
+            </div>
+          </section>
+
+          <section class="pp-sec pp-sec-alt" id="condiciones">
+            <div class="pp-wrap">
+              <p class="pp-num">10 · Condiciones</p>
+              <h2>Condiciones</h2>
+              <div class="pp-dos">
+                <details class="pp-card pp-cond" open><summary><h3>Capacitación</h3></summary><ul>{COND_CAP.map((c) => <li>{c}</li>)}</ul></details>
+                <details class="pp-card pp-cond" open><summary><h3>Automatización</h3></summary><ul>{COND_AUT.map((c) => <li>{c}</li>)}</ul></details>
+              </div>
+            </div>
+          </section>
+
+          <section class="pp-sec" id="pasos">
+            <div class="pp-wrap">
+              <p class="pp-num">11 · Próximos pasos</p>
+              <h2>Lo que necesitamos para empezar</h2>
+              <div class="pp-tres">
+                {PASOS_FINALES.map(([t, items]) => (
+                  <div class="pp-card"><h3>{t}</h3><ul class="pp-check">{items.map((i) => <li>{i}</li>)}</ul></div>
+                ))}
+              </div>
+              <p class="pp-nota">Con la opción de capacitación y la fecha confirmadas apartamos los sábados. Con la línea base y las muestras cerramos las cifras definitivas de la automatización.</p>
+            </div>
+          </section>
+
+          <!-- ELEGIR -->
+          <section class="pp-sec pp-elegir" id="elegir">
+            <div class="pp-wrap pp-wrap-sm">
+              <p class="pp-num">12 · Elegir</p>
+              <h2>¿Listo para avanzar?</h2>
+              <p class="pp-intro">Marque lo que eligió. A Mike le llega el aviso y le escribe para formalizar. No es un contrato ni genera ningún cobro.</p>
+              <form class="pp-card pp-form" id="pp-form" novalidate>
+                <div class="pp-form-sel">
+                  <span>Su elección</span>
+                  <b data-o="resumen"></b>
+                  <small data-o="resumenD"></small>
+                  <a href="#simulador">Cambiar en el simulador</a>
+                </div>
+                <div class="pp-form-fila">
+                  <label>Nombre<input name="nombre" required maxlength="120" autocomplete="name" /></label>
+                  <label>Cargo<input name="cargo" maxlength="120" autocomplete="organization-title" /></label>
+                </div>
+                <label>Comentario (opcional)<textarea name="comentario" rows="3" maxlength="1500" placeholder="Por ejemplo, fecha en que quisieran empezar la capacitación"></textarea></label>
+                <input class="pp-hp" name="web" tabindex="-1" autocomplete="off" aria-hidden="true" />
+                <button class="pp-btn" type="submit">Confirmar elección</button>
+                <p class="pp-form-msg" data-form-msg role="status"></p>
+              </form>
+            </div>
+          </section>
+        </main>
+
+        <footer class="pp-pie">
+          <div class="pp-wrap">
+            <span>Propuesta preparada por <b>Mike</b> · codebymike.net · <a href="mailto:0368dev@gmail.com">0368dev@gmail.com</a></span>
+          </div>
+        </footer>
+
+        <!-- CHAT -->
+        <button class="pp-fab" type="button" data-abrir-chat aria-label="Preguntar sobre la propuesta" hidden>
+          <svg viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12a8 8 0 0 1-11.6 7.1L4 20l1-4.6A8 8 0 1 1 21 12z"/><path d="M9 10h6M9 14h4"/></svg>
+          <span>¿Dudas? Pregunte</span>
+        </button>
+        <aside class="pp-chat" id="pp-chat" aria-label="Preguntas sobre la propuesta" hidden>
+          <header>
+            <div><b>Preguntas sobre la propuesta</b><span>Responde con lo que dice la propuesta</span></div>
+            <button type="button" data-cerrar-chat aria-label="Cerrar">×</button>
+          </header>
+          <div class="pp-chat-log" data-log>
+            <div class="pp-msg is-ia">
+              <p>Hola. Puedo resolverle dudas sobre esta propuesta: alcance, precios, pagos y condiciones. Lo que no esté en la propuesta o sea para negociar se lo paso a Mike.</p>
+            </div>
+            <div class="pp-sugeridas" data-sugeridas>
+              {SUGERIDAS.map((s) => <button type="button" data-sugerida>{s}</button>)}
+            </div>
+          </div>
+          <form class="pp-chat-form" data-chat-form>
+            <textarea name="q" rows="1" maxlength="800" placeholder="Escriba su pregunta" aria-label="Su pregunta" required></textarea>
+            <button type="submit" aria-label="Enviar"><svg viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg></button>
+          </form>
+          <p class="pp-chat-aviso">Sus preguntas quedan guardadas para que Mike las lea y le responda mejor. Las respuestas las da una IA: si algo no cuadra, vale lo que dice la propuesta.</p>
+        </aside>
+
+        <script type="application/json" id="pp-datos" set:html={JSON.stringify(DATOS_CLIENTE)} />
+      </>
+    )}
+
+    <script>
+      type Plan = { id: string; propuestas: number; mensual: number; despues: number }
+      type Cap = { id: string; sabados: number; horas: number; con: number; sola: number }
+      const el = document.getElementById('pp-datos')
+      if (el) {
+        const D = JSON.parse(el.textContent || '{}') as { planes: Plan[]; cap: Cap[]; anticipo: number; meses: number }
+        const $ = <T extends Element = HTMLElement>(s: string, r: ParentNode = document) => r.querySelector(s) as T | null
+        const $$ = <T extends Element = HTMLElement>(s: string, r: ParentNode = document) => Array.from(r.querySelectorAll(s)) as T[]
+        const pesos = (n: number) => '$' + Math.round(n).toLocaleString('es-CO').replace(/,/g, '.')
+        const out = (k: string, v: string) => $$(`[data-o="${k}"]`).forEach((n) => (n.textContent = v))
+
+        // ── Capacitación: 4 o 5 sábados ─────────────────────────────────
+        $$<HTMLButtonElement>('[data-cap]').forEach((b) =>
+          b.addEventListener('click', () => {
+            const k = b.dataset.cap as 's4' | 's5'
+            $$('[data-cap]').forEach((x) => x.setAttribute('aria-pressed', String(x === b)))
+            let total = 0
+            $$<HTMLLIElement>('.pp-areas li').forEach((li) => {
+              const h = Number(li.dataset[k])
+              total += h
+              $('.pp-area-bar i', li)!.style.width = `${(h / 6.5) * 100}%`
+              $('.pp-area-h b', li)!.textContent = `${String(h).replace('.', ',')} h`
+              $('.pp-area-h span', li)!.textContent = li.dataset[`${k}d`] || ''
+            })
+            out('cap-total', '')
+            $('[data-cap-total]')!.textContent = `${total} h`
+          }),
+        )
+
+        // ── Simulador ───────────────────────────────────────────────────
+        function calcular() {
+          const planId = ($<HTMLInputElement>('input[name="plan"]:checked')?.value || 'p20') as string
+          const capId = ($<HTMLInputElement>('input[name="cap"]:checked')?.value || 'ninguna') as string
+          const p = D.planes.find((x) => x.id === planId) || null
+          const c = D.cap.find((x) => x.id === capId) || null
+          const valorCap = c ? (p ? c.con : c.sola) : 0
+          const anticipo = p ? D.anticipo : 0
+          const total = (p ? anticipo + p.mensual * D.meses : 0) + valorCap
+          return { planId, capId, p, c, valorCap, anticipo, alFirmar: anticipo + valorCap / 2, total }
+        }
+        function pintar() {
+          const k = calcular()
+          const aviso = $('[data-sim-aviso]')!
+          const vacio = !k.p && !k.c
+          aviso.hidden = !vacio && !(k.c && !k.p)
+          aviso.textContent = vacio
+            ? 'Elija al menos la automatización o la capacitación.'
+            : k.c && !k.p
+              ? `Contratada sola, la capacitación cuesta ${pesos(k.c.sola)}. Con la automatización baja a ${pesos(k.c.con)}.`
+              : ''
+          out('mensual', k.p ? pesos(k.p.mensual) : '$0')
+          out('despues', k.p ? `Desde el mes 19: ${pesos(k.p.despues)} al mes` : 'Sin automatización no hay mensualidad')
+          out('alFirmar', pesos(k.alFirmar))
+          out('alFirmarD', [k.p && `anticipo ${pesos(k.anticipo)}`, k.c && `mitad de la capacitación ${pesos(k.valorCap / 2)}`].filter(Boolean).join(' + ') || 'Nada')
+          out('cap', k.c ? pesos(k.valorCap) : 'No incluida')
+          out('capD', k.c ? (k.p ? `Precio especial: ahorra ${pesos(k.c.sola - k.c.con)}` : 'Precio contratada sola') : '')
+          out('total', pesos(k.total))
+          const resumen = [k.p && `Hasta ${k.p.propuestas} propuestas al mes`, k.c && `capacitación de ${k.c.sabados} sábados`].filter(Boolean).join(' + ')
+          out('resumen', resumen || 'Nada elegido')
+          out('resumenD', k.p ? `${pesos(k.p.mensual)} al mes en los meses 1 a 18 · al empezar ${pesos(k.alFirmar)}` : k.c ? `Pago único de ${pesos(k.valorCap)}` : '')
+          // Línea de pagos: anticipo, 8 semanas sin cobro, 18 meses, después.
+          const linea = $('[data-o="linea"]')!
+          linea.innerHTML = k.p
+            ? `<span style="flex:1"><i></i>Firma</span><span style="flex:2" class="is-cero"><i></i>8 semanas $0</span><span style="flex:9" class="is-a"><i></i>Meses 1 a 18</span><span style="flex:4" class="is-b"><i></i>Mes 19 en adelante</span>`
+            : ''
+          $<HTMLButtonElement>('[data-ir-elegir]')!.disabled = vacio
+          $<HTMLButtonElement>('#pp-form button[type="submit"]')!.disabled = vacio
+        }
+        $$('input[name="plan"], input[name="cap"]').forEach((i) => i.addEventListener('change', pintar))
+        $$<HTMLButtonElement>('[data-simular]').forEach((b) =>
+          b.addEventListener('click', () => {
+            const r = $<HTMLInputElement>(`input[name="plan"][value="${b.dataset.simular}"]`)
+            if (r) r.checked = true
+            pintar()
+            $('#simulador')!.scrollIntoView({ behavior: 'smooth' })
+          }),
+        )
+        $('[data-ir-elegir]')?.addEventListener('click', () => {
+          $('#elegir')!.scrollIntoView({ behavior: 'smooth' })
+          setTimeout(() => $<HTMLInputElement>('#pp-form input[name="nombre"]')?.focus({ preventScroll: true }), 500)
+        })
+        pintar()
+
+        // ── Elegir ──────────────────────────────────────────────────────
+        const form = $<HTMLFormElement>('#pp-form')!
+        form.addEventListener('submit', async (ev) => {
+          ev.preventDefault()
+          const msg = $('[data-form-msg]')!
+          const k = calcular()
+          const fd = new FormData(form)
+          const nombre = String(fd.get('nombre') || '').trim()
+          if (nombre.length < 2) {
+            msg.textContent = 'Escriba su nombre.'
+            return
+          }
+          const b = $<HTMLButtonElement>('button[type="submit"]', form)!
+          b.disabled = true
+          msg.textContent = 'Enviando…'
+          try {
+            const res = await fetch('/api/propuesta/elegir', {
+              method: 'POST',
+              headers: { 'content-type': 'application/json' },
+              body: JSON.stringify({ plan: k.planId, capacitacion: k.capId, nombre, cargo: String(fd.get('cargo') || ''), comentario: String(fd.get('comentario') || ''), web: String(fd.get('web') || '') }),
+            })
+            const j = await res.json().catch(() => ({}))
+            if (!res.ok) throw new Error(j.error || 'No se pudo enviar.')
+            form.classList.add('is-ok')
+            msg.textContent = 'Listo. Mike recibió su elección y le escribe para formalizar.'
+          } catch (e) {
+            msg.textContent = e instanceof Error ? e.message : 'No se pudo enviar.'
+            b.disabled = false
+          }
+        })
+
+        // ── Navegación activa ───────────────────────────────────────────
+        const links = new Map($$<HTMLAnchorElement>('[data-nav]').map((a) => [a.dataset.nav!, a]))
+        const io = new IntersectionObserver(
+          (entries) => {
+            for (const e of entries) {
+              if (!e.isIntersecting) continue
+              links.forEach((a, id) => a.classList.toggle('is-on', id === e.target.id))
+            }
+          },
+          { rootMargin: '-45% 0px -50% 0px' },
+        )
+        links.forEach((_, id) => {
+          const s = document.getElementById(id)
+          if (s) io.observe(s)
+        })
+
+        // ── Chat ────────────────────────────────────────────────────────
+        const SECCIONES: Record<string, string> = {
+          resumen: 'Resumen', capacitacion: 'Capacitación', automatizacion: 'Automatización', ajustes: 'Ajustes y documentos',
+          agente: 'Agente de cumplimiento', panel: 'Panel web', chat: 'Chat y oportunidades', cronograma: 'Cronograma',
+          inversion: 'Inversión', simulador: 'Simulador', pago: 'Esquema de pago', desglose: 'Desglose de la mensualidad',
+          condiciones: 'Condiciones', pasos: 'Próximos pasos',
+        }
+        const chat = $('#pp-chat')!
+        const log = $('[data-log]', chat)!
+        const fab = $('.pp-fab')!
+        const chatForm = $<HTMLFormElement>('[data-chat-form]', chat)!
+        const ta = $<HTMLTextAreaElement>('textarea', chatForm)!
+        const historial: { rol: 'gerente' | 'ia'; texto: string }[] = []
+        let sesion = ''
+        try {
+          sesion = sessionStorage.getItem('pp-sesion') || ''
+        } catch {}
+        if (!sesion) {
+          sesion = (crypto.randomUUID?.() || String(Date.now()) + Math.random().toString(36).slice(2)).replace(/[^a-zA-Z0-9-]/g, '')
+          try {
+            sessionStorage.setItem('pp-sesion', sesion)
+          } catch {}
+        }
+        let disponible = false
+        fetch('/api/propuesta/chat')
+          .then((r) => r.json())
+          .then((j) => {
+            disponible = !!j.disponible
+            if (disponible) fab.hidden = false
+            else $$('[data-abrir-chat]').forEach((b) => b.remove())
+          })
+          .catch(() => $$('[data-abrir-chat]').forEach((b) => b.remove()))
+
+        const abrir = () => {
+          if (!disponible) return
+          chat.hidden = false
+          fab.hidden = true
+          requestAnimationFrame(() => chat.classList.add('is-abierto'))
+          ta.focus()
+        }
+        const cerrar = () => {
+          chat.classList.remove('is-abierto')
+          chat.hidden = true
+          fab.hidden = false
+        }
+        $$('[data-abrir-chat]').forEach((b) => b.addEventListener('click', abrir))
+        $('[data-cerrar-chat]', chat)!.addEventListener('click', cerrar)
+        document.addEventListener('keydown', (e) => {
+          if (e.key === 'Escape' && !chat.hidden) cerrar()
+        })
+
+        function burbuja(rol: 'gerente' | 'ia', texto: string, extra?: { seccion?: string | null; aMike?: boolean; error?: boolean }) {
+          const d = document.createElement('div')
+          d.className = `pp-msg ${rol === 'ia' ? 'is-ia' : 'is-yo'}${extra?.error ? ' is-error' : ''}`
+          const p = document.createElement('p')
+          p.textContent = texto
+          d.append(p)
+          if (extra?.aMike) {
+            const t = document.createElement('span')
+            t.className = 'pp-msg-tag'
+            t.textContent = 'Pregunta enviada a Mike'
+            d.append(t)
+          }
+          if (extra?.seccion && SECCIONES[extra.seccion]) {
+            const a = document.createElement('a')
+            a.href = `#${extra.seccion}`
+            a.className = 'pp-msg-link'
+            a.textContent = `Ver en la propuesta: ${SECCIONES[extra.seccion]}`
+            a.addEventListener('click', () => {
+              if (window.matchMedia('(max-width: 720px)').matches) cerrar()
+            })
+            d.append(a)
+          }
+          log.append(d)
+          log.scrollTop = log.scrollHeight
+          return d
+        }
+
+        async function preguntar(texto: string) {
+          texto = texto.trim().slice(0, 800)
+          if (!texto) return
+          $('[data-sugeridas]', log)?.remove()
+          burbuja('gerente', texto)
+          historial.push({ rol: 'gerente', texto })
+          const pensando = burbuja('ia', 'Revisando la propuesta…')
+          pensando.classList.add('is-pensando')
+          const b = $<HTMLButtonElement>('button', chatForm)!
+          b.disabled = ta.disabled = true
+          try {
+            const res = await fetch('/api/propuesta/chat', {
+              method: 'POST',
+              headers: { 'content-type': 'application/json' },
+              body: JSON.stringify({ sesion, mensajes: historial.slice(-16) }),
+            })
+            const j = await res.json().catch(() => ({}))
+            pensando.remove()
+            if (!res.ok) throw new Error(j.error || 'No se pudo responder.')
+            historial.push({ rol: 'ia', texto: j.respuesta })
+            burbuja('ia', j.respuesta, { seccion: j.seccion, aMike: j.pasarAMike })
+          } catch (e) {
+            pensando.remove()
+            historial.pop()
+            burbuja('ia', e instanceof Error ? e.message : 'No se pudo responder.', { error: true })
+          } finally {
+            b.disabled = ta.disabled = false
+            ta.focus()
+          }
+        }
+        chatForm.addEventListener('submit', (e) => {
+          e.preventDefault()
+          const t = ta.value
+          ta.value = ''
+          ta.style.height = ''
+          preguntar(t)
+        })
+        ta.addEventListener('keydown', (e) => {
+          if (e.key === 'Enter' && !e.shiftKey) {
+            e.preventDefault()
+            chatForm.requestSubmit()
+          }
+        })
+        ta.addEventListener('input', () => {
+          ta.style.height = ''
+          ta.style.height = `${Math.min(ta.scrollHeight, 120)}px`
+        })
+        $$<HTMLButtonElement>('[data-sugerida]').forEach((b) => b.addEventListener('click', () => preguntar(b.textContent || '')))
+      }
+    </script>
+
+    <style is:global>
+      .pp {
+        --bg: var(--paper-warm);
+        --card: #fff;
+        --alt: var(--paper-cool);
+        --sombra: 0 1px 2px rgba(14, 28, 38, 0.05), 0 8px 24px -12px rgba(14, 28, 38, 0.12);
+        margin: 0;
+        background: var(--bg);
+        color: var(--ink);
+        font-family: var(--font-sans);
+        font-size: 16px;
+        line-height: 1.55;
+        -webkit-font-smoothing: antialiased;
+      }
+      .pp *, .pp *::before, .pp *::after { box-sizing: border-box; }
+      .pp h1, .pp h2, .pp h3, .pp h4 { font-family: var(--font-display); font-weight: var(--display-weight); letter-spacing: -0.01em; margin: 0; }
+      .pp a { color: var(--deep); }
+      html { scroll-behavior: smooth; scroll-padding-top: 76px; }
+      @media (prefers-reduced-motion: reduce) { html { scroll-behavior: auto; } }
+
+      .pp-wrap { max-width: 1120px; margin: 0 auto; padding: 0 16px; }
+      @media (min-width: 720px) { .pp-wrap { padding: 0 32px; } }
+      .pp-wrap-sm { max-width: 760px; }
+
+      .pp-cerrada { min-height: 100vh; display: grid; place-content: center; text-align: center; padding: 24px; gap: 8px; }
+      .pp-cerrada h1 { font-size: clamp(26px, 4vw, 36px); }
+
+      /* Barra superior */
+      .pp-top { position: sticky; top: 0; z-index: 30; background: color-mix(in oklab, var(--bg) 88%, transparent); backdrop-filter: blur(10px); border-bottom: 1px solid var(--line); }
+      .pp-top-in { max-width: 1120px; margin: 0 auto; padding: 10px 16px; display: flex; align-items: center; gap: 16px; }
+      .pp-marca { display: flex; flex-direction: column; line-height: 1.15; text-decoration: none; color: var(--ink) !important; }
+      .pp-marca b { font-family: var(--font-display); font-size: 17px; }
+      .pp-marca span { font-size: 12px; color: var(--mute); }
+      .pp-nav { display: none; gap: 2px; margin-left: auto; }
+      .pp-nav a { text-decoration: none; color: var(--mute); font-size: 13.5px; padding: 6px 10px; border-radius: 999px; transition: background 0.2s, color 0.2s; }
+      .pp-nav a:hover, .pp-nav a.is-on { color: var(--deep); background: color-mix(in oklab, var(--deep) 9%, transparent); }
+      .pp-top .pp-btn { margin-left: auto; }
+      @media (min-width: 1000px) { .pp-nav { display: flex; } .pp-top .pp-btn { margin-left: 8px; } }
+
+      /* Botones */
+      .pp-btn { display: inline-flex; align-items: center; justify-content: center; gap: 8px; font: 600 15px var(--font-sans); padding: 12px 20px; border-radius: 999px; border: 1px solid var(--deep); background: var(--deep); color: #fff !important; text-decoration: none; cursor: pointer; transition: background 0.2s, transform 0.15s; }
+      .pp-btn:hover { background: var(--deep-2); }
+      .pp-btn:active { transform: translateY(1px); }
+      .pp-btn:disabled { opacity: 0.45; cursor: not-allowed; }
+      .pp-btn-ghost { background: transparent; color: var(--deep) !important; }
+      .pp-btn-ghost:hover { background: color-mix(in oklab, var(--deep) 8%, transparent); }
+      .pp-btn-sm { padding: 8px 14px; font-size: 13.5px; }
+
+      .pp-eyebrow, .pp-num { font: 500 12.5px var(--font-mono); letter-spacing: 0.06em; text-transform: uppercase; color: var(--clay-ink); margin: 0 0 12px; }
+      .pp-acento { color: var(--deep); }
+      .pp-dot { display: inline-block; width: 8px; height: 8px; border-radius: 50%; background: var(--c); margin-right: 8px; vertical-align: 2px; flex: none; }
+      .pp-nota { font-size: 13.5px; color: var(--mute); margin: 18px 0 0; max-width: 760px; }
+
+      /* Hero */
+      .pp-hero { padding: 56px 0 64px; }
+      .pp-hero h1 { font-size: clamp(32px, 5.4vw, 58px); line-height: 1.04; max-width: 15ch; }
+      .pp-lede { font-size: clamp(16px, 1.6vw, 19px); color: var(--ink-2); max-width: 60ch; margin: 18px 0 28px; }
+      .pp-hero-cards { display: grid; gap: 14px; }
+      @media (min-width: 720px) { .pp-hero-cards { grid-template-columns: 1fr 1fr; } }
+      .pp-hcard { display: flex; flex-direction: column; gap: 6px; padding: 22px; border-radius: var(--r-lg); background: var(--card); box-shadow: var(--sombra); text-decoration: none; color: var(--ink) !important; transition: transform 0.2s, box-shadow 0.2s; }
+      .pp-hcard:hover { transform: translateY(-2px); box-shadow: 0 2px 4px rgba(14, 28, 38, 0.06), 0 16px 32px -14px rgba(14, 28, 38, 0.22); }
+      .pp-hcard-k { font-size: 13px; color: var(--mute); display: flex; align-items: center; }
+      .pp-hcard b { font-family: var(--font-display); font-size: clamp(26px, 3vw, 34px); font-weight: 600; color: var(--deep); }
+      .pp-hcard b small { font-size: 15px; color: var(--mute); font-weight: 500; }
+      .pp-hcard > span:last-child { color: var(--ink-2); font-size: 14.5px; }
+      .pp-hero-acc { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 24px; }
+
+      /* Secciones */
+      .pp-sec { padding: 64px 0; }
+      .pp-sec-alt { background: var(--alt); }
+      .pp-sec h2 { font-size: clamp(26px, 3.6vw, 40px); line-height: 1.1; max-width: 22ch; }
+      .pp-intro { color: var(--ink-2); max-width: 64ch; margin: 14px 0 28px; font-size: 16.5px; }
+
+      .pp-card { background: var(--card); border-radius: var(--r-md); padding: 22px; box-shadow: var(--sombra); }
+      .pp-card h3 { font-size: 19px; display: flex; align-items: center; }
+      .pp-card-sub { color: var(--mute); font-size: 14px; margin: 6px 0 16px; }
+      .pp-card ul { margin: 12px 0 0; padding-left: 18px; color: var(--ink-2); font-size: 15px; }
+      .pp-card li + li { margin-top: 6px; }
+      .pp-card p { color: var(--ink-2); font-size: 15px; margin: 10px 0 0; }
+      .pp-card-pie { font-size: 13.5px !important; color: var(--mute) !important; }
+      .pp-dos, .pp-tres, .pp-opciones, .pp-antes { display: grid; gap: 14px; }
+      @media (min-width: 720px) { .pp-dos, .pp-opciones, .pp-antes { grid-template-columns: 1fr 1fr; } .pp-tres { grid-template-columns: repeat(3, 1fr); } }
+      .pp-dos { margin-top: 14px; }
+
+      /* Capacitación */
+      .pp-precio { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+      .pp-precio div { padding: 12px 14px; border-radius: 10px; background: color-mix(in oklab, #46a85b 10%, #fff); display: flex; flex-direction: column; }
+      .pp-precio div.is-sec { background: var(--alt); }
+      .pp-precio span { font-size: 12.5px; color: var(--mute); }
+      .pp-precio b { font-family: var(--font-display); font-size: 24px; font-weight: 600; }
+      .pp-tiempos { margin-top: 14px; }
+      .pp-tiempos-head { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 12px; margin-bottom: 8px; }
+      .pp-toggle { display: inline-flex; padding: 3px; background: var(--alt); border-radius: 999px; }
+      .pp-toggle button { border: 0; background: transparent; font: 600 13.5px var(--font-sans); padding: 7px 14px; border-radius: 999px; cursor: pointer; color: var(--mute); }
+      .pp-toggle button[aria-pressed='true'] { background: var(--card); color: var(--deep); box-shadow: 0 1px 3px rgba(14, 28, 38, 0.12); }
+      .pp-areas { list-style: none; padding: 0 !important; margin: 0 !important; }
+      .pp-areas li { display: grid; grid-template-columns: 1fr auto; gap: 6px 14px; padding: 14px 0; border-top: 1px solid var(--line); margin: 0 !important; }
+      .pp-area-t b { display: block; font-size: 15px; color: var(--ink); }
+      .pp-area-t span { font-size: 13.5px; color: var(--mute); }
+      .pp-area-bar { grid-column: 1 / -1; height: 8px; border-radius: 999px; background: var(--alt); overflow: hidden; order: 3; }
+      .pp-area-bar i { display: block; height: 100%; border-radius: 999px; background: var(--c); transition: width 0.45s cubic-bezier(0.2, 0.8, 0.2, 1); }
+      .pp-area-h { text-align: right; display: flex; flex-direction: column; }
+      .pp-area-h b { font-family: var(--font-display); font-size: 18px; }
+      .pp-area-h span { font: 12px var(--font-mono); color: var(--mute); }
+      .pp-total { margin: 12px 0 0 !important; text-align: right; }
+      .pp-total b { font-family: var(--font-display); font-size: 20px; color: var(--deep); }
+
+      /* Flujos */
+      .pp-flujo, .pp-pasos4, .pp-ciclo { list-style: none; padding: 0; margin: 0; display: grid; gap: 12px; counter-reset: x; }
+      @media (min-width: 720px) { .pp-flujo { grid-template-columns: repeat(3, 1fr); } .pp-pasos4 { grid-template-columns: repeat(4, 1fr); } .pp-ciclo { grid-template-columns: repeat(5, 1fr); } }
+      .pp-flujo li, .pp-pasos4 li, .pp-ciclo li { background: var(--card); border-radius: var(--r-md); padding: 18px; box-shadow: var(--sombra); display: flex; flex-direction: column; gap: 6px; }
+      .pp-flujo p, .pp-pasos4 p, .pp-ciclo p { margin: 0; font-size: 14px; color: var(--ink-2); flex: 1; }
+      .pp-flujo-n { width: 28px; height: 28px; border-radius: 50%; display: grid; place-items: center; font: 600 13px var(--font-mono); background: color-mix(in oklab, var(--deep) 10%, #fff); color: var(--deep); }
+      .pp-chip { align-self: flex-start; font-size: 12.5px; padding: 4px 10px; border-radius: 999px; background: color-mix(in oklab, #46a85b 12%, #fff); color: #2a6d3a; margin-top: 4px; }
+      .pp-antes { margin-top: 14px; }
+      .pp-card.is-bueno { background: color-mix(in oklab, #46a85b 6%, #fff); }
+
+      /* Agente */
+      .pp-agente { display: grid; gap: 14px; margin-top: 14px; }
+      @media (min-width: 900px) { .pp-agente { grid-template-columns: 1.1fr 1fr; align-items: start; } }
+      .pp-frentes { display: grid; gap: 10px; }
+      .pp-frente { background: var(--card); border-radius: var(--r-md); padding: 16px 18px; box-shadow: var(--sombra); }
+      .pp-frente b { font-size: 15px; }
+      .pp-frente p { margin: 4px 0 8px; font-size: 14px; color: var(--ink-2); }
+      .pp-frente q { display: block; font-size: 13.5px; color: var(--deep); background: color-mix(in oklab, var(--deep) 6%, #fff); padding: 8px 12px; border-radius: 8px; quotes: '“' '”'; }
+      .pp-alerta { margin: 0; background: var(--ink); color: #e8eef2; border-radius: var(--r-lg); padding: 22px; box-shadow: 0 24px 48px -24px rgba(14, 28, 38, 0.5); }
+      .pp-alerta-top { display: flex; flex-wrap: wrap; gap: 8px 12px; align-items: center; font-size: 12.5px; color: #9fb0bd; }
+      .pp-prio { background: #d8453a; color: #fff; padding: 3px 10px; border-radius: 999px; font-weight: 600; }
+      .pp-alerta h4 { font-size: 19px; color: #fff; margin: 14px 0; line-height: 1.25; }
+      .pp-alerta dl { display: grid; grid-template-columns: auto 1fr; gap: 8px 14px; margin: 0; font-size: 14px; }
+      .pp-alerta dt { color: #9fb0bd; }
+      .pp-alerta dd { margin: 0; }
+      .pp-alerta dd b { color: #ffb4a8; }
+      .pp-alerta figcaption { margin-top: 16px; font-size: 12.5px; color: #9fb0bd; }
+
+      /* Gantt */
+      .pp-gantt { padding: 18px 18px 12px; overflow-x: auto; }
+      .pp-gantt-head, .pp-gantt-fila summary { display: grid; grid-template-columns: minmax(130px, 1.2fr) 3fr; align-items: center; gap: 12px; }
+      .pp-gantt-head { grid-template-columns: minmax(130px, 1.2fr) repeat(8, 1fr); gap: 0; font: 12px var(--font-mono); color: var(--mute); padding-bottom: 6px; }
+      .pp-gantt-head span:not(:first-child) { text-align: center; }
+      .pp-gantt-head span:first-child { margin-right: 12px; }
+      .pp-gantt-fila { border-top: 1px solid var(--line); }
+      .pp-gantt-fila summary { list-style: none; cursor: pointer; padding: 10px 0; }
+      .pp-gantt-fila summary::-webkit-details-marker { display: none; }
+      .pp-gantt-t { font-size: 14px; font-weight: 600; }
+      .pp-gantt-pista { display: grid; grid-template-columns: repeat(8, 1fr); height: 14px; background: repeating-linear-gradient(90deg, transparent 0 calc(12.5% - 1px), var(--line) calc(12.5% - 1px) 12.5%); border-radius: 4px; }
+      .pp-gantt-pista i { background: var(--deep); border-radius: 999px; margin: 0 3px; transition: background 0.2s; }
+      .pp-gantt-fila summary:hover .pp-gantt-pista i, .pp-gantt-fila[open] .pp-gantt-pista i { background: var(--aqua); }
+      .pp-gantt-fila p { margin: 0 0 12px; font-size: 14px; }
+      .pp-gantt-pie { font-size: 12.5px !important; color: var(--mute) !important; }
+
+      /* Inversión */
+      .pp-incluido { display: flex; flex-direction: column; gap: 6px; background: color-mix(in oklab, var(--deep) 6%, #fff); box-shadow: none; }
+      .pp-incluido span { color: var(--ink-2); font-size: 14.5px; }
+      .pp-planes { display: grid; gap: 14px; margin-top: 14px; }
+      @media (min-width: 720px) { .pp-planes { grid-template-columns: repeat(3, 1fr); } }
+      .pp-plan { background: var(--card); border-radius: var(--r-lg); padding: 22px; box-shadow: var(--sombra); display: flex; flex-direction: column; align-items: flex-start; }
+      .pp-plan-k { font-size: 13px; color: var(--mute); }
+      .pp-plan-n { font-family: var(--font-display); font-size: 56px; line-height: 1; color: var(--deep); font-weight: 600; }
+      .pp-plan-p { width: 100%; display: flex; justify-content: space-between; align-items: baseline; gap: 8px; padding: 10px 0; border-top: 1px solid var(--line); margin-top: 12px; }
+      .pp-plan-p + .pp-plan-p { margin-top: 0; }
+      .pp-plan-p span { font-size: 13px; color: var(--mute); }
+      .pp-plan-p b { font-family: var(--font-display); font-size: 21px; font-weight: 600; white-space: nowrap; }
+      .pp-plan-p b small { font-size: 12.5px; color: var(--mute); font-family: var(--font-sans); font-weight: 500; }
+      .pp-plan-p.is-sec b { color: var(--ink-2); font-size: 17px; }
+      .pp-plan .pp-btn { margin-top: 12px; }
+      .pp-extras { display: grid; gap: 10px; margin-top: 14px; }
+      @media (min-width: 720px) { .pp-extras { grid-template-columns: repeat(3, 1fr); } }
+      .pp-extras div { padding: 14px 16px; border-radius: var(--r-md); background: var(--alt); display: flex; flex-direction: column; }
+      .pp-extras span { font-size: 13px; color: var(--mute); }
+      .pp-extras b { font-family: var(--font-display); font-size: 20px; font-weight: 600; }
+      .pp-extras small { font-size: 12.5px; color: var(--mute); }
+      .pp-desglose { margin-top: 28px; }
+      .pp-leyenda { display: flex; flex-wrap: wrap; gap: 6px 16px; font-size: 13px; color: var(--ink-2); margin-bottom: 14px; }
+      .pp-leyenda i { display: inline-block; width: 10px; height: 10px; border-radius: 3px; background: var(--c); margin-right: 6px; vertical-align: -1px; }
+      .pp-barra { display: grid; grid-template-columns: 80px 1fr auto; gap: 12px; align-items: center; padding: 8px 0; }
+      .pp-barra-t { font-size: 13.5px; color: var(--mute); }
+      .pp-barra-pista { display: flex; height: 22px; border-radius: 6px; overflow: hidden; gap: 2px; }
+      .pp-barra-pista i { background: var(--c); }
+      .pp-barra b { font-family: var(--font-display); font-size: 16px; font-weight: 600; }
+
+      /* Simulador */
+      .pp-sim { display: grid; gap: 14px; }
+      @media (min-width: 900px) { .pp-sim { grid-template-columns: 1fr 1fr; align-items: start; } }
+      .pp-sim fieldset { border: 0; padding: 0; margin: 0 0 20px; }
+      .pp-sim legend { font: 600 15px var(--font-display); margin-bottom: 10px; }
+      .pp-seg { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+      .pp-seg label { position: relative; }
+      .pp-seg input { position: absolute; opacity: 0; inset: 0; cursor: pointer; }
+      .pp-seg span { display: block; text-align: center; padding: 12px 10px; border-radius: 10px; background: var(--alt); font-size: 14.5px; font-weight: 500; transition: background 0.2s, color 0.2s, box-shadow 0.2s; }
+      .pp-seg input:checked + span { background: color-mix(in oklab, var(--deep) 10%, #fff); color: var(--deep); box-shadow: inset 0 0 0 2px var(--deep); font-weight: 600; }
+      .pp-seg input:focus-visible + span { outline: 2px solid var(--aqua); outline-offset: 2px; }
+      .pp-sim-aviso { margin: 0 !important; font-size: 14px; color: #9a5b00 !important; background: #fdf0dc; padding: 10px 12px; border-radius: 8px; }
+      .pp-sim-out { background: var(--ink); color: #e8eef2; }
+      .pp-sim-big span { font-size: 13.5px; color: #9fb0bd; }
+      .pp-sim-big b { display: block; font-family: var(--font-display); font-size: clamp(36px, 5vw, 52px); font-weight: 600; color: #fff; line-height: 1.05; margin: 4px 0; }
+      .pp-sim-big small { font-size: 14px; color: #7fe0d6; }
+      .pp-sim-dl { margin: 20px 0 0; display: grid; gap: 0; }
+      .pp-sim-dl div { display: grid; grid-template-columns: 1fr auto; gap: 2px 12px; padding: 12px 0; border-top: 1px solid rgba(255, 255, 255, 0.1); }
+      .pp-sim-dl dt { font-size: 14px; color: #c4d0d8; }
+      .pp-sim-dl dd { margin: 0; font-family: var(--font-display); font-size: 19px; font-weight: 600; color: #fff; text-align: right; }
+      .pp-sim-dl small { grid-column: 1 / -1; font-size: 12.5px; color: #8b9cab; }
+      .pp-linea { display: flex; gap: 3px; margin: 14px 0 18px; font-size: 11.5px; color: #9fb0bd; }
+      .pp-linea:empty { display: none; }
+      .pp-linea span { display: flex; flex-direction: column; gap: 5px; min-width: 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+      .pp-linea i { height: 8px; border-radius: 3px; background: #7fe0d6; }
+      .pp-linea .is-cero i { background: rgba(255, 255, 255, 0.18); }
+      .pp-linea .is-a i { background: #4aa3e0; }
+      .pp-linea .is-b i { background: #46a85b; }
+      .pp-sim-out .pp-btn { width: 100%; background: #fff; color: var(--ink) !important; border-color: #fff; }
+      .pp-sim-out .pp-btn:hover { background: #e6edf1; }
+
+      /* Pago */
+      .pp-timeline { list-style: none; padding: 0; margin: 0; display: grid; gap: 12px; }
+      @media (min-width: 720px) { .pp-timeline { grid-template-columns: repeat(4, 1fr); } }
+      .pp-timeline li { background: var(--card); border-radius: var(--r-md); padding: 18px; box-shadow: var(--sombra); position: relative; }
+      .pp-timeline span { font: 12px var(--font-mono); color: var(--clay-ink); text-transform: uppercase; letter-spacing: 0.05em; }
+      .pp-timeline b { display: block; font-family: var(--font-display); font-size: 20px; font-weight: 600; margin: 4px 0; }
+      .pp-timeline p { margin: 0; font-size: 14px; color: var(--ink-2); }
+
+      .pp-cond summary { list-style: none; cursor: pointer; }
+      .pp-cond summary::-webkit-details-marker { display: none; }
+      .pp-check { list-style: none; padding: 0 !important; }
+      .pp-check li { position: relative; padding-left: 24px; }
+      .pp-check li::before { content: ''; position: absolute; left: 0; top: 4px; width: 14px; height: 14px; border-radius: 4px; background: color-mix(in oklab, #46a85b 18%, #fff); box-shadow: inset 0 0 0 1.5px #46a85b; }
+
+      /* Elegir */
+      .pp-elegir { background: linear-gradient(180deg, var(--bg), color-mix(in oklab, var(--deep) 7%, var(--bg))); }
+      .pp-form { display: grid; gap: 14px; }
+      .pp-form-sel { display: flex; flex-direction: column; gap: 2px; padding: 14px 16px; border-radius: 10px; background: color-mix(in oklab, var(--deep) 7%, #fff); }
+      .pp-form-sel span { font-size: 12.5px; color: var(--mute); }
+      .pp-form-sel b { font-family: var(--font-display); font-size: 18px; font-weight: 600; color: var(--deep); }
+      .pp-form-sel small { font-size: 13.5px; color: var(--ink-2); }
+      .pp-form-sel a { font-size: 13px; margin-top: 4px; }
+      .pp-form-fila { display: grid; gap: 14px; }
+      @media (min-width: 600px) { .pp-form-fila { grid-template-columns: 1fr 1fr; } }
+      .pp-form label { display: flex; flex-direction: column; gap: 6px; font-size: 14px; font-weight: 500; }
+      .pp-form input, .pp-form textarea { font: 15px var(--font-sans); padding: 11px 12px; border-radius: 10px; border: 1px solid var(--line-2); background: #fff; color: var(--ink); resize: vertical; }
+      .pp-form input:focus, .pp-form textarea:focus { outline: 2px solid color-mix(in oklab, var(--deep) 40%, transparent); border-color: var(--deep); }
+      .pp-hp { position: absolute; left: -9999px; width: 1px; height: 1px; }
+      .pp-form-msg { margin: 0 !important; font-size: 14px; min-height: 1.4em; }
+      .pp-form.is-ok .pp-form-msg { color: #2a6d3a !important; font-weight: 600; }
+      .pp-form.is-ok button[type='submit'] { display: none; }
+
+      .pp-pie { padding: 28px 0 96px; font-size: 13.5px; color: var(--mute); border-top: 1px solid var(--line); }
+
+      /* Chat */
+      .pp-fab { position: fixed; right: 16px; bottom: 16px; z-index: 40; display: flex; align-items: center; gap: 8px; padding: 12px 18px 12px 14px; border: 0; border-radius: 999px; background: var(--deep); color: #fff; font: 600 14.5px var(--font-sans); cursor: pointer; box-shadow: 0 12px 28px -10px rgba(18, 78, 125, 0.6); transition: transform 0.2s, background 0.2s; }
+      .pp-fab:hover { background: var(--deep-2); transform: translateY(-2px); }
+      .pp-fab svg { width: 22px; height: 22px; }
+      .pp-fab[hidden], .pp-chat[hidden] { display: none; }
+      .pp-chat { position: fixed; z-index: 50; inset: auto 0 0 0; height: min(86vh, 640px); background: var(--card); border-radius: 18px 18px 0 0; box-shadow: 0 -12px 40px -12px rgba(14, 28, 38, 0.35); display: flex; flex-direction: column; transform: translateY(16px); opacity: 0; transition: transform 0.25s, opacity 0.25s; }
+      .pp-chat.is-abierto { transform: none; opacity: 1; }
+      @media (min-width: 720px) { .pp-chat { inset: auto 20px 20px auto; width: 400px; border-radius: 18px; height: min(78vh, 640px); } }
+      .pp-chat header { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 14px 16px; border-bottom: 1px solid var(--line); }
+      .pp-chat header b { display: block; font-family: var(--font-display); font-size: 16px; }
+      .pp-chat header span { font-size: 12.5px; color: var(--mute); }
+      .pp-chat header button { border: 0; background: var(--alt); width: 32px; height: 32px; border-radius: 50%; font-size: 20px; line-height: 1; cursor: pointer; color: var(--ink); }
+      .pp-chat-log { flex: 1; overflow-y: auto; padding: 16px; display: flex; flex-direction: column; gap: 10px; }
+      .pp-msg { max-width: 88%; display: flex; flex-direction: column; gap: 6px; }
+      .pp-msg p { margin: 0; padding: 10px 14px; border-radius: 16px; font-size: 14.5px; line-height: 1.5; white-space: pre-wrap; }
+      .pp-msg.is-ia p { background: var(--alt); border-bottom-left-radius: 4px; }
+      .pp-msg.is-yo { align-self: flex-end; }
+      .pp-msg.is-yo p { background: var(--deep); color: #fff; border-bottom-right-radius: 4px; }
+      .pp-msg.is-error p { background: #fdeceb; color: #9b2c22; }
+      .pp-msg.is-pensando p { color: var(--mute); animation: pp-pulso 1.2s ease-in-out infinite; }
+      @keyframes pp-pulso { 50% { opacity: 0.5; } }
+      .pp-msg-tag { align-self: flex-start; font-size: 12px; font-weight: 600; padding: 3px 10px; border-radius: 999px; background: #fdf0dc; color: #9a5b00; }
+      .pp-msg-link { font-size: 13px; font-weight: 600; text-decoration: none; padding-left: 4px; }
+      .pp-msg-link::after { content: ' →'; }
+      .pp-sugeridas { display: flex; flex-direction: column; align-items: flex-start; gap: 6px; margin-top: 4px; }
+      .pp-sugeridas button { border: 1px solid var(--line-2); background: #fff; border-radius: 999px; padding: 7px 12px; font: 13.5px var(--font-sans); color: var(--deep); cursor: pointer; text-align: left; transition: background 0.2s; }
+      .pp-sugeridas button:hover { background: color-mix(in oklab, var(--deep) 7%, #fff); }
+      .pp-chat-form { display: flex; gap: 8px; align-items: flex-end; padding: 10px 12px; border-top: 1px solid var(--line); }
+      .pp-chat-form textarea { flex: 1; resize: none; font: 15px var(--font-sans); padding: 10px 12px; border-radius: 12px; border: 1px solid var(--line-2); max-height: 120px; color: var(--ink); }
+      .pp-chat-form textarea:focus { outline: 2px solid color-mix(in oklab, var(--deep) 40%, transparent); border-color: var(--deep); }
+      .pp-chat-form button { width: 42px; height: 42px; border-radius: 50%; border: 0; background: var(--deep); color: #fff; display: grid; place-items: center; cursor: pointer; flex: none; }
+      .pp-chat-form button:disabled { opacity: 0.5; }
+      .pp-chat-form button svg { width: 20px; height: 20px; }
+      .pp-chat-aviso { margin: 0; padding: 0 14px 12px; font-size: 11.5px; color: var(--mute); line-height: 1.4; }
+    </style>
+  </body>
+</html>
