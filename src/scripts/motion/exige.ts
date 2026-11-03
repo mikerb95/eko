@@ -5,17 +5,14 @@
  * - Recorrido automático: mientras nadie elige, el panel pasa solo por los
  *   perfiles, con una barra que se llena en el chip activo. Así se entiende
  *   desde el primer segundo que la lista responde a algo.
- * - Reordenamiento con Flip: las normas que aplican suben y las demás bajan,
- *   en vez de saltar de sitio.
+ * - Entrada de las filas: el CSS solo muestra las normas del perfil elegido;
+ *   aquí entran escalonadas para que se lea el cambio, no un salto.
  * El recorrido se pausa al apuntar o enfocar el panel (nada se mueve bajo
  * quien lee) y cuando los chips salen de pantalla, y se detiene para siempre
  * en cuanto el visitante elige un perfil.
  */
-import { Flip } from 'gsap/Flip'
 import { CURVA, gsap, mientrasSeVea } from './core'
-import { esPerfil, ordenar, type Perfil } from '../../lib/exigencias'
-
-gsap.registerPlugin(Flip)
+import { esPerfil, type Perfil } from '../../lib/exigencias'
 
 /** Segundos por perfil en el recorrido automático: lo justo para leer qué se encendió. */
 const PASO = 3.6
@@ -27,23 +24,20 @@ export function montarExige(raiz: HTMLElement): () => void {
   const radios = [...raiz.querySelectorAll<HTMLInputElement>('input[name="exige-perfil"]')]
   if (!lista || radios.length === 0) return () => {}
 
-  // El orden del servidor es la referencia estable: reordenar siempre desde él
-  // hace que cada perfil quede igual sin importar de cuál se venga.
-  const filas = [...lista.querySelectorAll<HTMLElement>('.ex-norma')].map((el) => ({ el, code: el.dataset.code ?? '' }))
+  const filas = [...lista.querySelectorAll<HTMLElement>('.ex-norma')]
   const actual = (): Perfil | null => {
     const v = radios.find((r) => r.checked)?.value
     return esPerfil(v) ? v : null
   }
 
   function mostrar(perfil: Perfil) {
-    const estado = Flip.getState(filas.map((f) => f.el))
-    for (const f of ordenar(filas, perfil)) lista!.appendChild(f.el)
-    Flip.from(estado, { duration: 0.75, ease: CURVA, stagger: 0.015 })
+    const visibles = filas.filter((el) => el.classList.contains(`p-${perfil}`))
+    gsap.fromTo(visibles, { opacity: 0, x: -10 }, { opacity: 1, x: 0, duration: 0.5, stagger: 0.04, ease: CURVA, clearProps: 'transform,opacity' })
 
     // La cifra entra rodando desde abajo, como un dato que llega.
     const cifra = raiz.querySelector<HTMLElement>(`.ex-n[data-p="${perfil}"] b`)
     if (cifra) gsap.fromTo(cifra, { yPercent: 70, opacity: 0 }, { yPercent: 0, opacity: 1, duration: 0.6, ease: 'expo.out' })
-    const puntos = filas.filter((f) => f.el.classList.contains(`p-${perfil}`)).map((f) => f.el.querySelector('.ex-punto'))
+    const puntos = visibles.map((el) => el.querySelector('.ex-punto'))
     gsap.fromTo(puntos, { scale: 0.2 }, { scale: 1, duration: 0.5, stagger: 0.05, delay: 0.25, ease: 'back.out(3)', clearProps: 'transform' })
   }
 
