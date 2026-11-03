@@ -2,6 +2,7 @@
 export const prerender = false // página interna: el middleware exige sesión (src/middleware.ts)
 import Layout from '../layouts/Layout.astro'
 import SiteFooter from '../components/SiteFooter.astro'
+import Ilustracion from '../components/oportunidades/Ilustracion.astro'
 import { FOUNDED_YEAR, stats, tonnesManaged, yearsActive } from '../lib/brand'
 
 // Estado de cada eje frente a lo que ha pasado en 2026.
@@ -53,6 +54,8 @@ const ejes = [
 const oportunidades = [
   {
     n: "01", code: "CERTIFICADOS",
+    il: "certificados",
+    resumen: "Desde 2027 el cliente sube los certificados al RUA y el sistema los cruza. Gana el gestor que ya los entregue digitales.",
     title: "El gestor con certificado digital primero",
     lede: "El Decreto 766 vuelve obligatorio lo que hoy casi ningún gestor tiene: certificados electrónicos verificables que el cliente pueda subir al RUA y que cuadren con lo que reporta. Desde 2027 el sistema detecta si lo entregado y lo certificado no coinciden. Las empresas medianas y grandes van a preferir al gestor cuyo certificado pase el cruce sin trabajo extra. Es la Fase 1 de la plataforma, ahora con fecha límite.",
     tags: ["D. 766/2026", "RUA · IDEAM", "QR y firma digital"],
@@ -61,6 +64,8 @@ const oportunidades = [
   },
   {
     n: "02", code: "EVASORES REP",
+    il: "evasores",
+    resumen: "Cada productor que la ANLA encuentre sin sistema RAEE tiene que montar uno o unirse a un colectivo.",
     title: "Productores que tienen que ponerse al día",
     lede: "Cada importador o fabricante que la ANLA identifica como evasor tiene que presentar un sistema de recolección, individual o colectivo, y desde ahí rendir informe anual de avance. Son cientos de empresas que necesitan formular el sistema, unirse a un colectivo y demostrar recolección con certificados. Es consultoría (EKONSULTING) más operación de colectivo, que es lo que Ekosolv ya hace con envases (EKOPARTNER).",
     tags: ["Res. 0851/2022", "Sistemas colectivos", "Informe anual ANLA"],
@@ -69,6 +74,8 @@ const oportunidades = [
   },
   {
     n: "03", code: "VOLUMEN RAEE",
+    il: "volumen",
+    resumen: "Más de 300.000 toneladas al año y solo cerca del 20% se recicla formalmente.",
     title: "Crecimiento del volumen de RAEE",
     lede: "Colombia ya genera más de 300.000 toneladas de RAEE al año, más de 6 kg por habitante, y se recicla formalmente alrededor del 20%. La Res. 0851 cubre 297 subpartidas de aparatos de consumo masivo, y desde 2026 los sistemas colectivos deben ampliar cobertura a las nuevas subcategorías. El cambio de gobierno no ha tocado ni esta norma ni el Decreto 670 de 2025 (Basura Cero).",
     tags: ["297 subpartidas", "> 300.000 t/año", "~20% de reciclaje"],
@@ -77,6 +84,8 @@ const oportunidades = [
   },
   {
     n: "04", code: "LICENCIAMIENTO",
+    il: "licenciamiento",
+    resumen: "Si sale el decreto de trámite paralelo, los estudios ambientales se adelantan a 2027.",
     title: "Más proyectos entrando a licenciamiento",
     lede: "No hubo \"licenciamiento exprés\" inmediato, pero si se expide el decreto de trámite paralelo, proyectos de gas, transmisión, eólicos y vías podrían presentar estudios hasta dos años antes. Eso concentra en 2027 la demanda de estudios de impacto, planes de manejo e Informes de Cumplimiento Ambiental (ICA), justo lo que vende EKONSULTING.",
     tags: ["EIA · DAA · PMA", "ICA", "Decreto de trámite paralelo"],
@@ -85,6 +94,8 @@ const oportunidades = [
   },
   {
     n: "05", code: "NUEVAS CORRIENTES",
+    il: "corrientes",
+    resumen: "Baterías ya obligadas por norma y paneles solares con reglamentación en camino, con negocio de reúso.",
     title: "Baterías y paneles solares",
     lede: "Las baterías de plomo-ácido ya tienen sistema obligatorio y los gestores licenciados son los únicos que pueden certificar. Las de litio de vehículos eléctricos todavía no llegan en volumen, pero la obligación existe. Los paneles solares son la apuesta de largo plazo: Colombia Solar los instala por miles con vida útil de 25 años, y un módulo viejo conserva cerca del 80% de su capacidad, así que hay negocio de reúso además de reciclaje. Quien llegue con experiencia a la mesa técnica de MinAmbiente ayuda a escribir la norma.",
     tags: ["Res. 0799/2025", "Res. 40159/2026 MinMinas", "Reúso de módulos"],
@@ -93,12 +104,35 @@ const oportunidades = [
   },
   {
     n: "06", code: "ENVASES",
+    il: "envases",
+    resumen: "La meta sube de 20% en 2026 a 30% en 2030: más toneladas que los productores deben certificar.",
     title: "Metas de envases que suben cada año",
     lede: "La meta de aprovechamiento de envases y empaques llega al 20% en 2026 y sube hasta 30% en 2030, medida en toneladas certificadas. Con la Resolución 803 de 2024 los planes de gestión además tuvieron que sumar los plásticos de un solo uso, y el informe de marzo de 2026 fue el primero con esas reglas. Cada punto de meta adicional es más tonelaje que los productores deben comprar a un sistema colectivo. Y el Decreto 772 de 2026 da prioridad a las rutas selectivas de reciclables, así que habrá más material separado en la fuente.",
     tags: ["Res. 1407/2018 · 1342/2020", "Res. 803/2024", "Meta 30% en 2030"],
     when: "Cada año hasta 2030",
     estado: "vigente",
   },
+]
+
+// Lo esencial en 30 segundos, arriba de todo.
+const esencial = [
+  { il: "certificados", t: "El certificado digital ya tiene fecha", d: "Decreto 766: desde 2027 los certificados de gestión se cruzan en el RUA.", href: "#oportunidades" },
+  { il: "evasores", t: "La ANLA salió a buscar evasores", d: "Cada productor sin sistema de recolección es un cliente que tiene que ponerse al día.", href: "#marco" },
+  { il: "corrientes", t: "Llegan corrientes nuevas", d: "Baterías con sistema obligatorio y paneles solares con norma en camino.", href: "#oportunidades" },
+  { il: "posicion", t: "Ganar por cumplimiento, no por volumen", d: "Frente a Lito y los colectivos, el diferenciador es dejar al cliente cumplido.", href: "#competencia" },
+]
+
+// Índice fijo de la página.
+const secciones = [
+  { id: "esencial", t: "Lo esencial" },
+  { id: "cambios", t: "Qué cambió" },
+  { id: "marco", t: "Marco" },
+  { id: "oportunidades", t: "Oportunidades" },
+  { id: "capacidad", t: "Capacidad" },
+  { id: "encaje", t: "Encaje" },
+  { id: "competencia", t: "Competencia" },
+  { id: "plataforma", t: "Plataforma" },
+  { id: "fuentes", t: "Fuentes" },
 ]
 
 const cambios = [
@@ -355,6 +389,29 @@ const fuentes = [
     <p class="lede-coda reveal">La demanda ya está escrita en la norma.</p>
   </section>
 
+  <nav class="toc" aria-label="Secciones de la página">
+    <div class="wrap toc-inner">
+      <ol>
+        {secciones.map(sec => <li><a href={`#${sec.id}`} data-toc={sec.id}>{sec.t}</a></li>)}
+      </ol>
+    </div>
+    <div class="toc-progress" aria-hidden="true"><span></span></div>
+  </nav>
+
+  <section class="section wrap" id="esencial">
+    <div class="eyebrow reveal">Lo esencial en 30 segundos</div>
+    <div class="esencial reveal">
+      {esencial.map(e => (
+        <a class="ess" href={e.href}>
+          <Ilustracion tipo={e.il} class="ess-il" />
+          <div class="ess-t">{e.t}</div>
+          <p>{e.d}</p>
+          <span class="ess-go" aria-hidden="true">Ver detalle →</span>
+        </a>
+      ))}
+    </div>
+  </section>
+
   <section class="section wrap">
     <div class="band reveal">
       <div class="band-grid">
@@ -381,7 +438,7 @@ const fuentes = [
     </div>
   </section>
 
-  <section class="section wrap">
+  <section class="section wrap" id="cambios">
     <div class="section-head reveal">
       <div>
         <div class="eyebrow">Revisión del 28 de octubre</div>
@@ -401,7 +458,7 @@ const fuentes = [
     </div>
   </section>
 
-  <section class="section wrap">
+  <section class="section wrap" id="marco">
     <div class="section-head reveal">
       <div>
         <div class="eyebrow">Marco regulatorio</div>
@@ -453,7 +510,7 @@ const fuentes = [
     </div>
   </section>
 
-  <section class="section wrap">
+  <section class="section wrap" id="oportunidades">
     <div class="section-head reveal">
       <div>
         <div class="eyebrow">Oportunidades del sector</div>
@@ -463,31 +520,28 @@ const fuentes = [
         El marco regulatorio del posconsumo (Ley 1672/2013, Decreto 284/2018, Resolución 0851/2022 y Decreto 670/2025 de Basura Cero) sigue en firme tras el cambio de gobierno y genera obligaciones que no dependen de quién gobierne.
       </div>
     </div>
-    <div class="process reveal">
+    <div class="opps reveal">
       {oportunidades.map(o => (
-        <div class="process-row process-row-wide">
-          <div class="n">{o.n} · {o.code}</div>
-          <div>
-            <h3 style="font-size:clamp(20px,2vw,30px)">{o.title}</h3>
+        <article class="opp">
+          <div class="opp-il"><Ilustracion tipo={o.il} /></div>
+          <div class="opp-top">
+            <span class="opp-n">{o.n} · {o.code}</span>
+            <span class="estado" data-estado={o.estado}>{ESTADOS[o.estado]}</span>
           </div>
-          <div class="desc">
-            {o.lede}
-            <div style="display:flex; flex-wrap:wrap; gap:6px; margin-top:14px">
-              {o.tags.map(t => (
-                <span style="font-family: var(--font-mono); font-size:11px; color:var(--ink-2); padding:5px 10px; background:var(--paper); border:1px solid var(--line); border-radius:999px;">{t}</span>
-              ))}
-            </div>
-          </div>
-          <div class="when">
-            {o.when}
-            <div><span class="estado" data-estado={o.estado}>{ESTADOS[o.estado]}</span></div>
-          </div>
-        </div>
+          <h3>{o.title}</h3>
+          <p class="opp-res">{o.resumen}</p>
+          <div class="opp-when">{o.when}</div>
+          <details class="opp-more">
+            <summary>Por qué</summary>
+            <p>{o.lede}</p>
+            <ul class="opp-tags">{o.tags.map(t => <li>{t}</li>)}</ul>
+          </details>
+        </article>
       ))}
     </div>
   </section>
 
-  <section class="section wrap">
+  <section class="section wrap" id="capacidad">
     <div class="section-head reveal">
       <div>
         <div class="eyebrow">Perfil y capacidad instalada</div>
@@ -522,7 +576,7 @@ const fuentes = [
     </div>
   </section>
 
-  <section class="section wrap">
+  <section class="section wrap" id="encaje">
     <div class="section-head reveal">
       <div>
         <div class="eyebrow">Encaje oportunidad · capacidad</div>
@@ -534,24 +588,25 @@ const fuentes = [
     </div>
 
     <div class="fit reveal">
-      {encaje.map(e => (
-        <article class="fit-row">
-          <div class="fit-op">
-            <div class="code">{e.op}</div>
-            <div class="chips">
-              {e.lineas.map(n => <span class="chip">{n}</span>)}
+      {encaje.map((e, i) => (
+        <details class="fit-row" open={i === 0}>
+          <summary class="fit-sum">
+            <span class="code">{e.op}</span>
+            <span class="chips">{e.lineas.map(n => <span class="chip">{n}</span>)}</span>
+            <span class="fit-cubre">{e.cubre}</span>
+            <span class="fit-plus" aria-hidden="true"></span>
+          </summary>
+          <div class="fit-body">
+            <div class="fit-col">
+              <div class="lbl">Capacidad instalada</div>
+              <p>{e.tiene}</p>
+            </div>
+            <div class="fit-col is-gap">
+              <div class="lbl">Brecha</div>
+              <p>{e.brecha}</p>
             </div>
           </div>
-          <div class="fit-col">
-            <div class="lbl">Capacidad instalada</div>
-            <p>{e.tiene}</p>
-          </div>
-          <div class="fit-col is-gap">
-            <div class="lbl">Brecha</div>
-            <p>{e.brecha}</p>
-            <div class="fit-cubre">{e.cubre}</div>
-          </div>
-        </article>
+        </details>
       ))}
     </div>
 
@@ -560,7 +615,7 @@ const fuentes = [
     </p>
   </section>
 
-  <section class="section wrap">
+  <section class="section wrap" id="competencia">
     <div class="section-head reveal">
       <div>
         <div class="eyebrow">Competencia y posicionamiento</div>
@@ -682,7 +737,7 @@ const fuentes = [
     </div>
   </section>
 
-  <section class="section wrap">
+  <section class="section wrap" id="plataforma">
     <div class="section-head reveal">
       <div>
         <div class="eyebrow">La respuesta desde el software</div>
@@ -729,7 +784,7 @@ const fuentes = [
     </div>
   </section>
 
-  <section class="section wrap">
+  <section class="section wrap" id="fuentes">
     <div class="section-head reveal">
       <div>
         <div class="eyebrow">¿Por qué la demanda es inmediata?</div>
@@ -739,20 +794,48 @@ const fuentes = [
         Los certificados y la trazabilidad ya son requisito contractual de los clientes B2B. El Decreto 766 les pone fecha y formato digital, la ANLA está empujando a los evasores a entrar a un sistema y las metas de la Res. 0851 suben cada año. Frente a la competencia informal, la trazabilidad verificable es el argumento de venta.
       </div>
     </div>
-    <div class="reveal" style="margin-top:8px">
-      <div class="eyebrow" style="margin-bottom:16px">Fuentes</div>
-      <ul style="display:grid; gap:10px; list-style:none; padding:0">
+    <details class="fuentes reveal">
+      <summary>Ver las {fuentes.length} fuentes</summary>
+      <ul>
         {fuentes.map(f => (
           <li>
-            <a href={f.u} target="_blank" rel="noopener" class="ulink" style="font-size:14.5px">{f.t}</a>
+            <a href={f.u} target="_blank" rel="noopener" class="ulink">{f.t}</a>
           </li>
         ))}
       </ul>
-    </div>
+    </details>
   </section>
 
   <SiteFooter headline={`¿Hablamos de<br>la <em>fase 1</em>?`} />
 </Layout>
+
+<script>
+  // Índice fijo: marca la sección visible y llena la barra de progreso.
+  const links = new Map(
+    [...document.querySelectorAll<HTMLAnchorElement>('.toc [data-toc]')].map(a => [a.dataset.toc, a])
+  )
+  const marcar = (id: string) => {
+    links.forEach((a, k) => a.toggleAttribute('aria-current', k === id))
+    const activo = links.get(id)
+    activo?.scrollIntoView({ block: 'nearest', inline: 'center', behavior: 'smooth' })
+  }
+  const obs = new IntersectionObserver(
+    entradas => {
+      const visible = entradas.filter(e => e.isIntersecting).sort((a, b) => a.boundingClientRect.top - b.boundingClientRect.top)[0]
+      if (visible) marcar(visible.target.id)
+    },
+    { rootMargin: '-30% 0px -60% 0px' }
+  )
+  links.forEach((_, id) => { const el = document.getElementById(id); if (el) obs.observe(el) })
+
+  const barra = document.querySelector<HTMLElement>('.toc-progress span')
+  const avance = () => {
+    const max = document.documentElement.scrollHeight - innerHeight
+    if (barra) barra.style.transform = `scaleX(${max > 0 ? scrollY / max : 0})`
+  }
+  addEventListener('scroll', avance, { passive: true })
+  avance()
+</script>
 
 <style>
   /* ── Perfil: las cuatro líneas de negocio ────────────────────────────── */

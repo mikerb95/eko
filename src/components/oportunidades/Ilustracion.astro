@@ -1,0 +1,138 @@
+---
+// Ilustraciones de línea para /oportunidades2630. Dibujadas a mano en SVG
+// con los colores de marca: trazo tinta, rellenos suaves de bosque y arena,
+// y un solo acento sólido por pieza.
+interface Props {
+  tipo: 'certificados' | 'evasores' | 'volumen' | 'licenciamiento' | 'corrientes' | 'envases' | 'posicion'
+  class?: string
+}
+const { tipo, class: clase = '' } = Astro.props
+---
+
+<svg class={`il ${clase}`} viewBox="0 0 160 100" fill="none" aria-hidden="true">
+  {tipo === 'certificados' && (
+    <g>
+      <rect class="b" x="62" y="8" width="54" height="72" rx="4" />
+      <rect class="p" x="46" y="16" width="54" height="72" rx="4" />
+      <path class="t" d="M54 28h28M54 36h38" />
+      <rect class="t" x="54" y="46" width="8" height="8" />
+      <rect class="t" x="68" y="46" width="8" height="8" />
+      <rect class="t" x="54" y="60" width="8" height="8" />
+      <rect class="s" x="56.5" y="48.5" width="3" height="3" />
+      <rect class="s" x="70.5" y="48.5" width="3" height="3" />
+      <rect class="s" x="56.5" y="62.5" width="3" height="3" />
+      <rect class="s" x="68" y="60" width="3" height="3" />
+      <rect class="s" x="73" y="64" width="3" height="3" />
+      <rect class="s" x="69" y="66" width="3" height="3" />
+      <circle class="a" cx="98" cy="76" r="13" />
+      <path class="w" d="M92 76l4 4 8-8" />
+      <path class="t" d="M124 18l4-4M128 26h6M122 10l1-6" />
+    </g>
+  )}
+
+  {tipo === 'evasores' && (
+    <g>
+      <path class="t" d="M10 84h140" />
+      <rect class="p" x="18" y="56" width="34" height="28" rx="2" />
+      <rect class="b" x="56" y="56" width="34" height="28" rx="2" />
+      <rect class="p" x="36" y="28" width="34" height="28" rx="2" />
+      <path class="t" d="M24 64h22M42 36h22M62 64h22" />
+      <circle class="f" cx="104" cy="50" r="21" />
+      <path class="t" d="M119 65l20 20" stroke-width="6" />
+      <path class="ta" d="M104 40v12" />
+      <circle class="s" cx="104" cy="59" r="2" />
+    </g>
+  )}
+
+  {tipo === 'volumen' && (
+    <g>
+      <path class="t" d="M10 84h140" />
+      <rect class="f" x="16" y="68" width="12" height="16" rx="1" />
+      <rect class="f" x="32" y="58" width="12" height="26" rx="1" />
+      <rect class="a" x="48" y="46" width="12" height="38" rx="1" />
+      <path class="ta" d="M14 54l16-8 16-10 14-10" />
+      <path class="ta" d="M52 25l8 1-2 8" />
+      <rect class="p" x="74" y="24" width="48" height="34" rx="3" />
+      <rect class="b" x="80" y="30" width="36" height="22" rx="1" />
+      <path class="t" d="M98 58v10M88 70h20" />
+      <rect class="p" x="128" y="44" width="18" height="32" rx="3" />
+      <path class="t" d="M134 70h6" />
+    </g>
+  )}
+
+  {tipo === 'licenciamiento' && (
+    <g>
+      <path class="t" d="M8 86h144" />
+      <rect class="b" x="24" y="14" width="48" height="62" rx="3" />
+      <rect class="p" x="16" y="22" width="48" height="62" rx="3" />
+      <path class="t" d="M24 34h30M24 42h24M24 50h30" />
+      <circle class="ra" cx="48" cy="68" r="10" />
+      <path class="ta" d="M43 68h10M48 63v10" />
+      <path class="t" d="M98 86l10-56 10 56M101 68h14M103 54h10M92 40h32M98 86l15-28M118 86l-15-28" />
+      <path class="t" d="M144 86V40" />
+      <path class="ta" d="M144 40V22M144 40l14 8M144 40l-14 8" />
+      <circle class="s" cx="144" cy="40" r="2.5" />
+    </g>
+  )}
+
+  {tipo === 'corrientes' && (
+    <g>
+      <path class="t" d="M8 84h144" />
+      <circle class="sun" cx="22" cy="18" r="8" />
+      <path class="f t" d="M14 70l20-36h52L66 70z" />
+      <path class="t" d="M24 52h52M31.3 70l20-36M48.6 70l20-36" />
+      <path class="t" d="M50 70v14" />
+      <path class="t" d="M66 62c14 0 20-8 34-8" />
+      <rect class="p" x="100" y="40" width="44" height="28" rx="4" />
+      <rect class="t" x="144" y="48" width="4" height="12" rx="1" />
+      <rect class="a" x="106" y="46" width="8" height="16" rx="1" />
+      <rect class="a" x="118" y="46" width="8" height="16" rx="1" />
+      <rect class="t" x="130" y="46" width="8" height="16" rx="1" />
+    </g>
+  )}
+
+  {tipo === 'envases' && (
+    <g>
+      <path class="t" d="M8 84h144" />
+      <rect class="a" x="30" y="20" width="10" height="6" rx="1" />
+      <path class="p" d="M30 26v10c-6 3-8 8-8 14v30a3 3 0 0 0 3 3h20a3 3 0 0 0 3-3V50c0-6-2-11-8-14V26z" />
+      <rect class="b" x="22" y="54" width="26" height="12" />
+      <path class="b" d="M94 51l10-10v32l-10 10z" />
+      <path class="p" d="M60 51l10-10h34l-10 10z" />
+      <rect class="p" x="60" y="51" width="34" height="33" />
+      <path class="t" d="M77 51v12" />
+      <path class="ta" d="M115 58a15 15 0 0 1 25.6-10.6" />
+      <path class="ta" d="M139.2 40.4l1.4 7-7 -1.4" />
+      <path class="ta" d="M145 58a15 15 0 0 1-25.6 10.6" />
+      <path class="ta" d="M120.8 75.6l-1.4-7 7 1.4" />
+    </g>
+  )}
+
+  {tipo === 'posicion' && (
+    <g>
+      <circle class="b" cx="74" cy="54" r="32" />
+      <circle class="p" cx="74" cy="54" r="21" />
+      <circle class="a" cx="74" cy="54" r="10" />
+      <path class="t" d="M80 49l52-34" stroke-width="2" />
+      <path class="ta" d="M124 12l12-1-5 11M118 16l12-1-5 11" />
+      <circle class="w2" cx="78" cy="51" r="2.5" />
+    </g>
+  )}
+</svg>
+
+<style>
+  .il { display: block; width: 100%; height: auto; overflow: visible; }
+  .il :where(path, rect, circle) { stroke-linecap: round; stroke-linejoin: round; }
+  /* t: trazo · p: papel · b: arena · f: bosque suave · a: acento sólido */
+  .il .t  { stroke: var(--ink); stroke-width: 1.5; }
+  .il .ta { stroke: var(--forest); stroke-width: 2; fill: none; }
+  .il .p  { fill: var(--paper-warm); stroke: var(--ink); stroke-width: 1.5; }
+  .il .b  { fill: color-mix(in oklab, var(--clay) 45%, var(--paper-warm)); stroke: var(--ink); stroke-width: 1.5; }
+  .il .f  { fill: color-mix(in oklab, var(--forest) 16%, transparent); stroke: var(--ink); stroke-width: 1.5; }
+  .il .a  { fill: var(--forest); stroke: var(--ink); stroke-width: 1.5; }
+  .il .s  { fill: var(--ink); }
+  .il .w  { stroke: #fff; stroke-width: 2.4; fill: none; }
+  .il .w2 { fill: #fff; }
+  .il .ra { stroke: var(--forest); stroke-width: 2; fill: color-mix(in oklab, var(--forest) 10%, transparent); }
+  .il .sun { fill: var(--clay); stroke: var(--ink); stroke-width: 1.5; }
+</style>
