@@ -289,7 +289,7 @@ const barras = (cs: Conteo[], de: number, color: (c: Conteo) => string) =>
         }
         document.getElementById('dx-copiar')?.addEventListener('click', async (e) => {
           const input = document.getElementById('dx-url')
-          try { await navigator.clipboard.writeText(input.value) } catch { input.select(); document.execCommand('copy') }
+          try { await navigator.clipboard.writeText(input.value) } catch { input.select(); return }
           e.currentTarget.textContent = 'Copiado'
           setTimeout(() => { e.currentTarget.textContent = 'Copiar' }, 1600)
         })
