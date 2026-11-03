@@ -49,7 +49,7 @@ export const MODULOS: ModuloCapacitacion[] = [
   {
     id: 'operaciones',
     titulo: 'Operaciones',
-    quien: 'Consultores, revisión técnica y Ekopartner · Dos sábados',
+    quien: 'Consultores y revisión técnica · Dos sábados',
     aprende: [
       'Leer autos, resoluciones y requerimientos con IA e identificar obligaciones, plazos y responsables.',
       'Ubicar la norma que aplica y verificarla.',
@@ -70,6 +70,30 @@ export const MODULOS: ModuloCapacitacion[] = [
       { titulo: 'Plantilla de conciliación de certificados' },
       { titulo: 'Listas de chequeo de ICA y PMA' },
       { titulo: 'Plantillas de respuesta a la autoridad' },
+    ],
+  },
+  {
+    id: 'logistica',
+    titulo: 'Logística',
+    quien: 'Recolecciones, gestores y certificados · La hora de certificados es con Operaciones',
+    aprende: [
+      'Pasar a una tabla las cifras de un lote de certificados de los gestores y cruzarlas con lo recolectado.',
+      'Redactar con IA las solicitudes y los recordatorios a los gestores.',
+      'Preparar los certificados de recolección y de disposición final de Ekosolv a partir de los datos de la recolección y del certificado del gestor.',
+      'Organizar la programación de recolecciones y las respuestas a clientes sobre el estado de su servicio.',
+      'Revisar las cifras antes de cargarlas en Zoho.',
+    ],
+    podra: [
+      'Sacar de un certificado del gestor los datos del certificado de Ekosolv (cliente, fecha, tipo de residuo, kilos y gestor) y detectar diferencias con lo recolectado.',
+      'Preparar el borrador del certificado de disposición final de Ekosolv para el cliente con la plantilla de la empresa, listo para revisar y firmar.',
+      'Escribir en minutos las solicitudes y recordatorios a los gestores y las respuestas a clientes sobre su recolección o su certificado.',
+      'Consolidar las toneladas del mes por cliente y por gestor, listas para Zoho y para los reportes.',
+    ],
+    demuestra: 'El certificado de disposición final de Ekosolv preparado a partir del certificado real de un gestor y la conciliación de un lote de recolecciones.',
+    material: [
+      { titulo: 'Plantillas de solicitud y seguimiento a gestores' },
+      { titulo: 'Plantilla de datos para los certificados de Ekosolv' },
+      { titulo: 'Hoja de conciliación de cifras' },
     ],
   },
   {
