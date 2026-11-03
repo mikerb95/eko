@@ -31,8 +31,25 @@ const tope = crearTopeDiario({
 
 export class IANoDisponible extends Error {}
 
+// Modelo simulado para las pruebas en navegador (playwright.config.ts): misma
+// variable que el asistente del panel y nunca en Vercel.
+const simulado = () => env('ASISTENTE_MODELO_FALSO') === '1' && !env('VERCEL') && !env('VERCEL_ENV')
+
+function respuestaSimulada(e: EntradaIA): SalidaIA {
+  const extra = e.aclaraciones.map((a) => a.respuesta).join('. ')
+  return pulirSalida(
+    {
+      propuesta: [e.borrador.replace(/\.$/, ''), extra].filter(Boolean).join('. ') + '.',
+      preguntas: e.aclaraciones.length ? [] : ['¿Cuántas páginas tiene un documento típico?'],
+      nota: 'Ordené su respuesta y le pregunto un dato que ayuda a medir el tiempo.',
+    },
+    1,
+  )
+}
+
 /** ¿Se puede ofrecer el asistente? Falla cerrado: si la base no contesta, no. */
 export async function iaDisponible(): Promise<boolean> {
+  if (simulado()) return true
   if (!env('ANTHROPIC_API_KEY')) return false
   try {
     return (await tope.presupuestoRestante()) > 0
@@ -42,6 +59,7 @@ export async function iaDisponible(): Promise<boolean> {
 }
 
 export async function ayudarConRespuesta(e: EntradaIA): Promise<SalidaIA> {
+  if (simulado()) return respuestaSimulada(e)
   const clave = env('ANTHROPIC_API_KEY')
   if (!clave || !(await iaDisponible())) throw new IANoDisponible()
 
