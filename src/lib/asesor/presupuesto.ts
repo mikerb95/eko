@@ -43,11 +43,17 @@ export type TopeDiario = {
   sumarGasto: (usd: number, ahora?: Date) => Promise<void>
 }
 
-export function crearTopeDiario(opciones: { db: () => Promise<Client>; topeUsd: () => number }): TopeDiario {
+export function crearTopeDiario(opciones: {
+  db: () => Promise<Client>
+  topeUsd: () => number
+  /** Fila de `ajustes` donde se lleva la cuenta; otro asistente usa la suya. */
+  clave?: string
+}): TopeDiario {
+  const clave = opciones.clave ?? CLAVE_GASTO
   return {
     async presupuestoRestante(ahora = new Date()) {
       const db = await opciones.db()
-      const r = await db.execute({ sql: 'SELECT valor FROM ajustes WHERE clave = ?', args: [CLAVE_GASTO] })
+      const r = await db.execute({ sql: 'SELECT valor FROM ajustes WHERE clave = ?', args: [clave] })
       const valor = r.rows[0]?.valor
       return opciones.topeUsd() - gastoDelValor(typeof valor === 'string' ? valor : null, hoyBogota(ahora))
     },
@@ -64,7 +70,7 @@ export function crearTopeDiario(opciones: { db: () => Promise<Client>; topeUsd: 
                   THEN ?2 || '|' || (CAST(substr(ajustes.valor, 12) AS REAL) + ?3)
                   ELSE excluded.valor END,
                 actualizado = excluded.actualizado`,
-        args: [CLAVE_GASTO, hoy, usd, ahora.toISOString()],
+        args: [clave, hoy, usd, ahora.toISOString()],
       })
     },
   }
