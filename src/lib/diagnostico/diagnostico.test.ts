@@ -167,11 +167,11 @@ test('ia: quita aclaraciones vacías y tapa correos y celulares antes del modelo
 })
 
 test('ia: la salida sale sin rayas ni voseo, con máximo dos preguntas y ninguna en la última vuelta', () => {
-  const s = { propuesta: 'Reviso autos — cada semana', preguntas: ['¿Cuánto tardás?', 'b', 'c'], nota: 'Ordené su respuesta.' }
+  const s = { propuesta: 'Reviso autos — cada semana', preguntas: ['¿Podés contarme cuánto tarda?', 'b', 'c'], nota: 'Ordené su respuesta.' }
   const r = pulirSalida(s, 1)
   assert.doesNotMatch(r.propuesta, /[—–]/)
   assert.equal(r.preguntas.length, 2)
-  assert.doesNotMatch(r.preguntas[0]!, /tardás/)
+  assert.doesNotMatch(r.preguntas[0]!, /podés|contame/i)
   assert.deepEqual(pulirSalida(s, MAX_VUELTAS).preguntas, [])
 })
 
