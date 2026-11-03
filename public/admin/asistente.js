@@ -84,7 +84,7 @@ const PASOS = {
   contenido: (e) => (e.tipo === 'normativas' ? 'Revisando las normativas' : 'Revisando los artículos del blog'),
   buscar_en_panel: (e) => `Buscando «${cita(e.consulta)}» en el panel`,
   actualizar_recoleccion: () => 'Guardando el cambio en la orden',
-  actualizar_contacto: () => 'Preparando el cambio de contactos',
+  actualizar_contacto: () => 'Guardando el cambio en los contactos',
   actualizar_alerta: () => 'Guardando el cambio en la alerta',
   crear_borrador_articulo: () => 'Guardando el borrador del artículo',
   crear_borrador_normativa: () => 'Guardando el borrador de la normativa',

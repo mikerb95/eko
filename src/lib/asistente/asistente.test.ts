@@ -399,6 +399,27 @@ test('contacto: marcar atendido cuenta solo lo que cambió', async () => {
   }
 })
 
+test('contacto: asignar responsable sin tocar el estado, y quitarlo', async () => {
+  const { db, cerrar } = await baseNueva()
+  try {
+    await sembrar(db)
+    const p: any = await prepararEscritura('actualizar_contacto', { contactoIds: [1], responsable: 'Laura Gómez' }, ctx(db, 'consultor'))
+    assert.ok(p.ok)
+    const r: any = await ejecutarEscritura('actualizar_contacto', { contactoIds: [1], responsable: 'Laura Gómez' }, { ...ctx(db, 'consultor'), toolUseId: 't' })
+    assert.ok(r.ok)
+    let f: any = (await db.execute('SELECT status, assigned_to FROM contacts WHERE id = 1')).rows[0]
+    assert.equal(f.assigned_to, 'Laura Gómez')
+    assert.equal(f.status, 'nuevo')
+    assert.ok(!(await prepararEscritura('actualizar_contacto', { contactoIds: [1], responsable: 'Laura Gómez' }, ctx(db, 'consultor'))).ok)
+    assert.ok(!(await prepararEscritura('actualizar_contacto', { contactoIds: [1] }, ctx(db, 'consultor'))).ok)
+    assert.ok((await ejecutarEscritura('actualizar_contacto', { contactoIds: [1], responsable: '' }, { ...ctx(db, 'consultor'), toolUseId: 't2' })).ok)
+    f = (await db.execute('SELECT assigned_to FROM contacts WHERE id = 1')).rows[0]
+    assert.equal(f.assigned_to, '')
+  } finally {
+    cerrar()
+  }
+})
+
 test('alerta: la nota se agrega con fecha y firma, sin borrar la anterior', async () => {
   const { db, cerrar } = await baseNueva()
   try {
