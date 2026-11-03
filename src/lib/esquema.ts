@@ -306,6 +306,137 @@ export const TABLAS: readonly string[] = [
     resultado TEXT NOT NULL DEFAULT '',
     ok INTEGER NOT NULL DEFAULT 0
   )`,
+
+  // ── Talento humano (docs/plan-talento-humano.md) ────────────────────────
+  // Todo cuelga de users.id: los empleados son las mismas cuentas del panel.
+  // Sin datos de salud: de los exámenes y las incapacidades solo se guardan
+  // fechas y el enlace al soporte. El salario es opcional (NULL = no se lleva).
+  `CREATE TABLE IF NOT EXISTS th_empleados (
+    usuario_id INTEGER PRIMARY KEY,
+    documento TEXT NOT NULL DEFAULT '',
+    cargo_id INTEGER,
+    area TEXT NOT NULL DEFAULT '',
+    jefe TEXT NOT NULL DEFAULT '',
+    tipo_contrato TEXT NOT NULL DEFAULT '',
+    fecha_ingreso TEXT NOT NULL DEFAULT '',
+    fecha_fin_contrato TEXT NOT NULL DEFAULT '',
+    fecha_retiro TEXT NOT NULL DEFAULT '',
+    fecha_nacimiento TEXT NOT NULL DEFAULT '',
+    salario INTEGER,
+    telefono TEXT NOT NULL DEFAULT '',
+    correo_personal TEXT NOT NULL DEFAULT '',
+    emergencia_nombre TEXT NOT NULL DEFAULT '',
+    emergencia_telefono TEXT NOT NULL DEFAULT '',
+    eps TEXT NOT NULL DEFAULT '',
+    pension TEXT NOT NULL DEFAULT '',
+    cesantias TEXT NOT NULL DEFAULT '',
+    arl TEXT NOT NULL DEFAULT '',
+    caja TEXT NOT NULL DEFAULT '',
+    vacaciones_ajuste REAL NOT NULL DEFAULT 0,
+    notas TEXT NOT NULL DEFAULT '',
+    created_at TEXT NOT NULL,
+    updated_at TEXT NOT NULL
+  )`,
+
+  // Criterios de evaluación: JSON [{ id, nombre, descripcion }].
+  `CREATE TABLE IF NOT EXISTS th_cargos (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    nombre TEXT NOT NULL,
+    area TEXT NOT NULL DEFAULT '',
+    descripcion TEXT NOT NULL DEFAULT '',
+    criterios TEXT NOT NULL DEFAULT '[]',
+    created_at TEXT NOT NULL,
+    updated_at TEXT NOT NULL
+  )`,
+
+  // Solo el enlace (Drive, WorkDrive): el panel no guarda archivos de RR.HH.
+  `CREATE TABLE IF NOT EXISTS th_documentos (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    usuario_id INTEGER NOT NULL,
+    tipo TEXT NOT NULL,
+    nombre TEXT NOT NULL DEFAULT '',
+    enlace TEXT NOT NULL DEFAULT '',
+    fecha_expedicion TEXT NOT NULL DEFAULT '',
+    fecha_vencimiento TEXT NOT NULL DEFAULT '',
+    notas TEXT NOT NULL DEFAULT '',
+    created_at TEXT NOT NULL,
+    updated_at TEXT NOT NULL
+  )`,
+
+  `CREATE INDEX IF NOT EXISTS th_documentos_usuario ON th_documentos (usuario_id)`,
+
+  // Vacaciones, permisos, licencias e incapacidades. Los días se calculan al
+  // guardar y quedan fijos, para que cambiar el ajuste del sábado no reescriba
+  // el pasado.
+  `CREATE TABLE IF NOT EXISTS th_novedades (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    usuario_id INTEGER NOT NULL,
+    tipo TEXT NOT NULL,
+    desde TEXT NOT NULL,
+    hasta TEXT NOT NULL,
+    dias_habiles REAL NOT NULL DEFAULT 0,
+    dias_calendario INTEGER NOT NULL DEFAULT 0,
+    estado TEXT NOT NULL DEFAULT 'solicitada',
+    motivo TEXT NOT NULL DEFAULT '',
+    enlace TEXT NOT NULL DEFAULT '',
+    decidido_por TEXT NOT NULL DEFAULT '',
+    decidido_at TEXT NOT NULL DEFAULT '',
+    creado_por TEXT NOT NULL DEFAULT '',
+    created_at TEXT NOT NULL,
+    updated_at TEXT NOT NULL
+  )`,
+
+  `CREATE INDEX IF NOT EXISTS th_novedades_usuario ON th_novedades (usuario_id, desde)`,
+
+  // capacitacion_id enlaza los talleres de IA de /ia (src/lib/capacitacion.ts).
+  `CREATE TABLE IF NOT EXISTS th_cursos (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    nombre TEXT NOT NULL,
+    tipo TEXT NOT NULL DEFAULT 'interno',
+    proveedor TEXT NOT NULL DEFAULT '',
+    horas REAL NOT NULL DEFAULT 0,
+    vigencia_meses INTEGER NOT NULL DEFAULT 0,
+    capacitacion_id TEXT NOT NULL DEFAULT '',
+    descripcion TEXT NOT NULL DEFAULT '',
+    activo INTEGER NOT NULL DEFAULT 1,
+    created_at TEXT NOT NULL,
+    updated_at TEXT NOT NULL
+  )`,
+
+  `CREATE TABLE IF NOT EXISTS th_formaciones (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    usuario_id INTEGER NOT NULL,
+    curso_id INTEGER NOT NULL,
+    fecha TEXT NOT NULL,
+    vence_el TEXT NOT NULL DEFAULT '',
+    enlace TEXT NOT NULL DEFAULT '',
+    notas TEXT NOT NULL DEFAULT '',
+    created_at TEXT NOT NULL
+  )`,
+
+  `CREATE INDEX IF NOT EXISTS th_formaciones_usuario ON th_formaciones (usuario_id)`,
+
+  // calificaciones: copia de los criterios del cargo al momento de evaluar,
+  // JSON [{ id, nombre, nota, comentario }], para que editar el cargo después
+  // no cambie evaluaciones ya cerradas.
+  `CREATE TABLE IF NOT EXISTS th_evaluaciones (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    usuario_id INTEGER NOT NULL,
+    cargo TEXT NOT NULL DEFAULT '',
+    periodo TEXT NOT NULL DEFAULT '',
+    fecha TEXT NOT NULL,
+    evaluador TEXT NOT NULL DEFAULT '',
+    calificaciones TEXT NOT NULL DEFAULT '[]',
+    promedio REAL NOT NULL DEFAULT 0,
+    fortalezas TEXT NOT NULL DEFAULT '',
+    mejoras TEXT NOT NULL DEFAULT '',
+    metas TEXT NOT NULL DEFAULT '',
+    estado TEXT NOT NULL DEFAULT 'borrador',
+    created_at TEXT NOT NULL,
+    updated_at TEXT NOT NULL
+  )`,
+
+  `CREATE INDEX IF NOT EXISTS th_evaluaciones_usuario ON th_evaluaciones (usuario_id, fecha)`,
 ]
 
 /**
@@ -352,6 +483,13 @@ export const TABLAS_ESPERADAS: readonly string[] = [
   'orders',
   'posts',
   'reglas_agente',
+  'th_cargos',
+  'th_cursos',
+  'th_documentos',
+  'th_empleados',
+  'th_evaluaciones',
+  'th_formaciones',
+  'th_novedades',
   'users',
   'zoho_outbox',
 ]
