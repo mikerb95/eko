@@ -236,10 +236,10 @@ export const TABLAS: readonly string[] = [
   )`,
 
   // ── Diagnóstico de IA por área (capacitación) ──────────────────────────
-  // Una fila por respuesta a la encuesta de /diagnostico-ia. `datos` es la
+  // Una fila por respuesta a la encuesta de /ia. `datos` es la
   // respuesta completa ya validada (src/lib/diagnostico/validar.ts); `area` y
-  // `nombre` van aparte para listar y filtrar sin abrir el JSON. El enlace y si
-  // la encuesta está abierta viven en `ajustes` (clave 'diagnostico').
+  // `nombre` van aparte para listar y filtrar sin abrir el JSON. Si la encuesta
+  // está abierta vive en `ajustes` (clave 'diagnostico').
   `CREATE TABLE IF NOT EXISTS diagnostico_respuestas (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
     area TEXT NOT NULL,

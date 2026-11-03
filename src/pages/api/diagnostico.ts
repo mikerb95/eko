@@ -2,7 +2,7 @@ import type { APIRoute } from 'astro'
 import { json } from '../../lib/apiError'
 import { checkRateLimit, clientIp } from '../../lib/rateLimit'
 import { consentGranted } from '../../lib/legal'
-import { codigoValido, guardarRespuesta } from '../../lib/diagnostico/datos'
+import { encuestaAbierta, guardarRespuesta } from '../../lib/diagnostico/datos'
 import { ErrorDiagnostico, validarRespuesta } from '../../lib/diagnostico/validar'
 
 export const prerender = false
@@ -13,7 +13,7 @@ const RATE_MAX = 30
 const RATE_WINDOW_MS = 10 * 60 * 1000
 
 export const POST: APIRoute = async (context) => {
-  const { request, url } = context
+  const { request } = context
   let fallbackIp = 'unknown'
   try {
     fallbackIp = context.clientAddress
@@ -39,8 +39,8 @@ export const POST: APIRoute = async (context) => {
   if (String(b.website ?? '').trim()) return json({ ok: true })
 
   try {
-    if (!(await codigoValido(url.searchParams.get('c')))) {
-      return json({ error: 'Este enlace ya no está activo. Pídale a Gerencia el enlace vigente.' }, 403)
+    if (!(await encuestaAbierta())) {
+      return json({ error: 'La encuesta no está abierta en este momento.' }, 403)
     }
     if (!consentGranted(b.consent)) {
       return json({ error: 'Falta la autorización para usar sus respuestas en el diagnóstico.' }, 400)

@@ -4,9 +4,8 @@ import {
   abrirEncuesta,
   cerrarEncuesta,
   eliminarRespuesta,
-  leerEnlace,
+  leerEstado,
   listarRespuestas,
-  regenerarEnlace,
 } from '../../../lib/diagnostico/datos'
 import { aCSV, resumir } from '../../../lib/diagnostico/resumen'
 
@@ -30,7 +29,7 @@ export const GET: APIRoute = async ({ url, locals }) => {
         },
       })
     }
-    return json({ enlace: await leerEnlace(), respuestas, resumen: resumir(respuestas) })
+    return json({ estado: await leerEstado(), respuestas, resumen: resumir(respuestas) })
   } catch (e) {
     return fail('diagnostico', e)
   }
@@ -44,11 +43,11 @@ export const POST: APIRoute = async ({ request, locals }) => {
   } catch {
     return json({ error: 'JSON inválido' }, 400)
   }
-  const acciones = { abrir: abrirEncuesta, cerrar: cerrarEncuesta, regenerar: regenerarEnlace } as const
+  const acciones = { abrir: abrirEncuesta, cerrar: cerrarEncuesta } as const
   const accion = acciones[String(b.accion) as keyof typeof acciones]
   if (!accion) return json({ error: 'Acción desconocida' }, 400)
   try {
-    return json({ ok: true, enlace: await accion() })
+    return json({ ok: true, estado: await accion() })
   } catch (e) {
     return fail('diagnostico', e)
   }

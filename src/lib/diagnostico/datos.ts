@@ -1,10 +1,11 @@
 /**
- * Persistencia del diagnóstico: respuestas y estado del enlace.
+ * Persistencia del diagnóstico: respuestas y si la encuesta está abierta.
  *
- * El enlace de la encuesta lleva un código (`/diagnostico-ia?c=…`). Sin código
- * válido o con la encuesta cerrada, la página no muestra el formulario y la API
- * rechaza el envío. Así un enlace que se reenvía por fuera de Ekosolv se
- * invalida generando uno nuevo desde el panel, sin tocar código.
+ * La encuesta vive en /ia, una dirección corta y sin código para que sea fácil
+ * de comunicar al equipo. El control es el interruptor del panel: cerrada, la
+ * página no muestra el formulario y la API rechaza el envío. Contra envíos de
+ * extraños quedan el noindex, el honeypot, el tope por IP y la opción de borrar
+ * respuestas desde el panel.
  */
 import { asegurarEsquema, cliente } from '../db'
 import type { Respuesta } from './preguntas'
@@ -14,59 +15,39 @@ const CLAVE = 'diagnostico'
 /** Sube si cambia el texto de la autorización de la encuesta. */
 export const CONSENT_DIAGNOSTICO = 'diagnostico-1.0'
 
-export interface EstadoEnlace {
-  codigo: string
+export interface EstadoEncuesta {
   abierta: boolean
+  /** Si alguna vez se abrió: distingue "se abre pronto" de "ya cerró". */
+  usada: boolean
 }
 
-function nuevoCodigo(): string {
-  const bytes = crypto.getRandomValues(new Uint8Array(9))
-  return btoa(String.fromCharCode(...bytes)).replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/, '')
-}
-
-export async function leerEnlace(): Promise<EstadoEnlace> {
+export async function leerEstado(): Promise<EstadoEncuesta> {
   await asegurarEsquema()
   const r = await cliente().execute({ sql: 'SELECT valor FROM ajustes WHERE clave = ?', args: [CLAVE] })
+  const fila = r.rows[0]
+  if (!fila) return { abierta: false, usada: false }
   try {
-    const v = JSON.parse(String(r.rows[0]?.valor ?? ''))
-    return { codigo: String(v.codigo || ''), abierta: !!v.abierta && !!v.codigo }
+    return { abierta: !!JSON.parse(String(fila.valor)).abierta, usada: true }
   } catch {
-    return { codigo: '', abierta: false }
+    return { abierta: false, usada: true }
   }
 }
 
-async function guardarEnlace(e: EstadoEnlace): Promise<EstadoEnlace> {
+async function guardarEstado(abierta: boolean): Promise<EstadoEncuesta> {
   await asegurarEsquema()
   await cliente().execute({
     sql: `INSERT INTO ajustes (clave, valor, actualizado) VALUES (?, ?, ?)
           ON CONFLICT (clave) DO UPDATE SET valor = excluded.valor, actualizado = excluded.actualizado`,
-    args: [CLAVE, JSON.stringify(e), new Date().toISOString()],
+    args: [CLAVE, JSON.stringify({ abierta }), new Date().toISOString()],
   })
-  return e
+  return { abierta, usada: true }
 }
 
-/** Abre la encuesta. Conserva el código si ya había uno, para no romper el enlace enviado. */
-export async function abrirEncuesta(): Promise<EstadoEnlace> {
-  const e = await leerEnlace()
-  return guardarEnlace({ codigo: e.codigo || nuevoCodigo(), abierta: true })
-}
+export const abrirEncuesta = () => guardarEstado(true)
+export const cerrarEncuesta = () => guardarEstado(false)
 
-export async function cerrarEncuesta(): Promise<EstadoEnlace> {
-  const e = await leerEnlace()
-  return guardarEnlace({ codigo: e.codigo, abierta: false })
-}
-
-/** Código nuevo: el enlace anterior deja de funcionar. */
-export async function regenerarEnlace(): Promise<EstadoEnlace> {
-  const e = await leerEnlace()
-  return guardarEnlace({ codigo: nuevoCodigo(), abierta: e.abierta })
-}
-
-/** `true` si el código corresponde al enlace vigente y la encuesta está abierta. */
-export async function codigoValido(codigo: string | null | undefined): Promise<boolean> {
-  if (!codigo) return false
-  const e = await leerEnlace()
-  return e.abierta && e.codigo === codigo
+export async function encuestaAbierta(): Promise<boolean> {
+  return (await leerEstado()).abierta
 }
 
 export async function guardarRespuesta(r: Respuesta): Promise<number> {

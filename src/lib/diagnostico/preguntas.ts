@@ -1,7 +1,7 @@
 /**
  * Cuestionario del diagnóstico de IA por área (capacitación de Ekosolv).
  *
- * Fuente única: de aquí salen los pasos de la encuesta (/diagnostico-ia), la
+ * Fuente única: de aquí salen los pasos de la encuesta (/ia), la
  * validación del endpoint y las etiquetas del resumen en /admin/diagnostico.
  * Si cambia una opción, cambia en los tres lugares a la vez.
  *
