@@ -50,9 +50,9 @@ test('panel: inscribir, publicar y programar', async ({ page }) => {
   // La entrega de Logística no tiene contenido, pero sí ejercicio: se puede publicar.
   const entregaLog = est.lecciones.find((l: any) => l.modulo === 'logistica' && l.ejercicio)
   await admin(page.request, 'publicar_leccion', { id: entregaLog.id, publicada: true })
-  // Un tema sin contenido ni ejercicio no se publica.
-  const temaVacio = est.lecciones.find((l: any) => l.modulo === 'logistica' && !l.ejercicio)
-  const r = await page.request.post('/api/admin/academia', { data: { accion: 'publicar_leccion', id: temaVacio.id, publicada: true } })
+  // Todos los temas vienen con contenido; una lección sin contenido ni ejercicio no se publica.
+  expect(est.lecciones.every((l: any) => l.contenido.length > 200)).toBeTruthy()
+  const r = await page.request.post('/api/admin/academia', { data: { accion: 'guardar_leccion', modulo: 'logistica', titulo: 'Vacía', publicada: true } })
   expect(r.status()).toBe(400)
 
   // Sábados: general para todos y un bloque de Logística.
