@@ -595,7 +595,6 @@ const maxMensual = Math.max(...PLANES.map((p) => p.mensual))
               $('.pp-area-h b', li)!.textContent = `${String(h).replace('.', ',')} h`
               $('.pp-area-h span', li)!.textContent = li.dataset[`${k}d`] || ''
             })
-            out('cap-total', '')
             $('[data-cap-total]')!.textContent = `${total} h`
           }),
         )
