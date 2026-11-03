@@ -1,0 +1,311 @@
+---
+// Diagnóstico de IA por área: el enlace de la encuesta, el resumen que define
+// el orden y el contenido de los talleres, y las respuestas una por una.
+// Todo se arma en el servidor; el script del cliente solo envía acciones.
+export const prerender = false
+import AdminLayout from '../../layouts/AdminLayout.astro'
+import { ico } from '../../lib/admin/iconos'
+import { leerEnlace, listarRespuestas, type EstadoEnlace } from '../../lib/diagnostico/datos'
+import { resumir, vigentes, type Conteo, type Fila, type Resumen } from '../../lib/diagnostico/resumen'
+import {
+  DOCUMENTO_REAL,
+  DOCUMENTOS,
+  HERRAMIENTAS,
+  HORAS,
+  IAS,
+  MODALIDAD,
+  PREOCUPACIONES,
+  TAREAS,
+  USO_IA,
+  etiqueta,
+  nombreArea,
+} from '../../lib/diagnostico/preguntas'
+
+const role = Astro.locals.role || ''
+if (role !== 'admin') return Astro.redirect('/admin')
+
+let errorCarga = ''
+let enlace: EstadoEnlace = { codigo: '', abierta: false }
+let respuestas: Fila[] = []
+try {
+  ;[enlace, respuestas] = await Promise.all([leerEnlace(), listarRespuestas()])
+} catch (e: any) {
+  console.error('[admin/diagnostico] carga', e?.stack || e)
+  errorCarga = 'No se pudo cargar el diagnóstico.'
+}
+const r: Resumen = resumir(respuestas)
+const { reemplazadas } = vigentes(respuestas)
+const url = enlace.codigo ? `${Astro.url.origin}/diagnostico-ia?c=${enlace.codigo}` : ''
+
+// Colores de las barras: los mismos tintes del panel.
+const C_AREA: Record<string, string> = {
+  operaciones: '#1f8a8a',
+  ventas: '#2f80c9',
+  mercadeo: '#c2557a',
+  gerencia: '#8b5cf6',
+  finanzas: '#e8920c',
+}
+const C_USO: Record<string, string> = { nunca: '#d8453a', probado: '#e8920c', semanal: '#46a85b', diario: '#1f8a8a' }
+
+const maxHoras = Math.max(1, ...r.orden.map((o) => o.horasTotal))
+const fmtH = (h: number) => (Number.isInteger(h) ? String(h) : h.toFixed(1).replace('.', ','))
+const pct = (n: number, de: number) => (de ? (n / de) * 100 : 0)
+const fecha = (iso: string) =>
+  new Date(iso).toLocaleString('es-CO', { day: 'numeric', month: 'short', hour: 'numeric', minute: '2-digit', timeZone: 'America/Bogota' })
+const lista = (ids: string[], l: { id: string; etiqueta: string }[]) => ids.map((i) => etiqueta(l, i)).join(', ') || 'Sin respuesta'
+const barras = (cs: Conteo[], de: number, color: (c: Conteo) => string) =>
+  cs.map((c) => ({ ...c, w: pct(c.n, de), color: color(c) }))
+---
+
+<AdminLayout titulo="Diagnóstico IA · EKOSOLV" activo="diagnostico" css={['/admin/diagnostico.css']} cuentas={{ diagnostico: r.total }}>
+  <Fragment slot="avisos">
+    {errorCarga && <div class="banner-error">{errorCarga}</div>}
+  </Fragment>
+
+  <div class="panel-head">
+    <div>
+      <h2>Diagnóstico de IA por área</h2>
+      <p class="panel-sub">La encuesta previa a la capacitación. Define el orden de los talleres, los ejercicios y las fechas.</p>
+    </div>
+    {respuestas.length > 0 && (
+      <a class="btn-ghost btn-sm" href="/api/admin/diagnostico?formato=csv" download>Descargar CSV</a>
+    )}
+  </div>
+
+  <!-- ENLACE -->
+  <section class="dash-card dx-enlace">
+    <div class="dash-head">
+      <div>
+        <h3>
+          <span class={`dx-punto${enlace.abierta ? ' is-on' : ''}`} aria-hidden="true"></span>
+          {enlace.abierta ? 'Encuesta abierta' : enlace.codigo ? 'Encuesta cerrada' : 'Encuesta sin abrir'}
+        </h3>
+        <p>
+          {enlace.abierta
+            ? 'Comparta este enlace con el equipo. Quien no lo tenga no puede responder.'
+            : enlace.codigo
+              ? 'El enlace no recibe respuestas mientras esté cerrada.'
+              : 'Al abrirla se crea el enlace para enviarle al equipo.'}
+        </p>
+      </div>
+    </div>
+    {url && (
+      <div class="dx-url">
+        <input id="dx-url" type="text" readonly value={url} aria-label="Enlace de la encuesta" />
+        <button class="btn-primary btn-sm" type="button" id="dx-copiar">Copiar</button>
+      </div>
+    )}
+    <div class="dx-acciones">
+      {enlace.abierta
+        ? <button class="btn-ghost btn-sm" data-accion="cerrar">Cerrar encuesta</button>
+        : <button class="btn-primary btn-sm" data-accion="abrir">Abrir encuesta</button>}
+      {enlace.codigo && (
+        <button class="btn-ghost btn-sm" data-accion="regenerar" data-confirmar="El enlace actual dejará de funcionar. ¿Generar uno nuevo?">
+          Generar enlace nuevo
+        </button>
+      )}
+      <p class="form-error" id="dx-err"></p>
+    </div>
+  </section>
+
+  {r.total === 0 ? (
+    <div class="vacio"><b>Todavía no hay respuestas</b>Cuando el equipo llene la encuesta, aquí aparece el resumen por área.</div>
+  ) : (
+    <>
+      <div class="kpi-grid">
+        <div class="kpi" style="--c:#1f8a8a">
+          <span class="kpi-lbl">Personas</span><span class="kpi-num">{r.total}</span>
+          <span class="kpi-sub">{reemplazadas.size ? `${reemplazadas.size} respuesta(s) repetida(s) no cuentan` : 'Una respuesta por persona'}</span>
+        </div>
+        <div class="kpi" style="--c:#2f80c9">
+          <span class="kpi-lbl">Áreas con respuesta</span><span class="kpi-num">{r.areasConRespuesta}<i>/5</i></span>
+          <span class="kpi-sub">{r.orden.filter((o) => !o.n).map((o) => o.etiqueta).join(', ') || 'Están todas'}</span>
+        </div>
+        <div class="kpi" style="--c:#46a85b">
+          <span class="kpi-lbl">Horas por semana</span><span class="kpi-num">{fmtH(r.horasTotal)}</span>
+          <span class="kpi-sub">En tareas que se repiten, todo el equipo</span>
+        </div>
+        <div class={`kpi${r.sinUsoIA ? ' is-alerta' : ''}`} style="--c:#d8453a">
+          <span class="kpi-lbl">Nunca han usado IA</span><span class="kpi-num">{r.sinUsoIA}<i>/{r.total}</i></span>
+          <span class="kpi-sub">Arrancan desde cero en la capacitación general</span>
+        </div>
+      </div>
+
+      <div class="dash-grid">
+        <section class="dash-card">
+          <div class="dash-head">
+            <div>
+              <h3>Orden sugerido de los talleres</h3>
+              <p>Operaciones va primero, como dice el programa. Las demás, por horas semanales en tareas repetitivas.</p>
+            </div>
+          </div>
+          <ol class="dx-orden">
+            {r.orden.map((o, i) => (
+              <li style={`--c:${C_AREA[o.area]}`}>
+                <span class="dx-n">{i + 1}</span>
+                <span class="dx-area">{o.etiqueta}{o.fija && <small>fijo</small>}</span>
+                <span class="embudo-barra"><i style={`width:${pct(o.horasTotal, maxHoras)}%`}></i></span>
+                <b>{o.n ? `${fmtH(o.horasTotal)} h` : 'Sin datos'}</b>
+              </li>
+            ))}
+          </ol>
+        </section>
+
+        <section class="dash-card">
+          <div class="dash-head"><div><h3>Uso actual de IA</h3><p>Punto de partida para la capacitación general.</p></div></div>
+          <div class="dx-barras">
+            {barras(r.usoIA, r.total, (c) => C_USO[c.id] ?? '#1f8a8a').map((c) => (
+              <div class="dx-barra" style={`--c:${c.color}`}>
+                <span>{c.etiqueta}</span><span class="embudo-barra"><i style={`width:${c.w}%`}></i></span><b>{c.n}</b>
+              </div>
+            ))}
+          </div>
+          {r.preocupaciones.length > 0 && (
+            <>
+              <h4 class="dx-sub">Lo que más preocupa</h4>
+              <div class="dx-barras">
+                {barras(r.preocupaciones, r.total, () => '#8b5cf6').map((c) => (
+                  <div class="dx-barra" style={`--c:${c.color}`}>
+                    <span>{c.etiqueta}</span><span class="embudo-barra"><i style={`width:${c.w}%`}></i></span><b>{c.n}</b>
+                  </div>
+                ))}
+              </div>
+            </>
+          )}
+          <p class="dx-pie">
+            Modalidad: {r.modalidad.filter((m) => m.n).map((m) => `${m.etiqueta.toLowerCase()} ${m.n}`).join(' · ') || 'sin respuesta'}
+            {r.ias.length > 0 && <><br />Han usado: {r.ias.map((c) => `${c.etiqueta} ${c.n}`).join(' · ')}</>}
+          </p>
+        </section>
+      </div>
+
+      <!-- POR ÁREA -->
+      <h3 class="dx-titulo">Por área</h3>
+      <div class="dx-areas">
+        {r.areas.map((a) =>
+          a.n === 0 ? (
+            <section class="dash-card dx-area-card is-vacia" style={`--c:${C_AREA[a.area]}`}>
+              <h3><span class="dx-punto" aria-hidden="true"></span>{a.etiqueta}</h3>
+              <p class="muted">Sin respuestas todavía.</p>
+            </section>
+          ) : (
+            <section class="dash-card dx-area-card" style={`--c:${C_AREA[a.area]}`}>
+              <div class="dx-area-head">
+                <h3><span class="dx-punto" aria-hidden="true"></span>{a.etiqueta}</h3>
+                <span class="dx-cifras">
+                  {a.n} {a.n === 1 ? 'persona' : 'personas'} · {fmtH(a.horasTotal)} h/semana · {fmtH(a.horasPorPersona)} h por persona
+                </span>
+              </div>
+
+              {a.tareas.length > 0 && (
+                <>
+                  <h4 class="dx-sub">Tareas que hacen cada semana</h4>
+                  <div class="dx-barras">
+                    {barras(a.tareas, a.n, () => C_AREA[a.area]).map((c) => (
+                      <div class="dx-barra"><span>{c.etiqueta}</span><span class="embudo-barra"><i style={`width:${c.w}%`}></i></span><b>{c.n}/{a.n}</b></div>
+                    ))}
+                  </div>
+                </>
+              )}
+
+              <h4 class="dx-sub">Lo que quieren resolver con IA</h4>
+              <ul class="dx-notas">{a.deseos.map((d) => <li><p>{d.texto}</p><small>{d.nombre}</small></li>)}</ul>
+
+              <details class="dx-mas">
+                <summary>Tareas que más tiempo quitan, documentos y fechas</summary>
+                <h4 class="dx-sub">Tareas que más tiempo quitan</h4>
+                <ul class="dx-notas">{a.tareasPrincipales.map((d) => <li><p>{d.texto}</p><small>{d.nombre}</small></li>)}</ul>
+                <h4 class="dx-sub">Documento para el ejercicio</h4>
+                {a.documentos.length
+                  ? <ul class="dx-notas">{a.documentos.map((d) => <li><p>{d.texto || 'No dijo cuál'}</p><small>{d.nombre} · {etiqueta(DOCUMENTO_REAL, d.disponible)}</small></li>)}</ul>
+                  : <p class="muted">Nadie del área tiene un documento que sirva. Hay que preparar uno de ejemplo.</p>}
+                {a.herramientas.length > 0 && (
+                  <>
+                    <h4 class="dx-sub">Herramientas</h4>
+                    <p class="dx-tags">{a.herramientas.map((h) => <span class="dx-tag">{h.etiqueta} <b>{h.n}</b></span>)}</p>
+                  </>
+                )}
+                {a.restricciones.length > 0 && (
+                  <>
+                    <h4 class="dx-sub">Sábados que no pueden</h4>
+                    <ul class="dx-notas">{a.restricciones.map((d) => <li><p>{d.texto}</p><small>{d.nombre}</small></li>)}</ul>
+                  </>
+                )}
+              </details>
+            </section>
+          ),
+        )}
+      </div>
+
+      <!-- RESPUESTAS -->
+      <h3 class="dx-titulo">Respuestas <span class="muted">{respuestas.length}</span></h3>
+      <div class="dx-respuestas">
+        {respuestas.map((f) => (
+          <details class={`dash-card dx-resp${reemplazadas.has(f.id) ? ' is-vieja' : ''}`}>
+            <summary>
+              <b>{f.nombre}</b>
+              <span class="muted">{[f.cargo, nombreArea(f.area)].filter(Boolean).join(' · ')}</span>
+              {reemplazadas.has(f.id) && <span class="dx-tag">Reemplazada por una más reciente</span>}
+              <time>{fecha(f.creado)}</time>
+            </summary>
+            <dl class="datos-ficha">
+              <dt>Tareas semanales</dt><dd>{lista(f.tareas, TAREAS[f.area] ?? [])}</dd>
+              {f.tarea_otra && <><dt>Otra tarea</dt><dd>{f.tarea_otra}</dd></>}
+              <dt>Horas por semana</dt><dd>{etiqueta(HORAS, f.horas)}</dd>
+              <dt>Más tiempo le quita</dt><dd>{f.tarea_principal}</dd>
+              <dt>Documentos</dt><dd>{lista(f.documentos, DOCUMENTOS)}</dd>
+              <dt>Herramientas</dt><dd>{lista(f.herramientas, HERRAMIENTAS)}</dd>
+              <dt>Uso de IA</dt><dd>{etiqueta(USO_IA, f.uso_ia)}{f.ias.length ? ` (${lista(f.ias, IAS)})` : ''}</dd>
+              {f.para_que && <><dt>Para qué la usa</dt><dd>{f.para_que}</dd></>}
+              <dt>Preocupaciones</dt><dd>{lista(f.preocupaciones, PREOCUPACIONES)}</dd>
+              <dt>Quiere resolver</dt><dd>{f.deseo}</dd>
+              <dt>Documento real</dt><dd>{etiqueta(DOCUMENTO_REAL, f.documento_real)}{f.documento_cual ? `: ${f.documento_cual}` : ''}</dd>
+              <dt>Modalidad</dt><dd>{etiqueta(MODALIDAD, f.modalidad) || 'Sin respuesta'}</dd>
+              {f.restricciones && <><dt>No puede</dt><dd>{f.restricciones}</dd></>}
+            </dl>
+            <div class="dx-resp-pie">
+              <button class="btn-ghost btn-sm" data-borrar={f.id} data-nombre={f.nombre}><Fragment set:html={ico('borrar')} />Eliminar</button>
+            </div>
+          </details>
+        ))}
+      </div>
+    </>
+  )}
+
+  <Fragment slot="fuera">
+    <script is:inline>
+      ;(() => {
+        const err = document.getElementById('dx-err')
+        const mostrar = (m) => { if (err) err.textContent = m }
+        async function enviar(metodo, url, cuerpo) {
+          const res = await fetch(url, {
+            method: metodo,
+            headers: cuerpo ? { 'content-type': 'application/json' } : undefined,
+            body: cuerpo ? JSON.stringify(cuerpo) : undefined,
+          })
+          const j = await res.json().catch(() => ({}))
+          if (!res.ok) throw new Error(j.error || 'No se pudo completar la acción.')
+          return j
+        }
+        document.getElementById('dx-copiar')?.addEventListener('click', async (e) => {
+          const input = document.getElementById('dx-url')
+          try { await navigator.clipboard.writeText(input.value) } catch { input.select(); document.execCommand('copy') }
+          e.currentTarget.textContent = 'Copiado'
+          setTimeout(() => { e.currentTarget.textContent = 'Copiar' }, 1600)
+        })
+        document.querySelectorAll('[data-accion]').forEach((b) => b.addEventListener('click', async () => {
+          if (b.dataset.confirmar && !window.confirm(b.dataset.confirmar)) return
+          b.disabled = true
+          try { await enviar('POST', '/api/admin/diagnostico', { accion: b.dataset.accion }); location.reload() }
+          catch (ex) { mostrar(ex.message); b.disabled = false }
+        }))
+        document.querySelectorAll('[data-borrar]').forEach((b) => b.addEventListener('click', async () => {
+          if (!window.confirm(`¿Eliminar la respuesta de ${b.dataset.nombre}? No se puede deshacer.`)) return
+          b.disabled = true
+          try { await enviar('DELETE', `/api/admin/diagnostico?id=${b.dataset.borrar}`); location.reload() }
+          catch (ex) { alert(ex.message); b.disabled = false }
+        }))
+      })()
+    </script>
+  </Fragment>
+</AdminLayout>
