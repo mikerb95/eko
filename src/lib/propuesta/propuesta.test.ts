@@ -49,7 +49,7 @@ test('guardia: rechaza un descuento inventado', () => {
   assert.equal(r.ok, true)
   const r2 = pulirSalida({ respuesta: 'Le hacemos un precio de $950.000 al mes.', pasar_a_mike: false, motivo: '', seccion: 'ninguna' })
   assert.equal(r2.ok, false)
-  const r3 = pulirSalida({ respuesta: 'Quedaría en 1,1 millones.', pasar_a_mike: false, motivo: '', seccion: 'ninguna' })
+  const r3 = pulirSalida({ respuesta: 'Quedaría en 1,6 millones.', pasar_a_mike: false, motivo: '', seccion: 'ninguna' })
   assert.equal(r3.ok, false)
 })
 
