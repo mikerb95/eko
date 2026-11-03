@@ -5,6 +5,10 @@ import { canWrite } from './lib/reglasEscritura'
 const PUBLIC_ADMIN_PATHS = new Set(['/admin/login'])
 const PUBLIC_API_PATHS = new Set(['/api/admin/login'])
 
+// El rol `participante` solo estudia en la academia de IA. Del panel solo
+// puede usar la salida; cualquier otra página de /admin lo lleva a /academia.
+const PARTICIPANTE_API = new Set(['/api/admin/logout'])
+
 // Páginas internas del proyecto (las del pie de página, columna "Proyecto").
 // No son parte del sitio público: exigen sesión igual que /admin.
 //
@@ -71,15 +75,19 @@ export const onRequest = defineMiddleware(async (context, next) => {
   const isAdminPage = pathname === '/admin' || pathname.startsWith('/admin/')
   const isAdminApi = pathname.startsWith('/api/admin')
   const isDocPage = isProtectedDoc(pathname)
+  // Academia de IA: exige sesión de cualquier rol. Quién está inscrito y qué
+  // puede ver cada uno lo deciden la página y src/lib/academia/datos.ts.
+  const isAcademia = pathname === '/academia' || pathname.startsWith('/academia/')
+  const isAcademiaApi = pathname === '/api/academia' || pathname.startsWith('/api/academia/')
 
-  if (!isAdminPage && !isAdminApi && !isDocPage) return next()
+  if (!isAdminPage && !isAdminApi && !isDocPage && !isAcademia && !isAcademiaApi) return next()
   if (PUBLIC_ADMIN_PATHS.has(pathname) || PUBLIC_API_PATHS.has(pathname)) return next()
 
   const token = context.cookies.get(SESSION_COOKIE)?.value
   const session = await verifySession(token)
 
   if (!session) {
-    if (isAdminApi) {
+    if (isAdminApi || isAcademiaApi) {
       return new Response(JSON.stringify({ error: 'No autorizado' }), {
         status: 401,
         headers: { 'content-type': 'application/json' },
@@ -89,6 +97,16 @@ export const onRequest = defineMiddleware(async (context, next) => {
     // siempre al usuario en el panel.
     const next = normalize(pathname) + context.url.search
     return context.redirect(`/admin/login?next=${encodeURIComponent(next)}`)
+  }
+
+  if (session.r === 'participante') {
+    if (isAdminPage) return context.redirect('/academia')
+    if (isAdminApi && !PARTICIPANTE_API.has(pathname)) {
+      return new Response(JSON.stringify({ error: 'Tu cuenta solo tiene acceso a la academia' }), {
+        status: 403,
+        headers: { 'content-type': 'application/json' },
+      })
+    }
   }
 
   if (isDocPage && !DOC_ROLES.includes(session.r)) {
@@ -107,7 +125,10 @@ export const onRequest = defineMiddleware(async (context, next) => {
   }
   // El listado de usuarios y talento humano (salarios, contratos, documentos)
   // exponen información sensible: solo admin, incluso en GET.
-  if ((pathname.startsWith('/api/admin/users') || pathname.startsWith('/api/admin/talento')) && session.r !== 'admin') {
+  if (
+    (pathname.startsWith('/api/admin/users') || pathname.startsWith('/api/admin/talento') || pathname.startsWith('/api/admin/academia')) &&
+    session.r !== 'admin'
+  ) {
     return new Response(JSON.stringify({ error: 'Solo administradores' }), {
       status: 403,
       headers: { 'content-type': 'application/json' },

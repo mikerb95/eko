@@ -21,6 +21,9 @@ export const WRITE_RULES: ReadonlyArray<{ prefix: string; roles: readonly string
   // Talento humano: datos laborales y salariales. Las lecturas también se
   // restringen a admin (middleware y endpoint).
   { prefix: '/api/admin/talento', roles: ['admin'] },
+  // Academia de IA: lecciones, sábados, entregas y certificados. Las lecturas
+  // también se restringen a admin (middleware y endpoint).
+  { prefix: '/api/admin/academia', roles: ['admin'] },
   // La sincronización con Zoho escribe en un sistema externo: solo admin.
   { prefix: '/api/admin/zoho', roles: ['admin'] },
   // El asistente: cualquier sesión puede preguntar y decidir sus propuestas.
