@@ -355,7 +355,7 @@ const steps: TFStep[] = [
           {modulos.map((m) => {
             const [quien, ...meta] = m.quien.split(' · ')
             return (
-              <article class={`ia-modulo${m.id === 'general' ? ' is-general' : ''}`} id={`area-${m.id}`} style={`--c:${COLOR[m.id]}`}>
+              <article class={`ia-modulo${m.id === 'general' ? ' is-general' : ''}`} id={`area-${m.id}`} style={`--c:${m.id === 'general' ? '#7fd6cf' : COLOR[m.id]}`}>
                 <header class="ia-mod-head">
                   <span class="ia-ico"><Fragment set:html={svg(ICONO[m.id])} /></span>
                   <div class="ia-mod-tit">
@@ -848,7 +848,7 @@ const steps: TFStep[] = [
 
       /* La general: tarjeta principal en azul profundo, para todo el equipo. */
       .ia-modulo.is-general {
-        grid-column: 1 / -1; --c: #7fd6cf; color: #fff; border-color: transparent;
+        grid-column: 1 / -1; color: #fff; border-color: transparent;
         background:
           radial-gradient(90% 120% at 100% 0%, rgba(23, 156, 145, .45), transparent 55%),
           radial-gradient(70% 90% at 0% 100%, rgba(47, 128, 201, .35), transparent 60%),
