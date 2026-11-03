@@ -32,7 +32,10 @@
 }
 
 * { box-sizing: border-box; margin: 0; padding: 0; }
-html, body { height: 100%; }
+/* El body crece con el contenido: con height fijo, lo sticky (menú, índices)
+   solo se sostenía durante la primera pantalla. */
+html { height: 100%; }
+body { min-height: 100%; }
 html { scroll-behavior: smooth; }
 body {
   font-family: var(--font-sans);
