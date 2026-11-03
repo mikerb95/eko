@@ -10,6 +10,7 @@ export const ICONOS: Record<string, string> = {
   ia: '<path d="M12 3l1.8 5.2L19 10l-5.2 1.8L12 17l-1.8-5.2L5 10l5.2-1.8zM19 15l.8 2.2L22 18l-2.2.8L19 21l-.8-2.2L16 18l2.2-.8z"/>',
   talento: '<circle cx="9" cy="7.5" r="3"/><path d="M3.5 19c.5-3.3 2.6-5 5.5-5s5 1.7 5.5 5"/><path d="M15 4.5a3 3 0 0 1 0 6"/><path d="M17.5 11.5h4M19.5 9.5v4"/>',
   diagnostico: '<path d="M9 4h6v3H9z"/><path d="M15 5h3v16H6V5h3"/><path d="M9 12h6M9 16h4"/>',
+  academia: '<path d="M2 9l10-5 10 5-10 5z"/><path d="M6 11v5c1.7 1.6 3.7 2.4 6 2.4s4.3-.8 6-2.4v-5M22 9v6"/>',
   borrar: '<path d="M4 7h16M9 7V4h6v3M6 7l1 13h10l1-13"/>',
   salir: '<path d="M15 4h4v16h-4M10 8l-4 4 4 4M6 12h10"/>',
   buscar: '<circle cx="11" cy="11" r="7"/><path d="M20 20l-4-4"/>',
