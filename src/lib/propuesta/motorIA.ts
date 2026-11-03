@@ -80,7 +80,7 @@ export async function responderPregunta(e: EntradaChat): Promise<SalidaChat & { 
     uso = sumarUso(uso, r.usage)
     if (r.stop_reason === 'refusal' || !r.parsed_output) break
     const pulida = pulirSalida(r.parsed_output)
-    if (pulida.ok) {
+    if (!('inventadas' in pulida)) {
       salida = pulida.salida
       break
     }

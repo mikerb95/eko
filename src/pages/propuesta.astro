@@ -503,7 +503,7 @@ const maxMensual = Math.max(...PLANES.map((p) => p.mensual))
               <h2>Lo que necesitamos para empezar</h2>
               <div class="pp-tres">
                 {PASOS_FINALES.map(([t, items]) => (
-                  <div class="pp-card"><h3>{t}</h3><ul class="pp-check">{items.map((i) => <li>{i}</li>)}</ul></div>
+                  <div class="pp-card"><h3>{t}</h3><ul class="pp-check">{items.map((i: string) => <li>{i}</li>)}</ul></div>
                 ))}
               </div>
               <p class="pp-nota">Con la opción de capacitación y la fecha confirmadas apartamos los sábados. Con la línea base y las muestras cerramos las cifras definitivas de la automatización.</p>
@@ -567,7 +567,7 @@ const maxMensual = Math.max(...PLANES.map((p) => p.mensual))
           <p class="pp-chat-aviso">Sus preguntas quedan guardadas para que Mike las lea y le responda mejor. Las respuestas las da una IA: si algo no cuadra, vale lo que dice la propuesta.</p>
         </aside>
 
-        <script type="application/json" id="pp-datos" set:html={JSON.stringify(DATOS_CLIENTE)} />
+        <script type="application/json" id="pp-datos" is:inline set:html={JSON.stringify(DATOS_CLIENTE)} />
       </>
     )}
 
