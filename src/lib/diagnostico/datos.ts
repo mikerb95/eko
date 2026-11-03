@@ -76,7 +76,7 @@ export async function listarRespuestas(): Promise<Fila[]> {
       nombre: '', cargo: '', area: 'operaciones', tareas: [], tarea_otra: '', horas: '', tarea_principal: '',
       propuesta_rol: '', propuesta_horas: '', propuestas_mes: '', propuesta_demora: '',
       certificados_mes: '', certificado_min: '', seguimiento_gestores: '', certificado_demora: '',
-      otras_herramientas: '', otra_preocupacion: '', comentarios: '', ia_campos: [],
+      otras_herramientas: '', otra_preocupacion: '', comentarios: '', ia_aclaraciones: [],
       documentos: [], herramientas: [], uso_ia: '', ias: [], para_que: '', preocupaciones: [], deseo: '',
       documento_real: '', documento_cual: '', modalidad: '', restricciones: '',
       ...datos,

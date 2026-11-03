@@ -175,8 +175,27 @@ test('ia: la salida sale sin rayas ni voseo, con máximo dos preguntas y ninguna
   assert.deepEqual(pulirSalida(s, MAX_VUELTAS).preguntas, [])
 })
 
-test('validar: guarda solo los campos con IA que existen', () => {
-  const r = validarRespuesta({ ...base, ia_campos: 'deseo, tarea_principal, nombre' })
-  assert.deepEqual(r.ia_campos, ['deseo', 'tarea_principal'])
-  assert.deepEqual(validarRespuesta(base).ia_campos, [])
+test('validar: las aclaraciones de la IA van aparte y el texto de la persona no cambia', () => {
+  const ia_aclaraciones = JSON.stringify([
+    { campo: 'deseo', pregunta: '¿Cuántas páginas?', respuesta: 'Unas 20' },
+    { campo: 'deseo', pregunta: '¿Cuántas páginas?', respuesta: 'repetida' },
+    { campo: 'nombre', pregunta: 'x', respuesta: 'y' },
+    { campo: 'tarea_principal', pregunta: '¿Cada cuánto?', respuesta: '' },
+    { campo: 'certificado_demora', pregunta: '¿Qué parte?', respuesta: 'Cruzar cifras' },
+  ])
+  const r = validarRespuesta({ ...base, ia_aclaraciones })
+  assert.equal(r.deseo, base.deseo)
+  // certificado_demora no aplica a Operaciones.
+  assert.deepEqual(r.ia_aclaraciones, [{ campo: 'deseo', pregunta: '¿Cuántas páginas?', respuesta: 'Unas 20' }])
+  assert.deepEqual(validarRespuesta({ ...base, ia_aclaraciones: '{roto' }).ia_aclaraciones, [])
+  assert.deepEqual(validarRespuesta(base).ia_aclaraciones, [])
+})
+
+test('resumen: las aclaraciones salen como detalles de la nota y en el CSV', () => {
+  const r = validarRespuesta({ ...base, ia_aclaraciones: JSON.stringify([{ campo: 'deseo', pregunta: '¿Cuántas páginas?', respuesta: 'Unas 20' }]) })
+  const fila = { ...r, id: 1, creado: '2026-11-03T10:00:00Z' } as Fila
+  const ops = resumir([fila]).areas.find((a) => a.area === 'operaciones')!
+  assert.deepEqual(ops.deseos[0]!.detalles, ['¿Cuántas páginas? Unas 20'])
+  assert.equal(ops.deseos[0]!.texto, base.deseo)
+  assert.match(aCSV([fila]), /Tarea que quiere resolver con IA: ¿Cuántas páginas\? Unas 20/)
 })

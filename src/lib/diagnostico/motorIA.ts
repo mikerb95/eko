@@ -41,7 +41,7 @@ function respuestaSimulada(e: EntradaIA): SalidaIA {
     {
       propuesta: [e.borrador.replace(/\.$/, ''), extra].filter(Boolean).join('. ') + '.',
       preguntas: e.aclaraciones.length ? [] : ['¿Cuántas páginas tiene un documento típico?'],
-      nota: 'Ordené su respuesta y le pregunto un dato que ayuda a medir el tiempo.',
+      nota: 'Le pregunto un dato que ayuda a medir el tiempo.',
     },
     1,
   )

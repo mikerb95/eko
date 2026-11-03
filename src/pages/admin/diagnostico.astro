@@ -41,8 +41,8 @@ try {
 const r: Resumen = resumir(respuestas)
 const { reemplazadas } = vigentes(respuestas)
 const url = `${Astro.url.origin}/ia`
-// Cuántas personas aceptaron al menos una versión del asistente con IA de la encuesta.
-const conIA = vigentes(respuestas).filas.filter((f) => f.ia_campos?.length).length
+// Cuántas personas contestaron al menos una pregunta del asistente con IA de la encuesta.
+const conIA = vigentes(respuestas).filas.filter((f) => f.ia_aclaraciones?.length).length
 
 // Colores de las barras: los mismos tintes del panel.
 const C_AREA: Record<string, string> = {
@@ -184,7 +184,7 @@ const barras = (cs: Conteo[], de: number, color: (c: Conteo) => string) =>
           <p class="dx-pie">
             Modalidad: {r.modalidad.filter((m) => m.n).map((m) => `${m.etiqueta.toLowerCase()} ${m.n}`).join(' · ') || 'sin respuesta'}
             {r.ias.length > 0 && <><br />Han usado: {r.ias.map((c) => `${c.etiqueta} ${c.n}`).join(' · ')}</>}
-            {r.total > 0 && <><br />Aceptaron la ayuda del asistente de la encuesta: {conIA} de {r.total}</>}
+            {r.total > 0 && <><br />Agregaron detalles con el asistente de IA: {conIA} de {r.total}</>}
           </p>
         </section>
       </div>
@@ -213,12 +213,12 @@ const barras = (cs: Conteo[], de: number, color: (c: Conteo) => string) =>
               )}
 
               <h4 class="dx-sub">Lo que quieren resolver con IA</h4>
-              <ul class="dx-notas">{a.deseos.map((d) => <li><p>{d.texto}</p><small>{d.nombre}</small></li>)}</ul>
+              <ul class="dx-notas">{a.deseos.map((d) => <li><p>{d.texto}</p>{d.detalles && <ul class="dx-ia">{d.detalles.map((x) => <li>{x}</li>)}</ul>}<small>{d.nombre}</small></li>)}</ul>
 
               <details class="dx-mas">
                 <summary>Tareas que más tiempo quitan, documentos, comentarios y fechas</summary>
                 <h4 class="dx-sub">Tareas que más tiempo quitan</h4>
-                <ul class="dx-notas">{a.tareasPrincipales.map((d) => <li><p>{d.texto}</p><small>{d.nombre}</small></li>)}</ul>
+                <ul class="dx-notas">{a.tareasPrincipales.map((d) => <li><p>{d.texto}</p>{d.detalles && <ul class="dx-ia">{d.detalles.map((x) => <li>{x}</li>)}</ul>}<small>{d.nombre}</small></li>)}</ul>
                 <h4 class="dx-sub">Documento para el ejercicio</h4>
                 {a.documentos.length
                   ? <ul class="dx-notas">{a.documentos.map((d) => <li><p>{d.texto || 'No dijo cuál'}</p><small>{d.nombre} · {etiqueta(DOCUMENTO_REAL, d.disponible)}</small></li>)}</ul>

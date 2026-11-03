@@ -232,8 +232,11 @@ export const MODALIDAD = [
 
 /**
  * Campos abiertos en que la encuesta ofrece el asistente con IA
- * (src/lib/diagnostico/ia.ts). La respuesta guarda en cuáles la persona aceptó
- * la versión de la IA, para leer esas respuestas sabiendo que la IA ayudó.
+ * (src/lib/diagnostico/ia.ts). La IA solo pregunta: lo que la persona escribió
+ * se guarda tal cual, y sus respuestas a las preguntas de la IA van aparte, en
+ * `ia_aclaraciones`. Así no se mezcla su voz con la de la IA (los textos
+ * reescritos por IA salen más parecidos entre sí y más positivos: Zhang, Xu y
+ * Alvero, Sociological Methods & Research, 2025).
  */
 export const CAMPOS_CON_IA: Opcion[] = [
   { id: 'tarea_principal', etiqueta: 'Tarea que más tiempo le quita' },
@@ -242,6 +245,13 @@ export const CAMPOS_CON_IA: Opcion[] = [
   { id: 'certificado_demora', etiqueta: 'Lo que más demora del certificado' },
   { id: 'deseo', etiqueta: 'Tarea que quiere resolver con IA' },
 ]
+
+/** Una pregunta de la IA y lo que la persona contestó, ligada al campo. */
+export interface Aclaracion {
+  campo: string
+  pregunta: string
+  respuesta: string
+}
 
 /** Lo que queda guardado de cada respuesta, ya validado. */
 export interface Respuesta {
@@ -274,8 +284,8 @@ export interface Respuesta {
   modalidad: string
   restricciones: string
   comentarios: string
-  /** Campos en que usó la versión que propuso el asistente con IA. */
-  ia_campos: string[]
+  /** Detalles que la persona agregó al responder las preguntas del asistente con IA. */
+  ia_aclaraciones: Aclaracion[]
 }
 
 /** Busca la etiqueta de una opción; si no está, devuelve el id tal cual. */

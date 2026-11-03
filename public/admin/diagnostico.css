@@ -80,3 +80,8 @@
 
 .dx-head-acc { display: flex; gap: 8px; flex-wrap: wrap; }
 .dx-head-acc a { text-decoration: none; }
+
+/* Detalles que la persona agregó al contestar las preguntas del asistente con IA. */
+.dx-ia { list-style: none; margin: 6px 0 4px; padding: 8px 10px; border-radius: 8px; background: color-mix(in oklab, #124E7D 6%, #fff); display: grid; gap: 4px; }
+.dx-ia li { font-size: 13px; line-height: 1.45; color: #2b3a44; padding: 0; background: none; }
+.dx-ia::before { content: 'Con la IA'; display: block; font: 500 10.5px/1.4 ui-monospace, monospace; letter-spacing: .08em; text-transform: uppercase; color: #1f6b4a; margin-bottom: 2px; }

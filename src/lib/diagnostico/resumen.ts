@@ -45,6 +45,8 @@ export interface Conteo {
 export interface Nota {
   nombre: string
   texto: string
+  /** Lo que contestó a las preguntas del asistente con IA sobre este campo. */
+  detalles?: string[]
 }
 
 export interface ResumenArea {
@@ -198,7 +200,12 @@ function contar(valores: string[], lista: readonly Opcion[], todas = false): Con
 }
 
 const notas = (filas: Fila[], k: keyof Respuesta): Nota[] =>
-  filas.filter((f) => String(f[k] ?? '').trim()).map((f) => ({ nombre: f.nombre, texto: String(f[k]) }))
+  filas
+    .filter((f) => String(f[k] ?? '').trim())
+    .map((f) => {
+      const detalles = (f.ia_aclaraciones ?? []).filter((a) => a.campo === k).map((a) => `${a.pregunta} ${a.respuesta}`)
+      return { nombre: f.nombre, texto: String(f[k]), ...(detalles.length ? { detalles } : {}) }
+    })
 
 function resumirArea(area: (typeof AREAS)[number], filas: Fila[]): ResumenArea {
   const delArea = filas.filter((f) => f.area === area.id)
@@ -321,7 +328,10 @@ export function aCSV(filas: Fila[]): string {
     ['Modalidad', (f) => etiqueta(MODALIDAD, f.modalidad)],
     ['Sábados que no puede', (f) => f.restricciones],
     ['Comentarios', (f) => f.comentarios],
-    ['Respuestas con ayuda de la IA', (f) => (f.ia_campos ?? []).map((c) => etiqueta(CAMPOS_CON_IA, c)).join(' | ')],
+    [
+      'Detalles que salieron con la IA',
+      (f) => (f.ia_aclaraciones ?? []).map((a) => `${etiqueta(CAMPOS_CON_IA, a.campo)}: ${a.pregunta} ${a.respuesta}`).join(' | '),
+    ],
   ]
   const celda = (s: string) => `"${String(s ?? '').replace(/"/g, '""').replace(/\r?\n/g, ' ')}"`
   const lineas = [cols.map(([t]) => celda(t)).join(';'), ...filas.map((f) => cols.map(([, g]) => celda(g(f))).join(';'))]

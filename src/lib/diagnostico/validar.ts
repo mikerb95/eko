@@ -27,6 +27,7 @@ import {
   PREOCUPACIONES,
   TAREAS,
   USO_IA,
+  type Aclaracion,
   type AreaId,
   type Opcion,
   type Respuesta,
@@ -48,6 +49,35 @@ function varias(b: Record<string, unknown>, k: string, lista: readonly Opcion[])
     .map((s) => s.trim())
     .filter((s) => ids.has(s))
   return [...new Set(vistos)]
+}
+
+/**
+ * Las aclaraciones llegan como JSON en un campo oculto. Solo pasan las de
+ * campos con asistente, con pregunta y respuesta, sin repetir y con tope.
+ */
+function aclaraciones(b: Record<string, unknown>): Aclaracion[] {
+  let lista: unknown
+  try {
+    lista = JSON.parse(String(b.ia_aclaraciones ?? '[]').slice(0, 20_000))
+  } catch {
+    return []
+  }
+  if (!Array.isArray(lista)) return []
+  const campos = new Set(CAMPOS_CON_IA.map((c) => c.id))
+  const vistas = new Set<string>()
+  const out: Aclaracion[] = []
+  for (const x of lista) {
+    if (!x || typeof x !== 'object') continue
+    const campo = String((x as any).campo ?? '').trim()
+    const pregunta = String((x as any).pregunta ?? '').trim().slice(0, 300)
+    const respuesta = String((x as any).respuesta ?? '').trim().slice(0, 500)
+    const k = `${campo}|${pregunta}`
+    if (!campos.has(campo) || !pregunta || !respuesta || vistas.has(k)) continue
+    vistas.add(k)
+    out.push({ campo, pregunta, respuesta })
+    if (out.length >= 15) break
+  }
+  return out
 }
 
 export function validarRespuesta(b: Record<string, unknown>): Respuesta {
@@ -86,7 +116,7 @@ export function validarRespuesta(b: Record<string, unknown>): Respuesta {
     modalidad: una(b, 'modalidad', MODALIDAD),
     restricciones: texto(b, 'restricciones', 300),
     comentarios: texto(b, 'comentarios', 2000),
-    ia_campos: varias(b, 'ia_campos', CAMPOS_CON_IA),
+    ia_aclaraciones: aclaraciones(b),
   }
 
   // Propuestas: solo para las áreas que las hacen, y solo si participa.
@@ -98,6 +128,13 @@ export function validarRespuesta(b: Record<string, unknown>): Respuesta {
       r.propuesta_demora = texto(b, 'propuesta_demora', 800)
     }
   }
+
+  // Aclaraciones de pasos que no aplican al área final no cuentan.
+  r.ia_aclaraciones = r.ia_aclaraciones.filter(
+    (a) =>
+      (a.campo !== 'propuesta_demora' || (AREAS_PROPUESTAS.includes(area) && r.propuesta_rol && r.propuesta_rol !== 'no')) &&
+      (a.campo !== 'certificado_demora' || area === 'logistica'),
+  )
 
   // Certificados: solo Logística.
   if (area === 'logistica') {

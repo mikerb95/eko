@@ -284,8 +284,8 @@ const steps: TFStep[] = [
             </span>
             <p>
               <b>Pruebe la IA mientras responde.</b> En las preguntas abiertas escriba como le salga y pulse
-              <span class="ia-aviso-btn">Mejorar con IA</span>: le hará una o dos preguntas y le propondrá una versión más
-              clara. Usted decide si la usa. Es un primer ejemplo de lo que verá en el taller.
+              <span class="ia-aviso-btn">Completar con IA</span>: le hará una o dos preguntas para entender mejor su
+              tarea. Lo que usted escribió no se cambia. Es un primer ejemplo de lo que verá en el taller.
             </p>
           </div>
         )}
@@ -367,8 +367,9 @@ const steps: TFStep[] = [
     <script>
       // Asistente con IA de la encuesta (src/lib/diagnostico/ia.ts). Se monta
       // debajo de cada textarea con data-ia, solo si /api/diagnostico-ia dice
-      // que está disponible. Nada de esto se envía con la encuesta salvo la
-      // lista de campos en que la persona aceptó la versión de la IA.
+      // que está disponible. La IA solo pregunta: el texto de la persona no se
+      // toca, y lo que conteste a las preguntas viaja aparte con la encuesta
+      // (ia_aclaraciones).
       const MAX_VUELTAS = 3
 
       type Salida = { propuesta: string; preguntas: string[]; nota: string }
@@ -399,18 +400,23 @@ const steps: TFStep[] = [
         }
       }
 
-      // Campos en que la persona usó la versión de la IA; viaja con la encuesta.
-      const usados = new Set<string>()
+      // Lo que la persona contesta a las preguntas de la IA; viaja con la encuesta.
+      const guardadas: { campo: string; pregunta: string; respuesta: string }[] = []
       let oculto: HTMLInputElement | null = null
-      function marcarUsado(campo: string) {
-        usados.add(/^otra_/.test(campo) ? 'tarea_otra' : campo)
+      function guardar(campo: string, nuevas: { pregunta: string; respuesta: string }[]) {
+        const c = /^otra_/.test(campo) ? 'tarea_otra' : campo
+        for (const n of nuevas) {
+          const ya = guardadas.find((g) => g.campo === c && g.pregunta === n.pregunta)
+          if (ya) ya.respuesta = n.respuesta
+          else guardadas.push({ campo: c, ...n })
+        }
         if (!oculto && form) {
           oculto = el('input')
           oculto.type = 'hidden'
-          oculto.name = 'ia_campos'
+          oculto.name = 'ia_aclaraciones'
           form.appendChild(oculto)
         }
-        if (oculto) oculto.value = [...usados].join(', ')
+        if (oculto) oculto.value = JSON.stringify(guardadas.slice(-15))
       }
 
       function montar(ta: HTMLTextAreaElement) {
@@ -418,7 +424,7 @@ const steps: TFStep[] = [
         const disparar = el('button', 'iax-btn')
         disparar.type = 'button'
         disparar.innerHTML =
-          '<svg width="15" height="15" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 2l1.9 6.1L20 10l-6.1 1.9L12 18l-1.9-6.1L4 10l6.1-1.9z"/></svg><span>Mejorar con IA</span>'
+          '<svg width="15" height="15" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 2l1.9 6.1L20 10l-6.1 1.9L12 18l-1.9-6.1L4 10l6.1-1.9z"/></svg><span>Completar con IA</span>'
         const panel = el('div', 'iax-panel')
         panel.hidden = true
         panel.setAttribute('aria-live', 'polite')
@@ -442,7 +448,7 @@ const steps: TFStep[] = [
 
         function cargando() {
           panel.hidden = false
-          panel.replaceChildren(el('p', 'iax-cargando', vuelta ? 'Actualizando la propuesta con lo que respondió…' : 'La IA está leyendo su respuesta…'))
+          panel.replaceChildren(el('p', 'iax-cargando', vuelta ? 'La IA está leyendo lo que respondió…' : 'La IA está leyendo su respuesta…'))
         }
 
         function error(msg: string) {
@@ -455,34 +461,22 @@ const steps: TFStep[] = [
           const nodos: HTMLElement[] = []
           if (s.nota) nodos.push(el('p', 'iax-nota', s.nota))
 
+          // Lo que entendió la IA: sirve para que la persona vea si le
+          // entendió bien. No reemplaza su respuesta.
           const prop = el('div', 'iax-prop')
-          prop.append(el('span', 'iax-mini', 'Propuesta de la IA'), el('p', 'iax-texto', s.propuesta))
-          const acciones = el('div', 'iax-acciones')
-          const usar = el('button', 'iax-usar', 'Usar esta versión')
-          usar.type = 'button'
-          const dejar = el('button', 'iax-dejar', 'Quedarme con la mía')
-          dejar.type = 'button'
-          acciones.append(usar, dejar)
-          prop.append(acciones)
+          prop.append(el('span', 'iax-mini', 'Así entendió la IA su respuesta'), el('p', 'iax-texto', s.propuesta))
           nodos.push(prop)
 
-          usar.addEventListener('click', () => {
-            ta.value = s.propuesta
-            ta.dispatchEvent(new Event('input', { bubbles: true }))
-            marcarUsado(ta.name)
-            panel.replaceChildren(el('p', 'iax-listo', 'Listo, quedó en su respuesta. Puede editarla si quiere.'))
-            disparar.querySelector('span')!.textContent = 'Volver a pedir ayuda'
-            aclaraciones = []
-            vuelta = 0
-          })
-          dejar.addEventListener('click', () => {
+          const cerrar = el('button', 'iax-dejar', 'Cerrar')
+          cerrar.type = 'button'
+          cerrar.addEventListener('click', () => {
             panel.hidden = true
             panel.replaceChildren()
           })
 
           if (s.preguntas.length && vuelta < MAX_VUELTAS) {
             const preg = el('div', 'iax-preg')
-            preg.append(el('span', 'iax-mini', 'Para completarla, cuéntele a la IA'))
+            preg.append(el('span', 'iax-mini', 'La IA quiere saber'))
             const campos = s.preguntas.map((p) => {
               const l = el('label', 'iax-q')
               const inp = el('input', 'iax-input')
@@ -493,7 +487,7 @@ const steps: TFStep[] = [
               preg.append(l)
               return { pregunta: p, inp }
             })
-            const responder = el('button', 'iax-responder', 'Responder y actualizar')
+            const responder = el('button', 'iax-responder', 'Responder')
             responder.type = 'button'
             responder.addEventListener('click', () => {
               const nuevas = campos.map((c) => ({ pregunta: c.pregunta, respuesta: c.inp.value.trim() })).filter((c) => c.respuesta)
@@ -502,17 +496,27 @@ const steps: TFStep[] = [
                 return
               }
               aclaraciones = [...aclaraciones, ...nuevas]
-              pedir(s.propuesta)
+              guardar(ta.name, nuevas)
+              pedir()
             })
-            preg.append(responder)
+            const acciones = el('div', 'iax-acciones')
+            acciones.append(responder, cerrar)
+            preg.append(acciones)
             nodos.push(preg)
+          } else {
+            const fin = el('div', 'iax-acciones')
+            fin.append(
+              el('p', 'iax-listo', aclaraciones.length ? 'Gracias. Sus respuestas quedan junto a lo que escribió.' : 'Su respuesta ya está completa.'),
+              cerrar,
+            )
+            nodos.push(fin)
           }
           panel.replaceChildren(...nodos)
         }
 
-        async function pedir(base?: string) {
+        async function pedir() {
           if (ocupado) return
-          const borrador = (base ?? ta.value).trim()
+          const borrador = ta.value.trim()
           if (borrador.length < 3) {
             error('Escriba primero su respuesta, aunque sea en pocas palabras. La IA parte de lo que usted escriba.')
             ta.focus()
@@ -670,10 +674,10 @@ const steps: TFStep[] = [
       .ia-encuesta :global(.iax-prop) { background: #fff; border-radius: var(--r-md); padding: 14px 16px; }
       .ia-encuesta :global(.iax-texto) { font-size: 16px; line-height: 1.55; color: var(--ink); white-space: pre-wrap; }
       .ia-encuesta :global(.iax-acciones) { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 14px; }
-      .ia-encuesta :global(.iax-usar), .ia-encuesta :global(.iax-responder) {
+      .ia-encuesta :global(.iax-responder) {
         cursor: pointer; font-size: 14px; color: #fff; background: var(--deep); padding: 9px 16px; border-radius: 999px; transition: background .18s;
       }
-      .ia-encuesta :global(.iax-usar:hover), .ia-encuesta :global(.iax-responder:hover) { background: var(--deep-2); }
+      .ia-encuesta :global(.iax-responder:hover) { background: var(--deep-2); }
       .ia-encuesta :global(.iax-dejar) {
         cursor: pointer; font-size: 14px; color: var(--ink-2); background: transparent; padding: 9px 12px; border-radius: 999px;
       }
@@ -685,7 +689,7 @@ const steps: TFStep[] = [
         border-radius: 10px; padding: 9px 12px; outline: none; transition: border-color .18s;
       }
       .ia-encuesta :global(.iax-input:focus) { border-color: var(--deep); }
-      .ia-encuesta :global(.iax-responder) { align-self: flex-start; }
+      .ia-encuesta :global(.iax-acciones .iax-listo) { flex: 1 1 100%; }
       @media (prefers-reduced-motion: reduce) {
         .ia-encuesta :global(.iax-panel), .ia-encuesta :global(.iax-cargando::before) { animation: none; }
       }
