@@ -74,6 +74,7 @@ export async function listarRespuestas(): Promise<Fila[]> {
     return {
       // Valores por defecto por si una versión vieja del cuestionario no traía el campo.
       nombre: '', cargo: '', area: 'operaciones', tareas: [], tarea_otra: '', horas: '', tarea_principal: '',
+      propuesta_rol: '', propuesta_horas: '', propuestas_mes: '', propuesta_demora: '',
       documentos: [], herramientas: [], uso_ia: '', ias: [], para_que: '', preocupaciones: [], deseo: '',
       documento_real: '', documento_cual: '', modalidad: '', restricciones: '',
       ...datos,

@@ -98,6 +98,37 @@ export const HORAS = [
   { id: 'mas_20', etiqueta: 'Más de 20 horas', valor: 22 },
 ] as const
 
+/**
+ * Propuestas comerciales: la línea base de la automatización. El gerente dijo
+ * que su dolor es el tiempo de crear propuestas; con esto se sabe cuánto es.
+ * La pregunta sale a Ventas, Gerencia y Operaciones (los consultores aportan el
+ * diagnóstico técnico). `valor` es el punto medio de cada rango.
+ */
+export const AREAS_PROPUESTAS: AreaId[] = ['ventas', 'gerencia', 'operaciones']
+
+export const PROPUESTA_ROL = [
+  { id: 'arma', etiqueta: 'Las armo', hint: 'Del Brief al documento que se envía' },
+  { id: 'tecnica', etiqueta: 'Aporto la parte técnica o el diagnóstico' },
+  { id: 'revisa', etiqueta: 'Las reviso o las apruebo' },
+  { id: 'no', etiqueta: 'No participo en propuestas' },
+] as const satisfies readonly Opcion[]
+
+export const PROPUESTA_HORAS = [
+  { id: 'menos_1', etiqueta: 'Menos de 1 hora', valor: 0.5 },
+  { id: '1_3', etiqueta: 'Entre 1 y 3 horas', valor: 2 },
+  { id: '3_6', etiqueta: 'Entre 3 y 6 horas', valor: 4.5 },
+  { id: '6_12', etiqueta: 'Entre 6 y 12 horas', valor: 9 },
+  { id: 'mas_12', etiqueta: 'Más de 12 horas', valor: 14 },
+] as const
+
+export const PROPUESTAS_MES = [
+  { id: '1_5', etiqueta: 'Entre 1 y 5', valor: 3 },
+  { id: '6_10', etiqueta: 'Entre 6 y 10', valor: 8 },
+  { id: '11_20', etiqueta: 'Entre 11 y 20', valor: 15 },
+  { id: '21_40', etiqueta: 'Entre 21 y 40', valor: 30 },
+  { id: 'mas_40', etiqueta: 'Más de 40', valor: 45 },
+] as const
+
 export const DOCUMENTOS: Opcion[] = [
   { id: 'pdf_escaneado', etiqueta: 'PDF escaneados (autos, resoluciones, certificados)' },
   { id: 'pdf_digital', etiqueta: 'PDF digitales' },
@@ -166,6 +197,10 @@ export interface Respuesta {
   tarea_otra: string
   horas: string
   tarea_principal: string
+  propuesta_rol: string
+  propuesta_horas: string
+  propuestas_mes: string
+  propuesta_demora: string
   documentos: string[]
   herramientas: string[]
   uso_ia: string

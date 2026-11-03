@@ -11,6 +11,10 @@
  */
 import {
   AREA_IDS,
+  AREAS_PROPUESTAS,
+  PROPUESTA_HORAS,
+  PROPUESTA_ROL,
+  PROPUESTAS_MES,
   DOCUMENTO_REAL,
   DOCUMENTOS,
   HERRAMIENTAS,
@@ -57,6 +61,10 @@ export function validarRespuesta(b: Record<string, unknown>): Respuesta {
     tarea_otra: texto(b, `otra_${area}`, 400),
     horas: una(b, 'horas', HORAS),
     tarea_principal: texto(b, 'tarea_principal', 1500),
+    propuesta_rol: '',
+    propuesta_horas: '',
+    propuestas_mes: '',
+    propuesta_demora: '',
     documentos: varias(b, 'documentos', DOCUMENTOS),
     herramientas: varias(b, 'herramientas', HERRAMIENTAS),
     uso_ia: una(b, 'uso_ia', USO_IA),
@@ -68,6 +76,16 @@ export function validarRespuesta(b: Record<string, unknown>): Respuesta {
     documento_cual: texto(b, 'documento_cual', 300),
     modalidad: una(b, 'modalidad', MODALIDAD),
     restricciones: texto(b, 'restricciones', 300),
+  }
+
+  // Propuestas: solo para las áreas que las hacen, y solo si participa.
+  if (AREAS_PROPUESTAS.includes(area)) {
+    r.propuesta_rol = una(b, 'propuesta_rol', PROPUESTA_ROL)
+    if (r.propuesta_rol && r.propuesta_rol !== 'no') {
+      r.propuesta_horas = una(b, 'propuesta_horas', PROPUESTA_HORAS)
+      r.propuestas_mes = una(b, 'propuestas_mes', PROPUESTAS_MES)
+      r.propuesta_demora = texto(b, 'propuesta_demora', 800)
+    }
   }
 
   // Lo mínimo para que la respuesta sirva al diagnóstico. El formulario ya lo
