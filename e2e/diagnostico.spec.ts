@@ -97,6 +97,22 @@ test('equipo: responde la encuesta con el paso de su área', async ({ page }) =>
   await expect(page.getByRole('heading', { name: 'Gracias, quedó registrado' })).toBeVisible()
 })
 
+test('Logística ve sus tareas y el paso de certificados, no el de propuestas', async ({ page }) => {
+  await page.goto('/ia')
+  const activo = page.locator('.tf-step.is-active')
+  await activo.getByLabel(/Nombre/).fill('Pedro Logística')
+  await page.locator('.tf-next').click()
+  await activo.getByRole('button', { name: /Logística/ }).click()
+  await activo.getByRole('button', { name: /Emitir el certificado de disposición final/ }).click()
+  await page.locator('.tf-next').click()
+  await activo.getByRole('button', { name: 'Entre 2 y 5 horas' }).click()
+  await activo.getByLabel(/La tarea que más tiempo le quita/).fill('Pasar los datos del certificado del gestor al de Ekosolv')
+  await page.locator('.tf-next').click()
+  await expect(activo).toContainText('Sobre los certificados')
+  await page.locator('.tf-next').click()
+  await expect(page.locator('.tf-error')).toBeVisible()
+})
+
 test('panel: resumen por área y respuesta individual', async ({ page }) => {
   await entrar(page)
   await page.goto('/admin/diagnostico')
@@ -117,7 +133,18 @@ test('panel: resumen por área y respuesta individual', async ({ page }) => {
 
 test('informe para Gerencia: horas y valor con los supuestos', async ({ page }) => {
   await entrar(page)
+  // Una respuesta de Logística por la API, con lo mínimo.
+  const r = await page.request.post('/api/diagnostico', {
+    data: {
+      nombre: 'Pedro', area: 'logistica', tareas_logistica: 'cert_disposicion', horas: '2_5', tarea_principal: 'Certificados',
+      certificados_mes: '31_60', certificado_min: '30_60', seguimiento_gestores: '2_5', uso_ia: 'nunca',
+      deseo: 'Certificados más rápidos', documento_real: 'si', consent: 'on',
+    },
+  })
+  expect(r.ok()).toBeTruthy()
   await page.goto('/admin/diagnostico/informe')
+  // 45 certificados × 45 min y 3,5 h/semana de seguimiento.
+  await expect(page.locator('section').filter({ hasText: 'Certificados de Logística' })).toContainText('45 certificados al mes')
   // 2 horas por propuesta × 8 propuestas al mes.
   await expect(page.locator('.cifras')).toContainText('16 h')
   await expect(page.locator('.caja')).toContainText('10 horas')
