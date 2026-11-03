@@ -1,0 +1,165 @@
+---
+// Página del equipo de Ekosolv para la capacitación en IA: /ia.
+//
+// Una dirección corta para comunicarla de viva voz. Arriba va la encuesta del
+// diagnóstico (mientras esté abierta desde /admin/diagnostico); debajo, el
+// programa por área y el material de apoyo, que se publica aquí después de
+// cada taller (src/lib/capacitacion.ts).
+//
+// No es una página comercial: no está en src/lib/rutas.ts (ni en el sitemap ni
+// en llms.txt), va con noindex y no usa el Layout del sitio, para que no haya
+// menú ni asesor que distraigan.
+export const prerender = false
+import '../styles/global.css'
+import TypeformFlow from '../components/TypeformFlow.astro'
+import type { TFStep, TFOption } from '../components/TypeformFlow.astro'
+import {
+  AREAS,
+  DOCUMENTO_REAL,
+  DOCUMENTOS,
+  HERRAMIENTAS,
+  HORAS,
+  IAS,
+  MODALIDAD,
+  PREOCUPACIONES,
+  TAREAS,
+  USO_IA,
+  type Opcion,
+} from '../lib/diagnostico/preguntas'
+import { leerEstado, type EstadoEncuesta } from '../lib/diagnostico/datos'
+import { GENERAL, MODULOS, type ModuloCapacitacion } from '../lib/capacitacion'
+
+let estado: EstadoEncuesta = { abierta: false, usada: false }
+try {
+  estado = await leerEstado()
+} catch (e: any) {
+  console.error('[ia] carga', e?.message || e)
+}
+
+const COLOR: Record<string, string> = {
+  general: 'var(--deep)',
+  operaciones: '#1f8a8a',
+  ventas: '#2f80c9',
+  mercadeo: '#c2557a',
+  gerencia: '#8b5cf6',
+  finanzas: '#e8920c',
+}
+const modulos: ModuloCapacitacion[] = [GENERAL, ...MODULOS]
+
+const ops = (lista: readonly Opcion[]): TFOption[] => lista.map((o) => ({ value: o.id, label: o.etiqueta, hint: o.hint }))
+
+const steps: TFStep[] = [
+  {
+    title: 'Empecemos por usted',
+    subtitle: 'Son unos 15 minutos. Con sus respuestas se arma el taller de su área con casos de su trabajo real.',
+    row: true,
+    fields: [
+      { type: 'text', name: 'nombre', label: 'Nombre', placeholder: 'Su nombre', required: true, autocomplete: 'name' },
+      { type: 'text', name: 'cargo', label: 'Cargo', placeholder: 'Por ejemplo, consultora ambiental' },
+    ],
+  },
+  {
+    title: '¿En qué área trabaja?',
+    subtitle: 'Si trabaja en varias, elija la que le ocupa más tiempo.',
+    fields: [{ type: 'choice', name: 'area', label: 'Área', required: true, options: ops(AREAS) }],
+  },
+  ...AREAS.map(
+    (a): TFStep => ({
+      title: '¿Cuáles de estas tareas hace cada semana?',
+      subtitle: `Marque todas las que haga al menos una vez por semana en ${a.etiqueta}.`,
+      when: { field: 'area', equals: a.id },
+      fields: [
+        { type: 'choice', name: `tareas_${a.id}`, label: 'Tareas', multiple: true, options: ops(TAREAS[a.id]) },
+        {
+          type: 'textarea',
+          name: `otra_${a.id}`,
+          label: '¿Otra tarea que repita y no esté en la lista?',
+          placeholder: 'Opcional',
+        },
+      ],
+    }),
+  ),
+  {
+    title: '¿Cuánto tiempo se le va en eso?',
+    subtitle: 'Un cálculo aproximado basta.',
+    fields: [
+      {
+        type: 'choice',
+        name: 'horas',
+        label: 'Horas por semana en tareas que se repiten',
+        required: true,
+        options: HORAS.map((h) => ({ value: h.id, label: h.etiqueta })),
+      },
+      {
+        type: 'textarea',
+        name: 'tarea_principal',
+        label: 'La tarea que más tiempo le quita',
+        placeholder: 'Qué hace, con qué documentos y cuánto le toma cada vez',
+        required: true,
+      },
+    ],
+  },
+  {
+    title: '¿Con qué trabaja?',
+    subtitle: 'Marque lo que usa con frecuencia.',
+    fields: [
+      { type: 'choice', name: 'documentos', label: 'Documentos', multiple: true, options: ops(DOCUMENTOS) },
+      { type: 'choice', name: 'herramientas', label: 'Herramientas', multiple: true, options: ops(HERRAMIENTAS) },
+    ],
+  },
+  {
+    title: '¿Ha usado inteligencia artificial?',
+    subtitle: 'No hay respuestas buenas ni malas: sirve para arrancar desde donde está el equipo.',
+    fields: [
+      { type: 'choice', name: 'uso_ia', label: 'Con qué frecuencia', required: true, options: ops(USO_IA) },
+      { type: 'choice', name: 'ias', label: 'Cuáles ha usado', multiple: true, options: ops(IAS) },
+      { type: 'textarea', name: 'para_que', label: 'Si la usa, ¿para qué?', placeholder: 'Opcional' },
+    ],
+  },
+  {
+    title: '¿Qué le preocupa de usarla en su trabajo?',
+    subtitle: 'Marque todas las que apliquen. Cada una se trabaja en la capacitación general.',
+    fields: [{ type: 'choice', name: 'preocupaciones', label: 'Preocupaciones', multiple: true, options: ops(PREOCUPACIONES) }],
+  },
+  {
+    title: 'Si la IA le resolviera una sola tarea, ¿cuál sería?',
+    subtitle: 'Cada taller termina con un ejercicio sobre un documento real del área.',
+    fields: [
+      {
+        type: 'textarea',
+        name: 'deseo',
+        label: 'La tarea que le gustaría resolver',
+        placeholder: 'Por ejemplo, sacar las obligaciones y plazos de un auto sin leerlo completo',
+        required: true,
+      },
+      {
+        type: 'choice',
+        name: 'documento_real',
+        label: '¿Podría traer un documento real para el ejercicio?',
+        required: true,
+        options: ops(DOCUMENTO_REAL),
+      },
+      { type: 'text', name: 'documento_cual', label: '¿Cuál documento?', placeholder: 'Por ejemplo, un auto de seguimiento de la CAR' },
+    ],
+  },
+  {
+    title: 'Por último, la logística',
+    subtitle: 'Las fechas de los sábados se fijan con este diagnóstico.',
+    fields: [
+      { type: 'choice', name: 'modalidad', label: 'Prefiere la capacitación', options: ops(MODALIDAD) },
+      {
+        type: 'text',
+        name: 'restricciones',
+        label: '¿Hay algún sábado de las próximas semanas en que no pueda?',
+        placeholder: 'Opcional',
+      },
+      {
+        type: 'consent',
+        name: 'consent',
+        html: 'Autorizo el uso de estas respuestas para diagnosticar y planear la capacitación en IA de Ekosolv. Solo las ven Gerencia y el capacitador.',
+        notice: 'No escriba datos de clientes ni información confidencial en las respuestas.',
+      },
+    ],
+  },
+]
+---
