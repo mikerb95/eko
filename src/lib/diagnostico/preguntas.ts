@@ -22,7 +22,8 @@ export interface Opcion {
 }
 
 export const AREAS = [
-  { id: 'operaciones', etiqueta: 'Operaciones', hint: 'Consultoría ambiental, revisión técnica y Ekopartner' },
+  { id: 'operaciones', etiqueta: 'Operaciones', hint: 'Consultoría ambiental y revisión técnica' },
+  { id: 'logistica', etiqueta: 'Logística', hint: 'Recolecciones, gestores y certificados' },
   { id: 'ventas', etiqueta: 'Ventas', hint: 'Briefs, propuestas y seguimiento comercial' },
   { id: 'mercadeo', etiqueta: 'Mercadeo / Redes', hint: 'Contenido, redes y blog' },
   { id: 'gerencia', etiqueta: 'Gerencia General', hint: 'Dirección, decisiones y comunicaciones' },
@@ -49,6 +50,21 @@ export const TAREAS: Record<AreaId, Opcion[]> = {
     { id: 'certificados', etiqueta: 'Cruzar certificados de recolección y de disposición final' },
     { id: 'informes', etiqueta: 'Redactar informes técnicos' },
     { id: 'respuestas', etiqueta: 'Redactar respuestas a la autoridad' },
+  ],
+  // Logística: coordina las recolecciones, lleva las cifras en Zoho, pide a los
+  // gestores el certificado de disposición final y, con base en él, emite el
+  // certificado propio de Ekosolv para el cliente (además del de recolección).
+  logistica: [
+    { id: 'programar', etiqueta: 'Programar recolecciones con los clientes' },
+    { id: 'rutas', etiqueta: 'Coordinar transporte y rutas' },
+    { id: 'cifras_zoho', etiqueta: 'Registrar y actualizar cifras (kilos, toneladas) en Zoho' },
+    { id: 'pedir_certificados', etiqueta: 'Pedir a los gestores los certificados de disposición final' },
+    { id: 'seguimiento_gestores', etiqueta: 'Hacer seguimiento a gestores que no han enviado el certificado' },
+    { id: 'cert_recoleccion', etiqueta: 'Emitir el certificado de recolección de Ekosolv' },
+    { id: 'cert_disposicion', etiqueta: 'Emitir el certificado de disposición final de Ekosolv para el cliente' },
+    { id: 'cruzar_cifras', etiqueta: 'Cruzar lo recolectado con lo que certifica el gestor' },
+    { id: 'clientes_estado', etiqueta: 'Responder a clientes por el estado de su recolección o certificado' },
+    { id: 'consolidar', etiqueta: 'Consolidar toneladas para reportes' },
   ],
   ventas: [
     { id: 'brief', etiqueta: 'Pasar un Brief de Zoho CRM a propuesta' },

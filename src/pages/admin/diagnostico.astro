@@ -43,6 +43,7 @@ const url = `${Astro.url.origin}/ia`
 // Colores de las barras: los mismos tintes del panel.
 const C_AREA: Record<string, string> = {
   operaciones: '#1f8a8a',
+  logistica: '#46a85b',
   ventas: '#2f80c9',
   mercadeo: '#c2557a',
   gerencia: '#8b5cf6',
@@ -122,7 +123,7 @@ const barras = (cs: Conteo[], de: number, color: (c: Conteo) => string) =>
           <span class="kpi-sub">{reemplazadas.size ? `${reemplazadas.size} respuesta(s) repetida(s) no cuentan` : 'Una respuesta por persona'}</span>
         </div>
         <div class="kpi" style="--c:#2f80c9">
-          <span class="kpi-lbl">Áreas con respuesta</span><span class="kpi-num">{r.areasConRespuesta}<i>/5</i></span>
+          <span class="kpi-lbl">Áreas con respuesta</span><span class="kpi-num">{r.areasConRespuesta}<i>/{r.areas.length}</i></span>
           <span class="kpi-sub">{r.orden.filter((o) => !o.n).map((o) => o.etiqueta).join(', ') || 'Están todas'}</span>
         </div>
         <div class="kpi" style="--c:#46a85b">

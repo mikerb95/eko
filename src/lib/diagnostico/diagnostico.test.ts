@@ -66,7 +66,7 @@ test('resumir: Operaciones primero y las demás por horas', () => {
     fila({ nombre: 'D', area: 'ventas', tareas: ['brief', 'cotizar'], horas: '2_5', uso_ia: 'nunca' }),
   ]
   const r = resumir(filas)
-  assert.deepEqual(r.orden.map((o) => o.area), ['operaciones', 'finanzas', 'ventas', 'mercadeo', 'gerencia'])
+  assert.deepEqual(r.orden.map((o) => o.area), ['operaciones', 'finanzas', 'ventas', 'logistica', 'mercadeo', 'gerencia'])
   assert.equal(r.total, 4)
   assert.equal(r.areasConRespuesta, 3)
   assert.equal(r.sinUsoIA, 1)
