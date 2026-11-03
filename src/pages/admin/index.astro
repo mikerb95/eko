@@ -41,12 +41,15 @@ const user = Astro.locals.user || 'admin'
 const role = Astro.locals.role || ''
 const isAdmin = role === 'admin'
 let users: User[] = []
-if (isAdmin) {
-  try {
-    users = await listUsers()
-  } catch (e: any) {
-    if (!seedError) seedError = String(e?.message || e)
-  }
+// Nombres de las cuentas activas: sugerencias para el campo "Responsable" de
+// contactos y órdenes. Todos los roles los ven; la lista completa, solo el admin.
+let equipo: string[] = []
+try {
+  const todos = await listUsers()
+  equipo = [...new Set(todos.filter((u) => u.active).map((u) => u.name.trim()).filter(Boolean))]
+  if (isAdmin) users = todos
+} catch (e: any) {
+  if (!seedError) seedError = String(e?.message || e)
 }
 
 // ── Asistente con IA (docs/plan-asistente.md, fase 8) ─────────────────────
@@ -309,6 +312,8 @@ const cuentas = {
     )}
 
   <Fragment slot="fuera">
+    <datalist id="equipo">{equipo.map((n) => <option value={n} />)}</datalist>
+
     <!-- CONTACTO -->
     <div class="drawer" id="contact-drawer" hidden>
       <div class="drawer-bg" data-close></div>
@@ -382,7 +387,7 @@ const cuentas = {
                   <option value="cancelada">Cancelada</option>
                 </select>
               </label>
-              <label>Responsable<input name="assigned_to" placeholder="Nombre del responsable" /></label>
+              <label>Responsable<input name="assigned_to" list="equipo" placeholder="Nombre del responsable" autocomplete="off" /></label>
               <label>Fecha programada<input name="scheduled_at" type="date" /></label>
             </div>
             <label>Notas internas<textarea name="internal_notes" rows="3" placeholder="Vehículo, transportador, observaciones…"></textarea><small>Solo las ve el equipo; el cliente no las recibe.</small></label>
@@ -504,7 +509,7 @@ const cuentas = {
     </div>
 
 
-    <script is:inline define:vars={{ posts, normativas, orders, contacts, users, role, asis }}>
+    <script is:inline define:vars={{ posts, normativas, orders, contacts, users, role, asis, user }}>
       window.__ASIS__ = asis
       window.__POSTS__ = posts
       window.__NORMS__ = normativas
@@ -512,6 +517,7 @@ const cuentas = {
       window.__CONTACTS__ = contacts
       window.__USERS__ = users
       window.__ROLE__ = role
+      window.__YO__ = user
     </script>
     <script src="/admin/admin.js" type="module"></script>
     <script src="/admin/asistente.js" type="module"></script>
