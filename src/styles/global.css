@@ -373,7 +373,7 @@ h3 { font-size: 22px; }
 }
 .hero-main { display: flex; flex-direction: column; gap: clamp(24px, 3vw, 36px); min-width: 0; }
 .hero-title { font-size: clamp(52px, 7.4vw, 112px); text-wrap: balance; }
-/* Palabra + signo pegado: SplitText los vuelve piezas sueltas y la coma podía caer sola al inicio de línea. */
+/* Palabra + signo pegado (lo pone amarrarSignos en portada.ts): un signo nunca abre renglón. */
 .amarre { white-space: nowrap; }
 @media (min-width: 1080px) {
   .hero-grid { grid-template-columns: minmax(0, 1.08fr) minmax(0, 1fr); }

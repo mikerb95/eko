@@ -54,6 +54,7 @@ function entradaHero(raiz: HTMLElement): () => void {
   if (eyebrow) tl.from(eyebrow, { opacity: 0, y: 12, duration: 0.7 }, 0)
 
   if (titulo) {
+    amarrarSignos(titulo)
     const split = SplitText.create(titulo, { type: 'lines,words', mask: 'lines' })
     tl.from(split.words, { yPercent: 115, duration: 1.15, stagger: 0.07, ease: 'expo.out' }, 0.1)
   }
@@ -71,6 +72,27 @@ function entradaHero(raiz: HTMLElement): () => void {
   tl.from(raiz.querySelectorAll('.hero-stats, [data-radar]'), { opacity: 0, y: 28, duration: 1, stagger: 0.12, clearProps: 'transform,opacity' }, 0.9)
 
   return () => tl.kill()
+}
+
+/**
+ * Un signo de puntuación nunca abre renglón. El navegador ya lo cumple, pero
+ * SplitText vuelve cada palabra un bloque suelto y, si la palabra va dentro de
+ * un <em> y el signo por fuera, la coma puede caer sola abajo. Aquí se envuelve
+ * el elemento y el signo que lo sigue en un `.amarre` (nowrap) antes de partir.
+ */
+function amarrarSignos(el: HTMLElement): void {
+  const signo = /^[,.;:!?…)\]}»”’%]+/
+  for (const nodo of [...el.childNodes]) {
+    if (nodo.nodeType !== Node.TEXT_NODE) continue
+    const previo = nodo.previousSibling
+    const m = nodo.textContent?.match(signo)
+    if (!m || !(previo instanceof HTMLElement) || previo.classList.contains('amarre')) continue
+    const amarre = document.createElement('span')
+    amarre.className = 'amarre'
+    previo.replaceWith(amarre)
+    amarre.append(previo, m[0])
+    nodo.textContent = nodo.textContent!.slice(m[0].length)
+  }
 }
 
 /** Las cifras ruedan como un contador al entrar en pantalla (hero y franja de resultados). */
