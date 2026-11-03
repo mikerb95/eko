@@ -26,7 +26,9 @@ const CSP = [
   "font-src 'self' https://fonts.gstatic.com data:",
   "img-src 'self' data: https://img.youtube.com",
   "frame-src https://www.youtube-nocookie.com https://player.vimeo.com",
-  "connect-src 'self'",
+  // vercel.com: los casos del taller (/ia) suben los archivos directo a Vercel
+  // Blob con un token de un solo uso (src/pages/api/diagnostico-casos/subir.ts).
+  "connect-src 'self' https://vercel.com",
   "base-uri 'self'",
   "form-action 'self'",
   "frame-ancestors 'none'",
