@@ -85,3 +85,22 @@
 .dx-ia { list-style: none; margin: 6px 0 4px; padding: 8px 10px; border-radius: 8px; background: color-mix(in oklab, #124E7D 6%, #fff); display: grid; gap: 4px; }
 .dx-ia li { font-size: 13px; line-height: 1.45; color: #2b3a44; padding: 0; background: none; }
 .dx-ia::before { content: 'Con la IA'; display: block; font: 500 10.5px/1.4 ui-monospace, monospace; letter-spacing: .08em; text-transform: uppercase; color: #1f6b4a; margin-bottom: 2px; }
+
+/* Casos para el taller: archivos reales del equipo para los ejercicios. */
+.dx-casos-head { margin-top: 0; }
+.dx-casos { display: flex; flex-direction: column; gap: 6px; }
+.dx-casos-area { display: flex; flex-direction: column; gap: 8px; }
+.dx-casos-area .dx-sub { display: flex; align-items: center; color: color-mix(in oklab, var(--c) 70%, var(--ink)); }
+.dx-caso-cuerpo { padding: 14px 18px 4px; }
+.dx-caso-contexto { margin: 0 0 12px; font-size: 14px; line-height: 1.55; color: var(--ink); white-space: pre-line; }
+.dx-caso .datos-ficha { padding: 0; grid-template-columns: 150px 1fr; }
+.dx-archivos { list-style: none; margin: 12px 0 0; padding: 0; display: flex; flex-wrap: wrap; gap: 8px; }
+.dx-archivos li { display: inline-flex; align-items: baseline; gap: 8px; padding: 8px 12px; border-radius: 10px; background: var(--paper-2); max-width: 100%; }
+.dx-archivos a { font-size: 13px; font-weight: 500; color: var(--deep); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.dx-archivos small { font: 11.5px var(--mono); color: var(--mute); white-space: nowrap; }
+.dx-tag-datos { background: color-mix(in oklab, #e8920c 16%, #fff); color: #8a5300; }
+.dx-peligro:hover { color: #b04a2e; border-color: color-mix(in oklab, #b04a2e 45%, var(--line)); }
+.dx-peligro .ico { width: 14px; height: 14px; }
+@media (max-width: 600px) {
+  .dx-caso .datos-ficha { grid-template-columns: 1fr; }
+}

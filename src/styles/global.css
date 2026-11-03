@@ -429,6 +429,8 @@ h3 { font-size: 22px; }
     column-gap: clamp(40px, 4vw, 72px); row-gap: clamp(24px, 3.2vh, 40px);
   }
   .hero-title { font-size: clamp(64px, 16.4cqi, 108px); }
+  /* "Everything you" es un 8 % más ancho que "usted importa,": mismo corte, letra algo menor. */
+  :lang(en) .hero-title { font-size: clamp(60px, 14.8cqi, 100px); }
   .br-ancho { display: inline; }
   .hero-accion { margin-top: auto; padding-top: clamp(24px, 3vw, 36px); }
   .hero-salto { display: none; }

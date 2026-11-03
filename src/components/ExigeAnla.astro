@@ -174,7 +174,7 @@ const maxFilas = Math.max(...PERFILES.map((p) => normasDe(p).length))
   /* Solo se listan las normas del perfil elegido: nada de filas apagadas de relleno.
      El alto mínimo reserva el perfil más largo (--ex-filas) para que el panel no salte. */
   .ex-lista {
-    --ex-fila: 37px;
+    --ex-fila: 36px;
     list-style: none; margin-top: 14px; border-top: 1px solid var(--line);
     min-height: calc(var(--ex-filas, 8) * var(--ex-fila));
   }
@@ -207,7 +207,7 @@ const maxFilas = Math.max(...PERFILES.map((p) => normasDe(p).length))
     font-size: 14px; line-height: 1.5; color: var(--ink-2); max-width: 62ch;
   }
   .ex-norma details p strong { font-weight: 500; color: var(--ink); }
-  .ex-ayuda { margin-top: 10px; font-size: 13px; line-height: 1.45; color: var(--mute); max-width: 52ch; }
+  .ex-ayuda { margin-top: 10px; font-size: 13px; line-height: 1.45; color: var(--mute); }
 
   /* Encendido: una regla por perfil, porque el CSS no puede leer el valor del radio. */
   .exige:has(input[value="importadora"]:checked) .p-importadora,

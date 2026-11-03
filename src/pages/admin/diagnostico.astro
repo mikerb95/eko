@@ -7,6 +7,8 @@ import AdminLayout from '../../layouts/AdminLayout.astro'
 import { ico } from '../../lib/admin/iconos'
 import { leerEstado, listarRespuestas, type EstadoEncuesta } from '../../lib/diagnostico/datos'
 import { resumir, vigentes, type Conteo, type Fila, type Resumen } from '../../lib/diagnostico/resumen'
+import { leerEstadoCasos, listarCasos, type EstadoCasos } from '../../lib/diagnostico/casosDatos'
+import { PRIVACIDAD, RESULTADOS, type Caso } from '../../lib/diagnostico/casos'
 import {
   CERTIFICADO_MIN,
   CERTIFICADOS_MES,
@@ -32,8 +34,10 @@ if (role !== 'admin') return Astro.redirect('/admin')
 let errorCarga = ''
 let enlace: EstadoEncuesta = { abierta: false, usada: false }
 let respuestas: Fila[] = []
+let estadoCasos: EstadoCasos = { abierto: false, usado: false }
+let casos: Caso[] = []
 try {
-  ;[enlace, respuestas] = await Promise.all([leerEstado(), listarRespuestas()])
+  ;[enlace, respuestas, estadoCasos, casos] = await Promise.all([leerEstado(), listarRespuestas(), leerEstadoCasos(), listarCasos()])
 } catch (e: any) {
   console.error('[admin/diagnostico] carga', e?.stack || e)
   errorCarga = 'No se pudo cargar el diagnóstico.'
@@ -65,6 +69,13 @@ const pct = (n: number, de: number) => (de ? (n / de) * 100 : 0)
 const fecha = (iso: string) =>
   new Date(iso).toLocaleString('es-CO', { day: 'numeric', month: 'short', hour: 'numeric', minute: '2-digit', timeZone: 'America/Bogota' })
 const lista = (ids: string[], l: { id: string; etiqueta: string }[]) => ids.map((i) => etiqueta(l, i)).join(', ') || 'Sin respuesta'
+// Casos del taller agrupados por área, en el orden sugerido de los talleres.
+const casosPorArea = r.orden
+  .map((o) => ({ area: o.area, casos: casos.filter((c) => c.area === o.area) }))
+  .filter((g) => g.casos.length > 0)
+const archivosTotal = casos.reduce((n, c) => n + c.archivos.length, 0)
+const conDatosClientes = casos.filter((c) => c.privacidad === 'con_datos').length
+const peso = (b: number) => (b < 1024 * 1024 ? `${Math.max(1, Math.round(b / 1024))} KB` : `${(b / 1024 / 1024).toFixed(1).replace('.', ',')} MB`)
 const barras = (cs: Conteo[], de: number, color: (c: Conteo) => string) =>
   cs.map((c) => ({ ...c, w: pct(c.n, de), color: color(c) }))
 ---
@@ -295,6 +306,73 @@ const barras = (cs: Conteo[], de: number, color: (c: Conteo) => string) =>
     </>
   )}
 
+  <!-- CASOS PARA EL TALLER -->
+  <h3 class="dx-titulo" id="casos">Casos para el taller <span class="muted">{casos.length}</span></h3>
+  <section class="dash-card dx-enlace dx-casos-head">
+    <div class="dash-head">
+      <div>
+        <h3>
+          <span class={`dx-punto${estadoCasos.abierto ? ' is-on' : ''}`} aria-hidden="true"></span>
+          {estadoCasos.abierto ? 'Recibiendo casos' : estadoCasos.usado ? 'Casos cerrados' : 'Casos sin abrir'}
+        </h3>
+        <p>
+          Archivos reales del equipo y lo que cada persona hace con ellos, para armar los ejercicios del taller presencial.
+          Se reciben en la misma página /ia, aparte de la encuesta.
+          {casos.length > 0 && ` ${archivosTotal} archivo(s)${conDatosClientes ? `; ${conDatosClientes} caso(s) con datos reales de clientes` : ''}.`}
+        </p>
+      </div>
+    </div>
+    <div class="dx-acciones">
+      {estadoCasos.abierto
+        ? <button class="btn-ghost btn-sm" data-casos="cerrar">Dejar de recibir casos</button>
+        : <button class="btn-primary btn-sm" data-casos="abrir">Recibir casos</button>}
+      {casos.length > 0 && <button class="btn-ghost btn-sm dx-peligro" id="dx-casos-todos"><Fragment set:html={ico('borrar')} />Borrar todos los casos y archivos</button>}
+      <p class="form-error" id="dx-casos-err"></p>
+    </div>
+    <p class="dx-pie">Al terminar la capacitación, borre todo con el botón de arriba: se eliminan los casos y todos los archivos subidos, incluidos los que alguien subió y no alcanzó a enviar.</p>
+  </section>
+
+  {casos.length === 0 ? (
+    <div class="vacio"><b>Todavía no hay casos</b>Cuando alguien deje archivos en /ia, aparecen aquí agrupados por área.</div>
+  ) : (
+    <div class="dx-casos">
+      {casosPorArea.map((g) => (
+        <div class="dx-casos-area" style={`--c:${C_AREA[g.area]}`}>
+          <h4 class="dx-sub"><span class="dx-punto" aria-hidden="true"></span>{nombreArea(g.area)} · {g.casos.length}</h4>
+          {g.casos.map((c) => (
+            <details class="dash-card dx-resp dx-caso">
+              <summary>
+                <b>{c.nombre}</b>
+                <span class="muted">{c.archivos.length} archivo(s)</span>
+                {c.privacidad === 'con_datos' && <span class="dx-tag dx-tag-datos">Datos de clientes</span>}
+                <time>{fecha(c.creado)}</time>
+              </summary>
+              <div class="dx-caso-cuerpo">
+                <p class="dx-caso-contexto">{c.contexto}</p>
+                <dl class="datos-ficha">
+                  {c.fuentes && <><dt>Consulta</dt><dd>{c.fuentes}</dd></>}
+                  <dt>Entrega</dt><dd>{c.resultados.map((x) => etiqueta(RESULTADOS, x)).join(', ') || 'Sin indicar'}</dd>
+                  <dt>Datos de clientes</dt><dd>{etiqueta(PRIVACIDAD, c.privacidad)}</dd>
+                </dl>
+                <ul class="dx-archivos">
+                  {c.archivos.map((a, i) => (
+                    <li>
+                      <a href={`/api/admin/diagnostico/casos?caso=${c.id}&i=${i}`} download={a.nombre}>{a.nombre}</a>
+                      <small>{peso(a.tamano)}</small>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+              <div class="dx-resp-pie">
+                <button class="btn-ghost btn-sm" data-borrar-caso={c.id} data-nombre={c.nombre}><Fragment set:html={ico('borrar')} />Eliminar caso y archivos</button>
+              </div>
+            </details>
+          ))}
+        </div>
+      ))}
+    </div>
+  )}
+
   <Fragment slot="fuera">
     <script is:inline>
       ;(() => {
@@ -321,6 +399,25 @@ const barras = (cs: Conteo[], de: number, color: (c: Conteo) => string) =>
           b.disabled = true
           try { await enviar('POST', '/api/admin/diagnostico', { accion: b.dataset.accion }); location.reload() }
           catch (ex) { mostrar(ex.message); b.disabled = false }
+        }))
+        const errCasos = document.getElementById('dx-casos-err')
+        document.querySelectorAll('[data-casos]').forEach((b) => b.addEventListener('click', async () => {
+          b.disabled = true
+          try { await enviar('POST', '/api/admin/diagnostico/casos', { accion: b.dataset.casos }); location.reload() }
+          catch (ex) { if (errCasos) errCasos.textContent = ex.message; b.disabled = false }
+        }))
+        document.getElementById('dx-casos-todos')?.addEventListener('click', async (e) => {
+          const b = e.currentTarget
+          if (!window.confirm('¿Borrar TODOS los casos del taller y todos sus archivos? No se puede deshacer.')) return
+          b.disabled = true
+          try { await enviar('DELETE', '/api/admin/diagnostico/casos?todos=1'); location.reload() }
+          catch (ex) { if (errCasos) errCasos.textContent = ex.message; b.disabled = false }
+        })
+        document.querySelectorAll('[data-borrar-caso]').forEach((b) => b.addEventListener('click', async () => {
+          if (!window.confirm(`¿Eliminar el caso de ${b.dataset.nombre} con sus archivos? No se puede deshacer.`)) return
+          b.disabled = true
+          try { await enviar('DELETE', `/api/admin/diagnostico/casos?id=${b.dataset.borrarCaso}`); location.reload() }
+          catch (ex) { alert(ex.message); b.disabled = false }
         }))
         document.querySelectorAll('[data-borrar]').forEach((b) => b.addEventListener('click', async () => {
           if (!window.confirm(`¿Eliminar la respuesta de ${b.dataset.nombre}? No se puede deshacer.`)) return
