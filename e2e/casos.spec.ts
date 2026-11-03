@@ -95,7 +95,8 @@ test('panel: ve los casos, descarga un archivo y borra todo', async ({ page }) =
   await page.screenshot({ path: 'test-results/casos-panel.png', fullPage: true })
 
   const enlace = primero.getByRole('link', { name: 'Recolecciones octubre.xlsx' })
-  const r = await page.request.get((await enlace.getAttribute('href'))!)
+  const href = (await enlace.getAttribute('href'))!
+  const r = await page.request.get(href)
   expect(r.ok()).toBeTruthy()
   expect(await r.text()).toContain('Gestor Uno')
   expect(r.headers()['content-disposition']).toContain('attachment')
@@ -103,7 +104,7 @@ test('panel: ve los casos, descarga un archivo y borra todo', async ({ page }) =
   page.on('dialog', (d) => d.accept())
   await page.getByRole('button', { name: 'Borrar todos los casos y archivos' }).click()
   await expect(page.getByText('Todavía no hay casos')).toBeVisible()
-  expect((await page.request.get((await enlace.getAttribute('href'))!)).status()).toBe(404)
+  expect((await page.request.get(href)).status()).toBe(404)
 })
 
 test('sin sesión no se descarga nada', async ({ request }) => {
