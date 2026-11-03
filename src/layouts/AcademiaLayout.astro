@@ -1,0 +1,75 @@
+---
+// Armazón de la academia de IA (/academia). Privada y sin el menú del sitio:
+// solo el logo, la navegación de la academia y la cuenta. Mismos colores y
+// tipografías que /ia, para que el equipo la reconozca como la misma
+// capacitación.
+import '../styles/global.css'
+import '../styles/academia.css'
+
+interface Props {
+  titulo: string
+  activo?: 'inicio' | 'certificado' | ''
+  nombre?: string
+  rol?: string
+  ancho?: boolean
+}
+const { titulo, activo = '', nombre = '', rol = '', ancho = false } = Astro.props
+const iniciales = nombre.split(/\s+/).filter(Boolean).slice(0, 2).map((p) => p[0]!.toUpperCase()).join('') || '·'
+const verPanel = rol && rol !== 'participante'
+---
+
+<!DOCTYPE html>
+<html lang="es">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="robots" content="noindex, nofollow, noarchive" />
+    <link rel="icon" href="/favicon.ico" sizes="any" />
+    <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32.png" />
+    <title>{titulo}</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,400..700&family=Geist:wght@300..700&family=Geist+Mono:wght@300..500&display=swap"
+      rel="stylesheet"
+    />
+  </head>
+  <body class="ac">
+    <header class="ac-top">
+      <div class="ac-top-in">
+        <a class="ac-marca" href="/academia" aria-label="Inicio de la academia">
+          <img src="/brand/ekosolv-horizontal.png" alt="EKOSOLV" width="249" height="72" />
+          <span class="ac-tag">Academia de IA</span>
+        </a>
+        <nav class="ac-nav" aria-label="Academia">
+          <a href="/academia" aria-current={activo === 'inicio' ? 'page' : undefined}>Mi ruta</a>
+          <a href="/academia/certificado" aria-current={activo === 'certificado' ? 'page' : undefined}>Certificado</a>
+          {verPanel && <a href="/admin">Panel</a>}
+        </nav>
+        {nombre && (
+          <div class="ac-cuenta">
+            <span class="ac-avatar" aria-hidden="true">{iniciales}</span>
+            <span class="ac-nombre">{nombre}</span>
+            <button type="button" class="ac-salir" id="ac-salir">Salir</button>
+          </div>
+        )}
+      </div>
+    </header>
+
+    <main class={ancho ? 'ac-main ac-ancho' : 'ac-main'}>
+      <slot />
+    </main>
+
+    <footer class="ac-pie">
+      <span>Capacitación en IA para el equipo de Ekosolv</span>
+      <span>Dictada por Code by Mike</span>
+    </footer>
+
+    <script is:inline>
+      document.getElementById('ac-salir')?.addEventListener('click', async () => {
+        await fetch('/api/admin/logout', { method: 'POST' })
+        location.href = '/admin/login?next=/academia'
+      })
+    </script>
+  </body>
+</html>
