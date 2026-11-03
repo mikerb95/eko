@@ -57,9 +57,10 @@ export type TFStep = {
   /**
    * Paso condicional: solo se muestra (y solo se envía lo que tenga) si la
    * opción `field` quedó en `equals`. Sirve para preguntas que dependen de una
-   * respuesta anterior, como las tareas de cada área en el diagnóstico.
+   * respuesta anterior, como las tareas de cada área en el diagnóstico. Con
+   * una lista, aplica si la opción quedó en cualquiera de esos valores.
    */
-  when?: { field: string; equals: string }
+  when?: { field: string; equals: string | string[] }
 }
 
 interface Props {
@@ -149,7 +150,7 @@ const selectedValues = (f: Extract<TFField, { type: 'choice' }>) =>
             class="tf-step"
             data-index={i}
             data-when-field={step.when?.field}
-            data-when-equals={step.when?.equals}
+            data-when-equals={step.when ? [step.when.equals].flat().join('|') : undefined}
           >
             <div class="tf-step-head">
               <span class="tf-step-count">
@@ -659,7 +660,7 @@ const selectedValues = (f: Extract<TFField, { type: 'choice' }>) =>
       (form.querySelector(`input[type="hidden"][name="${name}"]`) as HTMLInputElement | null)?.value ?? ''
     const aplica = (i: number) => {
       const { whenField, whenEquals } = steps[i].dataset
-      return !whenField || valorDe(whenField) === whenEquals
+      return !whenField || (whenEquals ?? '').split('|').includes(valorDe(whenField))
     }
     const visibles = () => steps.map((_, i) => i).filter(aplica)
     const siguiente = (i: number) => visibles().find((j) => j > i) ?? -1

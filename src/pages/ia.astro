@@ -15,6 +15,7 @@ import TypeformFlow from '../components/TypeformFlow.astro'
 import type { TFStep, TFOption } from '../components/TypeformFlow.astro'
 import {
   AREAS,
+  AREAS_PROPUESTAS,
   DOCUMENTO_REAL,
   DOCUMENTOS,
   HERRAMIENTAS,
@@ -22,6 +23,9 @@ import {
   IAS,
   MODALIDAD,
   PREOCUPACIONES,
+  PROPUESTA_HORAS,
+  PROPUESTA_ROL,
+  PROPUESTAS_MES,
   TAREAS,
   USO_IA,
   type Opcion,
@@ -97,6 +101,27 @@ const steps: TFStep[] = [
         placeholder: 'Qué hace, con qué documentos y cuánto le toma cada vez',
         required: true,
       },
+    ],
+  },
+  {
+    title: '¿Participa en las propuestas comerciales?',
+    subtitle: 'Desde que llega el Brief hasta que la propuesta se envía al cliente. Un cálculo aproximado basta.',
+    when: { field: 'area', equals: AREAS_PROPUESTAS },
+    fields: [
+      { type: 'choice', name: 'propuesta_rol', label: 'Su papel', required: true, options: ops(PROPUESTA_ROL) },
+      {
+        type: 'choice',
+        name: 'propuesta_horas',
+        label: 'Si participa: horas de su parte en una propuesta',
+        options: PROPUESTA_HORAS.map((h) => ({ value: h.id, label: h.etiqueta })),
+      },
+      {
+        type: 'choice',
+        name: 'propuestas_mes',
+        label: 'Si participa: propuestas que pasan por usted al mes',
+        options: PROPUESTAS_MES.map((h) => ({ value: h.id, label: h.etiqueta })),
+      },
+      { type: 'textarea', name: 'propuesta_demora', label: '¿Qué parte de la propuesta le toma más tiempo?', placeholder: 'Opcional' },
     ],
   },
   {
