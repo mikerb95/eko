@@ -17,16 +17,17 @@
 #panel-tablero .dash-card .chips { margin-bottom: 10px; }
 .th-avisos, .th-mini { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; }
 .th-avisos li + li, .th-mini li + li { border-top: 1px solid color-mix(in oklab, var(--line) 70%, transparent); }
-.th-avisos button, .th-mini button {
+.th-avisos > li > button, .th-mini > li > button {
   display: flex; align-items: center; gap: 12px; padding: 10px 8px; margin: 0 -8px; width: calc(100% + 16px);
   background: none; border: 0; border-radius: 10px; cursor: pointer; text-align: left; font: inherit; color: inherit;
   transition: background 0.12s;
 }
-.th-avisos button:hover, .th-mini button:hover { background: var(--hover, color-mix(in oklab, var(--ink) 4%, transparent)); }
+.th-avisos > li > button:hover, .th-mini > li > button:hover { background: var(--hover, color-mix(in oklab, var(--ink) 4%, transparent)); }
 .th-aviso-txt { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 1px; }
 .th-aviso-txt b { font-weight: 600; font-size: 13.5px; }
 .th-aviso-txt small { font-size: 12.5px; color: var(--mute); line-height: 1.4; }
-.th-avisos .plazo-chip { flex: none; margin: 0; white-space: nowrap; background: var(--paper-2); }
+.th-avisos .plazo-chip { flex: none; margin: 0; white-space: nowrap; }
+.th-avisos .plazo-chip:not(.urgente):not(.vencido) { background: var(--paper-2); }
 .th-hoy { flex: none; font-size: 11px; font-weight: 600; padding: 3px 8px; border-radius: 99px; background: color-mix(in oklab, var(--deep) 12%, transparent); color: var(--deep-2); }
 .th-pend { display: flex; align-items: center; gap: 12px; padding: 10px 0; flex-wrap: wrap; }
 .th-pend .acciones { flex: none; }

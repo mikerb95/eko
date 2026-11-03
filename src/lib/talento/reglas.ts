@@ -440,14 +440,17 @@ export function vencimientos(d: DatosVencimientos, hoy: string): Aviso[] {
       if (e.tipo_contrato === 'fijo') {
         const limite = masDias(e.fecha_fin_contrato, -30)
         const yaTermino = e.fecha_fin_contrato < hoy
+        const sinPreaviso = !yaTermino && limite < hoy
         agregar({
           clave: `contrato-${e.usuario_id}`,
           usuario_id: e.usuario_id,
           tipo: 'contrato',
-          titulo: yaTermino ? 'Contrato a término fijo vencido' : 'Preaviso de no renovación',
+          titulo: yaTermino ? 'Contrato a término fijo vencido' : sinPreaviso ? 'Pasó la fecha del preaviso' : 'Preaviso de no renovación',
           detalle: yaTermino
             ? `El contrato terminaba el ${e.fecha_fin_contrato}. Si no se avisó, se prorrogó: actualice la fecha de fin o registre el retiro.`
-            : `El contrato termina el ${e.fecha_fin_contrato}. Si no se va a renovar, hay que avisarlo por escrito a más tardar el ${limite}; si no, se prorroga solo.`,
+            : sinPreaviso
+              ? `El contrato termina el ${e.fecha_fin_contrato} y el plazo para avisar la no renovación era el ${limite}. Si no se avisó por escrito, se prorroga por un período igual.`
+              : `El contrato termina el ${e.fecha_fin_contrato}. Si no se va a renovar, hay que avisarlo por escrito a más tardar el ${limite}; si no, se prorroga solo.`,
           fecha: yaTermino ? e.fecha_fin_contrato : limite,
         })
       } else {
