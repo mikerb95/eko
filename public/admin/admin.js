@@ -199,7 +199,6 @@ const listaContactos = crearLista({
     { k: 'nombre', lbl: 'Contacto', orden: (c) => plano(c.name),
       html: (c) => `<div class="persona">${avatar(c.name, 'sm')}<div><div class="t1">${esc(c.name)}</div><div class="t2">${esc(c.company || c.email)}</div></div></div>` },
     { k: 'mensaje', lbl: 'Mensaje', html: (c) => `${c.sector ? `<div>${esc(c.sector)}</div>` : ''}<div class="t2 clip">${esc(c.message || c.service_lines || '')}</div>` },
-    { k: 'canal', lbl: 'Correo y teléfono', html: (c) => `<div class="nw">${esc(c.email)}</div>${c.phone ? `<div class="t2">${esc(c.phone)}</div>` : ''}` },
     { k: 'estado', lbl: 'Estado', html: (c) => estado(c.status, CONTACT_STATUS_LABELS[c.status] || c.status), orden: (c) => c.status },
     { k: 'resp', lbl: 'Responsable', cls: 'nw', html: (c) => (c.assigned_to ? esc(c.assigned_to) : '<span class="muted">Sin asignar</span>'), orden: (c) => plano(c.assigned_to || 'zzz') },
     { k: 'fecha', lbl: 'Recibido', cls: 'nw', html: (c) => `<span title="${esc(fmtDate(c.created_at))}">${esc(fmtRel(c.created_at))}</span>`, orden: (c) => c.created_at || '' },
