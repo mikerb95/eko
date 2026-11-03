@@ -251,6 +251,25 @@ export const TABLAS: readonly string[] = [
     creado TEXT NOT NULL
   )`,
 
+  // Casos que el equipo deja en /ia para los ejercicios del taller presencial:
+  // archivos y lo que hace con ellos. Los archivos viven en Vercel Blob privado
+  // (src/lib/diagnostico/almacen.ts); aquí solo van sus rutas en `archivos`
+  // (JSON). Se borra todo al terminar la capacitación, desde el panel. Si se
+  // reciben casos vive en `ajustes` (clave 'taller_casos').
+  `CREATE TABLE IF NOT EXISTS taller_casos (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    area TEXT NOT NULL,
+    nombre TEXT NOT NULL DEFAULT '',
+    contexto TEXT NOT NULL DEFAULT '',
+    fuentes TEXT NOT NULL DEFAULT '',
+    resultados TEXT NOT NULL DEFAULT '[]',
+    privacidad TEXT NOT NULL DEFAULT '',
+    archivos TEXT NOT NULL DEFAULT '[]',
+    consent_at TEXT NOT NULL DEFAULT '',
+    consent_version TEXT NOT NULL DEFAULT '',
+    creado TEXT NOT NULL
+  )`,
+
   // ── Asistente con IA del panel (docs/plan-asistente.md) ─────────────────
   // Una fila por conversación: es el estado del bucle (src/lib/asistente/
   // bucle.ts). `mensajes` es el historial de la API, solo por anexión.
@@ -483,6 +502,7 @@ export const TABLAS_ESPERADAS: readonly string[] = [
   'orders',
   'posts',
   'reglas_agente',
+  'taller_casos',
   'th_cargos',
   'th_cursos',
   'th_documentos',
