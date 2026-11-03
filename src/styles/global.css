@@ -312,7 +312,6 @@ main { position: relative; z-index: 2; }
   color: var(--mute); text-transform: uppercase;
 }
 .eyebrow::before { content: ""; width: 22px; height: 1px; background: var(--mute); }
-.hero > .eyebrow { display: flex; margin-bottom: clamp(20px, 3vw, 32px); }
 
 /* Display headings */
 .display {
@@ -324,7 +323,7 @@ main { position: relative; z-index: 2; }
 .display em { color: var(--forest); }
 .display .thin { color: var(--mute); }
 h1 em, h2 em, h3 em, h4 em, .display em,
-.hero-card .big em, .hero-stats .n em { font-style: normal; }
+.hero-stats .n em { font-style: normal; }
 .display .clay { color: var(--clay-ink); }
 
 h1, h2, h3, h4 { font-weight: 500; letter-spacing: -0.02em; line-height: 1.1; }
@@ -359,69 +358,94 @@ h3 { font-size: 22px; }
 }
 
 /* ===== Hero ===== */
+/*
+  Primera pantalla (skill above-the-fold). Reglas que la sostienen:
+  - .hero-fold ocupa el alto visible bajo el nav (con tope) y lo reparte: la fila
+    de arriba se estira, las cifras quedan al pie, dentro del pliegue.
+  - Las dos columnas se estiran a la misma altura: el botón de la izquierda
+    (margin-top: auto) termina alineado con el pie del selector en todo ancho.
+  - El titular se mide contra su columna (cqi), no contra la ventana, y corta
+    siempre en el mismo sitio (.br-ancho), así no pasa de 2 a 4 renglones.
+*/
 .hero {
-  padding-top: clamp(28px, 4vw, 56px);
+  padding-top: clamp(20px, 3vw, 40px);
   padding-bottom: clamp(48px, 7vw, 112px);
   position: relative;
 }
 .hero-title { view-transition-name: hero-title; }
-/* Hero en dos columnas: titular, lede y CTA a la izquierda; el selector
-   "¿Qué le exige la ANLA?" (ExigeAnla.astro) a la derecha. */
-.hero-grid {
+.hero-fold {
   display: grid; grid-template-columns: minmax(0, 1fr);
-  gap: clamp(32px, 4vw, 64px); align-items: start;
+  grid-template-areas: "main" "stats" "exige";
+  gap: clamp(28px, 4vw, 56px);
 }
-.hero-main { display: flex; flex-direction: column; gap: clamp(24px, 3vw, 36px); min-width: 0; }
-.hero-title { font-size: clamp(52px, 7.4vw, 112px); text-wrap: balance; }
-/* Palabra + signo pegado (lo pone amarrarSignos en portada.ts): un signo nunca abre renglón. */
-.amarre { white-space: nowrap; }
-@media (min-width: 1080px) {
-  .hero-grid { grid-template-columns: minmax(0, 1.08fr) minmax(0, 1fr); }
-  .hero-title { font-size: clamp(64px, 6.6vw, 104px); }
-  .hero-main .lede { max-width: 46ch; }
+.hero-main { grid-area: main; display: flex; flex-direction: column; min-width: 0; container-type: inline-size; }
+.hero-fold > .exige { grid-area: exige; }
+.hero-fold > .hero-stats { grid-area: stats; }
+.hero-main > .eyebrow { margin-bottom: clamp(18px, 2.4vw, 28px); }
+.hero-title { font-size: clamp(46px, 13.4cqi, 104px); }
+.br-ancho { display: none; }
+.hero-sub {
+  margin-top: clamp(20px, 2.4vw, 30px);
+  font-size: clamp(18px, 1.5vw, 21px); line-height: 1.45;
+  max-width: 44ch; color: var(--ink-2); text-wrap: pretty;
 }
-.hero-card {
+.hero-accion {
+  margin-top: clamp(24px, 3vw, 36px);
+  display: flex; align-items: center; flex-wrap: wrap; gap: 14px 20px;
+}
+.hero-cta {
+  display: inline-flex; align-items: center; gap: 16px;
+  padding: 9px 9px 9px 26px; border-radius: 999px;
   background: var(--ink); color: var(--paper);
-  border-radius: var(--r-lg);
-  padding: 28px 32px;
-  display: flex; justify-content: space-between; align-items: center; gap: 32px;
-  position: relative; overflow: hidden;
+  font-size: 17px; font-weight: 500; white-space: nowrap;
+  transition: background .2s ease, transform .2s ease;
 }
-.hero-card::before {
-  content: ""; position: absolute; inset: 0;
-  background:
-    radial-gradient(ellipse at 100% 0%, color-mix(in oklab, var(--aqua) 70%, transparent) 0%, transparent 55%),
-    radial-gradient(ellipse at 0% 100%, color-mix(in oklab, var(--deep) 60%, transparent) 0%, transparent 55%);
-  opacity: .45; pointer-events: none;
-}
-.hero-card > * { position: relative; z-index: 1; }
-.hero-card .big { font-family: var(--font-display); font-weight: var(--display-weight); font-size: clamp(30px, 4.4vw, 42px); letter-spacing: -0.02em; }
-.hero-card .big em { color: var(--aqua); }
-.hero-card .sub { font-size: 14px; opacity: .7; margin-top: 4px; font-family: var(--font-mono); }
-.hero-card .arrow {
-  width: 56px; height: 56px; border-radius: 50%;
+.hero-cta .arrow {
+  width: 42px; height: 42px; border-radius: 50%;
   background: var(--aqua); color: var(--ink);
   display: grid; place-items: center; flex-shrink: 0;
   transition: transform .3s cubic-bezier(.2,.7,.2,1);
 }
-.hero-card:hover .arrow { transform: rotate(-45deg) scale(1.05); }
-@media (max-width: 860px) {
-  .hero-card { padding: 24px; gap: 20px; }
-  .hero-card .big { font-size: clamp(28px, 8vw, 40px); }
-  .hero-card .arrow { width: 46px; height: 46px; }
+.hero-cta:hover { background: var(--deep); transform: translateY(-1px); }
+.hero-cta:hover .arrow { transform: rotate(-45deg); }
+.hero-cta:focus-visible { outline: 2px solid var(--forest); outline-offset: 3px; }
+.hero-cta-nota { font-family: var(--font-mono); font-size: 13px; color: var(--mute); }
+/* En una sola columna el selector queda bajo las cifras: este enlace lo anuncia. */
+.hero-salto {
+  margin-top: 18px; align-self: flex-start;
+  display: inline-flex; align-items: center; gap: 10px;
+  font-size: 15px; color: var(--ink-2);
+  text-decoration: underline; text-decoration-color: color-mix(in oklab, var(--aqua) 70%, transparent);
+  text-decoration-thickness: 2px; text-underline-offset: 5px;
+}
+.hero-salto::before { content: ""; width: 8px; height: 8px; border-radius: 50%; background: var(--aqua); }
+/* Palabra + signo pegado (lo pone amarrarSignos en portada.ts): un signo nunca abre renglón. */
+.amarre { white-space: nowrap; }
+
+@media (min-width: 1080px) {
+  .hero-fold {
+    grid-template-columns: minmax(0, 1.08fr) minmax(0, 1fr);
+    grid-template-rows: 1fr auto;
+    grid-template-areas: "main exige" "stats stats";
+    column-gap: clamp(40px, 4vw, 72px); row-gap: clamp(24px, 3.2vh, 40px);
+    /* 72px del nav + el padding superior del hero. */
+    min-height: min(calc(100svh - 72px - clamp(20px, 3vw, 40px)), 920px);
+  }
+  .br-ancho { display: inline; }
+  .hero-accion { margin-top: auto; padding-top: clamp(24px, 3vw, 36px); }
+  .hero-salto { display: none; }
 }
 
-/* Cifras del hero: escala y trayectoria por encima del pliegue.
-   El bloque .band más abajo cubre desempeño — no repetir cifras entre ambos. */
+/* Cifras del hero: escala y trayectoria, al pie de la primera pantalla.
+   El bloque .band más abajo cubre desempeño: no repetir cifras entre ambos. */
 .hero-stats {
-  margin-top: clamp(28px, 4vw, 48px);
-  padding-top: clamp(20px, 2.5vw, 28px);
+  padding-top: clamp(16px, 2vw, 22px);
   border-top: 1px solid var(--line);
   display: grid; grid-template-columns: repeat(3, 1fr);
   gap: clamp(20px, 3vw, 40px);
 }
 .hero-stats .n {
-  font-family: var(--font-display); font-weight: var(--display-weight); font-size: clamp(38px, 4.2vw, 58px);
+  font-family: var(--font-display); font-weight: var(--display-weight); font-size: clamp(34px, 3.4vw, 50px);
   letter-spacing: -0.03em; line-height: 1;
   font-variant-numeric: tabular-nums;
 }
@@ -429,10 +453,15 @@ h3 { font-size: 22px; }
 .hero-stats .n small { font-size: .42em; color: var(--clay-ink); margin-left: 3px; vertical-align: top; }
 .hero-stats .lbl {
   font-family: var(--font-mono); font-size: 12px; letter-spacing: 0.08em;
-  text-transform: uppercase; color: var(--mute); margin-top: 10px; line-height: 1.45;
+  text-transform: uppercase; color: var(--mute); margin-top: 8px; line-height: 1.45;
 }
 @media (max-width: 700px) {
   .hero-stats { grid-template-columns: 1fr 1fr; row-gap: 28px; }
+}
+/* Pantallas bajas (laptops de 720 px): filas del selector más apretadas para que todo quepa. */
+@media (min-width: 1080px) and (max-height: 780px) {
+  .hero .ex-lista { --ex-fila: 33px; }
+  .hero .ex-perfiles { margin-top: 8px; }
 }
 
 /* Ticker / marquee */
@@ -1278,7 +1307,7 @@ body.nav-open .whatsapp-fab { opacity: 0; pointer-events: none; }
 /* ===== Motion de la portada (src/scripts/portada.ts) ===== */
 /* Solo el primer fotograma: el script quita la clase al montar la entrada, o la
    suelta el temporizador inline de la página a los 3 s. */
-.m-ok [data-portada] :is(.hero > .eyebrow, .hero-title, .hero-main > :not(.hero-title), [data-exige], .hero-stats, [data-radar]) { visibility: hidden; }
+.m-ok [data-portada] :is(.hero-main > *, [data-exige], .hero-stats, [data-radar]) { visibility: hidden; }
 
 /* Odómetro: columnas de 1.1em con la tira 0-9 dos veces. */
 .odo { display: inline-flex; height: 1.1em; line-height: 1.1; margin-block: -0.05em; vertical-align: top; }

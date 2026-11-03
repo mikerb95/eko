@@ -50,7 +50,7 @@ function entradaHero(raiz: HTMLElement): () => void {
   const titulo = raiz.querySelector<HTMLElement>('.hero-title')
   const tl = gsap.timeline({ defaults: { ease: CURVA } })
 
-  const eyebrow = raiz.querySelector('.hero > .eyebrow')
+  const eyebrow = raiz.querySelector('.hero-main > .eyebrow')
   if (eyebrow) tl.from(eyebrow, { opacity: 0, y: 12, duration: 0.7 }, 0)
 
   if (titulo) {
@@ -59,7 +59,7 @@ function entradaHero(raiz: HTMLElement): () => void {
     tl.from(split.words, { yPercent: 115, duration: 1.15, stagger: 0.07, ease: 'expo.out' }, 0.1)
   }
 
-  const resto = raiz.querySelectorAll('.hero-main > :not(.hero-title)')
+  const resto = raiz.querySelectorAll('.hero-main > :not(.hero-title, .eyebrow)')
   tl.from(resto, { opacity: 0, y: 28, duration: 1, stagger: 0.12, clearProps: 'transform,opacity' }, 0.55)
 
   // El panel de exigencias entra como una hoja que se apoya, y sus filas se escriben detrás.
