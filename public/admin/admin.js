@@ -7,6 +7,7 @@ let orders = window.__ORDERS__ || []
 let contacts = window.__CONTACTS__ || []
 let users = window.__USERS__ || []
 const role = window.__ROLE__ || ''
+const yo = String(window.__YO__ || '')
 
 /* ---------- Navegación ---------- */
 // Las pestañas viven en la barra lateral. La sección activa queda en la URL
@@ -179,13 +180,18 @@ of.addEventListener('submit', async (e) => {
 /* ---------- Contactos ---------- */
 const CONTACT_STATUS_LABELS = { nuevo: 'Nuevo', atendido: 'Atendido' }
 
+// "Míos" compara con el nombre de la sesión, sin tildes ni mayúsculas.
+const esMio = (c) => !!yo && plano(c.assigned_to || '') === plano(yo)
+
 const listaContactos = crearLista({
   el: '#contact-list', buscador: '#contact-q', chipsEl: '#contact-chips',
   datos: () => contacts,
-  texto: (c) => [c.name, c.company, c.email, c.phone, c.sector, c.service_lines, c.message].join(' '),
+  texto: (c) => [c.name, c.company, c.email, c.phone, c.sector, c.service_lines, c.message, c.assigned_to].join(' '),
   vacio: ['Sin mensajes de contacto todavía', 'Los envíos del formulario público aparecen aquí.'],
   chips: [
     { id: 'nuevo', lbl: 'Sin atender', f: (c) => c.status === 'nuevo' },
+    { id: 'mios', lbl: 'Míos', f: (c) => c.status === 'nuevo' && esMio(c), siHay: true },
+    { id: 'sinresp', lbl: 'Sin responsable', f: (c) => c.status === 'nuevo' && !c.assigned_to, siHay: true },
     { id: 'atendido', lbl: 'Atendidos', f: (c) => c.status === 'atendido' },
     { id: 'todos', lbl: 'Todos', f: () => true },
   ],
@@ -195,12 +201,14 @@ const listaContactos = crearLista({
     { k: 'mensaje', lbl: 'Mensaje', html: (c) => `${c.sector ? `<div>${esc(c.sector)}</div>` : ''}<div class="t2 clip">${esc(c.message || c.service_lines || '')}</div>` },
     { k: 'canal', lbl: 'Correo y teléfono', html: (c) => `<div class="nw">${esc(c.email)}</div>${c.phone ? `<div class="t2">${esc(c.phone)}</div>` : ''}` },
     { k: 'estado', lbl: 'Estado', html: (c) => estado(c.status, CONTACT_STATUS_LABELS[c.status] || c.status), orden: (c) => c.status },
+    { k: 'resp', lbl: 'Responsable', cls: 'nw', html: (c) => (c.assigned_to ? esc(c.assigned_to) : '<span class="muted">Sin asignar</span>'), orden: (c) => plano(c.assigned_to || 'zzz') },
     { k: 'fecha', lbl: 'Recibido', cls: 'nw', html: (c) => `<span title="${esc(fmtDate(c.created_at))}">${esc(fmtRel(c.created_at))}</span>`, orden: (c) => c.created_at || '' },
     { k: 'acc', lbl: '', cls: 'der', html: (c) => `<button type="button" class="btn-mini" data-acc="alternar" data-id="${c.id}">${c.status === 'nuevo' ? 'Marcar atendido' : 'Reabrir'}</button>` },
   ],
   abrir: (id) => openContact(Number(id)),
   acciones: { alternar: (id) => toggleContact(Number(id)) },
 })
+
 
 // Número para WhatsApp: los celulares colombianos de 10 cifras llevan el 57.
 const whatsapp = (tel) => {
@@ -219,6 +227,7 @@ function openContact(id) {
       <div class="ficha-cliente-top">${avatar(c.name)}<div><b>${esc(c.name)}</b><small>${c.company ? esc(c.company) + ' · ' : ''}Recibido ${esc(fmtDate(c.created_at))}</small></div></div>
       <dl class="datos-ficha">
         <dt>Estado</dt><dd>${estado(c.status, CONTACT_STATUS_LABELS[c.status] || c.status)}</dd>
+        <dt>Responsable</dt><dd>${c.assigned_to ? esc(c.assigned_to) : '<span class="muted">Sin asignar</span>'}</dd>
         <dt>Correo</dt><dd><a href="mailto:${esc(c.email)}">${esc(c.email)}</a></dd>
         ${c.phone ? `<dt>Teléfono</dt><dd>${esc(c.phone)}</dd>` : ''}
         ${c.sector ? `<dt>Sector</dt><dd>${esc(c.sector)}</dd>` : ''}
@@ -226,6 +235,20 @@ function openContact(id) {
       </dl>
       ${c.message ? `<p class="cita">${esc(c.message)}</p>` : ''}
     </div>
+    <fieldset class="grupo">
+      <legend>Responsable</legend>
+      <form class="asignar" id="contact-asignar">
+        <label>Quién atiende este mensaje
+          <input name="assigned_to" list="equipo" value="${esc(c.assigned_to || '')}" placeholder="Nombre de la persona" autocomplete="off" />
+          <small>Si se deja vacío, el mensaje queda sin responsable.</small>
+        </label>
+        <div class="asignar-botones">
+          ${yo && !esMio(c) ? '<button type="button" class="btn-mini" id="contact-asignarme">Asignármelo</button>' : ''}
+          <button type="submit" class="btn-mini">Guardar responsable</button>
+        </div>
+        <p class="form-error" id="contact-err"></p>
+      </form>
+    </fieldset>
     <div class="contacto-acciones">
       <a class="btn-ghost" href="mailto:${esc(c.email)}">Responder por correo</a>
       ${wa ? `<a class="btn-ghost" href="https://wa.me/${wa}" target="_blank" rel="noopener">Escribir por WhatsApp</a>` : ''}
@@ -236,27 +259,43 @@ function openContact(id) {
     </div>`
   $('#contact-body [data-close]').addEventListener('click', closeDrawers)
   $('#contact-toggle').addEventListener('click', async () => { await toggleContact(id); openContact(id) })
+  const fa = $('#contact-asignar')
+  const asignar = async (nombre) => {
+    $('#contact-err').textContent = ''
+    if (await patchContact(id, { assigned_to: nombre })) openContact(id)
+    else $('#contact-err').textContent = 'No se pudo guardar. Intente de nuevo.'
+  }
+  fa.addEventListener('submit', (e) => { e.preventDefault(); asignar(fa.assigned_to.value.trim()) })
+  $('#contact-asignarme')?.addEventListener('click', () => asignar(yo))
   openDrawer('#contact-drawer')
+}
+
+// PATCH de un contacto (estado y/o responsable). Devuelve true si guardó.
+async function patchContact(id, cambios) {
+  try {
+    const res = await fetch('/api/admin/contactos?id=' + id, {
+      method: 'PATCH',
+      headers: { 'content-type': 'application/json' },
+      body: JSON.stringify(cambios),
+    })
+    const j = await res.json()
+    if (!res.ok || !j.contact) return false
+    const idx = contacts.findIndex((x) => x.id === id)
+    if (idx >= 0) contacts[idx] = j.contact
+    listaContactos.pintar()
+    pintarInicio()
+    contarPendientes()
+    return true
+  } catch {
+    return false
+  }
 }
 
 async function toggleContact(id) {
   const c = contacts.find((x) => x.id === id)
   if (!c) return
-  try {
-    const res = await fetch('/api/admin/contactos?id=' + id, {
-      method: 'PATCH',
-      headers: { 'content-type': 'application/json' },
-      body: JSON.stringify({ status: c.status === 'nuevo' ? 'atendido' : 'nuevo' }),
-    })
-    const j = await res.json()
-    if (res.ok && j.contact) {
-      const idx = contacts.findIndex((x) => x.id === id)
-      if (idx >= 0) contacts[idx] = j.contact
-      listaContactos.pintar()
-      pintarInicio()
-      contarPendientes()
-    }
-  } catch { /* silencioso: el usuario puede reintentar */ }
+  // Silencioso si falla: el usuario puede reintentar.
+  await patchContact(id, { status: c.status === 'nuevo' ? 'atendido' : 'nuevo' })
 }
 
 // El número de la barra lateral sigue al estado real de los contactos.

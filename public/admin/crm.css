@@ -297,6 +297,9 @@ body.crm {
 .cita { margin: 0; padding: 12px 14px; background: var(--paper); border-radius: 10px; font-size: 13.5px; color: var(--ink-2); white-space: pre-line; box-shadow: var(--shadow-1); }
 .contacto-acciones { display: flex; flex-wrap: wrap; gap: 8px; }
 .contacto-acciones a { text-decoration: none; display: inline-flex; align-items: center; }
+.asignar { display: flex; flex-direction: column; gap: 10px; }
+.asignar-botones { display: flex; flex-wrap: wrap; gap: 6px; justify-content: flex-end; }
+.asignar .form-error:empty { display: none; }
 
 .linea-tiempo { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; }
 .linea-tiempo li { position: relative; padding: 0 0 14px 22px; font-size: 13px; }

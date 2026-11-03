@@ -271,12 +271,10 @@ const steps: TFStep[] = [
           {modulos.map((m) => (
             <div class="ia-mat" style={`--c:${COLOR[m.id]}`}>
               <h3><span class="ia-punto" aria-hidden="true"></span>{m.titulo}</h3>
+              {!m.material.some((x) => x.href) && <small class="ia-pronto">Después del taller</small>}
               <ul>
                 {m.material.map((x) => (
-                  <li>
-                    <span>{x.titulo}</span>
-                    {x.href ? <a href={x.href} target="_blank" rel="noopener">Abrir</a> : <small>Después del taller</small>}
-                  </li>
+                  <li>{x.href ? <a href={x.href} target="_blank" rel="noopener">{x.titulo}</a> : <span>{x.titulo}</span>}</li>
                 ))}
               </ul>
             </div>
@@ -371,12 +369,15 @@ const steps: TFStep[] = [
 
       .ia-material { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 14px; }
       .ia-mat { background: #fff; border-radius: var(--r-md); padding: 18px 20px; border: 1px solid var(--line); }
-      .ia-mat h3 { font-size: 16px; font-weight: 600; margin: 0 0 10px; }
-      .ia-mat ul { list-style: none; margin: 0; padding: 0; }
-      .ia-mat li { display: flex; justify-content: space-between; align-items: baseline; gap: 12px; padding: 8px 0; font-size: 14px; color: var(--ink-2); }
+      .ia-mat h3 { font-size: 16px; font-weight: 600; margin: 0; }
+      .ia-pronto {
+        display: inline-block; margin-top: 8px; font-family: var(--font-mono); font-size: 10.5px; letter-spacing: .06em;
+        text-transform: uppercase; color: var(--mute); background: var(--paper-warm); padding: 3px 8px; border-radius: 999px;
+      }
+      .ia-mat ul { list-style: none; margin: 10px 0 0; padding: 0; }
+      .ia-mat li { padding: 8px 0; font-size: 14px; line-height: 1.4; color: var(--ink-2); }
       .ia-mat li + li { border-top: 1px solid color-mix(in oklab, var(--line) 70%, transparent); }
-      .ia-mat small { flex: none; font-family: var(--font-mono); font-size: 10.5px; letter-spacing: .06em; text-transform: uppercase; color: var(--mute); }
-      .ia-mat a { flex: none; color: var(--deep); font-weight: 500; }
+      .ia-mat a { color: var(--deep); font-weight: 500; }
 
       .ia-pie { padding-top: 64px; padding-bottom: 48px; font-size: 13.5px; color: var(--mute); }
 
@@ -385,6 +386,15 @@ const steps: TFStep[] = [
         .ia-modulo.is-general .ia-podra { columns: 1; }
       }
       @media (max-width: 560px) {
+        /* En el celular la encuesta tiene que quedar a la vista sin mucho scroll. */
+        .ia-hero { padding-top: 28px; padding-bottom: 0; }
+        .ia-hero h1 { font-size: 36px; }
+        .ia-lede { font-size: 15.5px; margin-top: 14px; }
+        .ia-pasos { gap: 6px; margin-top: 18px; }
+        .ia-pasos a { font-size: 13px; padding: 6px 10px 6px 6px; gap: 6px; }
+        .ia-pasos b { width: 20px; height: 20px; font-size: 11px; }
+        .ia-pasos i { display: none; }
+        .ia-sec { padding-top: 40px; }
         .ia-modulo { padding: 22px 20px; }
         .ia-encuesta { padding: 22px 18px; border-radius: var(--r-md); }
       }

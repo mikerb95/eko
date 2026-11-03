@@ -5,7 +5,7 @@ import { z } from 'zod'
 import { CONTACT_STATUSES } from '../../contactos.ts'
 import { fechaBogota, like, num, ok, str, textoSeguro, type Herramienta } from './tipos.ts'
 
-const COLUMNAS = 'id, name, company, sector, service_lines, message, source, status, created_at'
+const COLUMNAS = 'id, name, company, sector, service_lines, message, source, status, assigned_to, created_at'
 
 export function aContacto(r: any) {
   return {
@@ -15,6 +15,7 @@ export function aContacto(r: any) {
     sector: str(r.sector) || null,
     lineasDeServicio: str(r.service_lines) || null,
     estado: str(r.status),
+    responsable: str(r.assigned_to) || null,
     recibido: fechaBogota(r.created_at),
     origen: str(r.source),
     enlace: `/admin?tab=contactos&id=${num(r.id)}`,
@@ -25,6 +26,7 @@ export function aContacto(r: any) {
 const esquema = z.object({
   estado: z.enum(CONTACT_STATUSES).optional().describe('nuevo = sin atender'),
   buscar: z.string().trim().max(80).optional().describe('Texto en nombre, empresa, sector o mensaje'),
+  responsable: z.string().trim().max(100).optional().describe('Nombre de quien lo atiende; "ninguno" para los que no tienen responsable'),
   limite: z.number().int().min(1).max(50).optional().describe('Máximo de mensajes (por defecto 20)'),
 })
 
@@ -32,7 +34,7 @@ export const CONTACTOS: Herramienta = {
   nombre: 'contactos',
   area: 'contactos',
   descripcion:
-    'Mensajes del formulario de contacto del sitio, con su estado (nuevo o atendido) y el conteo. Úsela para "¿qué contactos no se han atendido?" o "¿quién escribió por RAEE esta semana?".',
+    'Mensajes del formulario de contacto del sitio, con su estado (nuevo o atendido), su responsable y el conteo. Úsela para "¿qué contactos no se han atendido?", "¿cuáles tiene Laura?" o "¿quién escribió por RAEE esta semana?".',
   esquema,
   async ejecutar(args: z.infer<typeof esquema>, { db }) {
     const where: string[] = []
@@ -40,6 +42,13 @@ export const CONTACTOS: Herramienta = {
     if (args.estado) {
       where.push('status = ?')
       params.push(args.estado)
+    }
+    if (args.responsable) {
+      if (/^(ninguno|nadie|sin responsable)$/i.test(args.responsable)) where.push("assigned_to = ''")
+      else {
+        where.push(`assigned_to LIKE ? ESCAPE '\\'`)
+        params.push(like(args.responsable))
+      }
     }
     if (args.buscar) {
       where.push(`(name LIKE ? ESCAPE '\\' OR company LIKE ? ESCAPE '\\' OR sector LIKE ? ESCAPE '\\' OR message LIKE ? ESCAPE '\\')`)
