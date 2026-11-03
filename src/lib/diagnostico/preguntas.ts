@@ -98,6 +98,10 @@ export const TAREAS: Record<AreaId, Opcion[]> = {
     { id: 'conciliaciones', etiqueta: 'Hacer conciliaciones' },
     { id: 'facturacion', etiqueta: 'Facturar y revisar facturas' },
     { id: 'informe_mensual', etiqueta: 'Preparar el informe mensual para Gerencia' },
+    { id: 'costeo_comex', etiqueta: 'Revisar costeos de comercio exterior' },
+    { id: 'nacionalizacion', etiqueta: 'Revisar costos de nacionalización: aranceles, fletes, seguros y agencia de aduanas' },
+    { id: 'docs_exterior', etiqueta: 'Revisar facturas y documentos de proveedores del exterior y agentes de carga' },
+    { id: 'trm', etiqueta: 'Calcular el efecto de la TRM en costos, precios y márgenes' },
   ],
 }
 
