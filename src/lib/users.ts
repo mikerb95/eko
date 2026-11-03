@@ -4,7 +4,8 @@ import { UserError } from './apiError.ts'
 // Usuarios del panel: credenciales hasheadas (PBKDF2 via WebCrypto, sin deps)
 // y roles para autorización en el middleware.
 
-export const ROLES = ['admin', 'operaciones', 'logistica', 'consultor', 'finanzas', 'lectura'] as const
+// `participante`: solo entra a la academia de IA (/academia), nunca al panel.
+export const ROLES = ['admin', 'operaciones', 'logistica', 'consultor', 'finanzas', 'lectura', 'participante'] as const
 export type Role = (typeof ROLES)[number]
 
 export const ROLE_LABELS: Record<Role, string> = {
@@ -14,6 +15,7 @@ export const ROLE_LABELS: Record<Role, string> = {
   consultor: 'Consultor',
   finanzas: 'Finanzas',
   lectura: 'Solo lectura',
+  participante: 'Participante de la academia',
 }
 
 export interface User {

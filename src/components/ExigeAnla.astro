@@ -176,12 +176,12 @@ const maxFilas = Math.max(...PERFILES.map((p) => normasDe(p).length))
   .ex-lista {
     --ex-fila: 36px;
     list-style: none; margin-top: 14px; border-top: 1px solid var(--line);
-    min-height: calc(var(--ex-filas, 8) * var(--ex-fila));
+    min-height: calc(var(--ex-filas, 8) * var(--ex-fila) + 2px);
   }
   .ex-norma { display: none; border-bottom: 1px solid var(--line); }
   .ex-norma summary {
     list-style: none; cursor: pointer;
-    display: grid; grid-template-columns: 8px 140px minmax(0, 1fr) auto auto; align-items: center; gap: 12px;
+    display: grid; grid-template-columns: 8px 152px minmax(0, 1fr) auto auto; align-items: center; gap: 12px;
     min-height: calc(var(--ex-fila) - 1px);
     padding: 4px 6px; border-radius: 8px;
     transition: background .25s ease;
