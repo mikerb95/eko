@@ -2,7 +2,7 @@
 export const prerender = false // página interna: el middleware exige sesión (src/middleware.ts)
 import Layout from '../layouts/Layout.astro'
 import SiteFooter from '../components/SiteFooter.astro'
-import Ilustracion from '../components/oportunidades/Ilustracion.astro'
+import Ilustracion, { type TipoIlustracion } from '../components/oportunidades/Ilustracion.astro'
 import { FOUNDED_YEAR, stats, tonnesManaged, yearsActive } from '../lib/brand'
 
 // Estado de cada eje frente a lo que ha pasado en 2026.
@@ -403,7 +403,7 @@ const fuentes = [
     <div class="esencial reveal">
       {esencial.map(e => (
         <a class="ess" href={e.href}>
-          <Ilustracion tipo={e.il} class="ess-il" />
+          <Ilustracion tipo={e.il as TipoIlustracion} class="ess-il" />
           <div class="ess-t">{e.t}</div>
           <p>{e.d}</p>
           <span class="ess-go" aria-hidden="true">Ver detalle →</span>
@@ -523,7 +523,7 @@ const fuentes = [
     <div class="opps reveal">
       {oportunidades.map(o => (
         <article class="opp">
-          <div class="opp-il"><Ilustracion tipo={o.il} /></div>
+          <div class="opp-il"><Ilustracion tipo={o.il as TipoIlustracion} /></div>
           <div class="opp-top">
             <span class="opp-n">{o.n} · {o.code}</span>
             <span class="estado" data-estado={o.estado}>{ESTADOS[o.estado]}</span>

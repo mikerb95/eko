@@ -2,8 +2,9 @@
 // Ilustraciones de línea para /oportunidades2630. Dibujadas a mano en SVG
 // con los colores de marca: trazo tinta, rellenos suaves de bosque y arena,
 // y un solo acento sólido por pieza.
+export type TipoIlustracion = 'certificados' | 'evasores' | 'volumen' | 'licenciamiento' | 'corrientes' | 'envases' | 'posicion'
 interface Props {
-  tipo: 'certificados' | 'evasores' | 'volumen' | 'licenciamiento' | 'corrientes' | 'envases' | 'posicion'
+  tipo: TipoIlustracion
   class?: string
 }
 const { tipo, class: clase = '' } = Astro.props
