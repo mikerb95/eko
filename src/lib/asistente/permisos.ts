@@ -20,6 +20,7 @@ export const AREAS = [
   'contactos',
   'cumplimiento',
   'contenido',
+  'talento',
   'zoho_crm',
   'zoho_books',
   'zoho_workdrive',
@@ -44,6 +45,9 @@ export const MATRIZ: Record<Area, { consultan: readonly Role[]; proponen: readon
   contactos: { consultan: TODOS, proponen: escriben('/api/admin/contactos') },
   cumplimiento: { consultan: TODOS, proponen: escriben('/api/admin/cumplimiento') },
   contenido: { consultan: TODOS, proponen: contenido },
+  // Talento humano: datos laborales del equipo. Solo admin, y solo consulta
+  // (decisión de Mike, 2026-11-03: la sección es de uso exclusivo de RR.HH.).
+  talento: { consultan: ['admin'], proponen: [] },
   zoho_crm: { consultan: TODOS, proponen: ZOHO_PROPONEN },
   zoho_workdrive: { consultan: TODOS, proponen: ZOHO_PROPONEN },
   zoho_campaigns: { consultan: TODOS, proponen: ZOHO_PROPONEN },

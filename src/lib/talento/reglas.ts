@@ -313,7 +313,7 @@ export function saldoVacaciones(e: Empleado, novedades: readonly Novedad[], hoy:
 }
 
 /** Novedades aprobadas que tocan el rango [desde, hasta]. */
-export function ausenciasEntre(novedades: readonly Novedad[], desde: string, hasta: string): Novedad[] {
+export function ausenciasEntre<T extends Novedad>(novedades: readonly T[], desde: string, hasta: string): T[] {
   return novedades
     .filter((n) => n.estado === 'aprobada' && n.desde <= hasta && n.hasta >= desde)
     .sort((a, b) => a.desde.localeCompare(b.desde))

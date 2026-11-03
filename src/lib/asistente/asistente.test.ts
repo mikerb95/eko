@@ -283,6 +283,8 @@ test('ninguna consulta escribe en la base', async () => {
       ['cumplimiento', { que: 'alertas' }], ['cumplimiento', { que: 'alertas', venceAntesDe: '2026-12-01' }], ['cumplimiento', { que: 'expedientes' }], ['cumplimiento', { que: 'actos' }],
       ['contenido', { tipo: 'articulos' }], ['contenido', { tipo: 'normativas', buscar: 'RAEE' }],
       ['buscar_en_panel', { consulta: 'Acme' }],
+      ['talento_humano', { que: 'vencimientos' }], ['talento_humano', { que: 'personas' }], ['talento_humano', { que: 'vacaciones', persona: 'ana' }],
+      ['talento_humano', { que: 'ausencias' }], ['talento_humano', { que: 'solicitudes' }], ['talento_humano', { que: 'formacion' }], ['talento_humano', { que: 'evaluaciones' }],
     ]
     for (const [nombre, args] of llamadas) {
       const r = await ejecutar(nombre, args, ctx(db))
@@ -557,4 +559,64 @@ test('rayas largas fuera al mostrar; tarifa del modelo que respondió y la más 
   assert.equal(costoUsdModelo(u, 'claude-opus-5-5'), 4)
   assert.equal(costoUsdModelo(u, 'modelo-nuevo'), 10)
   assert.equal(costoUsdModelo(u, 'falso'), 0)
+})
+
+// ── Talento humano ───────────────────────────────────────────────────────
+
+async function sembrarTalento(db: Client) {
+  const ts = '2026-10-20T15:00:00.000Z'
+  await db.execute({ sql: `INSERT INTO users (id, username, name, role, active, created_at, updated_at) VALUES (10, 'ana.ruiz', 'Ana Ruiz', 'logistica', 1, ?, ?)`, args: [ts, ts] })
+  await db.execute({
+    sql: `INSERT INTO th_empleados (usuario_id, documento, tipo_contrato, fecha_ingreso, salario, telefono, correo_personal, emergencia_nombre, emergencia_telefono, eps, created_at, updated_at)
+          VALUES (10, '52123456', 'indefinido', '2025-10-28', 4800000, '3205550000', 'ana@personal.co', 'Mamá de Ana', '3015550000', 'Sura', ?, ?)`,
+    args: [ts, ts],
+  })
+  await db.execute({ sql: `INSERT INTO th_documentos (usuario_id, tipo, nombre, fecha_vencimiento, created_at, updated_at) VALUES (10, 'licencia', 'Licencia C2', '2026-11-05', ?, ?)`, args: [ts, ts] })
+  await db.execute({
+    sql: `INSERT INTO th_novedades (usuario_id, tipo, desde, hasta, dias_habiles, dias_calendario, estado, motivo, created_at, updated_at)
+          VALUES (10, 'vacaciones', '2026-10-27', '2026-10-30', 4, 4, 'aprobada', '', ?, ?),
+                 (10, 'incapacidad', '2026-08-03', '2026-08-04', 2, 2, 'aprobada', 'Diagnóstico: migraña', ?, ?)`,
+    args: [ts, ts, ts, ts],
+  })
+}
+
+test('talento: solo el admin recibe la herramienta, y sin propuestas', () => {
+  assert.ok(herramientasDe('admin').some((h) => h.nombre === 'talento_humano'))
+  for (const r of ['operaciones', 'logistica', 'consultor', 'finanzas', 'lectura']) {
+    assert.ok(!herramientasDe(r).some((h) => h.nombre === 'talento_humano'), r)
+    assert.ok(!puedeProponer(r, 'talento'), r)
+  }
+  assert.ok(!puedeProponer('admin', 'talento'))
+  assert.ok(!canWrite('/api/admin/talento', 'operaciones'))
+})
+
+test('talento: saldo y vencimientos calculados; sin salario, documento, contactos ni diagnósticos', async () => {
+  const { db, cerrar } = await baseNueva()
+  try {
+    await sembrarTalento(db)
+    const venc = await ejecutar('talento_humano', { que: 'vencimientos' }, ctx(db))
+    assert.ok(venc.ok)
+    const lista = (venc as any).datos.vencimientos
+    assert.equal(lista[0].persona, 'Ana Ruiz')
+    assert.equal(lista[0].fecha, '2026-11-05')
+    assert.equal(lista[0].diasQueFaltan, 8)
+
+    const vac = await ejecutar('talento_humano', { que: 'vacaciones', persona: 'ruiz' }, ctx(db))
+    assert.ok(vac.ok)
+    // Las vacaciones aprobadas que ya empezaron cuentan como disfrutadas.
+    assert.equal((vac as any).datos.personas[0].vacaciones.disfrutadas, 4)
+
+    const aus = await ejecutar('talento_humano', { que: 'ausencias', dias: 120 }, ctx(db))
+    assert.ok(aus.ok)
+
+    const todo = JSON.stringify([venc, vac, aus, await ejecutar('talento_humano', { que: 'personas' }, ctx(db)), await ejecutar('talento_humano', { que: 'solicitudes' }, ctx(db))])
+    for (const sensible of ['4800000', '52123456', '3205550000', 'ana@personal.co', 'Mamá de Ana', '3015550000', 'Sura', 'migraña']) {
+      assert.ok(!todo.includes(sensible), `salió ${sensible}`)
+    }
+
+    const negado = await ejecutar('talento_humano', { que: 'personas' }, ctx(db, 'logistica'))
+    assert.equal(negado.ok, false)
+  } finally {
+    cerrar()
+  }
 })

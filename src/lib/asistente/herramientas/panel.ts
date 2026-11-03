@@ -13,6 +13,7 @@ export const MENU: readonly EntradaMenu[] = [
   { titulo: 'Blog', enlace: '/admin?tab=blog', claves: ['articulos', 'publicaciones', 'notas', 'borradores'] },
   { titulo: 'Normativas', enlace: '/admin?tab=normativas', claves: ['normas', 'leyes', 'decretos', 'resoluciones'] },
   { titulo: 'Cumplimiento', enlace: '/admin/cumplimiento', claves: ['alertas', 'expedientes', 'autos', 'actos', 'anla', 'plazos', 'agente'] },
+  { titulo: 'Talento humano', enlace: '/admin/talento', claves: ['empleados', 'equipo', 'personal', 'vacaciones', 'permisos', 'incapacidades', 'contratos', 'evaluaciones', 'desempeno', 'capacitacion', 'cursos', 'rrhh', 'nomina'], soloAdmin: true },
   { titulo: 'Usuarios', enlace: '/admin?tab=usuarios', claves: ['roles', 'permisos', 'cuentas', 'contraseñas'], soloAdmin: true },
 ]
 

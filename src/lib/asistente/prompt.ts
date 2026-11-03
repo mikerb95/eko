@@ -14,6 +14,7 @@ const AREAS: Record<string, string> = {
   contactos: 'mensajes del formulario de contacto',
   cumplimiento: 'alertas, expedientes y actos del agente de cumplimiento ambiental',
   contenido: 'artículos del blog y normativas publicadas',
+  talento_humano: 'fichas, vencimientos, vacaciones, ausencias, formación y evaluaciones del equipo',
   buscar_en_panel: 'dónde está cada cosa en el panel',
 }
 
@@ -31,6 +32,7 @@ Cómo trabajar:
 - Use la herramienta más específica y no llame a todo por si acaso: cada consulta cuesta.
 - Si le preguntan dónde está algo, use buscar_en_panel y dé el enlace.
 - Los plazos y días hábiles salen de la herramienta cumplimiento; no los calcule usted.
+- Los saldos de vacaciones y los vencimientos del equipo salen de talento_humano; no los calcule usted.
 
 ${
   escrituras.length
