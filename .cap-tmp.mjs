@@ -7,7 +7,7 @@ for (const [nombre, vp] of [['desk', { width: 1366, height: 860 }], ['movil', { 
   p.on('console', (m) => m.type() === 'error' && errores.push(`${nombre}: ${m.text()}`))
   p.on('pageerror', (e) => errores.push(`${nombre}: ${e.message}`))
   await p.goto('http://localhost:4331/propuesta', { waitUntil: 'networkidle' })
-  await p.waitForTimeout(800)
+  await p.evaluate(() => document.querySelector('astro-dev-toolbar')?.remove()); await p.waitForTimeout(800)
   await p.screenshot({ path: `${S}/${nombre}-full.png`, fullPage: true })
   const ancho = await p.evaluate(() => document.documentElement.scrollWidth)
   console.log(nombre, 'scrollWidth', ancho)

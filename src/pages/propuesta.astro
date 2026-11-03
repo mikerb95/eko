@@ -633,7 +633,8 @@ const maxMensual = Math.max(...PLANES.map((p) => p.mensual))
           // Línea de pagos: anticipo, 8 semanas sin cobro, 18 meses, después.
           const linea = $('[data-o="linea"]')!
           linea.innerHTML = k.p
-            ? `<span style="flex:1"><i></i>Firma</span><span style="flex:2" class="is-cero"><i></i>8 semanas $0</span><span style="flex:9" class="is-a"><i></i>Meses 1 a 18</span><span style="flex:4" class="is-b"><i></i>Mes 19 en adelante</span>`
+            ? `<div class="pp-linea-barra"><i style="flex:2"></i><i style="flex:3" class="is-cero"></i><i style="flex:9" class="is-a"></i><i style="flex:4" class="is-b"></i></div>` +
+              `<ul><li><i></i>Anticipo</li><li><i class="is-cero"></i>8 semanas sin cobro</li><li><i class="is-a"></i>Meses 1 a 18</li><li><i class="is-b"></i>Desde el mes 19</li></ul>`
             : ''
           $<HTMLButtonElement>('[data-ir-elegir]')!.disabled = vacio
           $<HTMLButtonElement>('#pp-form button[type="submit"]')!.disabled = vacio
@@ -1011,7 +1012,7 @@ const maxMensual = Math.max(...PLANES.map((p) => p.mensual))
       .pp-barra b { font-family: var(--font-display); font-size: 16px; font-weight: 600; }
 
       /* Simulador */
-      .pp-sim { display: grid; gap: 14px; }
+      .pp-sim { display: grid; gap: 14px; margin-top: 28px; }
       @media (min-width: 900px) { .pp-sim { grid-template-columns: 1fr 1fr; align-items: start; } }
       .pp-sim fieldset { border: 0; padding: 0; margin: 0 0 20px; }
       .pp-sim legend { font: 600 15px var(--font-display); margin-bottom: 10px; }
@@ -1031,13 +1032,16 @@ const maxMensual = Math.max(...PLANES.map((p) => p.mensual))
       .pp-sim-dl dt { font-size: 14px; color: #c4d0d8; }
       .pp-sim-dl dd { margin: 0; font-family: var(--font-display); font-size: 19px; font-weight: 600; color: #fff; text-align: right; }
       .pp-sim-dl small { grid-column: 1 / -1; font-size: 12.5px; color: #8b9cab; }
-      .pp-linea { display: flex; gap: 3px; margin: 14px 0 18px; font-size: 11.5px; color: #9fb0bd; }
+      .pp-linea { margin: 14px 0 18px; font-size: 12px; color: #9fb0bd; }
       .pp-linea:empty { display: none; }
-      .pp-linea span { display: flex; flex-direction: column; gap: 5px; min-width: 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-      .pp-linea i { height: 8px; border-radius: 3px; background: #7fe0d6; }
-      .pp-linea .is-cero i { background: rgba(255, 255, 255, 0.18); }
-      .pp-linea .is-a i { background: #4aa3e0; }
-      .pp-linea .is-b i { background: #46a85b; }
+      .pp-linea-barra { display: flex; gap: 4px; }
+      .pp-linea i { display: block; height: 8px; border-radius: 3px; background: #7fe0d6; }
+      .pp-linea .is-cero { background: rgba(255, 255, 255, 0.18); }
+      .pp-linea .is-a { background: #4aa3e0; }
+      .pp-linea .is-b { background: #46a85b; }
+      .pp-linea ul { list-style: none; display: flex; flex-wrap: wrap; gap: 4px 14px; padding: 0; margin: 10px 0 0; }
+      .pp-linea li { display: flex; align-items: center; gap: 6px; }
+      .pp-linea li i { width: 10px; height: 10px; }
       .pp-sim-out .pp-btn { width: 100%; background: #fff; color: var(--ink) !important; border-color: #fff; }
       .pp-sim-out .pp-btn:hover { background: #e6edf1; }
 
