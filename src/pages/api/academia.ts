@@ -37,11 +37,11 @@ export const POST: APIRoute = async ({ request, locals }) => {
       case 'practicar': {
         const instruccion = validarInstruccion(b.instruccion)
         if (!instruccion) return json({ error: `Escriba una instrucción de entre ${MIN_INSTRUCCION} y ${MAX_INSTRUCCION} caracteres` }, 400)
-        const leccion = await leccionParaPracticar(cuenta.id, area, b.leccion_id)
+        const leccion = await leccionParaPracticar(area, b.leccion_id)
         if ((await practicasDeHoy(cuenta.id, hoyEnBogota())) >= PRACTICAS_DIA) {
           return json({ error: `Ya hizo ${PRACTICAS_DIA} prácticas hoy. Mañana puede seguir.` }, 429)
         }
-        let r
+        let r: Awaited<ReturnType<typeof practicar>>
         try {
           r = await practicar({ instruccion, consigna: leccion.practica_consigna, leccion: leccion.titulo, area: nombreModulo(area) })
         } catch (err) {

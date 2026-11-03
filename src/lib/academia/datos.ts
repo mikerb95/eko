@@ -444,7 +444,7 @@ export async function entregar(usuario_id: number, area: string, b: any): Promis
 }
 
 /** La lección de una práctica, comprobando que tenga el revisor y esté en la ruta. */
-export async function leccionParaPracticar(usuario_id: number, area: string, leccion_id: unknown): Promise<Leccion> {
+export async function leccionParaPracticar(area: string, leccion_id: unknown): Promise<Leccion> {
   const db = await preparar()
   const l = await leccionVisible(db, area, idValido(leccion_id, 'La lección'))
   if (!l.practica_consigna.trim()) throw new UserError('Esta lección no tiene práctica con IA')

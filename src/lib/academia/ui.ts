@@ -25,6 +25,12 @@ export function fechaLarga(iso: string, hoy = ''): string {
   return hoy && hoy.slice(0, 4) === m[1] ? base : `${base} de ${m[1]}`
 }
 
+/** "3 de noviembre de 2026", para documentos formales. */
+export function fechaFormal(iso: string): string {
+  const m = /^(\d{4})-(\d{2})-(\d{2})/.exec(iso || '')
+  return m ? `${+m[3]!} de ${MESES[+m[2]! - 1]} de ${m[1]}` : iso || ''
+}
+
 /** "8:00 a. m." a partir de "08:00". */
 export function horaTexto(h: string): string {
   const m = /^(\d{2}):(\d{2})$/.exec(h || '')

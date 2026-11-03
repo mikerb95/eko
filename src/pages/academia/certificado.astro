@@ -8,7 +8,7 @@ import AcademiaLayout from '../../layouts/AcademiaLayout.astro'
 import { hoyEnBogota } from '../../lib/agente/diasHabiles'
 import { emitirCertificado, estadoParticipante, resolverAcceso, type Certificado, type EstadoParticipante } from '../../lib/academia/datos'
 import { nombreModulo, textoHoras } from '../../lib/academia/reglas'
-import { fechaLarga } from '../../lib/academia/ui'
+import { fechaFormal } from '../../lib/academia/ui'
 import { SITE_URL } from '../../lib/site'
 
 const role = String(Astro.locals.role || '')
@@ -35,7 +35,7 @@ try {
   errorCarga = 'No se pudo cargar el certificado. Intente de nuevo en un momento.'
 }
 
-const fecha = cert ? fechaLarga(cert.emitido_at.slice(0, 10)) : ''
+const fecha = cert ? fechaFormal(cert.emitido_at.slice(0, 10)) : ''
 const verificar = cert ? `${SITE_URL}/verificar/${cert.codigo}` : ''
 const area = cert ? nombreModulo(cert.area) : ''
 ---
@@ -76,7 +76,7 @@ const area = cert ? nombreModulo(cert.area) : ''
           </p>
           <footer class="ac-dip-pie">
             <div><span>Fecha</span><b>{fecha}</b></div>
-            <div class="ac-dip-firma"><span class="linea"></span><b>Ekosolv S.A.S.</b></div>
+            <div class="ac-dip-firma"><span class="linea"></span><b>Ekosolv S.A.S.</b><span>Organiza</span></div>
             <div class="ac-dip-firma"><span class="linea"></span><b>Code by Mike</b><span>Capacitador</span></div>
             <div><span>Código</span><b class="mono">{cert.codigo}</b><small>{verificar.replace(/^https?:\/\//, '')}</small></div>
           </footer>
