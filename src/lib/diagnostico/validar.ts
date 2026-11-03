@@ -11,6 +11,7 @@
  */
 import {
   AREA_IDS,
+  CAMPOS_CON_IA,
   CERTIFICADO_MIN,
   CERTIFICADOS_MES,
   AREAS_PROPUESTAS,
@@ -85,6 +86,7 @@ export function validarRespuesta(b: Record<string, unknown>): Respuesta {
     modalidad: una(b, 'modalidad', MODALIDAD),
     restricciones: texto(b, 'restricciones', 300),
     comentarios: texto(b, 'comentarios', 2000),
+    ia_campos: varias(b, 'ia_campos', CAMPOS_CON_IA),
   }
 
   // Propuestas: solo para las áreas que las hacen, y solo si participa.

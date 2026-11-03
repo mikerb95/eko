@@ -230,6 +230,19 @@ export const MODALIDAD = [
   { id: 'igual', etiqueta: 'Me da igual' },
 ] as const satisfies readonly Opcion[]
 
+/**
+ * Campos abiertos en que la encuesta ofrece el asistente con IA
+ * (src/lib/diagnostico/ia.ts). La respuesta guarda en cuáles la persona aceptó
+ * la versión de la IA, para leer esas respuestas sabiendo que la IA ayudó.
+ */
+export const CAMPOS_CON_IA: Opcion[] = [
+  { id: 'tarea_principal', etiqueta: 'Tarea que más tiempo le quita' },
+  { id: 'tarea_otra', etiqueta: 'Otra tarea' },
+  { id: 'propuesta_demora', etiqueta: 'Lo que más demora de la propuesta' },
+  { id: 'certificado_demora', etiqueta: 'Lo que más demora del certificado' },
+  { id: 'deseo', etiqueta: 'Tarea que quiere resolver con IA' },
+]
+
 /** Lo que queda guardado de cada respuesta, ya validado. */
 export interface Respuesta {
   nombre: string
@@ -261,6 +274,8 @@ export interface Respuesta {
   modalidad: string
   restricciones: string
   comentarios: string
+  /** Campos en que usó la versión que propuso el asistente con IA. */
+  ia_campos: string[]
 }
 
 /** Busca la etiqueta de una opción; si no está, devuelve el id tal cual. */

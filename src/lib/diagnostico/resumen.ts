@@ -10,6 +10,7 @@
  */
 import {
   AREAS,
+  CAMPOS_CON_IA,
   CERTIFICADO_MIN,
   CERTIFICADOS_MES,
   DOCUMENTO_REAL,
@@ -320,6 +321,7 @@ export function aCSV(filas: Fila[]): string {
     ['Modalidad', (f) => etiqueta(MODALIDAD, f.modalidad)],
     ['Sábados que no puede', (f) => f.restricciones],
     ['Comentarios', (f) => f.comentarios],
+    ['Respuestas con ayuda de la IA', (f) => (f.ia_campos ?? []).map((c) => etiqueta(CAMPOS_CON_IA, c)).join(' | ')],
   ]
   const celda = (s: string) => `"${String(s ?? '').replace(/"/g, '""').replace(/\r?\n/g, ' ')}"`
   const lineas = [cols.map(([t]) => celda(t)).join(';'), ...filas.map((f) => cols.map(([, g]) => celda(g(f))).join(';'))]
