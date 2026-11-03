@@ -84,19 +84,20 @@ test('equipo: responde la encuesta con el paso de su área', async ({ page }) =>
 
   await activo.getByLabel(/La tarea que le gustaría resolver/).fill('Sacar obligaciones y plazos de un auto')
 
-  // Asistente con IA: pregunta, la persona responde y acepta la versión nueva.
+  // Asistente con IA: pregunta, la persona responde y su texto no cambia.
   await expect(page.locator('#ia-aviso')).toBeVisible()
-  await activo.getByRole('button', { name: 'Mejorar con IA' }).click()
+  await activo.getByRole('button', { name: 'Completar con IA' }).click()
   const panel = activo.locator('.iax-panel')
-  await expect(panel).toContainText('Propuesta de la IA')
+  await expect(panel).toContainText('Así entendió la IA su respuesta')
+  await expect(panel.getByRole('button', { name: /Usar esta versión/ })).toHaveCount(0)
   await panel.getByLabel(/páginas/).fill('Unas 20 páginas')
   await panel.getByLabel(/páginas/).press('Enter')
   await expect(panel.locator('.iax-texto')).toContainText('Unas 20 páginas')
-  await expect(panel.locator('.iax-preg')).toHaveCount(0)
+  await expect(panel).toContainText('Sus respuestas quedan junto a lo que escribió')
   await page.screenshot({ path: 'test-results/diagnostico-ia-asistente.png', fullPage: true })
-  await panel.getByRole('button', { name: 'Usar esta versión' }).click()
-  await expect(activo.getByLabel(/La tarea que le gustaría resolver/)).toHaveValue(/Unas 20 páginas/)
-  await expect(panel).toContainText('Listo')
+  await expect(activo.getByLabel(/La tarea que le gustaría resolver/)).toHaveValue('Sacar obligaciones y plazos de un auto')
+  await panel.getByRole('button', { name: 'Cerrar' }).click()
+  await expect(panel).toBeHidden()
   await activo.getByRole('button', { name: 'Sí, puedo traer uno' }).click()
   await activo.getByLabel(/¿Cuál documento\?/).fill('Auto de seguimiento de la CAR')
   await siguiente()
@@ -136,7 +137,8 @@ test('panel: resumen por área y respuesta individual', async ({ page }) => {
   const ops = page.locator('.dx-area-card').filter({ hasText: 'Operaciones' })
   await expect(ops).toContainText('Leer autos, resoluciones y requerimientos')
   await expect(ops).toContainText('Sacar obligaciones y plazos de un auto')
-  await expect(page.locator('.dx-pie').first()).toContainText('Aceptaron la ayuda del asistente de la encuesta: 1 de 1')
+  await expect(ops.locator('.dx-ia')).toContainText('Unas 20 páginas')
+  await expect(page.locator('.dx-pie').first()).toContainText('Agregaron detalles con el asistente de IA: 1 de 1')
   // Lo del paso de Ventas que se vio y se abandonó no quedó guardado.
   await expect(page.locator('.dx-vacia').filter({ hasText: 'Ventas' })).toContainText('sin respuestas todavía')
   await page.screenshot({ path: 'test-results/diagnostico-panel.png', fullPage: true })
