@@ -1073,6 +1073,97 @@ const steps: TFStep[] = [
         .ia-encuesta :global(.iax-panel), .ia-encuesta :global(.iax-cargando::before) { animation: none; }
       }
 
+      /* Casos para el taller */
+      .ia-casos { display: grid; grid-template-columns: minmax(0, 1fr) 300px; gap: 20px; align-items: start; }
+      .ia-caso { grid-column: 1; padding: clamp(22px, 4vw, 44px); display: flex; flex-direction: column; gap: 22px; }
+      .ia-caso[hidden] { display: none; }
+      .cx-guia { grid-column: 2; grid-row: 1; position: sticky; top: 20px; padding: 22px; border-radius: var(--r-lg); background: color-mix(in oklab, var(--forest) 7%, #fff); }
+      .cx-guia ul { list-style: none; margin: 12px 0 0; padding: 0; display: grid; gap: 12px; }
+      .cx-guia li { font-size: 14.5px; line-height: 1.5; color: var(--ink-2); padding-left: 18px; position: relative; }
+      .cx-guia li::before { content: ''; position: absolute; left: 2px; top: 8px; width: 7px; height: 7px; border-radius: 50%; background: var(--forest); }
+      .cx-guia b { color: var(--ink); font-weight: 600; }
+      .cx-fila { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 16px; }
+      .cx-campo { display: flex; flex-direction: column; gap: 8px; min-width: 0; border: 0; padding: 0; margin: 0; }
+      .cx-campo > span, .cx-campo legend { font-size: 15px; font-weight: 600; color: var(--ink); padding: 0; margin-bottom: 0; }
+      .cx-campo legend { margin-bottom: 8px; }
+      .cx-campo em { font-style: normal; font-weight: 400; font-size: 13px; color: var(--mute); margin-left: 6px; }
+      .cx-campo small { font-size: 13.5px; line-height: 1.5; color: var(--mute); }
+      .cx-campo input[type="text"], .cx-campo select, .cx-campo textarea {
+        font: inherit; font-size: 16px; color: var(--ink); background: #fff; width: 100%;
+        border: 1.5px solid var(--line-2); border-radius: 10px; padding: 11px 13px; outline: none; transition: border-color .18s, box-shadow .18s;
+      }
+      .cx-campo textarea { resize: vertical; min-height: 120px; line-height: 1.55; }
+      .cx-campo input:focus, .cx-campo select:focus, .cx-campo textarea:focus {
+        border-color: var(--deep); box-shadow: 0 0 0 3px color-mix(in oklab, var(--deep) 14%, transparent);
+      }
+      .cx-campo ::placeholder { color: color-mix(in oklab, var(--mute) 75%, #fff); }
+      .cx-zona {
+        position: relative; display: flex; flex-direction: column; align-items: center; gap: 6px; text-align: center; cursor: pointer;
+        padding: 26px 18px; border-radius: var(--r-md); border: 1.5px dashed color-mix(in oklab, var(--deep) 35%, var(--line-2));
+        background: color-mix(in oklab, var(--deep) 3%, #fff); transition: background .18s, border-color .18s;
+      }
+      .cx-zona:hover, .cx-zona.is-sobre { background: color-mix(in oklab, var(--deep) 8%, #fff); border-color: var(--deep); }
+      .cx-zona:focus-within { box-shadow: 0 0 0 3px color-mix(in oklab, var(--deep) 18%, transparent); }
+      .cx-zona input { position: absolute; inset: 0; opacity: 0; cursor: pointer; width: 100%; }
+      .cx-zona b { font-size: 15.5px; font-weight: 500; color: var(--ink); }
+      .cx-zona u { color: var(--deep); text-underline-offset: 3px; }
+      .cx-zona-ico { width: 44px; height: 44px; border-radius: 50%; display: grid; place-items: center; color: var(--deep); background: #fff; box-shadow: 0 2px 8px rgba(14, 28, 38, .08); margin-bottom: 4px; }
+      .cx-lista { list-style: none; margin: 4px 0 0; padding: 0; display: grid; gap: 8px; }
+      .cx-lista:empty { display: none; }
+      .cx-arch {
+        display: grid; grid-template-columns: minmax(0, 1fr) auto; grid-template-areas: 'n q' 'e q' 'p p'; gap: 2px 10px;
+        padding: 11px 12px 0 14px; border-radius: 10px; background: color-mix(in oklab, var(--paper-warm) 60%, #fff); overflow: hidden;
+      }
+      .cx-arch-nombre { grid-area: n; font-size: 14.5px; color: var(--ink); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+      .cx-arch-estado { grid-area: e; font: 400 12px/1.5 var(--font-mono); color: var(--mute); padding-bottom: 9px; }
+      .cx-arch.is-listo .cx-arch-estado { color: var(--forest); }
+      .cx-arch.is-error .cx-arch-estado { color: #b04a2e; }
+      .cx-quitar { grid-area: q; align-self: center; width: 30px; height: 30px; border-radius: 50%; display: grid; place-items: center; color: var(--mute); cursor: pointer; background: transparent; transition: background .18s, color .18s; }
+      .cx-quitar:hover { background: color-mix(in oklab, var(--ink) 7%, transparent); color: var(--ink); }
+      .cx-arch-pista { grid-area: p; height: 3px; margin: 0 -12px 0 -14px; background: color-mix(in oklab, var(--deep) 10%, transparent); }
+      .cx-arch-barra { display: block; height: 100%; width: 0; background: var(--deep); transition: width .2s; }
+      .cx-arch.is-listo .cx-arch-barra { background: var(--forest); }
+      .cx-arch.is-error .cx-arch-barra { background: #b04a2e; width: 100%; }
+      .cx-chips { display: flex; flex-wrap: wrap; gap: 8px; }
+      .cx-chip input, .cx-radio input { position: absolute; opacity: 0; pointer-events: none; }
+      .cx-chip span {
+        display: inline-block; cursor: pointer; font-size: 14.5px; color: var(--ink-2); padding: 8px 14px; border-radius: 999px;
+        background: #fff; border: 1.5px solid var(--line); transition: background .18s, border-color .18s, color .18s;
+      }
+      .cx-chip span:hover { border-color: color-mix(in oklab, var(--deep) 40%, var(--line)); }
+      .cx-chip input:checked + span { color: var(--deep); border-color: var(--deep); background: color-mix(in oklab, var(--deep) 8%, #fff); }
+      .cx-chip input:focus-visible + span, .cx-radio input:focus-visible + span { box-shadow: 0 0 0 3px color-mix(in oklab, var(--deep) 20%, transparent); }
+      .cx-radios { display: grid; gap: 8px; }
+      .cx-radio span {
+        display: flex; align-items: center; gap: 12px; cursor: pointer; font-size: 15px; color: var(--ink-2);
+        padding: 12px 14px; border-radius: 10px; border: 1.5px solid var(--line); background: #fff; transition: border-color .18s, background .18s;
+      }
+      .cx-radio span::before { content: ''; flex: none; width: 16px; height: 16px; border-radius: 50%; border: 1.5px solid var(--line-2); background: #fff; transition: border .18s; }
+      .cx-radio input:checked + span { border-color: var(--deep); background: color-mix(in oklab, var(--deep) 5%, #fff); color: var(--ink); }
+      .cx-radio input:checked + span::before { border: 5px solid var(--deep); }
+      .cx-consent { display: flex; gap: 12px; align-items: flex-start; font-size: 14.5px; line-height: 1.5; color: var(--ink-2); cursor: pointer; }
+      .cx-consent input { flex: none; width: 18px; height: 18px; margin-top: 2px; accent-color: var(--deep); }
+      .cx-hp { position: absolute; left: -9999px; width: 1px; height: 1px; opacity: 0; }
+      .cx-pie { display: flex; flex-wrap: wrap; align-items: center; gap: 14px; }
+      .cx-enviar {
+        cursor: pointer; font: inherit; font-size: 15.5px; font-weight: 500; color: #fff; background: var(--deep);
+        padding: 13px 24px; border-radius: 999px; transition: background .18s, transform .18s;
+      }
+      .cx-enviar:hover { background: var(--deep-2); transform: translateY(-1px); }
+      .cx-enviar:disabled { opacity: .65; cursor: default; transform: none; }
+      .cx-error { margin: 0; font-size: 14.5px; color: #b04a2e; }
+      .cx-error:empty { display: none; }
+      .cx-listo { align-items: flex-start; }
+      .cx-listo h3 { font-family: var(--font-display); font-weight: var(--display-weight); font-size: clamp(26px, 3vw, 34px); margin: 0; }
+      .cx-listo p { margin: 0; color: var(--ink-2); font-size: 16px; line-height: 1.55; max-width: 52ch; }
+      .cx-listo-ico { width: 48px; height: 48px; border-radius: 50%; display: grid; place-items: center; color: #fff; background: var(--forest); }
+      @media (max-width: 860px) {
+        .ia-casos { grid-template-columns: minmax(0, 1fr); }
+        .cx-guia { grid-column: 1; grid-row: auto; position: static; }
+      }
+      @media (max-width: 560px) {
+        .cx-fila { grid-template-columns: minmax(0, 1fr); }
+      }
       .ia-punto { display: inline-block; width: 9px; height: 9px; border-radius: 50%; background: var(--c); margin-right: 10px; vertical-align: 2px; }
       /* Programa por área */
       .ia-atajos { display: flex; flex-wrap: wrap; gap: 8px; margin: 0 0 22px; }
