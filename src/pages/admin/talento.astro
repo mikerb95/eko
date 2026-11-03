@@ -1,0 +1,465 @@
+---
+// Talento humano: fichas del equipo, documentos y vencimientos, vacaciones y
+// novedades, capacitación y desempeño. Solo admin (docs/plan-talento-humano.md).
+// Todo se carga en el servidor; el script del cliente pinta y envía cambios a
+// /api/admin/talento, que devuelve el estado completo ya recalculado.
+export const prerender = false
+import AdminLayout from '../../layouts/AdminLayout.astro'
+import { ico } from '../../lib/admin/iconos'
+import { festivosColombia, hoyEnBogota } from '../../lib/agente/diasHabiles'
+import { talentoEmailConfigured } from '../../lib/email'
+import { cargarEstado, type EstadoTalento } from '../../lib/talento/datos'
+import {
+  AREAS_EMPRESA,
+  CRITERIOS_BASE,
+  ESTADOS_NOVEDAD,
+  NIVELES,
+  TIPOS_CONTRATO,
+  TIPOS_CURSO,
+  TIPOS_DOCUMENTO,
+  TIPOS_NOVEDAD,
+  ausenciasEntre,
+  estaActivo,
+} from '../../lib/talento/reglas'
+
+const role = Astro.locals.role || ''
+if (role !== 'admin') return Astro.redirect('/admin')
+
+const hoy = hoyEnBogota()
+let errorCarga = ''
+let estado: EstadoTalento | null = null
+try {
+  estado = await cargarEstado(hoy)
+} catch (e: any) {
+  console.error('[admin/talento] carga', e?.stack || e)
+  errorCarga = 'No se pudo cargar la información de talento humano.'
+}
+
+const anio = Number(hoy.slice(0, 4))
+const festivos = [anio - 1, anio, anio + 1].flatMap((a) => [...festivosColombia(a)]).sort()
+const catalogos = {
+  areas: AREAS_EMPRESA,
+  contratos: TIPOS_CONTRATO,
+  documentos: TIPOS_DOCUMENTO,
+  novedades: TIPOS_NOVEDAD,
+  estadosNovedad: ESTADOS_NOVEDAD,
+  cursos: TIPOS_CURSO,
+  niveles: NIVELES,
+  criteriosBase: CRITERIOS_BASE,
+}
+const emailListo = talentoEmailConfigured()
+
+const activos = estado ? estado.personas.filter((p) => estaActivo(p.ficha, hoy)) : []
+const kpis = {
+  activos: activos.length,
+  sinFicha: estado ? estado.personas.filter((p) => !p.ficha && p.cuentaActiva).length : 0,
+  vencidos: estado ? estado.avisos.filter((a) => a.nivel === 'vencido').length : 0,
+  pronto: estado ? estado.avisos.filter((a) => a.nivel === 'urgente' || a.nivel === 'pronto').length : 0,
+  ausentes: estado ? ausenciasEntre(estado.novedades, hoy, hoy).length : 0,
+  porAprobar: estado ? estado.novedades.filter((n) => n.estado === 'solicitada').length : 0,
+}
+const cuentas = {
+  talento: kpis.activos,
+  talentoAvisos: estado ? estado.avisos.filter((a) => a.nivel === 'vencido' || a.nivel === 'urgente').length : 0,
+}
+const user = Astro.locals.user || ''
+---
+
+<AdminLayout titulo="Talento humano · EKOSOLV" activo="talento" css={['/admin/cumplimiento.css', '/admin/talento.css']} cuentas={cuentas}>
+  <Fragment slot="avisos">
+    {errorCarga && <div class="banner-error">{errorCarga}</div>}
+  </Fragment>
+
+  <div class="panel-head">
+    <div>
+      <h2>Talento humano</h2>
+      <p class="panel-sub">Fichas del equipo, vencimientos, vacaciones, capacitación y desempeño. Solo lo ven los administradores.</p>
+    </div>
+    <button class="btn-primary" type="button" id="nueva-novedad">+ Registrar novedad</button>
+  </div>
+
+  <nav class="subtabs" aria-label="Secciones de talento humano">
+    <button class="subtab is-active" data-tab="tablero">Tablero</button>
+    <button class="subtab" data-tab="equipo">Equipo <span class="count" data-cuenta="equipo">{kpis.activos}</span></button>
+    <button class="subtab" data-tab="novedades">Novedades <span class="count" data-cuenta="novedades">{kpis.porAprobar}</span></button>
+    <button class="subtab" data-tab="capacitacion">Capacitación</button>
+    <button class="subtab" data-tab="desempeno">Desempeño</button>
+    <button class="subtab" data-tab="cargos">Cargos</button>
+    <button class="subtab" data-tab="ajustes">Ajustes</button>
+  </nav>
+
+  <!-- TABLERO -->
+  <section id="panel-tablero" class="panel is-active">
+    <div class="kpi-grid" id="th-kpis"></div>
+    <div class="dash-grid">
+      <article class="dash-card">
+        <header class="dash-head">
+          <div><h3>Por vencer</h3><p>Documentos, cursos, contratos, períodos de prueba y evaluaciones de los próximos 90 días.</p></div>
+        </header>
+        <div class="chips" id="aviso-chips"></div>
+        <div id="th-avisos"></div>
+      </article>
+      <div class="th-columna">
+        <article class="dash-card">
+          <header class="dash-head">
+            <div><h3>Ausencias</h3><p>Hoy y las próximas dos semanas.</p></div>
+          </header>
+          <div id="th-ausencias"></div>
+        </article>
+        <article class="dash-card">
+          <header class="dash-head">
+            <div><h3>Solicitudes por aprobar</h3><p>Vacaciones y permisos que esperan respuesta.</p></div>
+            <button type="button" class="link-btn" data-ir-sub="novedades">Ver todas</button>
+          </header>
+          <div id="th-pendientes"></div>
+        </article>
+        <article class="dash-card">
+          <header class="dash-head">
+            <div><h3>Cumpleaños del mes</h3></div>
+          </header>
+          <div id="th-cumple"></div>
+        </article>
+      </div>
+    </div>
+  </section>
+
+  <!-- EQUIPO -->
+  <section id="panel-equipo" class="panel">
+    <div class="toolbar">
+      <label class="buscar"><Fragment set:html={ico('buscar')} /><input type="search" id="equipo-q" placeholder="Buscar por nombre, cargo, área o jefe" aria-label="Buscar personas" /></label>
+      <div class="chips" id="equipo-chips"></div>
+    </div>
+    <div id="equipo-list"></div>
+    <p class="muted th-nota">Las personas son las cuentas del panel. Para agregar a alguien, créele un usuario en <a href="/admin?tab=usuarios">Usuarios</a> y luego complete su ficha aquí.</p>
+  </section>
+
+  <!-- NOVEDADES -->
+  <section id="panel-novedades" class="panel">
+    <div class="toolbar">
+      <label class="buscar"><Fragment set:html={ico('buscar')} /><input type="search" id="novedad-q" placeholder="Buscar por persona, tipo o motivo" aria-label="Buscar novedades" /></label>
+      <div class="chips" id="novedad-chips"></div>
+    </div>
+    <div id="novedad-list"></div>
+  </section>
+
+  <!-- CAPACITACIÓN -->
+  <section id="panel-capacitacion" class="panel">
+    <div class="toolbar">
+      <label class="buscar"><Fragment set:html={ico('buscar')} /><input type="search" id="curso-q" placeholder="Buscar curso o proveedor" aria-label="Buscar cursos" /></label>
+      <div class="chips" id="curso-chips"></div>
+      <button class="btn-primary sp" type="button" id="nuevo-curso">+ Nuevo curso</button>
+    </div>
+    <div id="curso-list"></div>
+    <p class="muted th-nota">Los talleres de IA vienen del programa de capacitación (<a href="/ia" target="_blank">/ia</a>). Si un curso tiene vigencia, por ejemplo trabajo en alturas, el certificado de cada persona sale en el tablero antes de vencer.</p>
+  </section>
+
+  <!-- DESEMPEÑO -->
+  <section id="panel-desempeno" class="panel">
+    <div id="eval-pendientes"></div>
+    <div class="toolbar">
+      <label class="buscar"><Fragment set:html={ico('buscar')} /><input type="search" id="eval-q" placeholder="Buscar por persona, cargo o período" aria-label="Buscar evaluaciones" /></label>
+      <div class="chips" id="eval-chips"></div>
+      <button class="btn-primary sp" type="button" id="nueva-eval">+ Nueva evaluación</button>
+    </div>
+    <div id="eval-list"></div>
+  </section>
+
+  <!-- CARGOS -->
+  <section id="panel-cargos" class="panel">
+    <div class="toolbar">
+      <p class="muted th-intro">Cada cargo tiene sus criterios de evaluación. Al evaluar a una persona se usan los de su cargo.</p>
+      <button class="btn-primary sp" type="button" id="nuevo-cargo">+ Nuevo cargo</button>
+    </div>
+    <div id="cargo-list" class="th-cargos"></div>
+  </section>
+
+  <!-- AJUSTES -->
+  <section id="panel-ajustes" class="panel">
+    <div class="th-ajustes">
+      <form id="ajustes-form" class="card-form">
+        <div>
+          <h3>Reglas de la empresa</h3>
+          <p class="muted">Cambian cómo se cuentan las vacaciones nuevas y cuándo toca evaluar. Las novedades ya guardadas conservan sus días.</p>
+        </div>
+        <label class="switch">
+          <input type="checkbox" name="sabadoHabil" />
+          <span class="switch-ui" aria-hidden="true"></span>
+          <span class="switch-txt"><b>La empresa trabaja los sábados</b><small>Si está apagado, el sábado no descuenta días de vacaciones (los domingos y festivos nunca descuentan).</small></span>
+        </label>
+        <label>Evaluar a cada persona cada
+          <span class="th-sufijo"><input type="number" name="evaluacionMeses" min="1" max="36" required /><span>meses</span></span>
+        </label>
+        <div class="drawer-actions">
+          <p class="form-error" id="ajustes-err"></p>
+          <button type="submit" class="btn-primary"><span class="t">Guardar</span></button>
+        </div>
+      </form>
+      <div class="card-form">
+        <div>
+          <h3>Resumen semanal por correo</h3>
+          <p class="muted">Cada lunes a las 7:00 a. m. llega un resumen con lo vencido, lo que vence en 30 días, las ausencias de la semana y las solicitudes por aprobar. Si no hay nada, no se envía.</p>
+        </div>
+        {emailListo
+          ? <p class="th-ok">El correo está configurado.</p>
+          : <p class="th-pendiente">Falta configurar el correo: <code>RESEND_API_KEY</code>, <code>NOTIFY_FROM</code> y <code>TALENTO_EMAIL</code> (o <code>NOTIFY_EMAIL</code>), y <code>CRON_SECRET</code> para el envío automático.</p>}
+        <div class="drawer-actions">
+          <p class="form-error" id="resumen-err"></p>
+          <button type="button" class="btn-ghost" id="enviar-resumen" disabled={!emailListo}>Enviar el resumen ahora</button>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <Fragment slot="fuera">
+    <!-- PERSONA -->
+    <div class="drawer" id="persona-drawer" hidden>
+      <div class="drawer-bg" data-close></div>
+      <div class="drawer-panel drawer-ancho">
+        <div class="drawer-head">
+          <div><p class="drawer-kicker">Talento humano</p><h3 id="persona-titulo">Persona</h3><p class="th-sub" id="persona-sub"></p></div>
+          <button class="x" data-close aria-label="Cerrar">×</button>
+        </div>
+        <nav class="subtabs th-pestanas" id="persona-tabs" aria-label="Secciones de la ficha">
+          <button class="subtab is-active" data-ptab="ficha">Ficha</button>
+          <button class="subtab" data-ptab="documentos">Documentos</button>
+          <button class="subtab" data-ptab="novedades">Vacaciones y novedades</button>
+          <button class="subtab" data-ptab="formacion">Formación</button>
+          <button class="subtab" data-ptab="desempeno">Desempeño</button>
+        </nav>
+        <form id="ficha-form" class="drawer-body" data-pvista="ficha">
+          <input type="hidden" name="usuario_id" />
+          <fieldset class="grupo">
+            <legend>Cargo y contrato</legend>
+            <div class="grid2">
+              <label>Cargo<select name="cargo_id"></select><small>Define los criterios de su evaluación. Los cargos se crean en la pestaña Cargos.</small></label>
+              <label>Área<select name="area"></select></label>
+            </div>
+            <div class="grid2">
+              <label>Tipo de contrato<select name="tipo_contrato"></select></label>
+              <label>Jefe inmediato<input name="jefe" list="th-nombres" autocomplete="off" /></label>
+            </div>
+            <div class="grid3">
+              <label>Fecha de ingreso<input type="date" name="fecha_ingreso" /></label>
+              <label>Fin del contrato<input type="date" name="fecha_fin_contrato" /><small>Solo término fijo, obra o aprendizaje.</small></label>
+              <label>Fecha de retiro<input type="date" name="fecha_retiro" /><small>Al llegar, deja de contar como activa.</small></label>
+            </div>
+            <label>Salario mensual (opcional)<input name="salario" inputmode="numeric" placeholder="Déjelo vacío si no lo lleva aquí" autocomplete="off" /><small>Solo lo ven los administradores. No sale en el correo ni en el asistente.</small></label>
+          </fieldset>
+          <fieldset class="grupo">
+            <legend>Datos personales y contacto</legend>
+            <div class="grid3">
+              <label>Documento de identidad<input name="documento" autocomplete="off" /></label>
+              <label>Fecha de nacimiento<input type="date" name="fecha_nacimiento" /></label>
+              <label>Celular<input name="telefono" inputmode="tel" autocomplete="off" /></label>
+            </div>
+            <label>Correo personal<input type="email" name="correo_personal" autocomplete="off" /></label>
+            <div class="grid2">
+              <label>Contacto de emergencia<input name="emergencia_nombre" placeholder="Nombre y parentesco" autocomplete="off" /></label>
+              <label>Teléfono de emergencia<input name="emergencia_telefono" inputmode="tel" autocomplete="off" /></label>
+            </div>
+          </fieldset>
+          <fieldset class="grupo">
+            <legend>Seguridad social</legend>
+            <div class="grid3">
+              <label>EPS<input name="eps" /></label>
+              <label>Fondo de pensiones<input name="pension" /></label>
+              <label>Fondo de cesantías<input name="cesantias" /></label>
+            </div>
+            <div class="grid2">
+              <label>ARL<input name="arl" /></label>
+              <label>Caja de compensación<input name="caja" /></label>
+            </div>
+          </fieldset>
+          <fieldset class="grupo">
+            <legend>Vacaciones y notas</legend>
+            <label>Días de vacaciones ya disfrutados antes de usar el panel<input name="vacaciones_ajuste" inputmode="decimal" placeholder="0" /><small>Se descuentan del saldo. Así el saldo arranca bien aunque la persona lleve años en la empresa.</small></label>
+            <label>Notas internas<textarea name="notas" rows="3"></textarea><small>No escriba aquí diagnósticos ni información médica.</small></label>
+          </fieldset>
+          <div class="drawer-actions">
+            <p class="form-error" id="ficha-err"></p>
+            <button type="button" class="btn-ghost" data-close>Cerrar</button>
+            <button type="submit" class="btn-primary"><span class="t">Guardar ficha</span></button>
+          </div>
+        </form>
+        <div class="drawer-body" id="persona-vista" data-pvista="otra" hidden></div>
+      </div>
+    </div>
+
+    <!-- DOCUMENTO -->
+    <div class="drawer" id="doc-drawer" hidden>
+      <div class="drawer-bg" data-close></div>
+      <div class="drawer-panel drawer-angosto">
+        <div class="drawer-head"><div><p class="drawer-kicker">Documento</p><h3 id="doc-titulo">Documento</h3></div><button class="x" data-close aria-label="Cerrar">×</button></div>
+        <form id="doc-form" class="drawer-body">
+          <input type="hidden" name="id" />
+          <input type="hidden" name="usuario_id" />
+          <fieldset class="grupo">
+            <legend>Documento</legend>
+            <label>Tipo<select name="tipo"></select></label>
+            <label>Nombre<input name="nombre" placeholder="Ej.: Examen periódico 2026" /></label>
+            <label>Enlace<input name="enlace" type="url" placeholder="https://drive.google.com/…" /><small>El archivo se queda en Drive o WorkDrive; aquí solo va el enlace. Revise que esté compartido solo con RR.HH.</small></label>
+            <div class="grid2">
+              <label>Expedición<input type="date" name="fecha_expedicion" /></label>
+              <label>Vencimiento<input type="date" name="fecha_vencimiento" /><small>Si vence, sale en el tablero 90 días antes.</small></label>
+            </div>
+            <label>Notas<textarea name="notas" rows="2"></textarea></label>
+            <p class="muted th-aviso-salud" id="doc-aviso-salud" hidden>Del examen ocupacional, enlace solo el certificado de aptitud. La historia clínica es reservada y no debe estar aquí.</p>
+          </fieldset>
+          <div class="drawer-actions">
+            <p class="form-error" id="doc-err"></p>
+            <button type="button" class="btn-ghost" data-close>Cancelar</button>
+            <button type="submit" class="btn-primary"><span class="t">Guardar</span></button>
+          </div>
+        </form>
+      </div>
+    </div>
+
+    <!-- NOVEDAD -->
+    <div class="drawer" id="novedad-drawer" hidden>
+      <div class="drawer-bg" data-close></div>
+      <div class="drawer-panel drawer-angosto">
+        <div class="drawer-head"><div><p class="drawer-kicker">Novedad</p><h3 id="novedad-titulo">Registrar novedad</h3></div><button class="x" data-close aria-label="Cerrar">×</button></div>
+        <form id="novedad-form" class="drawer-body">
+          <input type="hidden" name="id" />
+          <fieldset class="grupo">
+            <legend>Quién y qué</legend>
+            <label>Persona<select name="usuario_id" required></select></label>
+            <label>Tipo<select name="tipo"></select></label>
+            <div class="grid2">
+              <label>Desde<input type="date" name="desde" required /></label>
+              <label>Hasta (inclusive)<input type="date" name="hasta" required /></label>
+            </div>
+            <div class="th-calculo" id="novedad-calculo"></div>
+          </fieldset>
+          <fieldset class="grupo">
+            <legend>Decisión y soporte</legend>
+            <label>Estado<select name="estado"></select></label>
+            <label>Motivo u observación<textarea name="motivo" rows="2"></textarea><small>En incapacidades, registre solo las fechas: nada de diagnósticos.</small></label>
+            <label>Enlace al soporte (opcional)<input name="enlace" type="url" placeholder="https://drive.google.com/…" /></label>
+          </fieldset>
+          <div class="drawer-actions">
+            <p class="form-error" id="novedad-err"></p>
+            <button type="button" class="btn-ghost danger-txt" id="novedad-borrar" hidden>Eliminar</button>
+            <button type="button" class="btn-ghost" data-close>Cancelar</button>
+            <button type="submit" class="btn-primary"><span class="t">Guardar</span></button>
+          </div>
+        </form>
+      </div>
+    </div>
+
+    <!-- CURSO -->
+    <div class="drawer" id="curso-drawer" hidden>
+      <div class="drawer-bg" data-close></div>
+      <div class="drawer-panel">
+        <div class="drawer-head"><div><p class="drawer-kicker">Capacitación</p><h3 id="curso-titulo">Curso</h3></div><button class="x" data-close aria-label="Cerrar">×</button></div>
+        <div class="drawer-body">
+          <form id="curso-form" class="th-subform">
+            <input type="hidden" name="id" />
+            <fieldset class="grupo">
+              <legend>Curso</legend>
+              <label>Nombre<input name="nombre" required /></label>
+              <div class="grid2">
+                <label>Tipo<select name="tipo"></select></label>
+                <label>Proveedor<input name="proveedor" placeholder="ARL, SENA, interno…" /></label>
+              </div>
+              <div class="grid2">
+                <label>Horas<input name="horas" inputmode="decimal" placeholder="0" /></label>
+                <label>Vigencia (meses)<input name="vigencia_meses" type="number" min="0" max="120" placeholder="0" /><small>0 si el certificado no vence.</small></label>
+              </div>
+              <label>Descripción<textarea name="descripcion" rows="2"></textarea></label>
+              <label class="switch">
+                <input type="checkbox" name="activo" checked />
+                <span class="switch-ui" aria-hidden="true"></span>
+                <span class="switch-txt"><b>Curso activo</b><small>Los inactivos no se ofrecen al registrar asistencia, pero conservan su historial.</small></span>
+              </label>
+              <div class="th-acciones-form">
+                <p class="form-error" id="curso-err"></p>
+                <button type="button" class="btn-ghost danger-txt" id="curso-borrar" hidden>Eliminar</button>
+                <button type="submit" class="btn-primary"><span class="t">Guardar curso</span></button>
+              </div>
+            </fieldset>
+          </form>
+          <div id="curso-asistencia"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- EVALUACIÓN -->
+    <div class="drawer" id="eval-drawer" hidden>
+      <div class="drawer-bg" data-close></div>
+      <div class="drawer-panel drawer-ancho">
+        <div class="drawer-head"><div><p class="drawer-kicker">Evaluación de desempeño</p><h3 id="eval-titulo">Evaluación</h3></div><button class="x" data-close aria-label="Cerrar">×</button></div>
+        <form id="eval-form" class="drawer-body">
+          <input type="hidden" name="id" />
+          <input type="hidden" name="cargo" />
+          <fieldset class="grupo">
+            <legend>Datos</legend>
+            <div class="grid3">
+              <label>Persona<select name="usuario_id" required></select></label>
+              <label>Período<input name="periodo" placeholder="2026, segundo semestre" /></label>
+              <label>Fecha<input type="date" name="fecha" required /></label>
+            </div>
+            <p class="muted th-eval-cargo" id="eval-cargo"></p>
+          </fieldset>
+          <fieldset class="grupo">
+            <legend>Calificación <span class="th-escala">1 muy por debajo · 3 cumple · 5 sobresaliente</span></legend>
+            <div id="eval-criterios"></div>
+            <div class="th-promedio" id="eval-promedio"></div>
+          </fieldset>
+          <fieldset class="grupo">
+            <legend>Conversación</legend>
+            <label>Fortalezas<textarea name="fortalezas" rows="2"></textarea></label>
+            <label>Aspectos por mejorar<textarea name="mejoras" rows="2"></textarea></label>
+            <label>Metas para el próximo período<textarea name="metas" rows="3"></textarea></label>
+          </fieldset>
+          <div class="drawer-actions">
+            <p class="form-error" id="eval-err"></p>
+            <button type="button" class="btn-ghost danger-txt" id="eval-borrar" hidden>Eliminar</button>
+            <button type="submit" class="btn-ghost" data-estado="borrador">Guardar borrador</button>
+            <button type="submit" class="btn-primary" data-estado="cerrada"><span class="t">Cerrar evaluación</span></button>
+          </div>
+        </form>
+      </div>
+    </div>
+
+    <!-- CARGO -->
+    <div class="drawer" id="cargo-drawer" hidden>
+      <div class="drawer-bg" data-close></div>
+      <div class="drawer-panel">
+        <div class="drawer-head"><div><p class="drawer-kicker">Cargos</p><h3 id="cargo-titulo">Cargo</h3></div><button class="x" data-close aria-label="Cerrar">×</button></div>
+        <form id="cargo-form" class="drawer-body">
+          <input type="hidden" name="id" />
+          <fieldset class="grupo">
+            <legend>Cargo</legend>
+            <div class="grid2">
+              <label>Nombre<input name="nombre" required placeholder="Coordinador de logística" /></label>
+              <label>Área<select name="area"></select></label>
+            </div>
+            <label>Descripción<textarea name="descripcion" rows="2" placeholder="Para qué existe el cargo y qué entrega"></textarea></label>
+          </fieldset>
+          <fieldset class="grupo">
+            <legend>Criterios de evaluación</legend>
+            <div id="cargo-criterios" class="th-criterios"></div>
+            <div class="add-sec">
+              <button type="button" id="criterio-mas">+ Criterio</button>
+              <button type="button" id="criterio-base">Usar criterios sugeridos</button>
+            </div>
+          </fieldset>
+          <div class="drawer-actions">
+            <p class="form-error" id="cargo-err"></p>
+            <button type="button" class="btn-ghost danger-txt" id="cargo-borrar" hidden>Eliminar</button>
+            <button type="button" class="btn-ghost" data-close>Cancelar</button>
+            <button type="submit" class="btn-primary"><span class="t">Guardar</span></button>
+          </div>
+        </form>
+      </div>
+    </div>
+
+    <datalist id="th-nombres">{estado?.personas.map((p) => <option value={p.nombre} />)}</datalist>
+
+    <script is:inline define:vars={{ estado, catalogos, festivos, emailListo, user }}>
+      window.__TALENTO__ = { estado, catalogos, festivos, emailListo, yo: user }
+    </script>
+    <script src="/admin/talento.js" type="module"></script>
+  </Fragment>
+</AdminLayout>
