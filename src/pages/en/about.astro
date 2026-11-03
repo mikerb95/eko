@@ -371,8 +371,8 @@ const poster = await getImage({
       backdrop-filter: blur(4px); padding: 5px 11px; border-radius: 999px;
     }
     .hito-body { padding: clamp(20px, 2vw, 28px); display: flex; flex-direction: column; gap: 10px; }
-    .hito-body h3 { font-family: var(--font-display); font-weight: 400; font-size: clamp(20px, 1.9vw, 26px); letter-spacing: -0.02em; }
-    .hito-body h3 em { font-style: italic; color: var(--forest); }
+    .hito-body h3 { font-family: var(--font-display); font-weight: var(--display-weight); font-size: clamp(20px, 1.9vw, 26px); letter-spacing: -0.02em; }
+    .hito-body h3 em { color: var(--forest); }
     .hito-body p { font-size: 14px; line-height: 1.6; color: var(--ink-2); }
 
     @media (max-width: 900px) {

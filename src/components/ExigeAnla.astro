@@ -140,7 +140,7 @@ const esBase = (code: string) => (BASE as readonly string[]).includes(code)
 
   .ex-perfiles { border: 0; margin-top: 14px; min-width: 0; }
   .ex-pregunta {
-    font-family: var(--font-display); font-size: clamp(22px, 2vw, 26px); letter-spacing: -0.01em;
+    font-family: var(--font-display); font-weight: var(--display-weight); font-size: clamp(22px, 2vw, 26px); letter-spacing: -0.01em;
     color: var(--ink); margin-bottom: 10px; padding: 0;
   }
   .ex-chips { display: flex; flex-wrap: wrap; gap: 7px; }
@@ -213,7 +213,7 @@ const esBase = (code: string) => (BASE as readonly string[]).includes(code)
   .ex-n, .ex-cta { display: none; }
   .ex-n { font-family: var(--font-mono); font-size: 12px; letter-spacing: 0.08em; text-transform: uppercase; color: var(--mute); align-items: baseline; gap: 10px; }
   .ex-n b {
-    font-family: var(--font-display); font-weight: 400; font-size: 42px; line-height: 1;
+    font-family: var(--font-display); font-weight: var(--display-weight); font-size: 42px; line-height: 1;
     letter-spacing: -0.03em; color: var(--ink); text-transform: none; display: inline-block;
   }
   .ex-cta {

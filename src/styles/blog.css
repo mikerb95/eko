@@ -72,7 +72,7 @@
 .blog-kicker .dot.accent-forest { background: var(--forest); }
 .blog-kicker .dot.accent-clay { background: var(--clay); }
 .blog-featured-title {
-  font-family: var(--font-display); font-weight: 400;
+  font-family: var(--font-display); font-weight: var(--display-weight);
   font-size: clamp(28px, 3vw, 44px); letter-spacing: -0.02em; line-height: 1.05;
   margin-top: 20px;
   text-wrap: balance;
@@ -112,7 +112,7 @@
 .br-cat .d.accent-forest { background: var(--forest); }
 .br-cat .d.accent-clay { background: var(--clay); }
 .br-title {
-  font-family: var(--font-display); font-weight: 400; font-size: clamp(18px, 1.8vw, 24px);
+  font-family: var(--font-display); font-weight: var(--display-weight); font-size: clamp(18px, 1.8vw, 24px);
   letter-spacing: -0.015em; line-height: 1.15; color: var(--ink);
   text-wrap: balance;
 }
@@ -201,19 +201,19 @@
   margin-bottom: 1.2em;
 }
 .post-h2 {
-  font-family: var(--font-display); font-weight: 400;
+  font-family: var(--font-display); font-weight: var(--display-weight);
   font-size: clamp(28px, 3vw, 40px); letter-spacing: -0.02em; line-height: 1.1;
   margin-top: 2em; margin-bottom: 0.6em;
   color: var(--ink);
 }
 .post-pull {
-  font-family: var(--font-display); font-weight: 400;
+  font-family: var(--font-display); font-weight: var(--display-weight);
   font-size: clamp(22px, 2.4vw, 32px); letter-spacing: -0.015em;
   line-height: 1.2; color: var(--ink);
   padding: 28px 0 28px 28px;
   border-left: 2px solid var(--forest);
   margin-block: 2em;
-  font-style: italic;
+
 }
 .post-list {
   list-style: none; margin-block: 1.6em;

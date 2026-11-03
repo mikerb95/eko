@@ -1153,16 +1153,14 @@ const mapa = [
   .doc-section[hidden] { display: none; }
   .doc-section + .doc-section { margin-top: 56px; }
   .sec-title {
-    font-family: var(--font-display);
+    font-family: var(--font-display); font-weight: var(--display-weight);
     font-size: clamp(28px, 4vw, 38px);
-    font-weight: 400;
     line-height: 1.1;
     margin-bottom: 18px;
   }
   .sub-title {
-    font-family: var(--font-display);
+    font-family: var(--font-display); font-weight: var(--display-weight);
     font-size: 23px;
-    font-weight: 400;
     margin: 40px 0 16px;
   }
   .sec-body {
@@ -1215,7 +1213,7 @@ const mapa = [
   .kpi-dot--forest { background: var(--forest); }
   .kpi-dot--clay { background: var(--clay-2); }
   .kpi-value {
-    font-family: var(--font-display);
+    font-family: var(--font-display); font-weight: var(--display-weight);
     font-size: 32px;
     line-height: 1.05;
     font-variant-numeric: tabular-nums;
@@ -1318,7 +1316,7 @@ const mapa = [
     padding-bottom: 8px;
     border-bottom: 1px solid var(--line);
   }
-  .grupo-t { font-family: var(--font-display); font-size: 22px; font-weight: 400; }
+  .grupo-t { font-family: var(--font-display); font-weight: var(--display-weight); font-size: 22px; }
   .grupo-n {
     margin-left: auto;
     padding: 2px 9px;
@@ -1458,7 +1456,7 @@ const mapa = [
     background: color-mix(in oklab, var(--paper-warm) 68%, transparent);
   }
   .cux-head { display: flex; align-items: baseline; gap: 10px; }
-  .cux-t { font-family: var(--font-display); font-size: 24px; font-weight: 400; }
+  .cux-t { font-family: var(--font-display); font-weight: var(--display-weight); font-size: 24px; }
   .cux-meta {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(230px, 1fr));
@@ -1764,7 +1762,7 @@ const mapa = [
     border-radius: var(--r-lg);
     background: color-mix(in oklab, var(--paper-warm) 68%, transparent);
   }
-  .instant-t { font-family: var(--font-display); font-size: 21px; font-weight: 400; }
+  .instant-t { font-family: var(--font-display); font-weight: var(--display-weight); font-size: 21px; }
   .instant-d {
     margin: 6px 0 16px;
     max-width: 82ch;
@@ -1904,7 +1902,7 @@ const mapa = [
     flex: none;
     width: 30px;
     height: 30px;
-    font-family: var(--font-display);
+    font-family: var(--font-display); font-weight: var(--display-weight);
     font-size: 17px;
     color: var(--deep-2);
     background: color-mix(in oklab, var(--deep) 11%, transparent);
