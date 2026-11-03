@@ -164,3 +164,10 @@
   .th-criterio { grid-template-columns: 1fr; }
   .th-pestanas { padding: 0 8px; }
 }
+
+@media (max-width: 560px) {
+  /* En celular el chip de fecha baja debajo del texto en vez de apretarlo. */
+  .th-avisos > li > button { flex-wrap: wrap; }
+  .th-avisos .th-aviso-txt { flex-basis: calc(100% - 44px); }
+  .th-avisos .plazo-chip { margin-left: 40px; }
+}
