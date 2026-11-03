@@ -442,7 +442,7 @@ const fuentes = [
     <div class="section-head reveal">
       <div>
         <div class="eyebrow">Revisión del 28 de octubre</div>
-        <h2>Qué <em>cambió</em> desde<br>la versión de julio.</h2>
+    <h2>Qué <em>cambió</em> desde la versión de julio.</h2>
       </div>
       <div class="meta">
         Solo lo que toca las cuatro líneas de negocio. Cada eje y cada oportunidad lleva ahora su estado: vigente, en trámite o caducado.
@@ -462,7 +462,7 @@ const fuentes = [
     <div class="section-head reveal">
       <div>
         <div class="eyebrow">Marco regulatorio</div>
-        <h2>Cuatro cambios que <em>mueven</em><br>el tablero del sector.</h2>
+    <h2>Cuatro cambios que <em>mueven</em> el tablero del sector.</h2>
       </div>
       <div class="meta">
         Dos ya están vigentes y crean obligaciones nuevas para los clientes de Ekosolv. Los otros dos están a medio camino y conviene seguirlos de cerca. Haz clic para expandir.
@@ -514,7 +514,7 @@ const fuentes = [
     <div class="section-head reveal">
       <div>
         <div class="eyebrow">Oportunidades del sector</div>
-        <h2>Seis frentes donde la demanda<br>crece <em>sin importar</em> el gobierno.</h2>
+    <h2>Seis frentes donde la demanda crece <em>sin importar</em> el gobierno.</h2>
       </div>
       <div class="meta">
         El marco regulatorio del posconsumo (Ley 1672/2013, Decreto 284/2018, Resolución 0851/2022 y Decreto 670/2025 de Basura Cero) sigue en firme tras el cambio de gobierno y genera obligaciones que no dependen de quién gobierne.
@@ -545,7 +545,7 @@ const fuentes = [
     <div class="section-head reveal">
       <div>
         <div class="eyebrow">Perfil y capacidad instalada</div>
-        <h2>Cuatro líneas que ya <em>operan</em><br>sobre el marco vigente.</h2>
+    <h2>Cuatro líneas que ya <em>operan</em> sobre el marco vigente.</h2>
       </div>
       <div class="meta">
         Las seis oportunidades anteriores son del sector entero. Lo que sigue es la traducción a Ekosolv: qué línea de negocio atiende cada una, con qué capacidad instalada se sostiene hoy y qué hay que construir para capturarla.
@@ -580,7 +580,7 @@ const fuentes = [
     <div class="section-head reveal">
       <div>
         <div class="eyebrow">Encaje oportunidad · capacidad</div>
-        <h2>Dónde alcanza lo que hay<br>y dónde <em>falta</em> construir.</h2>
+        <h2>Dónde alcanza lo que hay y dónde <em>falta</em> construir.</h2>
       </div>
       <div class="meta">
         Ninguna de las seis oportunidades se captura solo con la operación actual. En todas, la pieza faltante es la misma: convertir la operación en datos verificables por un tercero.
@@ -619,7 +619,7 @@ const fuentes = [
     <div class="section-head reveal">
       <div>
         <div class="eyebrow">Competencia y posicionamiento</div>
-        <h2>No ser el más grande,<br>ser el que <em>deja cumplido</em>.</h2>
+    <h2>No ser el más grande, ser el que <em>deja cumplido</em>.</h2>
       </div>
       <div class="meta">
         Frente a jugadores con más tonelaje, más sedes o respaldo gremial, Ekosolv no gana en volumen. Gana en lo que el Decreto 766 y la ANLA están volviendo obligatorio: demostrar el cumplimiento con un certificado que un tercero pueda verificar.
@@ -741,7 +741,7 @@ const fuentes = [
     <div class="section-head reveal">
       <div>
         <div class="eyebrow">La respuesta desde el software</div>
-        <h2>Plataforma de <em>trazabilidad</em> y<br>cumplimiento posconsumo.</h2>
+    <h2>Plataforma de <em>trazabilidad</em> y cumplimiento posconsumo.</h2>
       </div>
       <div class="meta">
         La palanca no es una app nueva de recolección: es convertir la operación actual en datos que los clientes necesitan por obligación, regulatoria o contractual. Eso es lo que genera demanda inmediata.
@@ -788,7 +788,7 @@ const fuentes = [
     <div class="section-head reveal">
       <div>
         <div class="eyebrow">¿Por qué la demanda es inmediata?</div>
-        <h2>La necesidad ya <em>existe</em>,<br>no hay que crearla.</h2>
+    <h2>La necesidad ya <em>existe</em>, no hay que crearla.</h2>
       </div>
       <div class="meta">
         Los certificados y la trazabilidad ya son requisito contractual de los clientes B2B. El Decreto 766 les pone fecha y formato digital, la ANLA está empujando a los evasores a entrar a un sistema y las metas de la Res. 0851 suben cada año. Frente a la competencia informal, la trazabilidad verificable es el argumento de venta.
@@ -952,7 +952,7 @@ const fuentes = [
     display: grid;
     grid-template-columns: 220px 1fr auto 32px;
     align-items: center;
-    gap: 16px;
+    gap: 16px 24px;
     padding: 20px 0;
   }
   .fit-sum::-webkit-details-marker { display: none; }
@@ -999,7 +999,7 @@ const fuentes = [
   .fit-body {
     display: grid;
     grid-template-columns: 220px 1fr 1fr;
-    gap: clamp(20px, 3vw, 48px);
+    gap: 16px 24px;
     padding: 0 0 28px;
   }
   .fit-body::before { content: ""; }
@@ -1028,6 +1028,8 @@ const fuentes = [
     background: var(--paper-warm);
     border: 1px solid var(--line);
   }
+
+  .section-head h2 { text-wrap: balance; }
 
   /* ── Índice fijo ─────────────────────────────────────────────────────── */
   section[id] { scroll-margin-top: 124px; }
