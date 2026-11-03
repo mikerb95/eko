@@ -54,6 +54,12 @@ export type TFStep = {
   subtitle?: string
   row?: boolean
   fields: TFField[]
+  /**
+   * Paso condicional: solo se muestra (y solo se envía lo que tenga) si la
+   * opción `field` quedó en `equals`. Sirve para preguntas que dependen de una
+   * respuesta anterior, como las tareas de cada área en el diagnóstico.
+   */
+  when?: { field: string; equals: string }
 }
 
 interface Props {
@@ -139,10 +145,15 @@ const selectedValues = (f: Extract<TFField, { type: 'choice' }>) =>
     <div class="tf-viewport">
       {
         steps.map((step, i) => (
-          <fieldset class="tf-step" data-index={i}>
+          <fieldset
+            class="tf-step"
+            data-index={i}
+            data-when-field={step.when?.field}
+            data-when-equals={step.when?.equals}
+          >
             <div class="tf-step-head">
               <span class="tf-step-count">
-                {pad(i + 1)} <span class="tf-sep">—</span> {pad(steps.length)}
+                <span class="tf-step-num">{pad(i + 1)}</span> <span class="tf-sep">/</span> <span class="tf-step-total">{pad(steps.length)}</span>
               </span>
               <legend class="tf-title">{step.title}</legend>
               {step.subtitle && <p class="tf-subtitle">{step.subtitle}</p>}
@@ -643,7 +654,19 @@ const selectedValues = (f: Extract<TFField, { type: 'choice' }>) =>
     flow.setAttribute('data-enhanced', '')
     let current = 0
 
-    const isLast = (i: number) => i === steps.length - 1
+    // Pasos condicionales (`when`): aplican según el valor actual de otra opción.
+    const valorDe = (name: string) =>
+      (form.querySelector(`input[type="hidden"][name="${name}"]`) as HTMLInputElement | null)?.value ?? ''
+    const aplica = (i: number) => {
+      const { whenField, whenEquals } = steps[i].dataset
+      return !whenField || valorDe(whenField) === whenEquals
+    }
+    const visibles = () => steps.map((_, i) => i).filter(aplica)
+    const siguiente = (i: number) => visibles().find((j) => j > i) ?? -1
+    const anterior = (i: number) => [...visibles()].reverse().find((j) => j < i) ?? -1
+
+    const isLast = (i: number) => siguiente(i) === -1
+    const pad2 = (n: number) => String(n).padStart(2, '0')
 
     function showError(msg: string) {
       errEl.textContent = msg
@@ -656,8 +679,16 @@ const selectedValues = (f: Extract<TFField, { type: 'choice' }>) =>
 
     function render(focus = true) {
       steps.forEach((s, i) => s.classList.toggle('is-active', i === current))
-      bar.style.width = `${((current + 1) / steps.length) * 100}%`
-      backBtn.hidden = current === 0
+      const vis = visibles()
+      const pos = vis.indexOf(current) + 1
+      bar.style.width = `${(pos / vis.length) * 100}%`
+      steps.forEach((s) => {
+        const num = s.querySelector('.tf-step-num')
+        const total = s.querySelector('.tf-step-total')
+        if (num) num.textContent = pad2(pos)
+        if (total) total.textContent = pad2(vis.length)
+      })
+      backBtn.hidden = anterior(current) === -1
       nextLabel.textContent = isLast(current) ? submitLabel : t.continue
       clearError()
       if (focus) {
@@ -717,7 +748,7 @@ const selectedValues = (f: Extract<TFField, { type: 'choice' }>) =>
       if (isLast(current)) {
         submit()
       } else {
-        goTo(current + 1)
+        goTo(siguiente(current))
       }
     }
 
@@ -770,7 +801,13 @@ const selectedValues = (f: Extract<TFField, { type: 'choice' }>) =>
     })
 
     async function submit() {
-      const payload = Object.fromEntries(new FormData(form).entries())
+      const datos = new FormData(form)
+      // Lo de los pasos condicionales que no aplicaron no se envía.
+      steps.forEach((s, i) => {
+        if (aplica(i)) return
+        s.querySelectorAll('[name]').forEach((el) => datos.delete((el as HTMLInputElement).name))
+      })
+      const payload = Object.fromEntries(datos.entries())
       nextBtn.disabled = true
       nextLabel.textContent = t.sending
       clearError()
@@ -810,7 +847,7 @@ const selectedValues = (f: Extract<TFField, { type: 'choice' }>) =>
     })
 
     nextBtn.addEventListener('click', next)
-    backBtn.addEventListener('click', () => goTo(current - 1))
+    backBtn.addEventListener('click', () => goTo(anterior(current)))
 
     form.addEventListener('keydown', (e) => {
       if (e.key !== 'Enter') return
