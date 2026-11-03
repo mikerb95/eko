@@ -681,12 +681,17 @@ const selectedValues = (f: Extract<TFField, { type: 'choice' }>) =>
       steps.forEach((s, i) => s.classList.toggle('is-active', i === current))
       const vis = visibles()
       const pos = vis.indexOf(current) + 1
-      bar.style.width = `${(pos / vis.length) * 100}%`
+      // Un grupo condicional que todavía no aplica (no se ha elegido la opción)
+      // cuenta como un paso, para que el total no cambie al responder.
+      const grupos = new Set(steps.map((s) => s.dataset.whenField).filter(Boolean))
+      const pendientes = [...grupos].filter((g) => !vis.some((i) => steps[i].dataset.whenField === g)).length
+      const total = vis.length + pendientes
+      bar.style.width = `${(pos / total) * 100}%`
       steps.forEach((s) => {
         const num = s.querySelector('.tf-step-num')
-        const total = s.querySelector('.tf-step-total')
+        const tot = s.querySelector('.tf-step-total')
         if (num) num.textContent = pad2(pos)
-        if (total) total.textContent = pad2(vis.length)
+        if (tot) tot.textContent = pad2(total)
       })
       backBtn.hidden = anterior(current) === -1
       nextLabel.textContent = isLast(current) ? submitLabel : t.continue
