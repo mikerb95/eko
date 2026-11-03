@@ -112,3 +112,11 @@ test('práctica: la revisión sale con los cuatro criterios en orden y sin rayas
   assert.equal(r.criterios[2]!.nivel, 'falta')
   assert.ok(!r.criterios[2]!.comentario.includes(RAYA))
 })
+
+test('todas las lecciones sembradas traen contenido y resumen, sin voseo', () => {
+  for (const l of leccionesSemilla()) {
+    assert.ok(l.contenido.trim().length > 200, `sin contenido: ${l.semilla}`)
+    assert.ok(l.resumen.trim(), `sin resumen: ${l.semilla}`)
+    assert.ok(!/\bvos\b|pod[eé]s\b|ten[eé]s\b/i.test(l.contenido), `voseo en ${l.semilla}`)
+  }
+})
