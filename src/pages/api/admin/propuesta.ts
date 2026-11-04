@@ -5,8 +5,6 @@ import {
   borrarPregunta,
   listarElecciones,
   listarPreguntas,
-  propuestaPublicada,
-  publicarPropuesta,
 } from '../../../lib/propuesta/almacen'
 
 export const prerender = false
@@ -19,24 +17,8 @@ const prohibido = () => json({ error: 'Solo administradores' }, 403)
 export const GET: APIRoute = async ({ locals }) => {
   if (!soloAdmin(locals.role)) return prohibido()
   try {
-    const [publicada, preguntas, elecciones] = await Promise.all([propuestaPublicada(), listarPreguntas(), listarElecciones()])
-    return json({ publicada, preguntas, elecciones })
-  } catch (e) {
-    return fail('propuesta', e)
-  }
-}
-
-export const POST: APIRoute = async ({ request, locals }) => {
-  if (!soloAdmin(locals.role)) return prohibido()
-  let b: any
-  try {
-    b = await request.json()
-  } catch {
-    return json({ error: 'JSON inválido' }, 400)
-  }
-  if (b.accion !== 'publicar' && b.accion !== 'retirar') return json({ error: 'Acción desconocida' }, 400)
-  try {
-    return json({ ok: true, publicada: await publicarPropuesta(b.accion === 'publicar') })
+    const [preguntas, elecciones] = await Promise.all([listarPreguntas(), listarElecciones()])
+    return json({ preguntas, elecciones })
   } catch (e) {
     return fail('propuesta', e)
   }

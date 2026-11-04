@@ -1,7 +1,7 @@
 import type { APIRoute } from 'astro'
 import { z } from 'zod'
 import { checkRateLimit, clientIp } from '../../../lib/rateLimit'
-import { guardarEleccion, propuestaPublicada } from '../../../lib/propuesta/almacen'
+import { guardarEleccion } from '../../../lib/propuesta/almacen'
 import { calcular, pesos } from '../../../lib/propuesta/datos'
 import { notifyPropuestaEleccion } from '../../../lib/email'
 
@@ -48,7 +48,6 @@ export const POST: APIRoute = async (context) => {
   if (!plan && d.capacitacion === 'ninguna') return json(400, { error: 'Elija al menos la automatización o la capacitación.' })
 
   try {
-    if (!(await propuestaPublicada())) return json(403, { error: 'La propuesta no está disponible.' })
     const k = calcular({ plan, capacitacion: d.capacitacion })
     await guardarEleccion({ plan: plan ?? '', capacitacion: d.capacitacion, nombre: d.nombre, cargo: d.cargo, comentario: d.comentario, calculo: k })
     const resumen = [k.plan?.etiqueta, k.capacitacion && `capacitación de ${k.capacitacion.sabados} sábados`].filter(Boolean).join(' + ')

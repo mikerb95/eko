@@ -1,37 +1,9 @@
 /**
- * Persistencia de /propuesta: si está publicada, las preguntas del chat y el
- * plan que elige el gerente.
- *
- * La página va con noindex, fuera del sitemap y de src/lib/rutas.ts. El
- * control es el interruptor del panel (/admin/propuesta): sin publicar, la
- * página dice que no está disponible y la API no responde.
+ * Persistencia de /propuesta: las preguntas del chat y el plan que elige el
+ * gerente. La página va con noindex, fuera del sitemap y de src/lib/rutas.ts.
  */
 import { asegurarEsquema, cliente } from '../db'
 import type { Calculo, IdCapacitacion, IdPlan } from './datos'
-
-const CLAVE = 'propuesta'
-
-export async function propuestaPublicada(): Promise<boolean> {
-  await asegurarEsquema()
-  const r = await cliente().execute({ sql: 'SELECT valor FROM ajustes WHERE clave = ?', args: [CLAVE] })
-  const fila = r.rows[0]
-  if (!fila) return false
-  try {
-    return !!JSON.parse(String(fila.valor)).publicada
-  } catch {
-    return false
-  }
-}
-
-export async function publicarPropuesta(publicada: boolean): Promise<boolean> {
-  await asegurarEsquema()
-  await cliente().execute({
-    sql: `INSERT INTO ajustes (clave, valor, actualizado) VALUES (?, ?, ?)
-          ON CONFLICT (clave) DO UPDATE SET valor = excluded.valor, actualizado = excluded.actualizado`,
-    args: [CLAVE, JSON.stringify({ publicada }), new Date().toISOString()],
-  })
-  return publicada
-}
 
 export interface Pregunta {
   id: number

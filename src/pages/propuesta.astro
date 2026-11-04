@@ -7,12 +7,10 @@
 // formulario para marcar el plan elegido.
 //
 // No es una página del sitio de Ekosolv: no está en src/lib/rutas.ts (ni en el
-// sitemap ni en llms.txt), va con noindex y no usa el Layout del sitio. Se
-// publica y se retira desde /admin/propuesta. Todas las cifras salen de
-// src/lib/propuesta/datos.ts.
+// sitemap ni en llms.txt), va con noindex y no usa el Layout del sitio. Todas
+// las cifras salen de src/lib/propuesta/datos.ts.
 export const prerender = false
 import '../styles/global.css'
-import { propuestaPublicada } from '../lib/propuesta/almacen'
 import {
   ANTICIPO,
   CAPACITACION,
@@ -27,14 +25,6 @@ import {
   REVISION_ADICIONAL,
   SEMANAS_DESARROLLO,
 } from '../lib/propuesta/datos'
-
-let publicada = false
-try {
-  publicada = await propuestaPublicada()
-} catch (e: any) {
-  console.error('[propuesta] carga', e?.message || e)
-}
-if (!publicada) Astro.response.status = 404
 
 const NAV = [
   ['resumen', 'Resumen'],
@@ -159,14 +149,6 @@ const maxMensual = Math.max(...PLANES.map((p) => p.mensual))
     />
   </head>
   <body class="pp">
-    {!publicada ? (
-      <main class="pp-cerrada">
-        <p class="pp-eyebrow">codebymike.net</p>
-        <h1>Esta propuesta no está disponible</h1>
-        <p>Si la necesita, escríbale a Mike a <a href="mailto:0368dev@gmail.com">0368dev@gmail.com</a>.</p>
-      </main>
-    ) : (
-      <>
         <header class="pp-top">
           <div class="pp-top-in">
             <a class="pp-marca" href="#resumen"><b>Ekosolv</b><span>Propuesta de codebymike.net</span></a>
@@ -568,8 +550,6 @@ const maxMensual = Math.max(...PLANES.map((p) => p.mensual))
         </aside>
 
         <script type="application/json" id="pp-datos" is:inline set:html={JSON.stringify(DATOS_CLIENTE)} />
-      </>
-    )}
 
     <script>
       type Plan = { id: string; propuestas: number; mensual: number; despues: number }
@@ -853,9 +833,6 @@ const maxMensual = Math.max(...PLANES.map((p) => p.mensual))
       .pp-wrap { max-width: 1120px; margin: 0 auto; padding: 0 16px; }
       @media (min-width: 720px) { .pp-wrap { padding: 0 32px; } }
       .pp-wrap-sm { max-width: 760px; }
-
-      .pp-cerrada { min-height: 100vh; display: grid; place-content: center; text-align: center; padding: 24px; gap: 8px; }
-      .pp-cerrada h1 { font-size: clamp(26px, 4vw, 36px); }
 
       /* Barra superior */
       .pp-top { position: sticky; top: 0; z-index: 30; background: color-mix(in oklab, var(--bg) 88%, transparent); backdrop-filter: blur(10px); border-bottom: 1px solid var(--line); }

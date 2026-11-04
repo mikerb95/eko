@@ -273,8 +273,7 @@ export const TABLAS: readonly string[] = [
   // ── Propuesta comercial en línea (/propuesta) ───────────────────────────
   // Una fila por pregunta del gerente al chat de la propuesta, con la
   // respuesta de la IA. `a_mike` = 1 cuando la IA no la pudo responder o era
-  // negociación (llega también por correo). Si la página está publicada vive
-  // en `ajustes` (clave 'propuesta').
+  // negociación (llega también por correo).
   `CREATE TABLE IF NOT EXISTS propuesta_preguntas (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
     sesion TEXT NOT NULL,

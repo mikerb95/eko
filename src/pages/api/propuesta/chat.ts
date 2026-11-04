@@ -1,12 +1,11 @@
 import type { APIRoute } from 'astro'
 import { checkRateLimit, clientIp } from '../../../lib/rateLimit'
-import { guardarPregunta, propuestaPublicada } from '../../../lib/propuesta/almacen'
+import { guardarPregunta } from '../../../lib/propuesta/almacen'
 import { validarEntradaChat } from '../../../lib/propuesta/ia'
 import { ChatNoDisponible, chatDisponible, responderPregunta } from '../../../lib/propuesta/motorIA'
 import { notifyPropuestaPregunta } from '../../../lib/email'
 
-// Chat con IA de /propuesta. Solo responde mientras la propuesta esté
-// publicada desde el panel. Cada pregunta queda guardada para Mike (la página
+// Chat con IA de /propuesta. Cada pregunta queda guardada para Mike (la página
 // lo avisa) y las que la IA no puede responder le llegan también por correo.
 
 export const prerender = false
@@ -23,7 +22,7 @@ const json = (status: number, body: unknown, headers: Record<string, string> = {
 
 export const GET: APIRoute = async () => {
   try {
-    return json(200, { disponible: (await propuestaPublicada()) && (await chatDisponible()) })
+    return json(200, { disponible: await chatDisponible() })
   } catch {
     return json(200, { disponible: false })
   }
@@ -51,7 +50,6 @@ export const POST: APIRoute = async (context) => {
   const pregunta = entrada.mensajes.at(-1)!.texto
 
   try {
-    if (!(await propuestaPublicada())) return json(403, { error: 'La propuesta no está disponible.' })
     const r = await responderPregunta(entrada)
 
     // Guardar y avisar no puede tumbar la respuesta: ya está pagada.

@@ -1,21 +1,20 @@
 ---
-// La propuesta comercial en línea (/propuesta): publicarla o retirarla, el
+// La propuesta comercial en línea (/propuesta): el enlace, el
 // plan que eligió el gerente y lo que le preguntó al chat. Solo admin.
 export const prerender = false
 import AdminLayout from '../../layouts/AdminLayout.astro'
 import { ico } from '../../lib/admin/iconos'
-import { listarElecciones, listarPreguntas, propuestaPublicada, type ElegidoPlan, type Pregunta } from '../../lib/propuesta/almacen'
+import { listarElecciones, listarPreguntas, type ElegidoPlan, type Pregunta } from '../../lib/propuesta/almacen'
 import { pesos } from '../../lib/propuesta/datos'
 
 const role = Astro.locals.role || ''
 if (role !== 'admin') return Astro.redirect('/admin')
 
 let errorCarga = ''
-let publicada = false
 let preguntas: Pregunta[] = []
 let elecciones: ElegidoPlan[] = []
 try {
-  ;[publicada, preguntas, elecciones] = await Promise.all([propuestaPublicada(), listarPreguntas(), listarElecciones()])
+  ;[preguntas, elecciones] = await Promise.all([listarPreguntas(), listarElecciones()])
 } catch (e: any) {
   console.error('[admin/propuesta] carga', e?.stack || e)
   errorCarga = 'No se pudo cargar la propuesta.'
@@ -45,14 +44,10 @@ const resumen = (e: ElegidoPlan) =>
     <div class="dash-head">
       <div>
         <h3>
-          <span class={`dx-punto${publicada ? ' is-on' : ''}`} aria-hidden="true"></span>
-          {publicada ? 'Propuesta publicada' : 'Propuesta sin publicar'}
+          <span class="dx-punto is-on" aria-hidden="true"></span>
+          Enlace de la propuesta
         </h3>
-        <p>
-          {publicada
-            ? 'Quien tenga el enlace la ve. No está en el menú, el sitemap ni los buscadores.'
-            : 'La página dice que la propuesta no está disponible y el chat no responde.'}
-        </p>
+        <p>Quien tenga el enlace la ve. No está en el menú, el sitemap ni los buscadores.</p>
       </div>
     </div>
     <div class="dx-url">
@@ -61,9 +56,6 @@ const resumen = (e: ElegidoPlan) =>
       <a class="btn-ghost btn-sm" href="/propuesta" target="_blank">Ver página<Fragment set:html={ico('externo', 'ext')} /></a>
     </div>
     <div class="dx-acciones">
-      {publicada
-        ? <button class="btn-ghost btn-sm" data-accion="retirar">Retirar propuesta</button>
-        : <button class="btn-primary btn-sm" data-accion="publicar">Publicar propuesta</button>}
       <p class="form-error" id="dx-err"></p>
     </div>
   </section>
@@ -156,11 +148,6 @@ const resumen = (e: ElegidoPlan) =>
           b.textContent = 'Copiado'
           setTimeout(() => { b.textContent = 'Copiar' }, 1600)
         })
-        document.querySelectorAll('[data-accion]').forEach((b) => b.addEventListener('click', async () => {
-          b.disabled = true
-          try { await enviar('POST', '/api/admin/propuesta', { accion: b.dataset.accion }); location.reload() }
-          catch (ex) { if (err) err.textContent = ex.message; b.disabled = false }
-        }))
         document.querySelectorAll('[data-borrar]').forEach((b) => b.addEventListener('click', async () => {
           if (!window.confirm('¿Eliminar este registro? No se puede deshacer.')) return
           b.disabled = true
