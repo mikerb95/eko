@@ -8,6 +8,11 @@
  * dice que no está disponible (sin clave o sin presupuesto del día), el panel
  * solo ofrece WhatsApp.
  *
+ * La burbuja es doble, como en codebymike.net: el verde con el logo dice
+ * WhatsApp y el círculo oscuro con la chispa dice que adentro hay un
+ * asistente con IA. A los 6 s sale un globo que invita a preguntarle (solo si
+ * la IA está disponible) y se va solo a los 8 s.
+ *
  * El historial vive en sessionStorage (solo esta pestaña) y el texto del
  * modelo se pinta con textContent: es dato no confiable, nunca HTML.
  */
@@ -22,7 +27,9 @@ const numero = SITE_ADDRESS.telefono.replace(/\D/g, '')
 
 const T = {
   es: {
-    fab: 'Chatea por WhatsApp',
+    fab: 'WhatsApp o asistente con IA',
+    globo: '¿Dudas? Pregúntele al asistente con IA',
+    globoCerrar: 'Cerrar el aviso',
     titulo: 'Ekosolv',
     sub: 'Asistente con IA',
     cerrar: 'Cerrar',
@@ -40,7 +47,9 @@ const T = {
     saludoWa: 'Hola, vengo del sitio de Ekosolv y quiero hablar con un consultor.',
   },
   en: {
-    fab: 'Chat on WhatsApp',
+    fab: 'WhatsApp or AI assistant',
+    globo: 'Questions? Ask our AI assistant',
+    globoCerrar: 'Close',
     titulo: 'Ekosolv',
     sub: 'AI assistant',
     cerrar: 'Close',
@@ -73,15 +82,30 @@ const waBase = `https://wa.me/${numero}`
     aria-controls="asesor-panel"
     data-asesor-fab
   >
-    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" width="28" height="28" aria-hidden="true">
+    <svg class="wa-fab-logo" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" width="26" height="26" aria-hidden="true">
       <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/>
     </svg>
+    <span class="wa-fab-raya" aria-hidden="true"></span>
+    <span class="wa-fab-ia" aria-hidden="true"><svg viewBox="0 0 24 24" width="19" height="19" fill="currentColor"><path class="wa-chispa-grande" d="M10.5 5.5C11.1 9.4 13.6 12.4 18 13 13.6 13.6 11.1 16.6 10.5 20.5 9.9 16.6 7.4 13.6 3 13 7.4 12.4 9.9 9.4 10.5 5.5Z"/><path class="wa-chispa-chica" d="M18.5 2.5C18.8 4 19.3 5.2 21.5 5.5 19.3 5.8 18.8 7 18.5 8.5 18.2 7 17.7 5.8 15.5 5.5 17.7 5.2 18.2 4 18.5 2.5Z"/></svg></span>
   </a>
+
+  <div class="asesor-globo" data-asesor-globo hidden>
+    <button type="button" class="asesor-globo-texto" data-asesor-globo-abrir aria-label={T.globo}>
+      <span aria-hidden="true">
+        {T.globo.split(' ').map((p, i) => (
+          <><span class="asesor-globo-palabra" style={`--i:${i}`}>{p}</span>{' '}</>
+        ))}
+      </span>
+    </button>
+    <button type="button" class="asesor-globo-cerrar" data-asesor-globo-cerrar aria-label={T.globoCerrar}>
+      <svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18"/></svg>
+    </button>
+  </div>
 
   <section id="asesor-panel" class="asesor-panel" role="dialog" aria-label={`${T.titulo} · ${T.sub}`} hidden>
     <header class="asesor-head">
       <div>
-        <div class="asesor-titulo"><span class="asesor-punto" aria-hidden="true"></span>{T.titulo}</div>
+        <div class="asesor-titulo"><span class="asesor-head-ia" aria-hidden="true"><svg viewBox="0 0 24 24" width="15" height="15" fill="currentColor"><path class="wa-chispa-grande" d="M10.5 5.5C11.1 9.4 13.6 12.4 18 13 13.6 13.6 11.1 16.6 10.5 20.5 9.9 16.6 7.4 13.6 3 13 7.4 12.4 9.9 9.4 10.5 5.5Z"/><path class="wa-chispa-chica" d="M18.5 2.5C18.8 4 19.3 5.2 21.5 5.5 19.3 5.8 18.8 7 18.5 8.5 18.2 7 17.7 5.8 15.5 5.5 17.7 5.2 18.2 4 18.5 2.5Z"/></svg></span>{T.titulo}</div>
         <div class="asesor-sub">{T.sub}</div>
       </div>
       <button type="button" class="asesor-cerrar" data-asesor-cerrar aria-label={T.cerrar}>
@@ -135,6 +159,7 @@ const waBase = `https://wa.me/${numero}`
     const waTexto = $<HTMLElement>('[data-asesor-wa-texto]')
     const aviso = $<HTMLElement>('[data-asesor-aviso]')
     const sugerencias = $<HTMLElement>('[data-asesor-sugerencias]')
+    const globo = $<HTMLElement>('[data-asesor-globo]')
 
     let estado: Estado = leer()
     let disponible: boolean | null = null
@@ -193,6 +218,7 @@ const waBase = `https://wa.me/${numero}`
     }
 
     function abrir() {
+      ocultarGlobo(true)
       panel.hidden = false
       fab.setAttribute('aria-expanded', 'true')
       raiz.classList.add('abierto')
@@ -207,14 +233,20 @@ const waBase = `https://wa.me/${numero}`
       fab.focus()
     }
 
-    async function consultar() {
-      pintar()
+    async function revisarDisponible() {
+      if (disponible !== null) return disponible
       try {
         const r = await fetch('/api/asesor', { headers: { accept: 'application/json' } })
         disponible = r.ok && (await r.json()).disponible === true
       } catch {
         disponible = false
       }
+      return disponible
+    }
+
+    async function consultar() {
+      pintar()
+      await revisarDisponible()
       form.hidden = !disponible
       aviso.hidden = !disponible
       pintar()
@@ -299,6 +331,52 @@ const waBase = `https://wa.me/${numero}`
       input.style.height = `${Math.min(input.scrollHeight, 120)}px`
     }
 
+    // Globo de invitación: sale a los 6 s y se va a los 8 s. No sale si el
+    // panel está abierto, si ya hay conversación o si la IA no está
+    // disponible (no se promete un asistente que no va a responder).
+    const sinMovimiento = () => matchMedia('(prefers-reduced-motion: reduce)').matches
+    let globoReloj: ReturnType<typeof setTimeout> | null = null
+    function programarSalidaGlobo(ms: number) {
+      if (globoReloj !== null) clearTimeout(globoReloj)
+      globoReloj = setTimeout(() => ocultarGlobo(false), ms)
+    }
+    async function mostrarGlobo() {
+      if (document.hidden) {
+        document.addEventListener('visibilitychange', () => setTimeout(mostrarGlobo, 1500), { once: true })
+        return
+      }
+      if (!panel.hidden || estado.mensajes.length > 0) return
+      if (!(await revisarDisponible()) || !panel.hidden) return
+      globo.hidden = false
+      raiz.classList.add('con-globo')
+      programarSalidaGlobo(8000)
+    }
+    function ocultarGlobo(ya: boolean) {
+      if (globoReloj !== null) clearTimeout(globoReloj)
+      globoReloj = null
+      if (globo.hidden) return
+      raiz.classList.remove('con-globo')
+      if (ya || sinMovimiento()) {
+        globo.hidden = true
+        globo.removeAttribute('data-saliendo')
+        return
+      }
+      globo.setAttribute('data-saliendo', '')
+      setTimeout(() => {
+        globo.hidden = true
+        globo.removeAttribute('data-saliendo')
+      }, 220)
+    }
+    setTimeout(mostrarGlobo, 6000)
+    globo.addEventListener('pointerenter', () => {
+      if (globoReloj !== null) clearTimeout(globoReloj)
+    })
+    globo.addEventListener('pointerleave', () => {
+      if (!globo.hidden && !globo.hasAttribute('data-saliendo')) programarSalidaGlobo(3000)
+    })
+    $<HTMLButtonElement>('[data-asesor-globo-abrir]').addEventListener('click', abrir)
+    $<HTMLButtonElement>('[data-asesor-globo-cerrar]').addEventListener('click', () => ocultarGlobo(false))
+
     for (const s of T.sugerencias as string[]) {
       const b = document.createElement('button')
       b.type = 'button'
@@ -364,7 +442,11 @@ const waBase = `https://wa.me/${numero}`
     color: #fff;
   }
   .asesor-titulo { display: flex; align-items: center; gap: 8px; font-weight: 600; font-size: 15px; }
-  .asesor-punto { width: 8px; height: 8px; border-radius: 50%; background: var(--aqua); box-shadow: 0 0 0 3px color-mix(in oklab, var(--aqua) 30%, transparent); }
+  .asesor-head-ia {
+    display: grid; place-items: center; width: 26px; height: 26px; border-radius: 50%;
+    color: var(--aqua); background: color-mix(in oklab, #fff 8%, transparent);
+    box-shadow: inset 0 0 0 1px color-mix(in oklab, var(--aqua) 45%, transparent);
+  }
   .asesor-sub { font-family: var(--font-mono); font-size: 11px; letter-spacing: .04em; text-transform: uppercase; opacity: .7; margin-top: 2px; }
   .asesor-cerrar {
     display: grid; place-items: center; width: 34px; height: 34px;
@@ -437,10 +519,99 @@ const waBase = `https://wa.me/${numero}`
   .asesor-aviso { margin: 0; font-size: 11.5px; color: var(--mute); text-align: center; }
   .asesor-aviso[hidden] { display: none; }
 
-  body.nav-open .asesor-panel { display: none; }
-  .asesor.abierto .whatsapp-fab { background: var(--deep); box-shadow: 0 4px 16px color-mix(in oklab, var(--deep) 45%, transparent); }
+  body.nav-open .asesor-panel,
+  body.nav-open .asesor-globo { display: none; }
+
+  /* Burbuja doble: el verde y el logo siguen diciendo WhatsApp; el círculo
+     oscuro con la chispa aqua dice que adentro hay un asistente con IA. Cada
+     tanto la estrella grande late con brillo y la chica titila después. */
+  .asesor .whatsapp-fab {
+    width: auto;
+    gap: 10px;
+    padding: 0 7px 0 15px;
+    border-radius: 999px;
+  }
+  .asesor .whatsapp-fab:hover { transform: translateY(-2px); }
+  .wa-fab-logo { flex: none; }
+  .wa-fab-raya { width: 1px; height: 24px; background: color-mix(in oklab, #fff 45%, transparent); }
+  .wa-fab-ia {
+    display: grid; place-items: center; flex: none;
+    width: 42px; height: 42px; border-radius: 50%;
+    background: var(--deep);
+    color: var(--aqua);
+    box-shadow: inset 0 0 0 1px color-mix(in oklab, var(--aqua) 40%, transparent);
+    transition: box-shadow .3s ease;
+  }
+  .wa-chispa-grande { transform-origin: 10.5px 13px; animation: wa-chispa-grande 7s ease-in-out infinite; }
+  .wa-chispa-chica { transform-origin: 18.5px 5.5px; animation: wa-chispa-chica 7s ease-in-out infinite; }
+  @keyframes wa-chispa-grande {
+    0%, 80%, 100% { transform: scale(1); filter: none; }
+    87% { transform: scale(1.2) rotate(8deg); filter: drop-shadow(0 0 3px var(--aqua)); }
+  }
+  @keyframes wa-chispa-chica {
+    0%, 84%, 100% { transform: scale(1); opacity: 1; }
+    88% { transform: scale(.3); opacity: .3; }
+    93% { transform: scale(1.35); opacity: 1; }
+  }
+  /* Con el globo afuera o el panel abierto, el círculo de IA se enciende. */
+  .asesor.con-globo .wa-fab-ia,
+  .asesor.abierto .wa-fab-ia {
+    box-shadow: inset 0 0 0 1px color-mix(in oklab, var(--aqua) 70%, transparent), 0 0 0 3px color-mix(in oklab, var(--aqua) 28%, transparent);
+  }
+
+  /* Globo que sale de la burbuja: la cola apunta al círculo de IA y las
+     palabras aparecen una tras otra, como texto que se genera. */
+  .asesor-globo {
+    position: fixed;
+    right: 28px;
+    bottom: 96px;
+    z-index: 1000;
+    width: max-content;
+    max-width: min(270px, calc(100vw - 40px));
+    transform-origin: calc(100% - 28px) 100%;
+    animation: asesor-globo-entrar .5s cubic-bezier(.16, 1, .3, 1);
+  }
+  .asesor-globo[hidden] { display: none; }
+  .asesor-globo[data-saliendo] { animation: asesor-globo-salir .22s ease-in forwards; }
+  @keyframes asesor-globo-entrar { from { opacity: 0; transform: translateY(10px) scale(.55); } }
+  @keyframes asesor-globo-salir { to { opacity: 0; transform: translateY(6px) scale(.85); } }
+  .asesor-globo-texto {
+    position: relative; display: block;
+    padding: 11px 36px 12px 15px;
+    border-radius: 16px; border-bottom-right-radius: 6px;
+    border: 1px solid color-mix(in oklab, var(--aqua) 45%, transparent);
+    background: var(--deep); color: #fff;
+    font: inherit; font-family: var(--font-sans); font-size: 14px; line-height: 1.4; text-align: left;
+    cursor: pointer;
+    box-shadow: 0 14px 40px -12px color-mix(in oklab, var(--ink) 60%, transparent);
+    transition: border-color .2s ease;
+  }
+  .asesor-globo-texto:hover { border-color: var(--aqua); }
+  .asesor-globo-texto:focus-visible { outline: 2px solid var(--aqua); outline-offset: 2px; }
+  .asesor-globo-texto::after {
+    content: ''; position: absolute; right: 22px; bottom: -6px;
+    width: 11px; height: 11px;
+    background: inherit; border-right: inherit; border-bottom: inherit;
+    border-bottom-right-radius: 2px; transform: rotate(45deg);
+  }
+  .asesor-globo-palabra { display: inline-block; animation: asesor-globo-palabra .3s ease-out both; animation-delay: calc(.3s + var(--i) * 70ms); }
+  @keyframes asesor-globo-palabra { from { opacity: 0; filter: blur(4px); } }
+  .asesor-globo-cerrar {
+    position: absolute; top: 7px; right: 7px;
+    display: grid; place-items: center; width: 24px; height: 24px;
+    border: 0; border-radius: 7px; background: transparent; cursor: pointer;
+    color: color-mix(in oklab, #fff 70%, transparent);
+  }
+  .asesor-globo-cerrar:hover { color: #fff; background: color-mix(in oklab, #fff 12%, transparent); }
+
+  @media (prefers-reduced-motion: reduce) {
+    .wa-chispa-grande, .wa-chispa-chica, .asesor-globo, .asesor-globo-palabra { animation: none; }
+  }
 
   @media (max-width: 600px) {
     .asesor-panel { right: 16px; left: 16px; width: auto; bottom: 82px; max-height: calc(100dvh - 110px); }
+    .asesor .whatsapp-fab { width: auto; padding: 0 5px 0 13px; gap: 8px; }
+    .wa-fab-ia { width: 38px; height: 38px; }
+    .asesor-globo { right: 20px; bottom: 82px; }
   }
 </style>
