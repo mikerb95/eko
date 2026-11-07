@@ -141,7 +141,7 @@ const TEMP_ACCESS = {
   // del panel solo abren para admin (DOC_ROLES en middleware.ts).
   role: 'admin' as Role,
   passHash: 'pbkdf2$120000$-8Qa0ZUut4K3BfRN6QZ89A$fP1HKkNIlXoJSFjOSE7_r30-zB-RJwaNAA4ExdwyKW0',
-  expires: '2026-11-04T23:59:59-05:00',
+  expires: '2027-01-06T23:59:59-05:00',
 }
 
 export async function verifyLogin(username: string, password: string): Promise<User | null> {
