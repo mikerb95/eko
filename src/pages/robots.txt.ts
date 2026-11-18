@@ -1,9 +1,11 @@
 import type { APIRoute } from 'astro'
-import { url } from '../lib/site'
+import { SITE_NOINDEX, url } from '../lib/site'
 
 /*
  * robots.txt generado dinámicamente para que el sitemap apunte al dominio real
- * (SITE_URL / PUBLIC_SITE_URL), que aún no es definitivo.
+ * (SITE_URL / PUBLIC_SITE_URL). Mientras el sitio vaya con noindex
+ * (SITE_NOINDEX) no anuncia el sitemap: sería pedir que rastreen páginas que
+ * a la vez piden no salir en el índice.
  *
  * ── POR QUÉ /admin, /docs Y /oportunidades2630 YA NO ESTÁN AQUÍ ──────────
  * Estaban con `Disallow`, y a la vez `astro.config.mjs` les pone
@@ -28,9 +30,7 @@ export const GET: APIRoute = async () => {
   const body = `User-agent: *
 Allow: /
 Disallow: /api/
-
-Sitemap: ${url('/sitemap.xml')}
-`
+${SITE_NOINDEX ? '' : `\nSitemap: ${url('/sitemap.xml')}\n`}`
   return new Response(body, {
     headers: { 'Content-Type': 'text/plain; charset=utf-8' },
   })

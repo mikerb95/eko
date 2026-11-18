@@ -252,9 +252,9 @@ export const RF: RequerimientoFuncional[] = [
     descripcion:
       'URL base, razón social y NIT viven en un solo módulo, sobreescribible con PUBLIC_SITE_URL para previews.',
     prioridad: 'alta',
-    estado: 'parcial',
+    estado: 'ok',
     archivos: ['src/lib/site.ts', 'astro.config.mjs'],
-    nota: 'El dominio definitivo sigue sin decidir: el valor por defecto es ekosolv.com pero el proyecto no está ligado a él.',
+    nota: 'El sitio vive en ekosolv.codebymike.net y va con noindex en todas las páginas para no aparecer en buscadores.',
   },
   {
     id: 'RF-16',

@@ -5,7 +5,7 @@ import "../styles/blog.css"
 import { ClientRouter } from 'astro:transitions'
 import Nav from '../components/Nav.astro'
 import SchemaOrg from '../components/SchemaOrg.astro'
-import { SITE_URL, url } from '../lib/site'
+import { SITE_NOINDEX, SITE_URL, url } from '../lib/site'
 import { hreflangFor, rutasEn, seoDe } from '../lib/rutas'
 import { migas, organizacion, servicioDeRuta, sitioWeb } from '../lib/schema'
 
@@ -103,7 +103,7 @@ const nodos = [
     <meta name="copyright" content={`© ${new Date().getFullYear()} Mike Rodríguez. All rights reserved.`} />
     <meta name="author" content="Mike Rodríguez" />
     <meta name="rights" content="All rights reserved. Reproduction, adaptation or reuse of this site, its code and its design, in whole or in part, is prohibited." />
-    <meta name="robots" content="noai, noimageai" />
+    <meta name="robots" content={SITE_NOINDEX ? 'noindex, nofollow, noai, noimageai' : 'noai, noimageai'} />
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,400..700&family=Geist:wght@300..700&family=Geist+Mono:wght@300..500&display=swap" rel="stylesheet" />

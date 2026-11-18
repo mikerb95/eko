@@ -138,9 +138,11 @@ corporativa y la que peor cae cuando la respuesta es incómoda.
 El DNS puede quedarse en el registrador o pasar a Cloudflare, apuntando a Vercel en
 cualquiera de los dos casos.
 
-Pendiente: el dominio definitivo no está decidido (`src/lib/site.ts` asume
-`ekosolv.com`). Bloquea la verificación de Resend, que exige un dominio con DNS
-comprobable. Ver `pendientes.md`.
+Decidido (2026-11-18): el sitio vive en `ekosolv.codebymike.net`. La zona de
+`codebymike.net` está en Vercel DNS con un comodín `*.codebymike.net`, así que no
+hace falta crear registros: basta agregar el subdominio en Settings → Domains del
+proyecto (y el TXT `_vercel` si Vercel lo pide por estar en otra cuenta). Todo el
+sitio va con `noindex`. Resend se puede verificar sobre `codebymike.net`.
 
 ## Resto de variables de entorno
 
@@ -148,7 +150,7 @@ Además de las de cada servicio, en Vercel hay que cargar:
 
 ```
 AUTH_SECRET=<32 bytes aleatorios en base64url>
-PUBLIC_SITE_URL=https://<dominio definitivo>
+PUBLIC_SITE_URL=https://ekosolv.codebymike.net  # opcional, es el valor por defecto
 ```
 
 `AUTH_SECRET` firma la cookie de sesión. Sin ella el arranque en producción falla a

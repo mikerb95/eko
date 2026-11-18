@@ -1,15 +1,15 @@
 /**
  * Identidad y dominio del sitio, en un solo lugar.
  *
- * ⚠️ EL DOMINIO AÚN NO ESTÁ DEFINITIVO. El proyecto todavía no está ligado a
- * ekosolv.com; queda pendiente la decisión de la gerencia. Por eso vive aquí
- * y no repartido por el código: cambiarlo debe ser editar una línea.
+ * El sitio vive en ekosolv.codebymike.net, un subdominio de codebymike.net, y
+ * no debe aparecer en buscadores (ver SITE_NOINDEX). Vive aquí y no repartido
+ * por el código: cambiar de dominio debe ser editar una línea.
  *
  * Se puede sobreescribir sin tocar el código con la variable de entorno
  * PUBLIC_SITE_URL (útil para previews de Vercel).
  */
 
-const FALLBACK_URL = 'https://ekosolv.com'
+const FALLBACK_URL = 'https://ekosolv.codebymike.net'
 
 function env(key: string): string {
   return (import.meta.env as any)?.[key] || (globalThis as any)?.process?.env?.[key] || ''
@@ -50,3 +50,11 @@ export const SITE_ADDRESS = {
 
 export const url = (path = '/'): string =>
   `${SITE_URL}${path.startsWith('/') ? path : `/${path}`}`
+
+/**
+ * Todo el sitio fuera de buscadores. Vive en un subdominio de codebymike.net
+ * con la marca de un cliente y no debe competir con el sitio real de Ekosolv.
+ * Lo usan los layouts (meta robots) y robots.txt; la cabecera X-Robots-Tag
+ * está en astro.config.mjs. Si algún día se indexa, cambiar los dos sitios.
+ */
+export const SITE_NOINDEX = true

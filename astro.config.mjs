@@ -4,8 +4,8 @@ import { readFileSync, writeFileSync } from 'node:fs'
 import { fileURLToPath } from 'node:url'
 
 // Debe coincidir con SITE_URL de src/lib/site.ts.
-// El dominio aún no es definitivo: PUBLIC_SITE_URL lo sobreescribe en previews.
-const site = process.env.PUBLIC_SITE_URL || 'https://ekosolv.com'
+// PUBLIC_SITE_URL lo sobreescribe en previews.
+const site = process.env.PUBLIC_SITE_URL || 'https://ekosolv.codebymike.net'
 
 // Cabeceras de seguridad aplicadas a todas las respuestas.
 //
@@ -42,6 +42,11 @@ const SECURITY_HEADERS = {
   'X-Frame-Options': 'DENY',
   'Referrer-Policy': 'strict-origin-when-cross-origin',
   'Permissions-Policy': 'camera=(), microphone=(), geolocation=(), browsing-topics=()',
+  // Todo el sitio fuera de buscadores: vive en un subdominio de codebymike.net
+  // con la marca de un cliente y no debe competir con el sitio real de
+  // Ekosolv. Va en la cabecera y no en robots.txt: con `Disallow` el
+  // rastreador no descarga la página y nunca lee el `noindex`.
+  'X-Robots-Tag': 'noindex, nofollow, noarchive',
 }
 
 // Zonas privadas: el panel, la API del panel y las páginas internas del
