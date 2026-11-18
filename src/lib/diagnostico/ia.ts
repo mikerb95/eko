@@ -22,6 +22,7 @@
  */
 import { z } from 'zod'
 import { sinRayas, sinVoseo, taparDatos } from '../asesor/bucle.ts'
+import { LIMITES } from './preguntas.ts'
 
 /** Campos abiertos donde aparece el asistente, con lo que el taller necesita saber de cada uno. */
 export const CAMPOS_IA: Record<string, { pregunta: string; busca: string }> = {
@@ -57,7 +58,8 @@ export function campoIA(nombre: string): string | null {
 
 /** Vueltas de preguntas por campo: con dos ya se ve el valor y el gasto queda acotado. */
 export const MAX_VUELTAS = 3
-export const MAX_BORRADOR = 1500
+/** El campo más largo de la encuesta: la IA lee la respuesta completa. */
+export const MAX_BORRADOR = LIMITES.tarea_principal
 
 const EsquemaEntrada = z
   .object({
@@ -66,14 +68,14 @@ const EsquemaEntrada = z
     contexto: z
       .object({
         area: z.string().max(40).optional(),
-        cargo: z.string().max(120).optional(),
+        cargo: z.string().max(LIMITES.cargo).optional(),
         tareas: z.array(z.string().max(160)).max(12).optional(),
         horas: z.string().max(60).optional(),
       })
       .strict()
       .optional(),
     aclaraciones: z
-      .array(z.object({ pregunta: z.string().max(300), respuesta: z.string().trim().max(500) }).strict())
+      .array(z.object({ pregunta: z.string().max(300), respuesta: z.string().trim().max(LIMITES.aclaracion) }).strict())
       .max(MAX_VUELTAS * 2)
       .optional(),
   })

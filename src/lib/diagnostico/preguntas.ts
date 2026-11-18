@@ -246,6 +246,29 @@ export const CAMPOS_CON_IA: Opcion[] = [
   { id: 'deseo', etiqueta: 'Tarea que quiere resolver con IA' },
 ]
 
+/**
+ * Largo máximo de cada respuesta abierta, en caracteres. El formulario no deja
+ * escribir más (maxlength) y el servidor recorta en el mismo número, así que lo
+ * que la persona ve escrito es lo que se guarda. `aclaracion` es cada respuesta
+ * a una pregunta de la IA. Subidos un 50% el 2026-11-18.
+ */
+export const LIMITES = {
+  nombre: 180,
+  cargo: 180,
+  tarea_otra: 600,
+  tarea_principal: 2250,
+  propuesta_demora: 1200,
+  certificado_demora: 1200,
+  otras_herramientas: 600,
+  para_que: 1200,
+  otra_preocupacion: 900,
+  deseo: 1500,
+  documento_cual: 450,
+  restricciones: 450,
+  comentarios: 3000,
+  aclaracion: 750,
+} as const
+
 /** Una pregunta de la IA y lo que la persona contestó, ligada al campo. */
 export interface Aclaracion {
   campo: string

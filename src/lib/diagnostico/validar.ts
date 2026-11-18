@@ -23,6 +23,7 @@ import {
   HERRAMIENTAS,
   HORAS,
   IAS,
+  LIMITES,
   MODALIDAD,
   PREOCUPACIONES,
   TAREAS,
@@ -58,7 +59,7 @@ function varias(b: Record<string, unknown>, k: string, lista: readonly Opcion[])
 function aclaraciones(b: Record<string, unknown>): Aclaracion[] {
   let lista: unknown
   try {
-    lista = JSON.parse(String(b.ia_aclaraciones ?? '[]').slice(0, 20_000))
+    lista = JSON.parse(String(b.ia_aclaraciones ?? '[]').slice(0, 30_000))
   } catch {
     return []
   }
@@ -70,7 +71,7 @@ function aclaraciones(b: Record<string, unknown>): Aclaracion[] {
     if (!x || typeof x !== 'object') continue
     const campo = String((x as any).campo ?? '').trim()
     const pregunta = String((x as any).pregunta ?? '').trim().slice(0, 300)
-    const respuesta = String((x as any).respuesta ?? '').trim().slice(0, 500)
+    const respuesta = String((x as any).respuesta ?? '').trim().slice(0, LIMITES.aclaracion)
     const k = `${campo}|${pregunta}`
     if (!campos.has(campo) || !pregunta || !respuesta || vistas.has(k)) continue
     vistas.add(k)
@@ -81,19 +82,19 @@ function aclaraciones(b: Record<string, unknown>): Aclaracion[] {
 }
 
 export function validarRespuesta(b: Record<string, unknown>): Respuesta {
-  const nombre = texto(b, 'nombre', 120)
+  const nombre = texto(b, 'nombre', LIMITES.nombre)
   const area = texto(b, 'area', 30) as AreaId
   if (!nombre) throw new ErrorDiagnostico('Escriba su nombre.')
   if (!AREA_IDS.includes(area)) throw new ErrorDiagnostico('Elija su área.')
 
   const r: Respuesta = {
     nombre,
-    cargo: texto(b, 'cargo', 120),
+    cargo: texto(b, 'cargo', LIMITES.cargo),
     area,
     tareas: varias(b, `tareas_${area}`, TAREAS[area]),
-    tarea_otra: texto(b, `otra_${area}`, 400),
+    tarea_otra: texto(b, `otra_${area}`, LIMITES.tarea_otra),
     horas: una(b, 'horas', HORAS),
-    tarea_principal: texto(b, 'tarea_principal', 1500),
+    tarea_principal: texto(b, 'tarea_principal', LIMITES.tarea_principal),
     propuesta_rol: '',
     propuesta_horas: '',
     propuestas_mes: '',
@@ -104,18 +105,18 @@ export function validarRespuesta(b: Record<string, unknown>): Respuesta {
     certificado_demora: '',
     documentos: varias(b, 'documentos', DOCUMENTOS),
     herramientas: varias(b, 'herramientas', HERRAMIENTAS),
-    otras_herramientas: texto(b, 'otras_herramientas', 400),
+    otras_herramientas: texto(b, 'otras_herramientas', LIMITES.otras_herramientas),
     uso_ia: una(b, 'uso_ia', USO_IA),
     ias: varias(b, 'ias', IAS),
-    para_que: texto(b, 'para_que', 800),
+    para_que: texto(b, 'para_que', LIMITES.para_que),
     preocupaciones: varias(b, 'preocupaciones', PREOCUPACIONES),
-    otra_preocupacion: texto(b, 'otra_preocupacion', 600),
-    deseo: texto(b, 'deseo', 1000),
+    otra_preocupacion: texto(b, 'otra_preocupacion', LIMITES.otra_preocupacion),
+    deseo: texto(b, 'deseo', LIMITES.deseo),
     documento_real: una(b, 'documento_real', DOCUMENTO_REAL),
-    documento_cual: texto(b, 'documento_cual', 300),
+    documento_cual: texto(b, 'documento_cual', LIMITES.documento_cual),
     modalidad: una(b, 'modalidad', MODALIDAD),
-    restricciones: texto(b, 'restricciones', 300),
-    comentarios: texto(b, 'comentarios', 2000),
+    restricciones: texto(b, 'restricciones', LIMITES.restricciones),
+    comentarios: texto(b, 'comentarios', LIMITES.comentarios),
     ia_aclaraciones: aclaraciones(b),
   }
 
@@ -125,7 +126,7 @@ export function validarRespuesta(b: Record<string, unknown>): Respuesta {
     if (r.propuesta_rol && r.propuesta_rol !== 'no') {
       r.propuesta_horas = una(b, 'propuesta_horas', PROPUESTA_HORAS)
       r.propuestas_mes = una(b, 'propuestas_mes', PROPUESTAS_MES)
-      r.propuesta_demora = texto(b, 'propuesta_demora', 800)
+      r.propuesta_demora = texto(b, 'propuesta_demora', LIMITES.propuesta_demora)
     }
   }
 
@@ -141,7 +142,7 @@ export function validarRespuesta(b: Record<string, unknown>): Respuesta {
     r.certificados_mes = una(b, 'certificados_mes', CERTIFICADOS_MES)
     r.certificado_min = una(b, 'certificado_min', CERTIFICADO_MIN)
     r.seguimiento_gestores = una(b, 'seguimiento_gestores', HORAS)
-    r.certificado_demora = texto(b, 'certificado_demora', 800)
+    r.certificado_demora = texto(b, 'certificado_demora', LIMITES.certificado_demora)
     if (!r.certificados_mes || !r.certificado_min) {
       throw new ErrorDiagnostico('Indique cuántos certificados emite al mes y cuánto le toma cada uno.')
     }
