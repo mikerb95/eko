@@ -2,7 +2,7 @@ import { test } from 'node:test'
 import assert from 'node:assert/strict'
 import { validarRespuesta, ErrorDiagnostico } from './validar.ts'
 import { aCSV, resumir, vigentes, type Fila } from './resumen.ts'
-import type { Respuesta } from './preguntas.ts'
+import { LIMITES, type Respuesta } from './preguntas.ts'
 
 const base = {
   nombre: 'Ana Pérez',
@@ -198,4 +198,14 @@ test('resumen: las aclaraciones salen como detalles de la nota y en el CSV', () 
   assert.deepEqual(ops.deseos[0]!.detalles, ['¿Cuántas páginas? Unas 20'])
   assert.equal(ops.deseos[0]!.texto, base.deseo)
   assert.match(aCSV([fila]), /Tarea que quiere resolver con IA: ¿Cuántas páginas\? Unas 20/)
+})
+
+test('validar: guarda hasta el límite de cada campo, el mismo maxlength del formulario', () => {
+  const justo = 'a'.repeat(LIMITES.tarea_principal)
+  assert.equal(validarRespuesta({ ...base, tarea_principal: justo }).tarea_principal, justo)
+  assert.equal(validarRespuesta({ ...base, tarea_principal: justo + 'b' }).tarea_principal, justo)
+  assert.equal(validarRespuesta({ ...base, comentarios: 'c'.repeat(5000) }).comentarios.length, LIMITES.comentarios)
+  const larga = 'r'.repeat(LIMITES.aclaracion + 10)
+  const r = validarRespuesta({ ...base, ia_aclaraciones: JSON.stringify([{ campo: 'deseo', pregunta: '¿Cuántas?', respuesta: larga }]) })
+  assert.equal(r.ia_aclaraciones[0].respuesta.length, LIMITES.aclaracion)
 })
