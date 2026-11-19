@@ -100,7 +100,7 @@ const steps: TFStep[] = [
       subtitle: `Marque todas las que haga al menos una vez por semana en ${a.etiqueta}.`,
       when: { field: 'area', equals: a.id },
       fields: [
-        { type: 'choice', name: `tareas_${a.id}`, label: 'Tareas', multiple: true, options: ops(TAREAS[a.id]) },
+        { type: 'choice', name: `tareas_${a.id}`, label: '¿Cuáles de estas tareas hace cada semana?', multiple: true, options: ops(TAREAS[a.id]) },
         {
           type: 'textarea',
           name: `otra_${a.id}`,
@@ -119,7 +119,7 @@ const steps: TFStep[] = [
       {
         type: 'choice',
         name: 'horas',
-        label: 'Horas por semana en tareas que se repiten',
+        label: '¿Cuántas horas a la semana le dedica a tareas que se repiten?',
         required: true,
         options: HORAS.map((h) => ({ value: h.id, label: h.etiqueta })),
       },
@@ -139,17 +139,17 @@ const steps: TFStep[] = [
     subtitle: 'Desde que llega el Brief hasta que la propuesta se envía al cliente. Un cálculo aproximado basta.',
     when: { field: 'area', equals: AREAS_PROPUESTAS },
     fields: [
-      { type: 'choice', name: 'propuesta_rol', label: 'Su papel', required: true, options: ops(PROPUESTA_ROL) },
+      { type: 'choice', name: 'propuesta_rol', label: '¿Qué papel tiene en las propuestas?', required: true, options: ops(PROPUESTA_ROL) },
       {
         type: 'choice',
         name: 'propuesta_horas',
-        label: 'Si participa: horas de su parte en una propuesta',
+        label: 'Si participa, ¿cuántas horas le dedica usted a cada propuesta?',
         options: PROPUESTA_HORAS.map((h) => ({ value: h.id, label: h.etiqueta })),
       },
       {
         type: 'choice',
         name: 'propuestas_mes',
-        label: 'Si participa: propuestas que pasan por usted al mes',
+        label: 'Si participa, ¿cuántas propuestas pasan por usted al mes?',
         options: PROPUESTAS_MES.map((h) => ({ value: h.id, label: h.etiqueta })),
       },
       { type: 'textarea', name: 'propuesta_demora', label: '¿Qué parte de la propuesta le toma más tiempo?', placeholder: 'Opcional', maxlength: LIMITES.propuesta_demora, ia: true },
@@ -187,8 +187,8 @@ const steps: TFStep[] = [
     title: '¿Con qué trabaja?',
     subtitle: 'Marque lo que usa con frecuencia.',
     fields: [
-      { type: 'choice', name: 'documentos', label: 'Documentos', multiple: true, options: ops(DOCUMENTOS) },
-      { type: 'choice', name: 'herramientas', label: 'Herramientas', multiple: true, options: ops(HERRAMIENTAS) },
+      { type: 'choice', name: 'documentos', label: '¿Qué documentos maneja?', multiple: true, options: ops(DOCUMENTOS) },
+      { type: 'choice', name: 'herramientas', label: '¿Qué herramientas usa?', multiple: true, options: ops(HERRAMIENTAS) },
       { type: 'text', name: 'otras_herramientas', label: '¿Otro documento o herramienta?', placeholder: 'Opcional', maxlength: LIMITES.otras_herramientas },
     ],
   },
@@ -196,8 +196,8 @@ const steps: TFStep[] = [
     title: '¿Ha usado inteligencia artificial?',
     subtitle: 'No hay respuestas buenas ni malas: sirve para arrancar desde donde está el equipo.',
     fields: [
-      { type: 'choice', name: 'uso_ia', label: 'Con qué frecuencia', required: true, options: ops(USO_IA) },
-      { type: 'choice', name: 'ias', label: 'Cuáles ha usado', multiple: true, options: ops(IAS) },
+      { type: 'choice', name: 'uso_ia', label: '¿Con qué frecuencia usa IA?', required: true, options: ops(USO_IA) },
+      { type: 'choice', name: 'ias', label: '¿Cuáles ha usado?', multiple: true, options: ops(IAS) },
       { type: 'textarea', name: 'para_que', label: 'Si la usa, ¿para qué?', placeholder: 'Opcional', maxlength: LIMITES.para_que },
     ],
   },
@@ -205,7 +205,7 @@ const steps: TFStep[] = [
     title: '¿Qué le preocupa de usarla en su trabajo?',
     subtitle: 'Marque todas las que apliquen. Cada una se trabaja en la capacitación general.',
     fields: [
-      { type: 'choice', name: 'preocupaciones', label: 'Preocupaciones', multiple: true, options: ops(PREOCUPACIONES) },
+      { type: 'choice', name: 'preocupaciones', label: '¿Qué le preocupa?', multiple: true, options: ops(PREOCUPACIONES) },
       { type: 'textarea', name: 'otra_preocupacion', label: '¿Otra preocupación?', placeholder: 'Opcional', maxlength: LIMITES.otra_preocupacion },
     ],
   },
@@ -236,7 +236,7 @@ const steps: TFStep[] = [
     title: 'Por último, la logística',
     subtitle: 'Las fechas de los sábados se fijan con este diagnóstico.',
     fields: [
-      { type: 'choice', name: 'modalidad', label: 'Prefiere la capacitación', options: ops(MODALIDAD) },
+      { type: 'choice', name: 'modalidad', label: '¿Cómo prefiere la capacitación?', options: ops(MODALIDAD) },
       {
         type: 'text',
         name: 'restricciones',

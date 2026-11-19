@@ -102,6 +102,8 @@ const {
 const T = {
   es: {
     continue: 'Continuar',
+    pickOne: 'Elija una',
+    pickMany: 'Puede marcar varias',
     back: 'Atrás',
     hint: 'Pulsa',
     required: 'Completa este campo para continuar.',
@@ -115,6 +117,8 @@ const T = {
   },
   en: {
     continue: 'Continue',
+    pickOne: 'Pick one',
+    pickMany: 'Pick all that apply',
     back: 'Back',
     hint: 'Press',
     required: 'Please complete this field to continue.',
@@ -161,6 +165,7 @@ const selectedValues = (f: Extract<TFField, { type: 'choice' }>) =>
             data-index={i}
             data-when-field={step.when?.field}
             data-when-equals={step.when ? [step.when.equals].flat().join('|') : undefined}
+            data-preguntas={step.fields.length > 1 ? 'true' : undefined}
           >
             <div class="tf-step-head">
               <span class="tf-step-count">
@@ -174,14 +179,26 @@ const selectedValues = (f: Extract<TFField, { type: 'choice' }>) =>
               {step.fields.map((f) => {
                 if (f.type === 'choice') {
                   const hiddenVal = selectedValues(f).join(', ')
+                  // Con un solo campo el título del paso ya es la pregunta. Con
+                  // varios, cada bloque de opciones lleva su pregunta visible:
+                  // sin ella, dos listas seguidas no dicen a qué responden.
+                  const conPregunta = step.fields.length > 1
+                  const qId = `${formId}-q-${f.name}`
                   return (
                     <div
                       class="tf-choices"
                       data-name={f.name}
                       data-multiple={f.multiple ? 'true' : 'false'}
                       role="group"
-                      aria-label={f.label}
+                      aria-label={conPregunta ? undefined : f.label}
+                      aria-labelledby={conPregunta ? qId : undefined}
                     >
+                      {conPregunta && (
+                        <p class="tf-q" id={qId}>
+                          <span class="tf-q-text">{f.label}{f.required ? ' *' : ''}</span>
+                          <span class="tf-q-hint">{f.multiple ? T.pickMany : T.pickOne}</span>
+                        </p>
+                      )}
                       <input
                         type="hidden"
                         name={f.name}
@@ -414,6 +431,27 @@ const selectedValues = (f: Extract<TFField, { type: 'choice' }>) =>
 
   /* Opciones seleccionables */
   .tf-choices { display: flex; flex-direction: column; gap: 12px; }
+
+  /* Pasos con varias preguntas: cada una con su enunciado visible y aire
+     entre bloques, para que nunca se lean como una sola lista. */
+  .tf-step[data-preguntas] .tf-fields { gap: 40px; }
+  .tf-q {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    margin: 0 0 4px;
+  }
+  .tf-q-text,
+  .tf-step[data-preguntas] .tf-label {
+    font-family: inherit;
+    font-size: 17px;
+    font-weight: 600;
+    letter-spacing: -0.01em;
+    text-transform: none;
+    line-height: 1.35;
+    color: var(--ink);
+  }
+  .tf-q-hint { font-size: 13px; color: var(--mute); }
   .tf-choice {
     display: flex;
     align-items: center;
