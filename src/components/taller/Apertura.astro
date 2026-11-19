@@ -83,8 +83,8 @@ const maxTarea = Math.max(1, ...(d?.tareas.map((x) => x.n) ?? [1]))
       <p class="cuenta" data-cuenta-regresiva={e.minutos * 60}>{e.minutos}:00</p>
     </div>
     <div style="display:flex;flex-direction:column;gap:14px;align-items:flex-start">
-      <div class="qr" set:html={ctx.qrAcademia} role="img" aria-label={`Código QR de ${ctx.urlAcademia}`} />
-      <p class="tl-nota">Academia · lección "Cómo pedir"</p>
+      <div class="qr" set:html={ctx.qrSala} role="img" aria-label={`Código QR de ${ctx.urlSala}`} />
+      <p class="tl-nota">El revisor está en la sala de su celular</p>
     </div>
   </>
 )}

@@ -10,7 +10,10 @@ const PUBLIC_API_PATHS = new Set(['/api/admin/login', '/api/admin/logout'])
 // La sala de la capacitación (QR del proyector): se entra con nombre, cargo y
 // área, sin cuenta. Su API valida un pase firmado propio (src/lib/talleres/sala.ts)
 // que solo sirve para votar en la capacitación en curso.
+// Regla: ningún QR de las capacitaciones lleva a un login. La tarjeta resumen
+// (QR del cierre) también es pública; solo tiene el contenido de la capacitación.
 const PUBLIC_SALA_PATHS = new Set(['/academia/sala', '/api/academia/sala'])
+const esResumenTaller = (p: string) => /^\/academia\/taller\/\d+\/resumen$/.test(p)
 
 // Páginas internas del proyecto (las del pie de página, columna "Proyecto").
 // No son parte del sitio público: exigen sesión igual que /admin.
@@ -84,7 +87,7 @@ export const onRequest = defineMiddleware(async (context, next) => {
   const isAcademiaApi = pathname === '/api/academia' || pathname.startsWith('/api/academia/')
 
   if (!isAdminPage && !isAdminApi && !isDocPage && !isAcademia && !isAcademiaApi) return next()
-  if (PUBLIC_ADMIN_PATHS.has(pathname) || PUBLIC_API_PATHS.has(pathname) || PUBLIC_SALA_PATHS.has(normalize(pathname))) return next()
+  if (PUBLIC_ADMIN_PATHS.has(pathname) || PUBLIC_API_PATHS.has(pathname) || PUBLIC_SALA_PATHS.has(normalize(pathname)) || esResumenTaller(normalize(pathname))) return next()
 
   const token = context.cookies.get(SESSION_COOKIE)?.value
   const session = await verifySession(token)

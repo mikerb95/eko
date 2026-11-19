@@ -685,16 +685,17 @@ export const TALLER_1: Taller = {
       minutos: 30,
       pasos: 0,
       notas: [
-        'Cada persona abre la lección "Cómo pedir" de la academia y usa el revisor: escribe su instrucción y la IA le dice qué le faltó.',
+        'En esta escena la sala del celular se convierte en el revisor: cada persona escribe su instrucción y la IA le dice qué le faltó. Quien cerró la sala, que vuelva a escanear el código.',
         'Recorrer la sala. A los 20 minutos, pedir 2 o 3 voluntarios y mostrar su instrucción antes y después.',
       ],
       datos: {
         pasos: [
           'Elija una tarea que haga cada semana y le quite tiempo.',
           'Escriba la instrucción con las cuatro partes.',
-          'Pásela por el revisor de la academia y ajústela.',
+          'Pásela por el revisor en su celular y ajústela.',
           'Guárdela: es la base de su entrega.',
         ],
+        consigna: 'Escriba una instrucción para una tarea real de su puesto usando las cuatro partes: contexto, tarea, formato y, si lo tiene, un ejemplo.',
       },
     },
 

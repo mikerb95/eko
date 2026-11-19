@@ -10,10 +10,13 @@
  *    alimenta el contador del proyector.
  */
 import { capitalizarNombre } from '../../lib/talleres/reglas'
+import { pintarRevision } from '../academia/revision'
 import { API_SALA, consultar as consultarTaller, enviar as enviarTaller } from './comun'
 
 const consultar = <T>(p: Record<string, string | number>) => consultarTaller<T>(p, API_SALA)
 const enviar = (c: Record<string, unknown>) => enviarTaller(c, 15_000, API_SALA)
+// El revisor hace dos llamadas a la IA: necesita más margen.
+const enviarLargo = (c: Record<string, unknown>) => enviarTaller(c, 60_000, API_SALA)
 
 interface Estado {
   enCurso: boolean
@@ -23,6 +26,7 @@ interface Estado {
   escena?: string
   interaccion?: { id: string; tipo: string; titulo: string; preguntas: { id: string; enunciado: string; opciones: { id: string; texto: string }[] }[] } | null
   mias?: Record<string, string>
+  practica?: { consigna: string; maximo: number } | null
 }
 
 const raiz = document.querySelector<HTMLElement>('[data-sala]')
@@ -160,6 +164,62 @@ function montar(raiz: HTMLElement) {
     }
   }
 
+  // Práctica guiada: la sala se vuelve el revisor de instrucciones.
+  const pintarPractica = (p: { consigna: string; maximo: number }) => {
+    titulo.textContent = 'Revise su instrucción'
+    sub.textContent = p.consigna
+    const form = document.createElement('form')
+    form.className = 'sl-form sl-practica'
+    form.innerHTML = `
+      <label><span>Su instrucción</span>
+        <textarea name="instruccion" rows="7" placeholder="Contexto: soy… Tarea: … Formato: …"></textarea>
+      </label>
+      <p class="sl-nota">No escriba datos personales: los correos y números de documento o teléfono se ocultan antes de enviarla.</p>
+      <button type="submit" class="ac-btn">Revisar mi instrucción</button>`
+    const txt = form.querySelector('textarea')!
+    txt.maxLength = p.maximo
+    const boton = form.querySelector('button')!
+    const res = document.createElement('div')
+    res.className = 'ac-revision'
+    res.hidden = true
+    form.addEventListener('submit', async (ev) => {
+      ev.preventDefault()
+      boton.disabled = true
+      boton.textContent = 'Revisando…'
+      decir('')
+      try {
+        const r = await enviarLargo({ accion: 'practicar', instruccion: txt.value })
+        res.hidden = false
+        res.innerHTML = pintarRevision(r)
+        res.scrollIntoView({ behavior: 'smooth', block: 'start' })
+      } catch (err) {
+        decir(err instanceof Error ? err.message : 'No se pudo revisar. Intente de nuevo.', 'error')
+      } finally {
+        boton.disabled = false
+        boton.textContent = 'Revisar mi instrucción'
+      }
+    })
+    res.addEventListener('click', async (ev) => {
+      const el = ev.target as HTMLElement
+      const mejorada = res.querySelector('.ac-mejorada pre')?.textContent ?? ''
+      if (el.closest('[data-usar-mejorada]')) {
+        txt.value = mejorada
+        txt.focus()
+        txt.scrollIntoView({ behavior: 'smooth', block: 'center' })
+      } else if (el.closest('[data-copiar]')) {
+        const b = el.closest<HTMLButtonElement>('[data-copiar]')!
+        try {
+          await navigator.clipboard.writeText(mejorada)
+          b.textContent = 'Copiada'
+        } catch {
+          b.textContent = 'Selecciónela y copie'
+        }
+        setTimeout(() => (b.textContent = 'Copiar'), 1800)
+      }
+    })
+    lista.replaceChildren(form, res)
+  }
+
   const espera = (texto: string) => {
     const p = document.createElement('p')
     p.className = 'sl-espera'
@@ -191,11 +251,12 @@ function montar(raiz: HTMLElement) {
     }
     taller = e.taller!
     entrar()
-    const id = e.interaccion?.id ?? ''
+    const id = e.interaccion?.id ?? (e.practica ? 'practica' : '')
     if (id === abierta) return
     abierta = id
     decir('')
     if (e.interaccion) pintarPreguntas(e)
+    else if (e.practica) pintarPractica(e.practica)
     else {
       titulo.textContent = e.escena || 'Mire la pantalla'
       sub.textContent = ''

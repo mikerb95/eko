@@ -8,7 +8,7 @@
 |---|---|
 | Programa | 4 capacitaciones presenciales de 4 h. La 1 es general (todo el equipo); la 2, 3 y 4 son por área. |
 | Dónde | ekosolv.codebymike.net/academia/taller/1, con login de la academia. |
-| Público | Responde desde el celular: el QR abre `/academia/sala`, que pide nombres, apellidos (mayúscula inicial automática), cargo y área, **sin usuario ni contraseña** (cambio de Mike, 2026-11-19). |
+| Público | Responde desde el celular: el QR abre `/academia/sala`, que pide nombres, apellidos (mayúscula inicial automática), cargo y área, **sin usuario ni contraseña** (cambio de Mike, 2026-11-19). Regla: **ningún QR lleva a un login**. El QR de la práctica guiada abre la misma sala, que en esa escena se vuelve el revisor de instrucciones; el del cierre abre la tarjeta resumen, que es pública. |
 | IA | En vivo con respaldo: Claude responde en el momento; si falla, se muestra la respuesta guardada, marcada como tal. |
 | Motion | En las 4 capacitaciones. |
 | Funciones | Vista de presentador, asistencia automática, evaluación antes y después, repaso al iniciar los sábados 2 a 4, tarjeta resumen, apertura con datos del diagnóstico. |

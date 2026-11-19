@@ -165,6 +165,24 @@ export async function asistentesDeHoy(taller: number, hoy: string): Promise<Asis
   return r.rows.map(filaAsistente)
 }
 
+/** Prácticas con el revisor que hizo hoy una persona desde la sala. */
+export async function practicasSalaDeHoy(asistente_id: number, hoy: string): Promise<number> {
+  const c = await db()
+  const r = await c.execute({
+    sql: 'SELECT COUNT(*) AS n FROM ac_taller_practicas WHERE asistente_id = ? AND substr(created_at, 1, 10) >= ?',
+    args: [asistente_id, hoy],
+  })
+  return num((r.rows[0] as any)?.n)
+}
+
+export async function guardarPracticaSala(taller: number, asistente_id: number, instruccion: string, revision: unknown): Promise<void> {
+  const c = await db()
+  await c.execute({
+    sql: 'INSERT INTO ac_taller_practicas (taller, asistente_id, instruccion, revision, created_at) VALUES (?, ?, ?, ?, ?)',
+    args: [taller, asistente_id, instruccion, JSON.stringify(revision), ahora()],
+  })
+}
+
 export async function votar(taller: number, interaccion: string, pregunta: string, usuario_id: number, valor: string): Promise<void> {
   const c = await db()
   await c.execute({

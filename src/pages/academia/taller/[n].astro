@@ -30,7 +30,6 @@ if (!admin) {
 
 const origen = Astro.url.origin
 const urlSala = `${origen}/academia/sala`
-const urlAcademia = `${origen}/academia`
 const urlResumen = `${origen}/academia/taller/${t.n}/resumen`
 const qr = (url: string, oscuro = false) =>
   QRCode.toString(url, { type: 'svg', margin: 0, errorCorrectionLevel: 'M', color: { dark: oscuro ? '#0E1C26' : '#0E1C26', light: '#ffffff00' } })
@@ -55,10 +54,8 @@ if (!bloqueo && t.escenas.some((e) => e.tipo === 'diagnostico')) {
 const ctx: Contexto = {
   admin,
   qrSala: bloqueo ? '' : await qr(urlSala),
-  qrAcademia: bloqueo ? '' : await qr(urlAcademia),
   qrResumen: bloqueo ? '' : await qr(urlResumen),
   urlSala,
-  urlAcademia,
   urlResumen,
   diag,
 }

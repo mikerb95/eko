@@ -621,6 +621,18 @@ export const TABLAS: readonly string[] = [
     UNIQUE (taller, fecha, clave)
   )`,
 
+  // Instrucciones que revisa la IA desde la sala durante la práctica guiada
+  // (asistente_id es el id de ac_taller_asistentes). Sirve para el límite
+  // diario por persona y para mostrar casos en el proyector.
+  `CREATE TABLE IF NOT EXISTS ac_taller_practicas (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    taller INTEGER NOT NULL,
+    asistente_id INTEGER NOT NULL,
+    instruccion TEXT NOT NULL,
+    revision TEXT NOT NULL,
+    created_at TEXT NOT NULL
+  )`,
+
   // Quién está en la sala (celular abierto en /academia/sala).
   `CREATE TABLE IF NOT EXISTS ac_taller_sala (
     taller INTEGER NOT NULL,
@@ -680,6 +692,7 @@ export const TABLAS_ESPERADAS: readonly string[] = [
   'ac_sesiones',
   'ac_taller_asistentes',
   'ac_taller_estado',
+  'ac_taller_practicas',
   'ac_taller_respuestas',
   'ac_taller_sala',
   'actos',

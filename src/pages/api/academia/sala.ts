@@ -2,9 +2,11 @@ import type { APIRoute } from 'astro'
 import { fail, json } from '../../../lib/apiError'
 import { SALA_COOKIE, SALA_TTL_SECONDS, crearPaseSala } from '../../../lib/auth'
 import { hoyEnBogota } from '../../../lib/agente/diasHabiles'
-import { AREA_IDS } from '../../../lib/academia/reglas'
+import { AREA_IDS, nombreModulo } from '../../../lib/academia/reglas'
+import { MAX_INSTRUCCION, MIN_INSTRUCCION, PRACTICAS_DIA, validarInstruccion } from '../../../lib/academia/practica'
+import { practicar, PracticaNoDisponible } from '../../../lib/academia/motorPractica'
 import { interaccionDe, interaccionPublica, registroSala, votoValido } from '../../../lib/talleres/reglas'
-import { marcarEnSala, misRespuestas, registrarAsistente, votar } from '../../../lib/talleres/datos'
+import { guardarPracticaSala, marcarEnSala, misRespuestas, practicasSalaDeHoy, registrarAsistente, votar } from '../../../lib/talleres/datos'
 import { salaActual } from '../../../lib/talleres/sala'
 
 // La sala del celular (/academia/sala). Pública: se llega por el QR del
@@ -12,9 +14,11 @@ import { salaActual } from '../../../lib/talleres/sala'
 // La persona escribe nombre, apellido, cargo y área y recibe un pase firmado
 // (cookie eko_sala) que solo sirve para votar en la capacitación en curso,
 // ese día. Fuera de una sesión en curso no se puede registrar ni votar.
+// Mientras el proyector está en la práctica guiada, la sala es el revisor de
+// instrucciones (mismo motor y tope de gasto que el de la academia).
 //
-// GET           → capacitación en curso, si la persona ya está registrada, pregunta abierta y sus respuestas
-// POST {accion} → registrar | entrar | votar
+// GET           → capacitación en curso, si la persona ya está registrada, pregunta abierta, sus respuestas y si hay práctica
+// POST {accion} → registrar | entrar | votar | practicar
 
 export const prerender = false
 
@@ -24,12 +28,14 @@ export const GET: APIRoute = async ({ cookies }) => {
     if (!estado || !t) return json({ enCurso: false })
     if (!asistente) return json({ enCurso: true, registrado: false, taller: t.n, titulo: t.titulo })
     const i = estado.interaccion ? interaccionDe(t, estado.interaccion) : null
+    const escena = t.escenas.find((x) => x.id === estado.escena)
     return json({
       enCurso: true,
       registrado: true,
       taller: t.n,
       titulo: t.titulo,
-      escena: t.escenas.find((x) => x.id === estado.escena)?.titulo ?? '',
+      escena: escena?.titulo ?? '',
+      practica: escena?.tipo === 'practica' ? { consigna: String(escena.datos?.consigna ?? ''), maximo: MAX_INSTRUCCION } : null,
       interaccion: i ? interaccionPublica(i) : null,
       mias: i ? await misRespuestas(t.n, i.id, asistente.id) : {},
     })
@@ -76,6 +82,24 @@ export const POST: APIRoute = async ({ request, cookies }) => {
       if (!votoValido(t, estado.interaccion, b.interaccion, b.pregunta, b.valor)) return json({ error: 'Esa pregunta ya se cerró' }, 409)
       await votar(t.n, b.interaccion, b.pregunta, asistente.id, b.valor)
       return json({ ok: true })
+    }
+
+    if (b?.accion === 'practicar') {
+      const escena = t.escenas.find((x) => x.id === estado.escena)
+      if (escena?.tipo !== 'practica') return json({ error: 'El revisor se abre durante la práctica guiada.' }, 409)
+      const instruccion = validarInstruccion(b.instruccion)
+      if (!instruccion) return json({ error: `Escriba una instrucción de entre ${MIN_INSTRUCCION} y ${MAX_INSTRUCCION} caracteres.` }, 400)
+      if ((await practicasSalaDeHoy(asistente.id, hoyEnBogota())) >= PRACTICAS_DIA) {
+        return json({ error: `Ya hizo ${PRACTICAS_DIA} prácticas hoy.` }, 429)
+      }
+      try {
+        const r = await practicar({ instruccion, consigna: String(escena.datos?.consigna ?? ''), leccion: 'Cómo pedir', area: nombreModulo(asistente.area) })
+        await guardarPracticaSala(t.n, asistente.id, instruccion, r.revision)
+        return json(r)
+      } catch (err) {
+        if (err instanceof PracticaNoDisponible) return json({ error: 'El revisor no está disponible en este momento. Siga con la instrucción y revísela con quien dicta.' }, 503)
+        throw err
+      }
     }
 
     return json({ error: 'Acción desconocida' }, 400)

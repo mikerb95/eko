@@ -36,7 +36,7 @@ const nombre = (id: string) => MODULOS.find((m) => m.id === id)?.titulo ?? id
     <div class="qr" set:html={ctx.qrResumen} role="img" aria-label={`Código QR de ${ctx.urlResumen}`} />
     <div style="display:flex;flex-direction:column;gap:18px;max-width:28ch">
       <p class="frase-grande">Rápida y capaz como un practicante nuevo. Su trabajo <span class="acento" style="color:#6fd2c9">siempre se revisa</span>.</p>
-      <p class="tl-nota">La tarjeta resumen y las lecciones quedan en la academia.</p>
+      <p class="tl-nota">Escanee el código para guardar la tarjeta resumen.</p>
     </div>
   </div>
 )}

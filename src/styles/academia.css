@@ -305,3 +305,9 @@
 .sl-form [aria-invalid='true'] { border-color: #b4442f; }
 .sl-form .ac-btn { margin-top: 4px; padding: 15px 20px; font-size: 16px; }
 @media (max-width: 340px) { .sl-par { grid-template-columns: 1fr; } }
+
+/* Revisor dentro de la sala (práctica guiada). */
+.sl-practica textarea { width: 100%; min-width: 0; font: 16px/1.5 var(--font-sans); color: var(--ink); background: #fff; border: 1px solid var(--line); border-radius: 14px; padding: 13px 14px; resize: vertical; }
+.sl-practica textarea:focus { outline: 2px solid color-mix(in oklab, var(--deep) 35%, transparent); outline-offset: 1px; }
+.sl-nota { font-size: 13.5px; color: var(--mute); margin: 0; }
+.sl .ac-revision { border-top: 0; margin-top: 4px; padding-top: 0; }

@@ -1,6 +1,8 @@
 ---
 // Tarjeta resumen de una capacitación: una hoja con las ideas clave y las
 // instrucciones vistas, para guardar en PDF o imprimir desde el navegador.
+// Pública (excepción en src/middleware.ts): se llega por el QR del cierre y
+// ningún QR debe llevar a un login. Solo tiene contenido de la capacitación.
 export const prerender = false
 import '../../../../styles/global.css'
 import { tallerDe } from '../../../../lib/talleres'
@@ -55,7 +57,6 @@ if (!t) return new Response('Esta capacitación no existe.', { status: 404 })
   <body>
     <div class="barra">
       <button type="button" onclick="window.print()">Guardar en PDF o imprimir</button>
-      <a href="/academia">Volver a la academia</a>
     </div>
     <article class="hoja">
       <header>

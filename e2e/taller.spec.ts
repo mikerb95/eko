@@ -107,6 +107,27 @@ test('presentación, sala, votos y asistencia', async ({ browser }) => {
   expect((await part.request.post('/api/academia/taller', { data: { accion: 'ia', taller: 1, demo: 'auto', version: 'v1' } })).status()).toBe(403)
   await ctxPart.close()
 
+  // Ningún QR de la presentación lleva a un login: se abren sin sesión.
+  const urlsQr = await proyector.$$eval('.qr[aria-label]', (els) => [...new Set(els.map((e) => e.getAttribute('aria-label')!.replace('Código QR de ', '')))])
+  expect(urlsQr.length).toBeGreaterThanOrEqual(2)
+  const sinSesion = await browser.newContext()
+  for (const u of urlsQr) {
+    const pg = await sinSesion.newPage()
+    await pg.goto(new URL(u).pathname)
+    expect(pg.url(), u).not.toContain('/admin/login')
+    await pg.close()
+  }
+  await sinSesion.close()
+
+  // Práctica guiada: en esa escena la sala del celular es el revisor.
+  await proyector.request.post('/api/academia/taller', { data: { accion: 'estado', taller: 1, escena: 'practica' } })
+  await cel.goto('/academia/sala')
+  await expect(cel.getByRole('heading', { name: 'Revise su instrucción' })).toBeVisible({ timeout: 8000 })
+  await cel.getByLabel('Su instrucción').fill('Soy analista de Ekosolv. Resume este certificado en una tabla con fecha y gestor.')
+  await cel.getByRole('button', { name: 'Revisar mi instrucción' }).click()
+  await expect(cel.locator('.ac-revision')).toContainText('Así quedó su instrucción')
+  await cel.screenshot({ path: 'test-results/taller-practica-celular.png', fullPage: true })
+
   // Demo con IA: con el modelo simulado sale la respuesta guardada, marcada.
   const constructor = await proyector.$$eval('.tl-escena', (els) => els.findIndex((e) => (e as HTMLElement).dataset.escena === 'constructor') + 1)
   await proyector.goto(`/academia/taller/1#${constructor}.0`)

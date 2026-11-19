@@ -9,10 +9,8 @@ export interface Diagnostico {
 export interface Contexto {
   admin: boolean
   qrSala: string
-  qrAcademia: string
   qrResumen: string
   urlSala: string
-  urlAcademia: string
   urlResumen: string
   diag: Diagnostico | null
 }
