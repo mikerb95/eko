@@ -1,0 +1,23 @@
+---
+// La sala: lo que cada participante abre en el celular durante una
+// capacitación presencial (se llega por el código QR del proyector). Muestra
+// la pregunta abierta en ese momento, guarda sus respuestas y, al entrar,
+// marca la asistencia al bloque del día. Motor: src/scripts/taller/sala.ts.
+export const prerender = false
+import AcademiaLayout from '../../layouts/AcademiaLayout.astro'
+const nombre = String(Astro.locals.user || '')
+const rol = String(Astro.locals.role || '')
+---
+
+<AcademiaLayout titulo="Sala · Academia de IA · Ekosolv" nombre={nombre} rol={rol}>
+  <section class="sl" data-sala aria-live="polite">
+    <p class="ac-kicker" data-sl-kicker>Sala de la capacitación</p>
+    <h1 data-sl-titulo>Conectando…</h1>
+    <p class="sl-sub" data-sl-sub></p>
+    <div class="sl-preguntas" data-sl-preguntas></div>
+    <p class="sl-estado" data-sl-estado></p>
+  </section>
+  <script>
+    import '../../scripts/taller/sala'
+  </script>
+</AcademiaLayout>

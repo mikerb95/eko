@@ -581,6 +581,34 @@ export const TABLAS: readonly string[] = [
   // Copia de los datos al emitir: cambiar después el nombre o las horas no
   // altera un certificado ya entregado. La verificación pública es
   // /verificar/<codigo>.
+  // Capacitaciones presentadas desde el sitio (/academia/taller/<n>,
+  // src/lib/talleres). Escena activa y pregunta abierta en los celulares.
+  `CREATE TABLE IF NOT EXISTS ac_taller_estado (
+    taller INTEGER PRIMARY KEY,
+    escena TEXT NOT NULL DEFAULT '',
+    interaccion TEXT NOT NULL DEFAULT '',
+    updated_at TEXT NOT NULL
+  )`,
+
+  // Una respuesta por persona y pregunta: al cambiar el voto se reemplaza.
+  `CREATE TABLE IF NOT EXISTS ac_taller_respuestas (
+    taller INTEGER NOT NULL,
+    interaccion TEXT NOT NULL,
+    pregunta TEXT NOT NULL,
+    usuario_id INTEGER NOT NULL,
+    valor TEXT NOT NULL,
+    updated_at TEXT NOT NULL,
+    PRIMARY KEY (taller, interaccion, pregunta, usuario_id)
+  )`,
+
+  // Quién está en la sala (celular abierto en /academia/sala).
+  `CREATE TABLE IF NOT EXISTS ac_taller_sala (
+    taller INTEGER NOT NULL,
+    usuario_id INTEGER NOT NULL,
+    visto_at TEXT NOT NULL,
+    PRIMARY KEY (taller, usuario_id)
+  )`,
+
   `CREATE TABLE IF NOT EXISTS ac_certificados (
     codigo TEXT PRIMARY KEY,
     usuario_id INTEGER NOT NULL,
@@ -630,6 +658,9 @@ export const TABLAS_ESPERADAS: readonly string[] = [
   'ac_practicas',
   'ac_progreso',
   'ac_sesiones',
+  'ac_taller_estado',
+  'ac_taller_respuestas',
+  'ac_taller_sala',
   'actos',
   'actos_archivos',
   'ajustes',

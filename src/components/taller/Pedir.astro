@@ -1,0 +1,84 @@
+---
+// Escenas de "Cómo pedir": el método de cuatro partes, la demo en vivo con
+// Claude y cómo corregir una respuesta. La demo muestra cada versión de la
+// instrucción con lo nuevo resaltado; la respuesta la pide el presentador
+// (en vivo) o se muestra la guardada (fuera de la sesión o si la IA falla).
+import type { Escena, Taller } from '../../lib/talleres/tipos'
+import { aHtml } from '../../lib/talleres/formato'
+import type { Contexto } from './tipos'
+
+interface Props {
+  e: Escena
+  t: Taller
+  ctx: Contexto
+}
+const { e, t, ctx } = Astro.props
+const d = e.datos ?? {}
+const COLOR_PARTE: Record<string, string> = { contexto: '#124E7D', tarea: '#179C91', formato: '#B8926F', ejemplo: '#00AA9F' }
+const demo = e.demo ? t.demos.find((x) => x.id === e.demo) : null
+const final = demo?.versiones.at(-1)
+const sinDoc = (s: string) => s.split('\n\n---\n')[0]!
+const mensajes = (d.mensajes ?? []) as { de: string; texto: string }[]
+---
+
+{e.tipo === 'metodo' && (
+  <>
+    <div class="partes">
+      {(d.partes as { id: string; nombre: string; texto: string }[]).map((p, k) => (
+        <div class="parte" style={`--c:${COLOR_PARTE[p.id]}`} data-paso={k + 1}>
+          <b>0{k + 1}</b>
+          <h3>{p.nombre}</h3>
+          <p>{p.texto}</p>
+        </div>
+      ))}
+    </div>
+    <div class="armada" aria-label="Instrucción armada con las cuatro partes">
+      {(d.partes as { id: string; ejemplo: string }[]).map((p, k) => (
+        <span style={`--c:${COLOR_PARTE[p.id]}`} data-paso={k + 1}>{p.ejemplo}</span>
+      ))}
+    </div>
+  </>
+)}
+
+{e.tipo === 'constructor' && demo && final && (
+  <>
+    <div style="display:flex;flex-direction:column;gap:16px;min-height:0">
+      <div class="versiones" data-versiones>
+        {demo.versiones.map((v, k) => <span class:list={[{ on: k === demo.versiones.length - 1 }]} data-version={k}>{v.parte}</span>)}
+      </div>
+      {demo.versiones.map((v, k) => {
+        const texto = sinDoc(v.instruccion)
+        const i = texto.indexOf(v.agregado)
+        return (
+          <pre class="instr" data-instr={k} hidden={k !== demo.versiones.length - 1}>{i < 0 ? texto : <>{texto.slice(0, i)}<mark>{v.agregado}</mark>{texto.slice(i + v.agregado.length)}</>}<span class="adj">+ adjunto: {demo.documentoTitulo}</span></pre>
+        )
+      })}
+      <div class="acciones">
+        <button type="button" class="tl-btn" data-pedir>{ctx.admin ? 'Preguntarle a Claude' : 'Ver la respuesta guardada'}</button>
+        <button type="button" class="tl-btn sec" data-ver-doc aria-expanded="false">Ver el auto</button>
+      </div>
+    </div>
+    <div class="respuesta" aria-live="polite">
+      <div class="cab">
+        <span class="fuente guardada" data-fuente>Respuesta guardada</span>
+        <span class="tl-nota" data-version-nombre>{final.parte}</span>
+      </div>
+      <div class="texto-ia" data-texto-ia set:html={aHtml(final.respaldo)} />
+    </div>
+    <div class="doc-ej" data-doc-ej>
+      <h4>{demo.documentoTitulo}{demo.provisional ? ' · documento de ejemplo' : ''}</h4>
+      {demo.documento}
+    </div>
+  </>
+)}
+
+{e.tipo === 'iterar' && (
+  <>
+    <div class="chat">
+      {mensajes.map((m, k) => (
+        <p class={`burbuja ${m.de}`} data-paso={Math.floor(k / 2) + 1}>{m.texto}</p>
+      ))}
+    </div>
+    <p class="guardar" data-paso="3"><b>Guárdela.</b> Cuando una instrucción le funcione, guárdela en un proyecto de Claude con sus documentos e instrucciones fijas, para no repetirlas cada vez.</p>
+  </>
+)}

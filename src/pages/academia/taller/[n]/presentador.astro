@@ -1,0 +1,95 @@
+---
+// Vista de presentador (solo admin): notas, cronómetro, escena siguiente y
+// estado de la sala. Se abre en el portátil (tecla P en el proyector) y se
+// sincroniza con la ventana del proyector por BroadcastChannel; también mueve
+// la presentación por su cuenta si el proyector no está abierto.
+export const prerender = false
+import '../../../../styles/global.css'
+import '../../../../styles/presentador.css'
+import { tallerDe } from '../../../../lib/talleres'
+
+const t = tallerDe(Astro.params.n)
+if (!t) return new Response('Esta capacitación no existe.', { status: 404 })
+if (String(Astro.locals.role || '') !== 'admin') return Astro.redirect(`/academia/taller/${t.n}`)
+
+const datos = {
+  n: t.n,
+  titulo: t.titulo,
+  bloques: t.bloques,
+  escenas: t.escenas.map((e) => ({
+    id: e.id,
+    tipo: e.tipo,
+    kicker: e.kicker,
+    titulo: e.titulo,
+    notas: e.notas,
+    pasos: e.pasos,
+    minutos: e.minutos,
+    bloque: e.bloque,
+    provisional: !!e.provisional,
+    interaccion: e.interaccion ?? '',
+  })),
+}
+---
+
+<!doctype html>
+<html lang="es">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="robots" content="noindex, nofollow, noarchive" />
+    <title>{`Presentador · Capacitación ${t.n}`}</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,400..700&family=Geist:wght@300..700&family=Geist+Mono:wght@400..500&display=swap" rel="stylesheet" />
+  </head>
+  <body class="pr">
+    <header class="pr-top">
+      <div>
+        <p class="pr-kicker">Vista de presentador · Capacitación {t.n}</p>
+        <h1>{t.titulo}</h1>
+      </div>
+      <div class="pr-relojes">
+        <div><span>Sesión</span><b data-reloj-total>0:00</b></div>
+        <div><span>Esta escena</span><b data-reloj-escena>0:00</b></div>
+        <div><span>Ritmo</span><b data-ritmo>a tiempo</b></div>
+        <button type="button" class="pr-btn sec" data-iniciar>Iniciar cronómetro</button>
+      </div>
+    </header>
+
+    <div class="pr-avisos" data-avisos aria-live="polite"></div>
+
+    <main class="pr-main">
+      <section class="pr-actual">
+        <p class="pr-kicker" data-kicker></p>
+        <h2 data-titulo></h2>
+        <p class="pr-meta"><span data-numero></span> · <span data-paso></span> · <span data-plan></span></p>
+        <ol class="pr-notas" data-notas></ol>
+        <div class="pr-acciones">
+          <button type="button" class="pr-btn sec" data-anterior>← Anterior</button>
+          <button type="button" class="pr-btn" data-siguiente>Siguiente →</button>
+          <button type="button" class="pr-btn ia" data-pedir hidden>Preguntarle a Claude</button>
+          <button type="button" class="pr-btn ia" data-generar hidden>Elegir el siguiente token</button>
+        </div>
+      </section>
+
+      <aside class="pr-lado">
+        <div class="pr-caja">
+          <span>En la sala</span><b data-sala>0</b>
+          <span>Asistencia marcada hoy</span><b data-asistentes>0</b>
+        </div>
+        <div class="pr-caja pr-sig">
+          <span>Siguiente escena</span>
+          <b data-sig-titulo></b>
+        </div>
+        <ol class="pr-bloques" data-bloques></ol>
+        <a class="pr-btn sec" href={`/academia/taller/${t.n}`} target="ekosolv-proyector" data-abrir>Abrir el proyector</a>
+        <p class="pr-ayuda">En el proyector: F pantalla completa · flechas o clicker para avanzar.</p>
+      </aside>
+    </main>
+
+    <script type="application/json" id="pr-datos" set:html={JSON.stringify(datos).replace(/</g, '\\u003c')} />
+    <script>
+      import '../../../../scripts/taller/presentador'
+    </script>
+  </body>
+</html>

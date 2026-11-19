@@ -1,0 +1,41 @@
+# Capacitaciones presentadas desde el sitio
+
+> `/academia/taller/<n>` (proyector), `/academia/taller/<n>/presentador` (solo admin), `/academia/sala` (celular) y `/academia/taller/<n>/resumen` (tarjeta). Construido el 2026-11-19.
+
+## Decisiones de Mike (2026-11-19)
+
+| Tema | Decisión |
+|---|---|
+| Programa | 4 capacitaciones presenciales de 4 h. La 1 es general (todo el equipo); la 2, 3 y 4 son por área. |
+| Dónde | ekosolv.codebymike.net/academia/taller/1, con login de la academia. |
+| Público | Responde desde el celular **con su cuenta** (QR en el proyector). |
+| IA | En vivo con respaldo: Claude responde en el momento; si falla, se muestra la respuesta guardada, marcada como tal. |
+| Motion | En las 4 capacitaciones. |
+| Funciones | Vista de presentador, asistencia automática, evaluación antes y después, repaso al iniciar los sábados 2 a 4, tarjeta resumen, apertura con datos del diagnóstico. |
+| Fuera | Reto cronometrado y preguntas anónimas (no los eligió). |
+
+## Cómo se dicta
+
+1. Programar en `/admin/academia` el bloque del día con el módulo de la capacitación (para la 1: `general`). Sin eso, la asistencia no se marca y el presentador lo avisa.
+2. Abrir `/academia/taller/1` en la pantalla del proyector (F = pantalla completa) y la tecla P abre la vista de presentador en el portátil.
+3. Flechas, PageDown, barra espaciadora o clicker: cada clic revela el siguiente paso de la escena; sin pasos, pasa a la siguiente.
+4. Al cambiar de escena se abre en los celulares la pregunta de esa escena. Mientras la sesión está en curso (movida en las últimas 6 h), los participantes no ven la presentación, solo la sala.
+
+## Dónde está cada cosa
+
+- Contenido (puro): `src/lib/talleres/taller1.ts`; tipos en `tipos.ts`; registro en `index.ts`; reglas y pruebas en `reglas.ts`, `formato.ts`, `talleres.test.ts`.
+- Datos: `src/lib/talleres/datos.ts` (tablas `ac_taller_estado`, `ac_taller_respuestas`, `ac_taller_sala`; la asistencia va a `ac_asistencia`).
+- IA en vivo: `src/lib/talleres/motorIA.ts`. La instrucción sale del contenido, nunca del navegador. Tope `TALLER_IA_TOPE_DIARIO_USD` (2 USD por defecto).
+- API: `src/pages/api/academia/taller.ts`.
+- Escenas: `src/components/taller/` (un componente por familia). Motor: `src/scripts/taller/proyector.ts`, hooks por tipo en `escenas.ts`, presentador y sala en sus archivos. Estilos: `src/styles/taller.css`, `presentador.css` y la sección de sala en `academia.css`.
+- Prueba en navegador: `e2e/taller.spec.ts`.
+
+## Para agregar la capacitación 2, 3 o 4
+
+Crear `src/lib/talleres/tallerN.ts` con la misma forma (bloques, escenas, interacciones, demos, `repaso` apuntando a preguntas de la 1) y sumarlo en `index.ts`. Si una escena necesita un tipo nuevo, agregar su marcado en `src/components/taller/` y su hook en `escenas.ts`.
+
+## Pendientes
+
+- Reemplazar el contenido marcado como provisional con material real de Ekosolv: el auto de la demo, las citas de "verdad o alucinación", los casos del semáforo y el certificado del anonimizador. Verificar las citas normativas antes de la sesión.
+- Probar la demo con IA real en producción (en local usa el modelo simulado y muestra la respuesta guardada).
+- Contenido de las capacitaciones 2, 3 y 4 cuando lleguen los documentos de cada área.

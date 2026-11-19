@@ -1,0 +1,90 @@
+---
+// Escenas de marco: portada, sala (QR), diagnóstico, descanso y práctica.
+import type { Escena, Taller } from '../../lib/talleres/tipos'
+import { tokenizarAprox } from '../../lib/talleres/reglas'
+import type { Contexto } from './tipos'
+
+interface Props {
+  e: Escena
+  t: Taller
+  ctx: Contexto
+}
+const { e, t, ctx } = Astro.props
+const cinta = tokenizarAprox('modelo de lenguaje · tokens · probabilidad · contexto · instrucción · verificación · datos personales · Ekosolv ·')
+const d = ctx.diag
+const fmt = (n: number) => n.toLocaleString('es-CO')
+const maxTarea = Math.max(1, ...(d?.tareas.map((x) => x.n) ?? [1]))
+---
+
+{e.tipo === 'portada' && (
+  <>
+    <div class="cinta" aria-hidden="true" data-cinta>
+      {[...cinta, ...cinta].map((tk, i) => <span class={`tk t${i % 4}`}>{tk}</span>)}
+    </div>
+    <p class="sub">{t.subtitulo}</p>
+    <p class="firma">Ekosolv · Capacitación en IA · Dictada por Code by Mike</p>
+  </>
+)}
+
+{e.tipo === 'sala' && (
+  <>
+    <div class="qr" set:html={ctx.qrSala} role="img" aria-label={`Código QR de ${ctx.urlSala}`} />
+    <div style="display:flex;flex-direction:column;gap:28px">
+      <p class="url">{ctx.urlSala.replace(/^https?:\/\//, '')}</p>
+      <ol>
+        <li>Escanee el código con la cámara del celular.</li>
+        <li>Entre con su usuario y contraseña de la academia.</li>
+        <li>Deje esa página abierta: por ahí responde durante la sesión.</li>
+      </ol>
+      <p class="contador"><b data-sala-n>0</b><span>personas en la sala</span></p>
+    </div>
+  </>
+)}
+
+{e.tipo === 'diagnostico' && (
+  d && d.total > 0 ? (
+    <div class="cifras">
+      <div class="cifra" data-paso="1">
+        <b data-cuenta={d.total}>{fmt(d.total)}</b>
+        <span>personas del equipo respondieron la encuesta del diagnóstico</span>
+      </div>
+      <div class="cifra" data-paso="2">
+        <b data-cuenta={d.horasMes}>{fmt(d.horasMes)}</b>
+        <span>horas al mes que el equipo dice gastar en tareas repetitivas</span>
+      </div>
+      <div class="cifra" data-paso="3">
+        <div class="barras">
+          {d.tareas.map((x) => (
+            <div class="barra-f" style={`--v:${x.n / maxTarea}`}>
+              <span>{x.etiqueta}</span>
+              <b>{x.n}</b>
+              <span class="riel"><i /></span>
+            </div>
+          ))}
+        </div>
+        <span>Las tareas que más se repiten en las respuestas</span>
+      </div>
+    </div>
+  ) : (
+    <p class="llamado"><span class="pt" />La encuesta del diagnóstico todavía no tiene respuestas. Cuando las tenga, aquí aparecen las horas y las tareas del equipo.</p>
+  )
+)}
+
+{e.tipo === 'descanso' && (
+  <p class="cuenta" data-cuenta-regresiva={(e.datos?.minutos ?? 15) * 60}>{e.datos?.minutos ?? 15}:00</p>
+)}
+
+{e.tipo === 'practica' && (
+  <>
+    <div style="display:flex;flex-direction:column;gap:28px">
+      <ol>
+        {(e.datos?.pasos as string[]).map((p) => <li>{p}</li>)}
+      </ol>
+      <p class="cuenta" data-cuenta-regresiva={e.minutos * 60}>{e.minutos}:00</p>
+    </div>
+    <div style="display:flex;flex-direction:column;gap:14px;align-items:flex-start">
+      <div class="qr" set:html={ctx.qrAcademia} role="img" aria-label={`Código QR de ${ctx.urlAcademia}`} />
+      <p class="tl-nota">Academia · lección "Cómo pedir"</p>
+    </div>
+  </>
+)}

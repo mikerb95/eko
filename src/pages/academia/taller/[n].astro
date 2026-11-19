@@ -1,0 +1,132 @@
+---
+// Presentación de una capacitación (/academia/taller/<n>). Se proyecta desde
+// aquí: quien dicta (admin) la controla con el teclado o un clicker y abre la
+// vista de presentador en otra ventana; los participantes responden desde
+// /academia/sala. Fuera de la sesión, cualquier cuenta de la academia la
+// recorre para repasar (la demo con IA muestra la respuesta guardada).
+// Contenido: src/lib/talleres. Motor: src/scripts/taller.
+export const prerender = false
+import QRCode from 'qrcode'
+import '../../../styles/global.css'
+import '../../../styles/taller.css'
+import Escena from '../../../components/taller/Escena.astro'
+import { TIPOS_OSCUROS, type Contexto, type Diagnostico } from '../../../components/taller/tipos'
+import { tallerDe } from '../../../lib/talleres'
+import { enCurso, leerEstado } from '../../../lib/talleres/datos'
+import { cuentaDe } from '../../../lib/academia/datos'
+import { listarRespuestas } from '../../../lib/diagnostico/datos'
+import { resumir, SEMANAS_MES } from '../../../lib/diagnostico/resumen'
+
+const t = tallerDe(Astro.params.n)
+if (!t) return new Response('Esta capacitación todavía no está publicada.', { status: 404, headers: { 'content-type': 'text/plain; charset=utf-8' } })
+
+const admin = String(Astro.locals.role || '') === 'admin'
+let bloqueo = ''
+if (!admin) {
+  const cuenta = await cuentaDe(String(Astro.locals.username || ''))
+  if (!cuenta) bloqueo = 'cuenta'
+  else if (enCurso(await leerEstado(t.n).catch(() => null))) bloqueo = 'en_curso'
+}
+
+const origen = Astro.url.origin
+const urlSala = `${origen}/academia/sala`
+const urlAcademia = `${origen}/academia`
+const urlResumen = `${origen}/academia/taller/${t.n}/resumen`
+const qr = (url: string, oscuro = false) =>
+  QRCode.toString(url, { type: 'svg', margin: 0, errorCorrectionLevel: 'M', color: { dark: oscuro ? '#0E1C26' : '#0E1C26', light: '#ffffff00' } })
+
+let diag: Diagnostico | null = null
+if (!bloqueo && t.escenas.some((e) => e.tipo === 'diagnostico')) {
+  try {
+    const r = resumir(await listarRespuestas())
+    const tareas = new Map<string, number>()
+    for (const a of r.areas) for (const x of a.tareas) tareas.set(x.etiqueta, (tareas.get(x.etiqueta) ?? 0) + x.n)
+    diag = {
+      total: r.total,
+      horasMes: Math.round(r.horasTotal * SEMANAS_MES),
+      sinUsoIA: r.sinUsoIA,
+      tareas: [...tareas].filter(([, n]) => n > 0).sort((a, b) => b[1] - a[1]).slice(0, 4).map(([etiqueta, n]) => ({ etiqueta, n })),
+    }
+  } catch (e: any) {
+    console.error('[taller] diagnóstico', e?.message || e)
+  }
+}
+
+const ctx: Contexto = {
+  admin,
+  qrSala: bloqueo ? '' : await qr(urlSala),
+  qrAcademia: bloqueo ? '' : await qr(urlAcademia),
+  qrResumen: bloqueo ? '' : await qr(urlResumen),
+  urlSala,
+  urlAcademia,
+  urlResumen,
+  diag,
+}
+
+// Lo que necesita el motor en el navegador.
+const datos = {
+  n: t.n,
+  admin,
+  bloques: t.bloques,
+  escenas: t.escenas.map((e) => ({ id: e.id, tipo: e.tipo, pasos: e.pasos, minutos: e.minutos, bloque: e.bloque, interaccion: e.interaccion ?? '', demo: e.demo ?? '', oscura: TIPOS_OSCUROS.has(e.tipo) })),
+  demos: t.demos.map((d) => ({ id: d.id, versiones: d.versiones.map((v) => ({ id: v.id, parte: v.parte, respaldo: v.respaldo })) })),
+  evaluacion: t.evaluacion ?? null,
+}
+---
+
+<!doctype html>
+<html lang="es">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="robots" content="noindex, nofollow, noarchive" />
+    <link rel="icon" href="/favicon.ico" sizes="any" />
+    <title>{`Capacitación ${t.n} · ${t.titulo} · Ekosolv`}</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,400..700&family=Geist:wght@300..700&family=Geist+Mono:wght@400..500&display=swap" rel="stylesheet" />
+  </head>
+  <body class="tl">
+    {bloqueo === 'cuenta' && (
+      <main class="tl-aviso">
+        <h1>Su cuenta no está activa en la academia</h1>
+        <p>Si cree que es un error, avísele a quien coordina la capacitación.</p>
+      </main>
+    )}
+    {bloqueo === 'en_curso' && (
+      <main class="tl-aviso">
+        <h1>La capacitación está en curso</h1>
+        <p>Durante la sesión se responde desde la sala. Cuando termine, aquí podrá repasar la presentación completa.</p>
+        <a class="tl-btn" href="/academia/sala">Ir a la sala</a>
+      </main>
+    )}
+    {!bloqueo && (
+      <>
+        <header class="tl-barra">
+          <img src="/brand/ekosolv-horizontal.png" alt="EKOSOLV" width="249" height="72" />
+          <span class="tl-barra-tit">Capacitación {t.n} · {t.titulo}</span>
+          <a href="/academia">Volver a la academia</a>
+        </header>
+        <div class="tl-escenario" data-taller-raiz>
+          <div class="tl-lienzo" data-lienzo>
+            {t.escenas.map((e, k) => <Escena e={e} t={t} ctx={ctx} indice={k} />)}
+            <footer class="tl-pie" data-pie aria-hidden="true">
+              <span>
+                <img class="logo-cla" src="/brand/ekosolv-horizontal.png" alt="" width="249" height="72" />
+                <img class="logo-osc" src="/brand/ekosolv-horizontal-white.png" alt="" width="249" height="72" />
+              </span>
+              <span class="tl-progreso" data-progreso>
+                {t.bloques.map((b) => <span style={`--m:${b.minutos}`} data-bloque-barra={b.id}><i /></span>)}
+              </span>
+              <span class="tl-num" data-num>1 / {t.escenas.length}</span>
+            </footer>
+          </div>
+        </div>
+        <script type="application/json" id="tl-datos" set:html={JSON.stringify(datos).replace(/</g, '\\u003c')} />
+        <script>
+          import '../../../scripts/taller/proyector'
+        </script>
+      </>
+    )}
+  </body>
+</html>

@@ -1,0 +1,107 @@
+import { expect, test, type Page } from '@playwright/test'
+
+// Capacitación en vivo de punta a punta: quien dicta mueve la presentación
+// (proyector y vista de presentador sincronizados), una persona entra a la
+// sala desde el celular, queda con asistencia, responde la evaluación y su
+// voto llega al proyector. La demo con IA cae en la respuesta guardada
+// (modelo simulado), y fuera del ancho de proyector la página es un documento.
+
+test.describe.configure({ mode: 'serial' })
+
+const PARTICIPANTE = { username: 'luis.mora', password: 'clave-segura-2', name: 'Luis Mora' }
+const hoy = new Intl.DateTimeFormat('en-CA', { timeZone: 'America/Bogota' }).format(new Date())
+
+async function entrar(page: Page, username: string, password: string) {
+  const r = await page.request.post('/api/admin/login', { data: { username, password } })
+  expect(r.ok()).toBeTruthy()
+}
+
+async function admin(page: Page, accion: string, datos: Record<string, unknown>) {
+  const r = await page.request.post('/api/admin/academia', { data: { accion, ...datos } })
+  expect(r.ok(), await r.text()).toBeTruthy()
+}
+
+test('presentación, sala, votos y asistencia', async ({ browser }) => {
+  const ctxAdmin = await browser.newContext({ viewport: { width: 1600, height: 900 } })
+  const proyector = await ctxAdmin.newPage()
+  await entrar(proyector, 'admin', 'ekosolv2026*')
+  await admin(proyector, 'guardar_inscripcion', { area: 'operaciones', crear: PARTICIPANTE })
+  await admin(proyector, 'guardar_sesion', { titulo: 'Capacitación general', fecha: hoy, hora: '08:00', horas: 4, modulos: ['general'] })
+
+  // Proyector: modo presentación, una escena a la vez.
+  await proyector.goto('/academia/taller/1')
+  await expect(proyector.locator('body')).toHaveClass(/tl-on/)
+  await expect(proyector.locator('.tl-escena.activa')).toHaveAttribute('data-escena', 'portada')
+  await proyector.keyboard.press('ArrowRight')
+  await expect(proyector.locator('.tl-escena.activa')).toHaveAttribute('data-escena', 'sala')
+  await expect(proyector).toHaveURL(/#2\.0$/)
+
+  // Vista de presentador: se sincroniza al abrir y mueve el proyector.
+  const presentador = await ctxAdmin.newPage()
+  await presentador.goto('/academia/taller/1/presentador')
+  await expect(presentador.locator('[data-titulo]')).toHaveText(/Saque el celular/)
+  await presentador.getByRole('button', { name: 'Siguiente →' }).click()
+  await expect(proyector.locator('.tl-escena.activa')).toHaveAttribute('data-escena', 'pre')
+  await expect(presentador.locator('[data-notas] li').first()).toContainText('No es un examen')
+
+  // Celular del participante: entra a la sala y responde.
+  const ctxCel = await browser.newContext({ viewport: { width: 390, height: 844 }, isMobile: true, hasTouch: true })
+  const cel = await ctxCel.newPage()
+  await entrar(cel, PARTICIPANTE.username, PARTICIPANTE.password)
+  await cel.goto('/academia/sala')
+  await expect(cel.getByRole('heading', { name: 'Antes de empezar: cinco preguntas' })).toBeVisible()
+  const op = cel.locator('[data-pregunta="e1"] [data-op="b"]')
+  await op.click()
+  await expect(op).toHaveAttribute('aria-pressed', 'true')
+  await expect(cel.locator('[data-sl-kicker]')).toHaveText('Asistencia registrada')
+  await cel.screenshot({ path: 'test-results/taller-sala-celular.png', fullPage: true })
+
+  // El voto y la asistencia llegan al proyector y al panel.
+  await proyector.bringToFront()
+  await expect(proyector.locator('.activa [data-respondieron]')).toHaveText('1', { timeout: 8000 })
+  const panel = await (await proyector.request.get('/api/academia/taller?que=panel&n=1')).json()
+  expect(panel).toMatchObject({ sala: 1, asistentes: 1 })
+
+  // Mientras la sesión está en curso, el participante no ve la presentación
+  // (tiene las respuestas) y no puede votar en una pregunta cerrada.
+  await cel.goto('/academia/taller/1')
+  await expect(cel.getByRole('heading', { name: 'La capacitación está en curso' })).toBeVisible()
+  const cerrada = await cel.request.post('/api/academia/taller', { data: { accion: 'votar', taller: 1, interaccion: 'post', pregunta: 'e1', valor: 'b' } })
+  expect(cerrada.status()).toBe(409)
+  expect((await cel.request.post('/api/academia/taller', { data: { accion: 'estado', taller: 1, escena: 'portada' } })).status()).toBe(403)
+  expect((await cel.request.post('/api/academia/taller', { data: { accion: 'ia', taller: 1, demo: 'auto', version: 'v1' } })).status()).toBe(403)
+
+  // Demo con IA: con el modelo simulado sale la respuesta guardada, marcada.
+  const constructor = await proyector.$$eval('.tl-escena', (els) => els.findIndex((e) => (e as HTMLElement).dataset.escena === 'constructor') + 1)
+  await proyector.goto(`/academia/taller/1#${constructor}.0`)
+  await proyector.reload()
+  await expect(proyector.locator('.tl-escena.activa')).toHaveAttribute('data-escena', 'constructor')
+  await expect(proyector.locator('.activa [data-fuente]')).toHaveText('Sin respuesta todavía')
+  await proyector.getByRole('button', { name: 'Preguntarle a Claude' }).click()
+  await expect(proyector.locator('.activa [data-fuente]')).toHaveText('Respuesta guardada')
+  await expect(proyector.locator('.activa [data-texto-ia]')).toContainText('Planta de Ejemplo')
+  await proyector.keyboard.press('ArrowRight')
+  await expect(proyector.locator('.activa [data-instr="1"]')).toBeVisible()
+  await expect(proyector.locator('.activa [data-fuente]')).toHaveText('Sin respuesta todavía')
+  await proyector.screenshot({ path: 'test-results/taller-constructor.png' })
+
+  // La tarjeta resumen.
+  await proyector.goto('/academia/taller/1/resumen')
+  await expect(proyector.getByRole('heading', { name: 'Inteligencia artificial, por dentro' })).toBeVisible()
+
+  await ctxCel.close()
+  await ctxAdmin.close()
+})
+
+test('en pantalla angosta la presentación es un documento completo', async ({ browser }) => {
+  const ctx = await browser.newContext({ viewport: { width: 390, height: 844 } })
+  const page = await ctx.newPage()
+  await entrar(page, 'admin', 'ekosolv2026*')
+  await page.goto('/academia/taller/1')
+  await expect(page.locator('body')).not.toHaveClass(/tl-on/)
+  await expect(page.locator('.pend')).toHaveCount(0)
+  await expect(page.locator('#escena-semaforo')).toBeVisible()
+  const ancho = await page.evaluate(() => document.documentElement.scrollWidth)
+  expect(ancho).toBeLessThanOrEqual(390)
+  await ctx.close()
+})

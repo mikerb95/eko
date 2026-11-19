@@ -1,0 +1,57 @@
+---
+// Una escena de la presentación: cabecera común (kicker, título, aviso de
+// contenido provisional) y el cuerpo según su tipo. Los elementos con
+// data-paso="k" aparecen con el clic k del presentador (en modo documento se
+// ven todos).
+import type { Escena, Taller } from '../../lib/talleres/tipos'
+import { COLOR_BLOQUE, TIPOS_OSCUROS, type Contexto } from './tipos'
+import Apertura from './Apertura.astro'
+import Dentro from './Dentro.astro'
+import Interactivos from './Interactivos.astro'
+import Votaciones from './Votaciones.astro'
+import Pedir from './Pedir.astro'
+import Cierre from './Cierre.astro'
+
+interface Props {
+  e: Escena
+  t: Taller
+  ctx: Contexto
+  indice: number
+}
+const { e, t, ctx, indice } = Astro.props
+const oscura = TIPOS_OSCUROS.has(e.tipo)
+const grupo = (() => {
+  if (['portada', 'sala', 'diagnostico', 'descanso', 'practica'].includes(e.tipo)) return 'apertura'
+  if (['reglas', 'perillas', 'etapas', 'contexto', 'ecosistema', 'areas', 'verificar'].includes(e.tipo)) return 'dentro'
+  if (['tokens', 'siguiente', 'inventa', 'mapa', 'anonimizar'].includes(e.tipo)) return 'interactivos'
+  if (['evaluacion', 'voto', 'verdad', 'semaforo', 'comparacion', 'repaso'].includes(e.tipo)) return 'votaciones'
+  if (['metodo', 'constructor', 'iterar'].includes(e.tipo)) return 'pedir'
+  return 'cierre'
+})()
+---
+
+<section
+  class:list={['tl-escena', `esc-${e.tipo}`, { oscura }]}
+  id={`escena-${e.id}`}
+  data-escena={e.id}
+  data-tipo={e.tipo}
+  data-pasos={e.pasos}
+  data-indice={indice}
+  data-bloque={e.bloque}
+  data-interaccion={e.interaccion}
+  data-demo={e.demo}
+  style={`--bloque:${COLOR_BLOQUE[e.bloque] ?? '#179C91'}`}
+  aria-label={e.titulo}
+>
+  <p class="tl-kicker">{e.kicker}</p>
+  <h2 class="tl-titulo">{e.titulo}</h2>
+  {e.provisional && <span class="tl-provisional">Ejemplo ilustrativo · se reemplaza con material de Ekosolv</span>}
+  <div class="tl-cuerpo">
+    {grupo === 'apertura' && <Apertura e={e} t={t} ctx={ctx} />}
+    {grupo === 'dentro' && <Dentro e={e} />}
+    {grupo === 'interactivos' && <Interactivos e={e} />}
+    {grupo === 'votaciones' && <Votaciones e={e} t={t} />}
+    {grupo === 'pedir' && <Pedir e={e} t={t} ctx={ctx} />}
+    {grupo === 'cierre' && <Cierre e={e} t={t} ctx={ctx} />}
+  </div>
+</section>

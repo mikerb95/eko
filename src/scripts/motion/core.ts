@@ -127,3 +127,24 @@ export function alEntrar(el: Element, fn: () => void, start = 'top 82%'): void {
     },
   })
 }
+
+/**
+ * Un signo de puntuación nunca abre renglón. El navegador ya lo cumple, pero
+ * SplitText vuelve cada palabra un bloque suelto y, si la palabra va dentro de
+ * un <em> y el signo por fuera, la coma puede caer sola abajo. Aquí se envuelve
+ * el elemento y el signo que lo sigue en un `.amarre` (nowrap) antes de partir.
+ */
+export function amarrarSignos(el: HTMLElement): void {
+  const signo = /^[,.;:!?…)\]}»”’%]+/
+  for (const nodo of [...el.childNodes]) {
+    if (nodo.nodeType !== Node.TEXT_NODE) continue
+    const previo = nodo.previousSibling
+    const m = nodo.textContent?.match(signo)
+    if (!m || !(previo instanceof HTMLElement) || previo.classList.contains('amarre')) continue
+    const amarre = document.createElement('span')
+    amarre.className = 'amarre'
+    previo.replaceWith(amarre)
+    amarre.append(previo, m[0])
+    nodo.textContent = nodo.textContent!.slice(m[0].length)
+  }
+}

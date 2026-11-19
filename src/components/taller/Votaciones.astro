@@ -1,0 +1,114 @@
+---
+// Escenas que se responden desde el celular: evaluación, votaciones con
+// revelado (comprobación, verdad o alucinación, semáforo), repaso y la
+// comparación de antes y después. Los conteos llegan por la API mientras la
+// escena está activa; el revelado de la respuesta va con los pasos.
+import type { Escena, Taller } from '../../lib/talleres/tipos'
+import { interaccionDe, preguntasDeRepaso } from '../../lib/talleres/reglas'
+import { tallerDe } from '../../lib/talleres'
+
+interface Props {
+  e: Escena
+  t: Taller
+}
+const { e, t } = Astro.props
+const i = e.interaccion ? interaccionDe(t, e.interaccion) : null
+const preguntas = e.tipo === 'repaso' ? preguntasDeRepaso(t, tallerDe(t.repaso?.taller)) : (i?.preguntas ?? [])
+const COLOR_SEM: Record<string, string> = { si: '#2E8B57', anon: '#C98A16', no: '#B4442F' }
+const ETQ_SEM: Record<string, string> = { si: 'Se sube', anon: 'Anonimizado', no: 'No se sube' }
+const evalPre = t.evaluacion ? interaccionDe(t, t.evaluacion.pre) : null
+---
+
+{e.tipo === 'evaluacion' && (
+  <>
+    <ol>
+      {preguntas.map((p) => <li>{p.enunciado}</li>)}
+    </ol>
+    <div class="anillo" data-anillo>
+      <svg viewBox="0 0 36 36" aria-hidden="true">
+        <circle class="fondo" cx="18" cy="18" r="15.9" />
+        <circle class="barra" cx="18" cy="18" r="15.9" pathLength="100" />
+      </svg>
+      <div class="anillo-txt"><b data-respondieron>0</b><span>respondieron</span></div>
+    </div>
+  </>
+)}
+
+{(e.tipo === 'voto' || e.tipo === 'repaso') && (
+  <div class:list={['votos', { dos: preguntas.length === 2 }]}>
+    {preguntas.map((p, k) => (
+      <div class="voto revelada" data-pregunta={p.id} data-paso-revela={k + 1} data-correcta={p.correcta}>
+        <h3>{p.enunciado}</h3>
+        {p.opciones.map((o) => (
+          <div class:list={['op', { correcta: o.id === p.correcta }]} data-op={o.id}>
+            <i /><span>{o.texto}</span><b data-n>0</b>
+          </div>
+        ))}
+        {p.explicacion && <p class="exp" data-paso={k + 1}>{p.explicacion}</p>}
+      </div>
+    ))}
+    <p class="total-votos"><span data-personas>0</span> personas han respondido</p>
+  </div>
+)}
+
+{e.tipo === 'verdad' && (
+  <div class="afirmaciones">
+    {preguntas.map((p, k) => (
+      <div class="afirm" data-pregunta={p.id}>
+        <p>{p.enunciado}</p>
+        <div class="reparto" aria-label="Votos de la sala">
+          <span class="v" data-op="v">Verdad</span>
+          <span class="i" data-op="i">Inventada</span>
+        </div>
+        <div class="veredicto" data-paso={k + 1}>
+          <span class:list={['sello', { ok: p.correcta === 'v' }]}>{p.correcta === 'v' ? 'Verdad' : 'Inventada'}</span>
+          <span class="exp">{p.explicacion}</span>
+        </div>
+      </div>
+    ))}
+  </div>
+)}
+
+{e.tipo === 'semaforo' && (
+  <>
+    <div class="leyenda-sem">
+      <span style="--c:#124E7D">Se sube</span>
+      <span style="--c:#C98A16">Se sube anonimizado</span>
+      <span style="--c:#B8926F">No se sube</span>
+    </div>
+    <div class="afirmaciones">
+      {preguntas.map((p, k) => (
+        <div class="afirm" data-pregunta={p.id}>
+          <p>{p.enunciado}</p>
+          <div class="reparto" aria-label="Votos de la sala">
+            <span class="si" data-op="si" />
+            <span class="anon" data-op="anon" />
+            <span class="no" data-op="no" />
+          </div>
+          <div class="veredicto" data-paso={k + 1}>
+            <span class="luz" style={`--c:${COLOR_SEM[p.correcta ?? 'no']}`}>{ETQ_SEM[p.correcta ?? 'no']}</span>
+            <span class="exp">{p.explicacion}</span>
+          </div>
+        </div>
+      ))}
+    </div>
+  </>
+)}
+
+{e.tipo === 'comparacion' && (
+  <div data-comparacion style="display:flex;flex-direction:column;gap:40px">
+    <div class="antes-despues">
+      <div class="cifra"><b data-antes>0 %</b><span>aciertos al empezar</span></div>
+      <span class="flecha" aria-hidden="true">→</span>
+      <div class="cifra"><b data-despues>0 %</b><span>aciertos al terminar</span></div>
+    </div>
+    <div class="pares" data-paso="1">
+      {(evalPre?.preguntas ?? []).map((p, k) => (
+        <div class="par" data-par={k}>
+          <span>{p.enunciado}</span>
+          <span class="rieles"><i class="a" /><i class="d" /></span>
+        </div>
+      ))}
+    </div>
+  </div>
+)}

@@ -1,0 +1,135 @@
+---
+// Escenas que el presentador manipula en vivo: tokens, siguiente token,
+// por qué inventa, mapa de significados y anonimizador. El servidor pinta un
+// estado completo y legible; el motor (src/scripts/taller/escenas.ts) le da vida.
+import type { Escena } from '../../lib/talleres/tipos'
+import { tokenizarAprox } from '../../lib/talleres/reglas'
+
+interface Props {
+  e: Escena
+}
+const { e } = Astro.props
+const d = e.datos ?? {}
+const tokens = e.tipo === 'tokens' ? tokenizarAprox(String(d.texto)) : []
+const palabras = e.tipo === 'tokens' ? String(d.texto).split(/\s+/).filter(Boolean).length : 0
+const opciones = (d.opciones ?? []) as { w: string; p: number }[]
+const pct = (p: number) => `${Math.round(p * 100)} %`
+const grupos = (d.grupos ?? []) as { id: string; nombre: string; color: string }[]
+const colorG = (g: string) => grupos.find((x) => x.id === g)?.color ?? '#124E7D'
+const centro = (g: string) => {
+  const pts = ((d.puntos ?? []) as { g: string; x: number; y: number }[]).filter((p) => p.g === g)
+  return { x: pts.reduce((a, p) => a + p.x, 0) / pts.length, y: pts.reduce((a, p) => a + p.y, 0) / pts.length }
+}
+const segmentos = (d.segmentos ?? []) as { t: string; dato?: string }[]
+const nDatos = segmentos.filter((s) => s.dato).length
+---
+
+{e.tipo === 'tokens' && (
+  <>
+    <label class="tl-oculto" for="tk-entrada">Texto para partir en tokens</label>
+    <input id="tk-entrada" type="text" value={d.texto} data-tk-entrada autocomplete="off" spellcheck="false" />
+    <div class="fichas" data-tk-fichas aria-live="polite">
+      {tokens.map((tk, i) => <span class={`tk t${i % 4}`}>{tk}</span>)}
+    </div>
+    <div class="conteos">
+      <span><b data-tk-n>{tokens.length}</b>tokens</span>
+      <span><b data-tk-p>{palabras}</b>palabras</span>
+      <span><b data-tk-c>{String(d.texto).length}</b>caracteres</span>
+    </div>
+    <p class="llamado" data-paso="1"><span class="pt" />Lo que la IA puede leer de una vez, y lo que cuesta, se mide en tokens, no en páginas.</p>
+    <p class="tl-nota">Partición aproximada, para ilustrar. Cada modelo tiene su propio vocabulario de tokens.</p>
+  </>
+)}
+
+{(e.tipo === 'siguiente' || e.tipo === 'inventa') && (
+  <>
+    <div style="display:flex;flex-direction:column;gap:28px">
+      <p class="frase" data-frase>
+        <span data-frase-base>{d.frase}</span> <span class="nueva" data-frase-nueva></span><span class="cursor" aria-hidden="true" />
+      </p>
+      {e.tipo === 'siguiente' && (
+        <>
+          <div class="historial" data-historial aria-live="polite" />
+          <div class="acciones">
+            <button type="button" class="tl-btn" data-generar>Elegir el siguiente token</button>
+          </div>
+        </>
+      )}
+      {e.tipo === 'inventa' && (
+        <>
+          <p class="frase-grande" data-paso="1" data-inventa-sigue>
+            ... de 2019, que obliga a todo generador a reportar cada mes. <span class="sello">No existe</span>
+          </p>
+          <div class="donde" data-paso="2">
+            <span>Números de normas y artículos</span>
+            <span>Fechas, plazos y cifras</span>
+            <span>Hechos recientes</span>
+            <span>Lo que no está en el documento que usted le dio</span>
+          </div>
+        </>
+      )}
+    </div>
+    <div style="display:flex;flex-direction:column;gap:28px">
+      <div class="candidatos" data-candidatos>
+        {opciones.map((o, i) => (
+          <div class="cand" style={`--v:${o.p}`} data-cand={i} data-p={o.p}>
+            <span class={`tk t${i % 4}`}>{o.w}</span>
+            <span class="riel"><i /></span>
+            <b>{pct(o.p)}</b>
+          </div>
+        ))}
+      </div>
+      {e.tipo === 'siguiente' && (
+        <div class="temperatura" data-paso="2">
+          <label for="temp-ctrl"><span>Temperatura</span><b data-temp-v>1,0</b></label>
+          <input id="temp-ctrl" type="range" min="0.1" max="2" step="0.1" value="1" data-temp />
+          <label aria-hidden="true"><span>Predecible</span><span>Arriesgada</span></label>
+        </div>
+      )}
+      <p class="tl-nota">Probabilidades de ejemplo, para ilustrar.</p>
+    </div>
+  </>
+)}
+
+{e.tipo === 'mapa' && (
+  <div class="mapa" data-mapa role="img" aria-label="Mapa en dos dimensiones donde las palabras de significado parecido quedan cerca">
+    <svg class="lineas" viewBox="0 0 100 100" preserveAspectRatio="none" data-paso="3" aria-hidden="true">
+      {['raee', 'respel'].map((g) => {
+        const c = centro(g)
+        return <line x1={d.destacado.x} y1={d.destacado.y} x2={c.x} y2={c.y} vector-effect="non-scaling-stroke" />
+      })}
+    </svg>
+    {grupos.map((g) => {
+      const c = centro(g.id)
+      return (
+        <span class="halo" style={`--x:${c.x};--y:${c.y};--c:${g.color}`} data-paso="2">
+          <b>{g.nombre}</b>
+        </span>
+      )
+    })}
+    <div data-paso="1">
+      {(d.puntos as { w: string; g: string; x: number; y: number }[]).map((p) => (
+        <span class="pto" style={`--x:${p.x};--y:${p.y};--c:${colorG(p.g)}`} data-pto data-x={p.x} data-y={p.y}>{p.w}</span>
+      ))}
+    </div>
+    <span class="pto destacado" style={`--x:${d.destacado.x};--y:${d.destacado.y};--c:#179C91`} data-paso="3">{d.destacado.w}</span>
+  </div>
+)}
+
+{e.tipo === 'anonimizar' && (
+  <>
+    <p class="docu" data-docu>
+      {segmentos.map((s) =>
+        s.dato ? (
+          <button type="button" class="dato" data-dato aria-pressed="false" title="Tapar este dato">
+            <span class="orig">{s.t}</span><span class="rol">[{s.dato}]</span><span class="tapa" aria-hidden="true" />
+          </button>
+        ) : (
+          <span>{s.t}</span>
+        ),
+      )}
+    </p>
+    <p class="marcador">Datos personales tapados: <b data-tapados>0</b> de {nDatos}</p>
+    <p class="llamado" data-paso="1"><span class="pt" />El documento sigue sirviendo para la tarea: kilos, residuo y empresa siguen ahí.</p>
+  </>
+)}

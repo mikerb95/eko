@@ -1,0 +1,42 @@
+---
+// Escenas de cierre: lo que viene en los sábados de área y la despedida con
+// la tarjeta resumen.
+import type { Escena, Taller } from '../../lib/talleres/tipos'
+import { colorDe } from '../../lib/academia/ui'
+import { MODULOS } from '../../lib/capacitacion'
+import type { Contexto } from './tipos'
+
+interface Props {
+  e: Escena
+  t: Taller
+  ctx: Contexto
+}
+const { e, ctx } = Astro.props
+const d = e.datos ?? {}
+const nombre = (id: string) => MODULOS.find((m) => m.id === id)?.titulo ?? id
+---
+
+{e.tipo === 'sigue' && (
+  <div class="sabados">
+    {(d.sabados as { n: number; areas: string[]; texto: string }[]).map((s) => (
+      <div class="sabado">
+        <span class="n">Capacitación {s.n} de 4</span>
+        <h3>Sábado {s.n}</h3>
+        <div class="puntos">
+          {s.areas.map((a) => <span style={`--c:${colorDe(a)}`}>{nombre(a)}</span>)}
+        </div>
+        <p>{s.texto}</p>
+      </div>
+    ))}
+  </div>
+)}
+
+{e.tipo === 'cierre' && (
+  <div style="display:flex;gap:56px;align-items:center;flex-wrap:wrap">
+    <div class="qr" set:html={ctx.qrResumen} role="img" aria-label={`Código QR de ${ctx.urlResumen}`} />
+    <div style="display:flex;flex-direction:column;gap:18px;max-width:28ch">
+      <p class="frase-grande">Rápida y capaz como un practicante nuevo. Su trabajo <span class="acento" style="color:#6fd2c9">siempre se revisa</span>.</p>
+      <p class="tl-nota">La tarjeta resumen y las lecciones quedan en la academia.</p>
+    </div>
+  </div>
+)}
