@@ -3,8 +3,9 @@
 // capacitación presencial (se llega por el código QR del proyector). Es
 // pública: la primera vez pide nombres, apellidos, cargo y área (sin usuario
 // ni contraseña) y eso queda como su asistencia. Después muestra la pregunta
-// abierta en cada momento y guarda sus respuestas. Debajo, un ejemplo de la
-// escena en curso para su área y una caja para enviarle preguntas a quien dicta.
+// abierta en cada momento y guarda sus respuestas. Cuando no hay nada que
+// votar, muestra la idea de la escena en palabras sencillas y un ejemplo de su
+// área. Abajo, una caja para enviarle preguntas a quien dicta.
 // Motor: src/scripts/taller/sala.ts. API: /api/academia/sala.
 export const prerender = false
 import AcademiaLayout from '../../layouts/AcademiaLayout.astro'
@@ -19,7 +20,8 @@ Astro.response.headers.set('cache-control', 'no-store')
 <AcademiaLayout titulo="Sala · Academia de IA · Ekosolv" sinNav>
   {asistente ? (
     <section class="sl" data-sala aria-live="polite">
-      <p class="ac-kicker" data-sl-kicker>Asistencia registrada · {asistente.nombre} {asistente.apellido}</p>
+      <p class="sl-quien" data-sl-kicker>Asistencia registrada · {asistente.nombre} {asistente.apellido}</p>
+      <p class="ac-kicker" data-sl-escena></p>
       <h1 data-sl-titulo>Conectando…</h1>
       <p class="sl-sub" data-sl-sub></p>
       <div class="sl-preguntas" data-sl-preguntas></div>
@@ -33,7 +35,7 @@ Astro.response.headers.set('cache-control', 'no-store')
       <form class="sl-form sl-duda" data-sl-duda novalidate>
         <label>
           <span>¿Tiene una pregunta?</span>
-          <textarea name="texto" rows="3" maxlength="400" placeholder="Escríbala aquí: le llega a quien dicta."></textarea>
+          <textarea name="texto" rows="2" maxlength="400" placeholder="Escríbala aquí: le llega a quien dicta."></textarea>
         </label>
         <button type="submit" class="ac-btn ac-btn-sec">Enviar pregunta</button>
         <p class="sl-estado" data-sl-duda-estado role="status"></p>

@@ -32,6 +32,8 @@ interface Estado {
   escena?: string
   interaccion?: { id: string; tipo: string; titulo: string; preguntas: { id: string; enunciado: string; opciones: { id: string; texto: string }[] }[] } | null
   mias?: Record<string, string>
+  kicker?: string
+  idea?: string
   ejemplo?: { area: string; titulo: string; texto: string } | null
   practica?: { consigna: string; maximo: number } | null
 }
@@ -149,6 +151,7 @@ function montarDuda(form: HTMLFormElement) {
 function montar(raiz: HTMLElement) {
   const $ = (s: string) => raiz.querySelector<HTMLElement>(s)!
     const titulo = $('[data-sl-titulo]')
+  const kicker = $('[data-sl-escena]')
   const sub = $('[data-sl-sub]')
   const lista = $('[data-sl-preguntas]')
   const estado = $('[data-sl-estado]')
@@ -164,7 +167,7 @@ function montar(raiz: HTMLElement) {
     ejemploVisto = clave
     ejemplo.hidden = !e
     if (!e) return
-    $('[data-sl-ej-area]').textContent = `En ${e.area}`
+    $('[data-sl-ej-area]').textContent = `En su área · ${e.area}`
     $('[data-sl-ej-titulo]').textContent = e.titulo
     $('[data-sl-ej-texto]').textContent = e.texto
   }
@@ -317,6 +320,7 @@ function montar(raiz: HTMLElement) {
       taller = 0
       abierta = null
       titulo.textContent = 'No hay una capacitación en curso'
+      kicker.textContent = ''
       sub.textContent = 'Cuando empiece la sesión, esta página se actualiza sola.'
       lista.replaceChildren()
       pintarEjemplo(null)
@@ -334,14 +338,18 @@ function montar(raiz: HTMLElement) {
     const id = e.interaccion?.id ?? (e.practica ? 'practica' : `escena:${e.escena}`)
     if (id === abierta) return
     abierta = id
+    kicker.textContent = e.kicker ?? ''
     decir('')
     if (e.interaccion) pintarPreguntas(e)
     else if (e.practica) pintarPractica(e.practica)
     else {
+      // Sin nada que votar: la idea de la escena y, debajo, el ejemplo del área.
       titulo.textContent = e.escena || 'Mire la pantalla'
-      sub.textContent = ''
-      espera(e.ejemplo ? 'Mire la pantalla. Abajo tiene un ejemplo de su área.' : 'Mire la pantalla. Cuando haya una pregunta, aparece aquí.')
+      sub.textContent = e.idea ?? ''
+      if (e.idea) lista.replaceChildren()
+      else espera('Mire la pantalla. Cuando haya una pregunta, aparece aquí.')
     }
+    sub.classList.toggle('idea', !e.interaccion && !e.practica && !!e.idea)
   }
 
   refrescar()

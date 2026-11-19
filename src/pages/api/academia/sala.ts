@@ -16,7 +16,8 @@ import { salaActual } from '../../../lib/talleres/sala'
 // ese día. Fuera de una sesión en curso no se puede registrar ni votar.
 // Mientras el proyector está en la práctica guiada, la sala es el revisor de
 // instrucciones (mismo motor y tope de gasto que el de la academia).
-// En cada escena la persona ve un ejemplo de su área (Taller.ejemplos) y
+// En cada escena la persona ve la idea en palabras sencillas y un ejemplo de
+// su área (Taller.celular), y
 // puede enviarle una pregunta a quien dicta, que la ve en el presentador.
 //
 // GET           → capacitación en curso, si la persona ya está registrada, pregunta abierta, sus respuestas y si hay práctica
@@ -37,9 +38,14 @@ export const GET: APIRoute = async ({ cookies }) => {
       taller: t.n,
       titulo: t.titulo,
       escena: escena?.titulo ?? '',
+      kicker: escena?.kicker ?? '',
+      idea: t.celular?.[estado.escena]?.idea ?? '',
       practica: escena?.tipo === 'practica' ? { consigna: String(escena.datos?.consigna ?? ''), maximo: MAX_INSTRUCCION } : null,
       interaccion: i ? interaccionPublica(i) : null,
-      ejemplo: t.ejemplos?.[estado.escena]?.[asistente.area] ? { area: nombreModulo(asistente.area), ...t.ejemplos[estado.escena]![asistente.area]! } : null,
+      ejemplo: (() => {
+        const ej = t.celular?.[estado.escena]?.areas?.[asistente.area]
+        return ej ? { area: nombreModulo(asistente.area), ...ej } : null
+      })(),
       mias: i ? await misRespuestas(t.n, i.id, asistente.id) : {},
     })
   } catch (e) {

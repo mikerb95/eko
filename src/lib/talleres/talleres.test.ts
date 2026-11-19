@@ -33,9 +33,17 @@ test('validarPregunta limpia espacios y rechaza vacías o muy largas', () => {
 })
 
 for (const t of Object.values(TALLERES)) {
-  test(`taller ${t.n}: ejemplos por área de escenas que existen y para todas las áreas`, () => {
-    for (const [escena, porArea] of Object.entries(t.ejemplos ?? {})) {
+  test(`taller ${t.n}: el celular tiene idea en cada escena sin votación y ejemplo para todas las áreas`, () => {
+    if (!t.celular) return
+    for (const e of t.escenas) {
+      if (e.interaccion || e.tipo === 'practica') continue
+      assert.ok(t.celular[e.id]?.idea, `falta la idea de ${e.id}`)
+    }
+    for (const [escena, guia] of Object.entries(t.celular)) {
       assert.ok(t.escenas.some((e) => e.id === escena), `escena ${escena}`)
+      assert.ok(!/[\u2013\u2014]/.test(guia.idea), `${escena}: guion largo`)
+      if (!guia.areas) continue
+      const porArea = guia.areas
       for (const a of AREA_IDS) {
         const ej = porArea[a]
         assert.ok(ej?.titulo && ej.texto, `${escena}: falta ${a}`)

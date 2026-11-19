@@ -133,7 +133,7 @@ test('presentación, sala, votos y asistencia', async ({ browser }) => {
   // Ejemplo del área en el celular según la escena, y preguntas a quien dicta.
   await proyector.request.post('/api/academia/taller', { data: { accion: 'estado', taller: 1, escena: 'tokens' } })
   await cel.goto('/academia/sala')
-  await expect(cel.locator('[data-sl-ej-area]')).toHaveText('En Operaciones', { timeout: 8000 })
+  await expect(cel.locator('[data-sl-ej-area]')).toHaveText('En su área · Operaciones', { timeout: 8000 })
   await expect(cel.locator('[data-sl-ej-titulo]')).toHaveText('Un auto de 40 páginas')
   await expect(cel.locator("[data-sl-titulo]")).toHaveText("La IA no lee letras ni palabras: lee tokens")
   await cel.getByLabel('¿Tiene una pregunta?').fill('¿Un auto escaneado también se parte en tokens?')

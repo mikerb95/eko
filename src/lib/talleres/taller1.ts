@@ -11,7 +11,7 @@
  * de presentador lo avisa.
  */
 import type { Interaccion, Pregunta, Taller } from './tipos.ts'
-import { EJEMPLOS_TALLER1 } from './ejemplos1.ts'
+import { CELULAR_TALLER1 } from './ejemplos1.ts'
 
 // ---------- Evaluación de entrada y salida (las mismas preguntas) ----------
 
@@ -805,7 +805,7 @@ export const TALLER_1: Taller = {
       notas: ['La tarjeta resumen queda en la academia para descargar e imprimir. Cerrar con la idea del practicante: rápido y capaz, pero su trabajo siempre se revisa.'],
     },
   ],
-  ejemplos: EJEMPLOS_TALLER1,
+  celular: CELULAR_TALLER1,
   resumen: {
     ideas: [
       { titulo: 'Predice, no consulta', texto: 'Redacta el texto más probable, token por token, a partir de lo que aprendió y de lo que usted le da.' },

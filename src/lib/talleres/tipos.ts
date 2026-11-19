@@ -100,6 +100,14 @@ export interface EjemploArea {
   texto: string
 }
 
+/** Lo que ve el celular en una escena sin votación: la idea y su ejemplo por área. */
+export interface GuiaCelular {
+  /** Lo que se explica en pantalla, en palabras sencillas (igual para todos). */
+  idea: string
+  /** id de área → ejemplo de esa idea en su trabajo. */
+  areas?: Record<string, EjemploArea>
+}
+
 export interface Escena {
   id: string
   bloque: string
@@ -136,11 +144,8 @@ export interface Taller {
   evaluacion?: { pre: string; post: string }
   /** Preguntas de una capacitación anterior para repasar al empezar. */
   repaso?: { taller: number; interaccion: string; preguntas: string[] }
-  /**
-   * Ejemplos por área para el celular: id de escena → id de área → ejemplo.
-   * Cada participante ve el de su área mientras esa escena está en pantalla.
-   */
-  ejemplos?: Record<string, Record<string, EjemploArea>>
+  /** Celular por escena (id de escena → idea y ejemplos por área). */
+  celular?: Record<string, GuiaCelular>
   /** Tarjeta resumen descargable. */
   resumen: {
     ideas: { titulo: string; texto: string }[]
