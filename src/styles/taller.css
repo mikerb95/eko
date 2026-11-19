@@ -490,12 +490,9 @@
 .sabados { display: grid; grid-template-columns: minmax(0, 1fr); gap: 16px; }
 .tl-on .sabados { grid-template-columns: repeat(3, 1fr); gap: 28px; }
 .sabado { background: #fff; border-radius: 18px; padding: 22px 24px; display: flex; flex-direction: column; gap: 12px; }
-.tl-on .sabado { padding: 32px; min-height: 330px; }
+.tl-on .sabado { padding: 32px; }
 .sabado .n { font: 500 .62em/1 var(--font-mono); letter-spacing: .1em; text-transform: uppercase; color: var(--mute); }
 .sabado h3 { font-size: 1.2em; }
-.sabado .puntos { display: flex; flex-direction: column; gap: 8px; }
-.sabado .puntos span { display: flex; gap: 10px; align-items: center; font-size: .8em; }
-.sabado .puntos span::before { content: ''; width: 12px; height: 12px; border-radius: 50%; background: var(--c); }
 .sabado p { font-size: .76em; color: var(--mute); }
 
 /* ---------- Pantalla "en curso" para participantes ---------- */

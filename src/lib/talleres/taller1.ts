@@ -775,7 +775,7 @@ export const TALLER_1: Taller = {
       pasos: 1,
       notas: [
         'Mostrar el promedio de aciertos antes y después. Paso 1: pregunta por pregunta.',
-        'Comentar la pregunta que menos subió: ahí hay que reforzar en los sábados de área.',
+        'Comentar la pregunta que menos subió: ahí hay que reforzar en los próximos sábados.',
       ],
     },
     {
@@ -783,20 +783,15 @@ export const TALLER_1: Taller = {
       bloque: 'cierre',
       tipo: 'sigue',
       kicker: 'Lo que viene',
-      titulo: 'Tres sábados más, cada área con sus documentos',
+      titulo: 'Tres sábados más, todo el equipo',
       minutos: 3,
       pasos: 0,
       notas: [
-        'Cada área trabaja con sus propios documentos y termina con un ejercicio real.',
+        'Todo el equipo asiste a los tres sábados que faltan, sin separar por áreas.',
         'Mientras tanto: entregar en la academia la tarea real de su puesto.',
       ],
-      datos: {
-        sabados: [
-          { n: 2, areas: ['operaciones'], texto: 'Autos, normativa, ICA, PMA y respuestas a la autoridad.' },
-          { n: 3, areas: ['operaciones', 'logistica', 'ventas'], texto: 'Certificados y cifras, Logística y Ventas.' },
-          { n: 4, areas: ['mercadeo', 'gerencia', 'finanzas'], texto: 'Mercadeo, Gerencia y Finanzas.' },
-        ],
-      },
+      // Sin temas por sábado: el cronograma todavía no está definido.
+      datos: { sabados: [2, 3, 4] },
     },
     {
       id: 'cierre',

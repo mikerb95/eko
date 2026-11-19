@@ -1,9 +1,7 @@
 ---
-// Escenas de cierre: lo que viene en los sábados de área y la despedida con
-// la tarjeta resumen.
+// Escenas de cierre: los sábados que faltan (todo el equipo asiste a todos)
+// y la despedida con la tarjeta resumen.
 import type { Escena, Taller } from '../../lib/talleres/tipos'
-import { colorDe } from '../../lib/academia/ui'
-import { MODULOS } from '../../lib/capacitacion'
 import type { Contexto } from './tipos'
 
 interface Props {
@@ -13,19 +11,15 @@ interface Props {
 }
 const { e, ctx } = Astro.props
 const d = e.datos ?? {}
-const nombre = (id: string) => MODULOS.find((m) => m.id === id)?.titulo ?? id
 ---
 
 {e.tipo === 'sigue' && (
   <div class="sabados">
-    {(d.sabados as { n: number; areas: string[]; texto: string }[]).map((s) => (
+    {(d.sabados as number[]).map((n) => (
       <div class="sabado">
-        <span class="n">Capacitación {s.n} de 4</span>
-        <h3>Sábado {s.n}</h3>
-        <div class="puntos">
-          {s.areas.map((a) => <span style={`--c:${colorDe(a)}`}>{nombre(a)}</span>)}
-        </div>
-        <p>{s.texto}</p>
+        <span class="n">Capacitación {n} de 4</span>
+        <h3>Sábado {n}</h3>
+        <p>Todo el equipo · 4 horas, presencial</p>
       </div>
     ))}
   </div>

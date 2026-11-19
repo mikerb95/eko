@@ -3,7 +3,6 @@
  * (tablas ac_taller_* y ac_asistencia de esquema.ts). Solo servidor.
  */
 import { asegurarEsquema, cliente } from '../db.ts'
-import { rutaDe } from '../academia/reglas.ts'
 import type { Taller } from './tipos.ts'
 import { claveNombre, type FilaVoto, type RegistroSala } from './reglas.ts'
 
@@ -103,9 +102,7 @@ const filaAsistente = (x: any): Asistente => ({
 export async function registrarAsistente(t: Taller, hoy: string, r: RegistroSala): Promise<{ asistente: Asistente; marcados: number }> {
   const c = await db()
   const clave = claveNombre(`${r.nombre} ${r.apellido}`)
-  const cuentas = await c.execute(
-    `SELECT u.id, u.name, i.area FROM users u JOIN ac_inscripciones i ON i.usuario_id = u.id WHERE u.active = 1`,
-  )
+  const cuentas = await c.execute(`SELECT u.id, u.name FROM users u JOIN ac_inscripciones i ON i.usuario_id = u.id WHERE u.active = 1`)
   const cuenta = cuentas.rows.find((x: any) => claveNombre(str(x.name)) === clave) as any
   const usuario_id = cuenta ? num(cuenta.id) : 0
   const res = await c.execute({
@@ -117,7 +114,7 @@ export async function registrarAsistente(t: Taller, hoy: string, r: RegistroSala
     args: [t.n, hoy, r.nombre, r.apellido, r.cargo, r.area, clave, usuario_id, ahora()],
   })
   const asistente = filaAsistente(res.rows[0])
-  const marcados = cuenta ? await marcarAsistenciaAcademia(t, usuario_id, str(cuenta.area), hoy) : 0
+  const marcados = cuenta ? await marcarAsistenciaAcademia(t, usuario_id, hoy) : 0
   return { asistente, marcados }
 }
 
@@ -127,10 +124,13 @@ export async function asistenteDe(id: number): Promise<Asistente | null> {
   return r.rows[0] ? filaAsistente(r.rows[0]) : null
 }
 
-/** Asistencia de la academia (certificado): bloques de hoy de la ruta de la cuenta. */
-async function marcarAsistenciaAcademia(t: Taller, usuario_id: number, area: string, hoy: string): Promise<number> {
-  const ruta = rutaDe(area)
-  const sesiones = (await sesionesDeHoy(t, hoy)).filter((s) => s.modulos.some((m) => ruta.includes(m) && t.modulos.includes(m)))
+/**
+ * Asistencia de la academia (certificado): todos los bloques de hoy de esta
+ * capacitación. No se filtra por área: todo el equipo asiste a todos los
+ * sábados (Mike, 2026-11-19).
+ */
+async function marcarAsistenciaAcademia(t: Taller, usuario_id: number, hoy: string): Promise<number> {
+  const sesiones = await sesionesDeHoy(t, hoy)
   if (!sesiones.length) return 0
   const c = await db()
   const ts = ahora()
