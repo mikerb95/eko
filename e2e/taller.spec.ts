@@ -1,4 +1,5 @@
 import { expect, test, type Page } from '@playwright/test'
+import { CELULAR_TALLER1 } from '../src/lib/talleres/ejemplos1'
 
 // Capacitación en vivo de punta a punta: quien dicta mueve la presentación
 // (proyector y vista de presentador sincronizados), una persona entra a la
@@ -134,7 +135,7 @@ test('presentación, sala, votos y asistencia', async ({ browser }) => {
   await proyector.request.post('/api/academia/taller', { data: { accion: 'estado', taller: 1, escena: 'tokens' } })
   await cel.goto('/academia/sala')
   await expect(cel.locator('[data-sl-ej-area]')).toHaveText('En su área · Operaciones', { timeout: 8000 })
-  await expect(cel.locator('[data-sl-ej-titulo]')).toHaveText('Un auto lleno de números')
+  await expect(cel.locator('[data-sl-ej-titulo]')).toHaveText(CELULAR_TALLER1.tokens!.areas!.operaciones!.titulo)
   await expect(cel.locator("[data-sl-titulo]")).toHaveText("La IA no lee letras ni palabras: lee tokens")
   await cel.getByLabel('¿Tiene una pregunta?').fill('¿Un auto escaneado también se parte en tokens?')
   await cel.getByRole('button', { name: 'Enviar pregunta' }).click()
@@ -142,7 +143,7 @@ test('presentación, sala, votos y asistencia', async ({ browser }) => {
   expect(await cel.evaluate(() => document.documentElement.scrollWidth)).toBeLessThanOrEqual(390)
   await cel.screenshot({ path: 'test-results/taller-ejemplo-celular.png', fullPage: true })
   await proyector.request.post('/api/academia/taller', { data: { accion: 'estado', taller: 1, escena: 'metodo' } })
-  await expect(cel.locator('[data-sl-ej-titulo]')).toHaveText('Las cuatro partes con un auto', { timeout: 8000 })
+  await expect(cel.locator('[data-sl-ej-titulo]')).toHaveText(CELULAR_TALLER1.metodo!.areas!.operaciones!.titulo, { timeout: 8000 })
   await expect(cel.locator('[data-sl-titulo]')).toHaveText('Una buena instrucción tiene cuatro partes')
   await presentador.bringToFront()
   const duda = presentador.locator('[data-dudas] li').first()
