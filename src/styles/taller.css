@@ -108,15 +108,17 @@
    escena que sale se corre y se desvanece; la nueva entra desde el otro lado.
    El resto de la página (pie con el avance) cambia sin animación. */
 ::view-transition-old(root), ::view-transition-new(root) { animation: none; }
-::view-transition-group(tl-escena) { animation-duration: .6s; }
-::view-transition-old(tl-escena) { animation: tl-vt-sale .45s cubic-bezier(.4, 0, .2, 1) both; }
-::view-transition-new(tl-escena) { animation: tl-vt-entra .6s cubic-bezier(.16, 1, .3, 1) both; }
+::view-transition-group(tl-escena) { animation-duration: .71s; }
+/* En secuencia y no encimadas: la vieja se va rápido y la nueva entra un
+   instante después, para que los dos títulos no se lean a la vez. */
+::view-transition-old(tl-escena) { animation: tl-vt-sale .26s cubic-bezier(.4, 0, 1, 1) both; }
+::view-transition-new(tl-escena) { animation: tl-vt-entra .55s cubic-bezier(.16, 1, .3, 1) .16s both; }
 [data-tl-dir='atras']::view-transition-old(tl-escena) { animation-name: tl-vt-sale-atras; }
 [data-tl-dir='atras']::view-transition-new(tl-escena) { animation-name: tl-vt-entra-atras; }
-@keyframes tl-vt-sale { to { opacity: 0; transform: translateX(-5%) scale(.97); } }
-@keyframes tl-vt-entra { from { opacity: 0; transform: translateX(7%); } }
-@keyframes tl-vt-sale-atras { to { opacity: 0; transform: translateX(5%) scale(.97); } }
-@keyframes tl-vt-entra-atras { from { opacity: 0; transform: translateX(-7%); } }
+@keyframes tl-vt-sale { to { opacity: 0; transform: translateX(-3%) scale(.98); } }
+@keyframes tl-vt-entra { from { opacity: 0; transform: translateX(4%); } }
+@keyframes tl-vt-sale-atras { to { opacity: 0; transform: translateX(3%) scale(.98); } }
+@keyframes tl-vt-entra-atras { from { opacity: 0; transform: translateX(-4%); } }
 @media (prefers-reduced-motion: reduce) {
   ::view-transition-group(*), ::view-transition-old(*), ::view-transition-new(*) { animation: none !important; }
 }
