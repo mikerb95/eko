@@ -633,6 +633,20 @@ export const TABLAS: readonly string[] = [
     created_at TEXT NOT NULL
   )`,
 
+  // Preguntas que los participantes le envían a quien dicta desde el celular.
+  // escena: la que estaba en pantalla al enviarla. respondida: 1 cuando
+  // quien dicta la marca en la vista de presentador.
+  `CREATE TABLE IF NOT EXISTS ac_taller_preguntas (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    taller INTEGER NOT NULL,
+    fecha TEXT NOT NULL,
+    asistente_id INTEGER NOT NULL,
+    escena TEXT NOT NULL,
+    texto TEXT NOT NULL,
+    respondida INTEGER NOT NULL DEFAULT 0,
+    created_at TEXT NOT NULL
+  )`,
+
   // Quién está en la sala (celular abierto en /academia/sala).
   `CREATE TABLE IF NOT EXISTS ac_taller_sala (
     taller INTEGER NOT NULL,
@@ -693,6 +707,7 @@ export const TABLAS_ESPERADAS: readonly string[] = [
   'ac_taller_asistentes',
   'ac_taller_estado',
   'ac_taller_practicas',
+  'ac_taller_preguntas',
   'ac_taller_respuestas',
   'ac_taller_sala',
   'actos',

@@ -24,6 +24,17 @@ export function interaccionPublica(i: Interaccion): Interaccion {
  * Un voto vale si la interacción es la que está abierta en ese momento, la
  * pregunta es de esa interacción y el valor es una de sus opciones.
  */
+/** Preguntas que una persona le puede enviar a quien dicta en un mismo día. */
+export const PREGUNTAS_DIA = 20
+export const MAX_PREGUNTA = 400
+
+/** Limpia la pregunta que llega del celular; null si está vacía o es muy larga. */
+export function validarPregunta(v: unknown): string | null {
+  if (typeof v !== 'string') return null
+  const s = v.replace(/\s+/g, ' ').trim()
+  return s.length >= 3 && s.length <= MAX_PREGUNTA ? s : null
+}
+
 export function votoValido(t: Taller, abierta: string, interaccion: unknown, pregunta: unknown, valor: unknown): boolean {
   if (typeof interaccion !== 'string' || interaccion !== abierta) return false
   const i = interaccionDe(t, interaccion)

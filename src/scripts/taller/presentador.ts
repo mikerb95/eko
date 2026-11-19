@@ -160,6 +160,38 @@ function montar(d: DatosPr) {
     ritmo.className = Math.abs(desfase) <= 2 ? '' : desfase > 0 ? 'tarde' : 'antes'
   }, 1000)
 
+  // Preguntas que llegan del celular. Al marcarla como respondida sale de la lista.
+  const pintarDudas = (ps: { id: number; texto: string; nombre: string; area: string; escena: string }[]) => {
+    $('[data-n-dudas]').textContent = String(ps.length)
+    $('[data-dudas-vacio]').hidden = ps.length > 0
+    $('[data-dudas]').replaceChildren(
+      ...ps.map((p) => {
+        const li = document.createElement('li')
+        const tx = document.createElement('p')
+        tx.textContent = p.texto
+        const sp = document.createElement('span')
+        sp.textContent = `${p.nombre} · ${p.area}${p.escena ? ` · en "${p.escena}"` : ''}`
+        const b = document.createElement('button')
+        b.type = 'button'
+        b.textContent = 'Respondida'
+        b.addEventListener('click', async () => {
+          b.disabled = true
+          try {
+            await enviar({ accion: 'respondida', taller: d.n, id: p.id })
+            li.remove()
+            const n = $('[data-dudas]').children.length
+            $('[data-n-dudas]').textContent = String(n)
+            $('[data-dudas-vacio]').hidden = n > 0
+          } catch {
+            b.disabled = false
+          }
+        })
+        li.append(tx, sp, b)
+        return li
+      }),
+    )
+  }
+
   const panel = () =>
     consultar({ que: 'panel', n: d.n })
       .then((r) => {
@@ -176,6 +208,7 @@ function montar(d: DatosPr) {
             return li
           }),
         )
+        pintarDudas(r.preguntas ?? [])
         sesionesHoy = r.sesiones
         avisos()
       })

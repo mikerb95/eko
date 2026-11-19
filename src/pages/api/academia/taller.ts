@@ -4,7 +4,7 @@ import { hoyEnBogota } from '../../../lib/agente/diasHabiles'
 import { nombreModulo } from '../../../lib/academia/reglas'
 import { tallerDe } from '../../../lib/talleres'
 import { compararEvaluacion, contarVotos, interaccionDe } from '../../../lib/talleres/reglas'
-import { asistentesDeHoy, enSala, fijarEstado, respuestas, sesionesDeHoy } from '../../../lib/talleres/datos'
+import { asistentesDeHoy, enSala, fijarEstado, marcarRespondida, preguntasPendientes, respuestas, sesionesDeHoy } from '../../../lib/talleres/datos'
 import { preguntarDemo } from '../../../lib/talleres/motorIA'
 
 // Capacitaciones en vivo (/academia/taller/<n>). El middleware ya exige
@@ -14,8 +14,8 @@ import { preguntarDemo } from '../../../lib/talleres/motorIA'
 //
 // GET ?que=resultados&n&i  → conteo de una interacción (proyector)
 // GET ?que=comparacion&n   → evaluación de entrada contra salida
-// GET ?que=panel&n         → sala, asistencia y aviso de bloque del día (presentador)
-// POST {accion}            → estado | ia
+// GET ?que=panel&n         → sala, asistencia, preguntas de la sala y aviso de bloque del día (presentador)
+// POST {accion}            → estado | ia | respondida
 
 export const prerender = false
 
@@ -44,12 +44,19 @@ export const GET: APIRoute = async ({ url, locals }) => {
     if (que === 'panel') {
       if (!esAdmin(locals)) return json({ error: 'Solo administradores' }, 403)
       const hoy = hoyEnBogota()
-      const [sala, asistentes, sesiones] = await Promise.all([enSala(t.n), asistentesDeHoy(t.n, hoy), sesionesDeHoy(t, hoy)])
+      const [sala, asistentes, sesiones, preguntas] = await Promise.all([enSala(t.n), asistentesDeHoy(t.n, hoy), sesionesDeHoy(t, hoy), preguntasPendientes(t.n, hoy)])
       return json({
         sala,
         asistentes: asistentes.length,
         lista: asistentes.map((a) => ({ nombre: `${a.nombre} ${a.apellido}`, cargo: a.cargo, area: nombreModulo(a.area), cuenta: a.usuario_id > 0 })),
         sesiones: sesiones.map((s) => s.titulo),
+        preguntas: preguntas.map((p) => ({
+          id: p.id,
+          texto: p.texto,
+          nombre: p.nombre,
+          area: nombreModulo(p.area),
+          escena: t.escenas.find((e) => e.id === p.escena)?.titulo ?? '',
+        })),
       })
     }
 
@@ -84,6 +91,14 @@ export const POST: APIRoute = async ({ request, locals }) => {
         const r = await preguntarDemo(t, b.demo, b.version)
         if (!r) return json({ error: 'Esa versión de la demo no existe' }, 400)
         return json(r)
+      }
+
+      case 'respondida': {
+        if (!esAdmin(locals)) return json({ error: 'Solo administradores' }, 403)
+        const id = Number(b.id)
+        if (!Number.isInteger(id) || id <= 0) return json({ error: 'Pregunta inválida' }, 400)
+        await marcarRespondida(t.n, id)
+        return json({ ok: true })
       }
 
       default:

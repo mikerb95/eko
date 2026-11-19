@@ -119,6 +119,31 @@ test('presentación, sala, votos y asistencia', async ({ browser }) => {
   }
   await sinSesion.close()
 
+  // Ejemplo del área en el celular según la escena, y preguntas a quien dicta.
+  await proyector.request.post('/api/academia/taller', { data: { accion: 'estado', taller: 1, escena: 'tokens' } })
+  await cel.goto('/academia/sala')
+  await expect(cel.locator('[data-sl-ej-area]')).toHaveText('En Operaciones', { timeout: 8000 })
+  await expect(cel.locator('[data-sl-ej-titulo]')).toHaveText('Un auto de 40 páginas')
+  await expect(cel.locator("[data-sl-titulo]")).toHaveText("La IA no lee letras ni palabras: lee tokens")
+  await cel.getByLabel('¿Tiene una pregunta?').fill('¿Un auto escaneado también se parte en tokens?')
+  await cel.getByRole('button', { name: 'Enviar pregunta' }).click()
+  await expect(cel.locator('[data-sl-duda-estado]')).toHaveText('Enviada. Quien dicta la ve en su pantalla.')
+  expect(await cel.evaluate(() => document.documentElement.scrollWidth)).toBeLessThanOrEqual(390)
+  await cel.screenshot({ path: 'test-results/taller-ejemplo-celular.png', fullPage: true })
+  await proyector.request.post('/api/academia/taller', { data: { accion: 'estado', taller: 1, escena: 'metodo' } })
+  await expect(cel.locator('[data-sl-ej-titulo]')).toHaveText('Las cuatro partes en su trabajo', { timeout: 8000 })
+  await expect(cel.locator('[data-sl-titulo]')).toHaveText('Una buena instrucción tiene cuatro partes')
+  await presentador.bringToFront()
+  const duda = presentador.locator('[data-dudas] li').first()
+  await expect(duda).toContainText('¿Un auto escaneado también se parte en tokens?', { timeout: 8000 })
+  await expect(duda).toContainText('Luis Mora · Operaciones · en "La IA no lee letras ni palabras: lee tokens"')
+  await expect(presentador.locator('[data-n-dudas]')).toHaveText('1')
+  await presentador.screenshot({ path: 'test-results/taller-dudas-presentador.png' })
+  await duda.getByRole('button', { name: 'Respondida' }).click()
+  await expect(presentador.locator('[data-dudas] li')).toHaveCount(0)
+  await expect(presentador.locator('[data-n-dudas]')).toHaveText('0')
+  expect((await (await proyector.request.get('/api/academia/taller?que=panel&n=1')).json()).preguntas).toEqual([])
+
   // Práctica guiada: en esa escena la sala del celular es el revisor.
   await proyector.request.post('/api/academia/taller', { data: { accion: 'estado', taller: 1, escena: 'practica' } })
   await cel.goto('/academia/sala')

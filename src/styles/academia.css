@@ -275,6 +275,7 @@
 .sl { max-width: 560px; margin: 0 auto; display: flex; flex-direction: column; gap: 14px; }
 .sl h1 { font-size: clamp(26px, 6.5vw, 36px); line-height: 1.08; margin: 0; }
 .sl-sub { color: var(--ink-2); font-size: 16px; margin: 0; }
+.sl-sub:empty { display: none; }
 .sl-preguntas { display: flex; flex-direction: column; gap: 18px; margin-top: 6px; }
 .sl-pregunta { background: #fff; border-radius: var(--r-lg); padding: 18px; display: flex; flex-direction: column; gap: 10px; box-shadow: 0 1px 0 rgba(14, 28, 38, .05); }
 .sl-pregunta h2 { font-size: 18px; line-height: 1.3; margin: 0; }
@@ -310,4 +311,17 @@
 .sl-practica textarea { width: 100%; min-width: 0; font: 16px/1.5 var(--font-sans); color: var(--ink); background: #fff; border: 1px solid var(--line); border-radius: 14px; padding: 13px 14px; resize: vertical; }
 .sl-practica textarea:focus { outline: 2px solid color-mix(in oklab, var(--deep) 35%, transparent); outline-offset: 1px; }
 .sl-nota { font-size: 13.5px; color: var(--mute); margin: 0; }
+
+/* Ejemplo del área de la persona para la escena en curso. */
+.sl-ejemplo { display: flex; flex-direction: column; gap: 8px; margin-top: 8px; padding: 18px; border-radius: var(--r-lg); background: color-mix(in oklab, var(--deep) 6%, #fff); }
+.sl-ejemplo .n { display: flex; align-items: center; gap: 8px; margin: 0; font: 500 11.5px/1 var(--font-mono); letter-spacing: .08em; text-transform: uppercase; color: var(--deep); }
+.sl-ejemplo .n::before { content: ''; width: 8px; height: 8px; border-radius: 50%; background: var(--deep); }
+.sl-ejemplo h2 { font-size: 18px; line-height: 1.3; margin: 0; }
+.sl-ejemplo p { margin: 0; font-size: 15.5px; line-height: 1.5; color: var(--ink-2); }
+.sl-ejemplo .sl-nota { font-size: 12.5px; color: var(--mute); }
+
+/* Preguntas a quien dicta. */
+.sl-duda { margin-top: 14px; padding-top: 18px; border-top: 1px solid var(--line); }
+.sl-duda textarea { width: 100%; min-width: 0; font: 16px/1.5 var(--font-sans); color: var(--ink); background: #fff; border: 1px solid var(--line); border-radius: 14px; padding: 13px 14px; resize: vertical; }
+.sl-duda textarea:focus { outline: 2px solid color-mix(in oklab, var(--deep) 35%, transparent); outline-offset: 1px; }
 .sl .ac-revision { border-top: 0; margin-top: 4px; padding-top: 0; }

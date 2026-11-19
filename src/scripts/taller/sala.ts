@@ -8,6 +8,12 @@
  *    opciones; al tocar una, la guarda (se puede cambiar mientras siga
  *    abierta). Avisa que sigue en la sala cada 30 segundos, que es lo que
  *    alimenta el contador del proyector.
+ *
+ * 3. Debajo de lo anterior: el ejemplo de la escena en curso para el área de
+ *    la persona y una caja para enviarle preguntas a quien dicta (las ve en
+ *    la vista de presentador).
+ *
+ * Mientras la página esté abierta, la pantalla del celular no se apaga.
  */
 import { capitalizarNombre } from '../../lib/talleres/reglas'
 import { pintarRevision } from '../academia/revision'
@@ -26,6 +32,7 @@ interface Estado {
   escena?: string
   interaccion?: { id: string; tipo: string; titulo: string; preguntas: { id: string; enunciado: string; opciones: { id: string; texto: string }[] }[] } | null
   mias?: Record<string, string>
+  ejemplo?: { area: string; titulo: string; texto: string } | null
   practica?: { consigna: string; maximo: number } | null
 }
 
@@ -33,6 +40,32 @@ const raiz = document.querySelector<HTMLElement>('[data-sala]')
 if (raiz) montar(raiz)
 const registro = document.querySelector<HTMLFormElement>('[data-sl-registro]')
 if (registro) montarRegistro(registro)
+mantenerDespierto()
+
+/**
+ * Pide que la pantalla no se apague mientras la sala esté abierta (Screen
+ * Wake Lock). El navegador lo suelta cuando la pestaña se oculta, así que se
+ * vuelve a pedir al regresar; y como Safari a veces lo niega sin un toque,
+ * también se reintenta en cada toque. Si el navegador no lo soporta, la sala
+ * funciona igual y la pantalla se apaga como siempre.
+ */
+function mantenerDespierto() {
+  if (!('wakeLock' in navigator)) return
+  let activo = false
+  const pedir = async () => {
+    if (activo || document.visibilityState !== 'visible') return
+    activo = true
+    try {
+      const lock = await navigator.wakeLock.request('screen')
+      lock.addEventListener('release', () => (activo = false))
+    } catch {
+      activo = false
+    }
+  }
+  void pedir()
+  document.addEventListener('visibilitychange', () => void pedir())
+  addEventListener('pointerdown', () => void pedir(), { passive: true })
+}
 
 function montarRegistro(form: HTMLFormElement) {
   const estado = form.querySelector<HTMLElement>('[data-sl-estado]')!
@@ -83,13 +116,58 @@ function montarRegistro(form: HTMLFormElement) {
   })
 }
 
+/** Caja para enviarle una pregunta a quien dicta. */
+function montarDuda(form: HTMLFormElement) {
+  const txt = form.querySelector('textarea')!
+  const boton = form.querySelector('button')!
+  const estado = form.querySelector<HTMLElement>('[data-sl-duda-estado]')!
+  const decir = (t: string, clase = '') => {
+    estado.textContent = t
+    estado.className = `sl-estado ${clase}`
+  }
+  txt.addEventListener('input', () => decir(''))
+  form.addEventListener('submit', async (ev) => {
+    ev.preventDefault()
+    if (!txt.value.trim()) {
+      decir('Escriba su pregunta.', 'error')
+      txt.focus()
+      return
+    }
+    boton.disabled = true
+    try {
+      await enviar({ accion: 'preguntar', texto: txt.value })
+      txt.value = ''
+      decir('Enviada. Quien dicta la ve en su pantalla.', 'ok')
+    } catch (err) {
+      decir(err instanceof Error ? err.message : 'No se pudo enviar. Intente de nuevo.', 'error')
+    } finally {
+      boton.disabled = false
+    }
+  })
+}
+
 function montar(raiz: HTMLElement) {
   const $ = (s: string) => raiz.querySelector<HTMLElement>(s)!
     const titulo = $('[data-sl-titulo]')
   const sub = $('[data-sl-sub]')
   const lista = $('[data-sl-preguntas]')
   const estado = $('[data-sl-estado]')
-  let abierta = ''
+  // null: todavía no se ha pintado nada (una escena sin pregunta también es '').
+  let abierta: string | null = null
+  let ejemploVisto = ''
+  const ejemplo = $('[data-sl-ejemplo]')
+  montarDuda(raiz.querySelector<HTMLFormElement>('[data-sl-duda]')!)
+
+  const pintarEjemplo = (e: Estado['ejemplo']) => {
+    const clave = e ? e.titulo + e.texto : ''
+    if (clave === ejemploVisto) return
+    ejemploVisto = clave
+    ejemplo.hidden = !e
+    if (!e) return
+    $('[data-sl-ej-area]').textContent = `En ${e.area}`
+    $('[data-sl-ej-titulo]').textContent = e.titulo
+    $('[data-sl-ej-texto]').textContent = e.texto
+  }
   let taller = 0
   let ultimaEntrada = 0
   let enviando = false
@@ -237,10 +315,11 @@ function montar(raiz: HTMLElement) {
     }
     if (!e.enCurso) {
       taller = 0
-      abierta = ''
+      abierta = null
       titulo.textContent = 'No hay una capacitación en curso'
       sub.textContent = 'Cuando empiece la sesión, esta página se actualiza sola.'
       lista.replaceChildren()
+      pintarEjemplo(null)
       decir('')
       return
     }
@@ -251,7 +330,8 @@ function montar(raiz: HTMLElement) {
     }
     taller = e.taller!
     entrar()
-    const id = e.interaccion?.id ?? (e.practica ? 'practica' : '')
+    pintarEjemplo(e.ejemplo ?? null)
+    const id = e.interaccion?.id ?? (e.practica ? 'practica' : `escena:${e.escena}`)
     if (id === abierta) return
     abierta = id
     decir('')
@@ -260,7 +340,7 @@ function montar(raiz: HTMLElement) {
     else {
       titulo.textContent = e.escena || 'Mire la pantalla'
       sub.textContent = ''
-      espera('Mire la pantalla. Cuando haya una pregunta, aparece aquí.')
+      espera(e.ejemplo ? 'Mire la pantalla. Abajo tiene un ejemplo de su área.' : 'Mire la pantalla. Cuando haya una pregunta, aparece aquí.')
     }
   }
 

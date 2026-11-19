@@ -183,6 +183,53 @@ export async function guardarPracticaSala(taller: number, asistente_id: number, 
   })
 }
 
+export interface PreguntaSala {
+  id: number
+  escena: string
+  texto: string
+  nombre: string
+  area: string
+  created_at: string
+}
+
+export async function preguntasDeHoyDe(asistente_id: number, hoy: string): Promise<number> {
+  const c = await db()
+  const r = await c.execute({ sql: 'SELECT COUNT(*) AS n FROM ac_taller_preguntas WHERE asistente_id = ? AND fecha = ?', args: [asistente_id, hoy] })
+  return num((r.rows[0] as any)?.n)
+}
+
+export async function guardarPregunta(taller: number, hoy: string, asistente_id: number, escena: string, texto: string): Promise<void> {
+  const c = await db()
+  await c.execute({
+    sql: 'INSERT INTO ac_taller_preguntas (taller, fecha, asistente_id, escena, texto, created_at) VALUES (?, ?, ?, ?, ?, ?)',
+    args: [taller, hoy, asistente_id, escena, texto, ahora()],
+  })
+}
+
+/** Preguntas de hoy sin responder, de la más antigua a la más nueva. */
+export async function preguntasPendientes(taller: number, hoy: string): Promise<PreguntaSala[]> {
+  const c = await db()
+  const r = await c.execute({
+    sql: `SELECT p.id, p.escena, p.texto, p.created_at, a.nombre, a.apellido, a.area
+          FROM ac_taller_preguntas p JOIN ac_taller_asistentes a ON a.id = p.asistente_id
+          WHERE p.taller = ? AND p.fecha = ? AND p.respondida = 0 ORDER BY p.id`,
+    args: [taller, hoy],
+  })
+  return r.rows.map((x: any) => ({
+    id: num(x.id),
+    escena: str(x.escena),
+    texto: str(x.texto),
+    nombre: `${str(x.nombre)} ${str(x.apellido)}`.trim(),
+    area: str(x.area),
+    created_at: str(x.created_at),
+  }))
+}
+
+export async function marcarRespondida(taller: number, id: number): Promise<void> {
+  const c = await db()
+  await c.execute({ sql: 'UPDATE ac_taller_preguntas SET respondida = 1 WHERE id = ? AND taller = ?', args: [id, taller] })
+}
+
 export async function votar(taller: number, interaccion: string, pregunta: string, usuario_id: number, valor: string): Promise<void> {
   const c = await db()
   await c.execute({

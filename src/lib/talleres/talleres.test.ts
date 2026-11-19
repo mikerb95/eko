@@ -17,12 +17,34 @@ import {
   puntaje,
   reloj,
   tokenizarAprox,
+  validarPregunta,
+  MAX_PREGUNTA,
   votoValido,
 } from './reglas.ts'
+import { AREA_IDS } from '../academia/reglas.ts'
 import { aHtml } from './formato.ts'
 import type { Taller } from './tipos.ts'
 
+test('validarPregunta limpia espacios y rechaza vacías o muy largas', () => {
+  assert.equal(validarPregunta('  ¿Y si el auto   está escaneado? '), '¿Y si el auto está escaneado?')
+  assert.equal(validarPregunta('  '), null)
+  assert.equal(validarPregunta(42), null)
+  assert.equal(validarPregunta('a'.repeat(MAX_PREGUNTA + 1)), null)
+})
+
 for (const t of Object.values(TALLERES)) {
+  test(`taller ${t.n}: ejemplos por área de escenas que existen y para todas las áreas`, () => {
+    for (const [escena, porArea] of Object.entries(t.ejemplos ?? {})) {
+      assert.ok(t.escenas.some((e) => e.id === escena), `escena ${escena}`)
+      for (const a of AREA_IDS) {
+        const ej = porArea[a]
+        assert.ok(ej?.titulo && ej.texto, `${escena}: falta ${a}`)
+        assert.ok(!/[\u2013\u2014]/.test(ej.titulo + ej.texto), `${escena}/${a}: guion largo`)
+      }
+      assert.deepEqual(Object.keys(porArea).sort(), [...AREA_IDS].sort(), `${escena}: áreas de más`)
+    }
+  })
+
   test(`taller ${t.n}: los minutos de bloques y escenas cuadran`, () => {
     const bloques = t.bloques.reduce((a, b) => a + b.minutos, 0)
     assert.equal(bloques, t.minutosTotales)

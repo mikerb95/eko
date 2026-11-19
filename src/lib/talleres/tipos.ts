@@ -94,6 +94,12 @@ export type TipoEscena =
   | 'cierre'
   | 'repaso'
 
+/** Cómo se ve la idea de una escena en el trabajo de un área (celular). */
+export interface EjemploArea {
+  titulo: string
+  texto: string
+}
+
 export interface Escena {
   id: string
   bloque: string
@@ -130,6 +136,11 @@ export interface Taller {
   evaluacion?: { pre: string; post: string }
   /** Preguntas de una capacitación anterior para repasar al empezar. */
   repaso?: { taller: number; interaccion: string; preguntas: string[] }
+  /**
+   * Ejemplos por área para el celular: id de escena → id de área → ejemplo.
+   * Cada participante ve el de su área mientras esa escena está en pantalla.
+   */
+  ejemplos?: Record<string, Record<string, EjemploArea>>
   /** Tarjeta resumen descargable. */
   resumen: {
     ideas: { titulo: string; texto: string }[]

@@ -3,7 +3,8 @@
 // capacitación presencial (se llega por el código QR del proyector). Es
 // pública: la primera vez pide nombres, apellidos, cargo y área (sin usuario
 // ni contraseña) y eso queda como su asistencia. Después muestra la pregunta
-// abierta en cada momento y guarda sus respuestas.
+// abierta en cada momento y guarda sus respuestas. Debajo, un ejemplo de la
+// escena en curso para su área y una caja para enviarle preguntas a quien dicta.
 // Motor: src/scripts/taller/sala.ts. API: /api/academia/sala.
 export const prerender = false
 import AcademiaLayout from '../../layouts/AcademiaLayout.astro'
@@ -23,6 +24,20 @@ Astro.response.headers.set('cache-control', 'no-store')
       <p class="sl-sub" data-sl-sub></p>
       <div class="sl-preguntas" data-sl-preguntas></div>
       <p class="sl-estado" data-sl-estado></p>
+      <aside class="sl-ejemplo" data-sl-ejemplo hidden>
+        <p class="n" data-sl-ej-area></p>
+        <h2 data-sl-ej-titulo></h2>
+        <p data-sl-ej-texto></p>
+        <p class="sl-nota">Ejemplo ilustrativo</p>
+      </aside>
+      <form class="sl-form sl-duda" data-sl-duda novalidate>
+        <label>
+          <span>¿Tiene una pregunta?</span>
+          <textarea name="texto" rows="3" maxlength="400" placeholder="Escríbala aquí: le llega a quien dicta."></textarea>
+        </label>
+        <button type="submit" class="ac-btn ac-btn-sec">Enviar pregunta</button>
+        <p class="sl-estado" data-sl-duda-estado role="status"></p>
+      </form>
     </section>
   ) : (
     <section class="sl">

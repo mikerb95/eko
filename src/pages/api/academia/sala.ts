@@ -5,8 +5,8 @@ import { hoyEnBogota } from '../../../lib/agente/diasHabiles'
 import { AREA_IDS, nombreModulo } from '../../../lib/academia/reglas'
 import { MAX_INSTRUCCION, MIN_INSTRUCCION, PRACTICAS_DIA, validarInstruccion } from '../../../lib/academia/practica'
 import { practicar, PracticaNoDisponible } from '../../../lib/academia/motorPractica'
-import { interaccionDe, interaccionPublica, registroSala, votoValido } from '../../../lib/talleres/reglas'
-import { guardarPracticaSala, marcarEnSala, misRespuestas, practicasSalaDeHoy, registrarAsistente, votar } from '../../../lib/talleres/datos'
+import { interaccionDe, interaccionPublica, PREGUNTAS_DIA, registroSala, validarPregunta, votoValido, MAX_PREGUNTA } from '../../../lib/talleres/reglas'
+import { guardarPracticaSala, guardarPregunta, marcarEnSala, misRespuestas, practicasSalaDeHoy, preguntasDeHoyDe, registrarAsistente, votar } from '../../../lib/talleres/datos'
 import { salaActual } from '../../../lib/talleres/sala'
 
 // La sala del celular (/academia/sala). Pública: se llega por el QR del
@@ -16,9 +16,11 @@ import { salaActual } from '../../../lib/talleres/sala'
 // ese día. Fuera de una sesión en curso no se puede registrar ni votar.
 // Mientras el proyector está en la práctica guiada, la sala es el revisor de
 // instrucciones (mismo motor y tope de gasto que el de la academia).
+// En cada escena la persona ve un ejemplo de su área (Taller.ejemplos) y
+// puede enviarle una pregunta a quien dicta, que la ve en el presentador.
 //
 // GET           → capacitación en curso, si la persona ya está registrada, pregunta abierta, sus respuestas y si hay práctica
-// POST {accion} → registrar | entrar | votar | practicar
+// POST {accion} → registrar | entrar | votar | practicar | preguntar
 
 export const prerender = false
 
@@ -37,6 +39,7 @@ export const GET: APIRoute = async ({ cookies }) => {
       escena: escena?.titulo ?? '',
       practica: escena?.tipo === 'practica' ? { consigna: String(escena.datos?.consigna ?? ''), maximo: MAX_INSTRUCCION } : null,
       interaccion: i ? interaccionPublica(i) : null,
+      ejemplo: t.ejemplos?.[estado.escena]?.[asistente.area] ? { area: nombreModulo(asistente.area), ...t.ejemplos[estado.escena]![asistente.area]! } : null,
       mias: i ? await misRespuestas(t.n, i.id, asistente.id) : {},
     })
   } catch (e) {
@@ -81,6 +84,15 @@ export const POST: APIRoute = async ({ request, cookies }) => {
     if (b?.accion === 'votar') {
       if (!votoValido(t, estado.interaccion, b.interaccion, b.pregunta, b.valor)) return json({ error: 'Esa pregunta ya se cerró' }, 409)
       await votar(t.n, b.interaccion, b.pregunta, asistente.id, b.valor)
+      return json({ ok: true })
+    }
+
+    if (b?.accion === 'preguntar') {
+      const texto = validarPregunta(b.texto)
+      if (!texto) return json({ error: `Escriba su pregunta (hasta ${MAX_PREGUNTA} caracteres).` }, 400)
+      const hoy = hoyEnBogota()
+      if ((await preguntasDeHoyDe(asistente.id, hoy)) >= PREGUNTAS_DIA) return json({ error: `Ya envió ${PREGUNTAS_DIA} preguntas hoy. Hágala en voz alta.` }, 429)
+      await guardarPregunta(t.n, hoy, asistente.id, estado.escena, texto)
       return json({ ok: true })
     }
 
