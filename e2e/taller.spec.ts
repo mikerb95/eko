@@ -43,6 +43,17 @@ test('presentación, sala, votos y asistencia', async ({ browser }) => {
   await presentador.getByRole('button', { name: 'Siguiente →' }).click()
   await expect(proyector.locator('.tl-escena.activa')).toHaveAttribute('data-escena', 'pre')
   await expect(presentador.locator('[data-notas] li').first()).toContainText('No es un examen')
+  // Las flechas del teclado en el presentador también mueven el proyector.
+  await presentador.keyboard.press('ArrowRight')
+  await expect(proyector.locator('.tl-escena.activa')).toHaveAttribute('data-escena', 'diagnostico')
+  await expect(presentador.locator('[data-titulo]')).toHaveText('Por qué estamos aquí')
+  await presentador.keyboard.press('ArrowLeft')
+  await expect(proyector.locator('.tl-escena.activa')).toHaveAttribute('data-escena', 'pre')
+  await presentador.locator('summary').click()
+  await presentador.keyboard.press('ArrowRight')
+  await expect(proyector.locator('.tl-escena.activa')).toHaveAttribute('data-escena', 'diagnostico')
+  await presentador.keyboard.press('ArrowLeft')
+  await expect(proyector.locator('.tl-escena.activa')).toHaveAttribute('data-escena', 'pre')
 
   // Celular: el QR abre la sala sin usuario ni contraseña. Nombres y
   // apellidos quedan con mayúscula inicial mientras se escriben.
