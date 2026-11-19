@@ -56,9 +56,12 @@ const evalPre = t.evaluacion ? interaccionDe(t, t.evaluacion.pre) : null
     {preguntas.map((p, k) => (
       <div class="afirm" data-pregunta={p.id}>
         <p>{p.enunciado}</p>
-        <div class="reparto" aria-label="Votos de la sala">
-          <span class="v" data-op="v">Verdad</span>
-          <span class="i" data-op="i">Inventada</span>
+        <div class="votos">
+          <span class="votos-n" data-votos>Esperando votos</span>
+          <div class="reparto vacia" aria-label="Votos de la sala">
+            <span class="v" data-op="v" />
+            <span class="i" data-op="i" />
+          </div>
         </div>
         <div class="veredicto" data-paso={k + 1}>
           <span class:list={['sello', { ok: p.correcta === 'v' }]}>{p.correcta === 'v' ? 'Verdad' : 'Inventada'}</span>
@@ -72,18 +75,21 @@ const evalPre = t.evaluacion ? interaccionDe(t, t.evaluacion.pre) : null
 {e.tipo === 'semaforo' && (
   <>
     <div class="leyenda-sem">
-      <span style="--c:#124E7D">Se sube</span>
-      <span style="--c:#C98A16">Se sube anonimizado</span>
-      <span style="--c:#B8926F">No se sube</span>
+      <span style={`--c:${COLOR_SEM.si}`}>Se sube</span>
+      <span style={`--c:${COLOR_SEM.anon}`}>Se sube anonimizado</span>
+      <span style={`--c:${COLOR_SEM.no}`}>No se sube</span>
     </div>
     <div class="afirmaciones">
       {preguntas.map((p, k) => (
         <div class="afirm" data-pregunta={p.id}>
           <p>{p.enunciado}</p>
-          <div class="reparto" aria-label="Votos de la sala">
-            <span class="si" data-op="si" />
-            <span class="anon" data-op="anon" />
-            <span class="no" data-op="no" />
+          <div class="votos">
+            <span class="votos-n" data-votos>Esperando votos</span>
+            <div class="reparto vacia" aria-label="Votos de la sala">
+              <span class="si" data-op="si" />
+              <span class="anon" data-op="anon" />
+              <span class="no" data-op="no" />
+            </div>
           </div>
           <div class="veredicto" data-paso={k + 1}>
             <span class="luz" style={`--c:${COLOR_SEM[p.correcta ?? 'no']}`}>{ETQ_SEM[p.correcta ?? 'no']}</span>

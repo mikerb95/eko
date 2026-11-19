@@ -444,8 +444,12 @@ const voto: Hook = {
 function reparto(el: HTMLElement, api: Api, etiquetas: Record<string, string>) {
   sondear(el, api, (r) => {
     for (const a of $$(el, '.afirm')) {
-      const c = r.preguntas?.[a.dataset.pregunta!]
-      if (!c) continue
+      const c = r.preguntas?.[a.dataset.pregunta!] ?? { total: 0, opciones: {} }
+      // Sin votos la barra queda punteada y dice que espera: vacía y gris
+      // parecía un campo roto.
+      $(a, '.reparto')?.classList.toggle('vacia', !c.total)
+      const n = $(a, '[data-votos]')
+      if (n) n.textContent = c.total ? `${c.total} ${c.total === 1 ? 'voto' : 'votos'} de la sala` : 'Esperando votos'
       for (const s of $$(a, '[data-op]')) {
         const v = c.total ? (c.opciones[s.dataset.op!] ?? 0) / c.total : 0
         s.style.setProperty('--v', String(v))
