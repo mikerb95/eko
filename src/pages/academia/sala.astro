@@ -1,22 +1,65 @@
 ---
 // La sala: lo que cada participante abre en el celular durante una
-// capacitación presencial (se llega por el código QR del proyector). Muestra
-// la pregunta abierta en ese momento, guarda sus respuestas y, al entrar,
-// marca la asistencia al bloque del día. Motor: src/scripts/taller/sala.ts.
+// capacitación presencial (se llega por el código QR del proyector). Es
+// pública: la primera vez pide nombres, apellidos, cargo y área (sin usuario
+// ni contraseña) y eso queda como su asistencia. Después muestra la pregunta
+// abierta en cada momento y guarda sus respuestas.
+// Motor: src/scripts/taller/sala.ts. API: /api/academia/sala.
 export const prerender = false
 import AcademiaLayout from '../../layouts/AcademiaLayout.astro'
-const nombre = String(Astro.locals.user || '')
-const rol = String(Astro.locals.role || '')
+import { SALA_COOKIE } from '../../lib/auth'
+import { AREAS_ACADEMIA } from '../../lib/academia/reglas'
+import { salaActual } from '../../lib/talleres/sala'
+
+const { estado, t, asistente } = await salaActual(Astro.cookies.get(SALA_COOKIE)?.value)
+Astro.response.headers.set('cache-control', 'no-store')
 ---
 
-<AcademiaLayout titulo="Sala · Academia de IA · Ekosolv" nombre={nombre} rol={rol}>
-  <section class="sl" data-sala aria-live="polite">
-    <p class="ac-kicker" data-sl-kicker>Sala de la capacitación</p>
-    <h1 data-sl-titulo>Conectando…</h1>
-    <p class="sl-sub" data-sl-sub></p>
-    <div class="sl-preguntas" data-sl-preguntas></div>
-    <p class="sl-estado" data-sl-estado></p>
-  </section>
+<AcademiaLayout titulo="Sala · Academia de IA · Ekosolv" sinNav>
+  {asistente ? (
+    <section class="sl" data-sala aria-live="polite">
+      <p class="ac-kicker" data-sl-kicker>Asistencia registrada · {asistente.nombre} {asistente.apellido}</p>
+      <h1 data-sl-titulo>Conectando…</h1>
+      <p class="sl-sub" data-sl-sub></p>
+      <div class="sl-preguntas" data-sl-preguntas></div>
+      <p class="sl-estado" data-sl-estado></p>
+    </section>
+  ) : (
+    <section class="sl">
+      <p class="ac-kicker">{t ? `Capacitación ${t.n} · ${t.titulo}` : 'Sala de la capacitación'}</p>
+      <h1>Antes de empezar, ¿quién es usted?</h1>
+      <p class="sl-sub">
+        {estado
+          ? 'Con estos datos queda registrada su asistencia. No necesita usuario ni contraseña.'
+          : 'La sesión todavía no ha empezado. Puede llenar sus datos cuando quien dicta abra la presentación.'}
+      </p>
+      <form class="sl-form" data-sl-registro novalidate>
+        <div class="sl-par">
+          <label>
+            <span>Nombres</span>
+            <input name="nombre" required maxlength="60" autocomplete="given-name" autocapitalize="words" spellcheck="false" data-capitalizar />
+          </label>
+          <label>
+            <span>Apellidos</span>
+            <input name="apellido" required maxlength="60" autocomplete="family-name" autocapitalize="words" spellcheck="false" data-capitalizar />
+          </label>
+        </div>
+        <label>
+          <span>Cargo</span>
+          <input name="cargo" required maxlength="80" autocomplete="organization-title" autocapitalize="sentences" />
+        </label>
+        <label>
+          <span>Área</span>
+          <select name="area" required>
+            <option value="" selected disabled>Elija su área</option>
+            {AREAS_ACADEMIA.map((a) => <option value={a.id}>{a.etiqueta}</option>)}
+          </select>
+        </label>
+        <button type="submit" class="ac-btn">Entrar a la sala</button>
+        <p class="sl-estado" data-sl-estado role="status"></p>
+      </form>
+    </section>
+  )}
   <script>
     import '../../scripts/taller/sala'
   </script>

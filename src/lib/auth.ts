@@ -99,3 +99,37 @@ export function clearCookie(secure: boolean): string {
   if (secure) parts.push('Secure')
   return parts.join('; ')
 }
+
+// ---- Pase de la sala de capacitación ----
+// Quien entra por el QR del proyector no tiene cuenta: escribe su nombre,
+// cargo y área y recibe este pase firmado, válido solo para esa capacitación
+// y ese día. No abre nada más del sitio (verifySession lo rechaza porque no
+// trae usuario ni rol).
+
+export const SALA_COOKIE = 'eko_sala'
+export const SALA_TTL_SECONDS = 60 * 60 * 14
+
+export interface PaseSala {
+  a: number // id en ac_taller_asistentes
+  t: number // capacitación
+  f: string // día (AAAA-MM-DD, Bogotá)
+}
+
+export async function crearPaseSala(p: PaseSala): Promise<string> {
+  const payload = b64url(enc.encode(JSON.stringify({ k: 'sala', ...p, exp: Math.floor(Date.now() / 1000) + SALA_TTL_SECONDS })))
+  return `${payload}.${b64url(await hmac(payload))}`
+}
+
+export async function verificarPaseSala(token: string | undefined | null): Promise<PaseSala | null> {
+  if (!token || !token.includes('.')) return null
+  const [payload, sig] = token.split('.')
+  if (!timingSafeEqual(sig, b64url(await hmac(payload)))) return null
+  try {
+    const d = JSON.parse(new TextDecoder().decode(b64urlToBytes(payload)))
+    if (d.k !== 'sala' || typeof d.exp !== 'number' || d.exp < Math.floor(Date.now() / 1000)) return null
+    if (!Number.isInteger(d.a) || !Number.isInteger(d.t) || typeof d.f !== 'string') return null
+    return { a: d.a, t: d.t, f: d.f }
+  } catch {
+    return null
+  }
+}

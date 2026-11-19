@@ -4,6 +4,9 @@ import { TALLERES, tallerDe } from './index.ts'
 import { TALLER_1 } from './taller1.ts'
 import {
   aplicarTemperatura,
+  capitalizarNombre,
+  claveNombre,
+  registroSala,
   compararEvaluacion,
   contarVotos,
   inicioDeEscenas,
@@ -153,4 +156,20 @@ test('aHtml escapa y reconoce tablas, listas y negrillas', () => {
   assert.ok(!h.includes('<script>'))
   assert.ok(h.includes('<table>') && h.includes('<th>A</th>') && h.includes('<strong>x</strong>'))
   assert.ok(h.includes('<ol><li>uno</li><li>dos</li></ol>'))
+})
+
+test('registro de la sala: nombres con mayúscula inicial y datos obligatorios', () => {
+  assert.equal(capitalizarNombre('maría JOSÉ de la torre'), 'María José De La Torre')
+  assert.equal(capitalizarNombre('ana-lucía o\'neil'), 'Ana-Lucía O\'Neil')
+  assert.equal(capitalizarNombre('luis '), 'Luis ')
+  assert.equal(claveNombre('  María   José Peña '), 'maria jose pena')
+  const areas = ['operaciones', 'ventas']
+  assert.deepEqual(registroSala({ nombre: ' laura  ', apellido: 'GÓMEZ ruiz', cargo: ' Analista  ambiental ', area: 'ventas' }, areas), {
+    nombre: 'Laura',
+    apellido: 'Gómez Ruiz',
+    cargo: 'Analista ambiental',
+    area: 'ventas',
+  })
+  assert.deepEqual(registroSala({ nombre: 'Laura', apellido: '', cargo: 'x', area: 'ventas' }, areas), { error: 'Escriba su apellido.' })
+  assert.deepEqual(registroSala({ nombre: 'Laura', apellido: 'Gómez', cargo: 'x', area: 'otra' }, areas), { error: 'Elija su área.' })
 })

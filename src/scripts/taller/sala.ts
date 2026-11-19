@@ -1,13 +1,23 @@
 /**
- * La sala en el celular. Consulta cada 2 segundos qué pregunta está abierta y
- * pinta sus opciones; al tocar una, la guarda (se puede cambiar mientras siga
- * abierta). Avisa que está en la sala al llegar y cada 30 segundos, que es lo
- * que marca la asistencia y alimenta el contador del proyector.
+ * La sala en el celular, en dos momentos:
+ *
+ * 1. Registro (sin cuenta): nombres y apellidos con la primera letra de cada
+ *    palabra en mayúscula mientras se escribe, cargo y área. Al enviarlo
+ *    queda la asistencia y la página se recarga ya dentro de la sala.
+ * 2. Sala: consulta cada 2 segundos qué pregunta está abierta y pinta sus
+ *    opciones; al tocar una, la guarda (se puede cambiar mientras siga
+ *    abierta). Avisa que sigue en la sala cada 30 segundos, que es lo que
+ *    alimenta el contador del proyector.
  */
-import { consultar, enviar } from './comun'
+import { capitalizarNombre } from '../../lib/talleres/reglas'
+import { API_SALA, consultar as consultarTaller, enviar as enviarTaller } from './comun'
+
+const consultar = <T>(p: Record<string, string | number>) => consultarTaller<T>(p, API_SALA)
+const enviar = (c: Record<string, unknown>) => enviarTaller(c, 15_000, API_SALA)
 
 interface Estado {
   enCurso: boolean
+  registrado?: boolean
   taller?: number
   titulo?: string
   escena?: string
@@ -17,11 +27,61 @@ interface Estado {
 
 const raiz = document.querySelector<HTMLElement>('[data-sala]')
 if (raiz) montar(raiz)
+const registro = document.querySelector<HTMLFormElement>('[data-sl-registro]')
+if (registro) montarRegistro(registro)
+
+function montarRegistro(form: HTMLFormElement) {
+  const estado = form.querySelector<HTMLElement>('[data-sl-estado]')!
+  const boton = form.querySelector<HTMLButtonElement>('button[type="submit"]')!
+  const decir = (t: string, clase = '') => {
+    estado.textContent = t
+    estado.className = `sl-estado ${clase}`
+  }
+
+  // Mayúscula inicial en cada palabra mientras se escribe. La longitud no
+  // cambia, así que el cursor se deja donde estaba.
+  for (const input of form.querySelectorAll<HTMLInputElement>('[data-capitalizar]')) {
+    input.addEventListener('input', () => {
+      const nuevo = capitalizarNombre(input.value)
+      if (nuevo === input.value) return
+      const [a, b] = [input.selectionStart, input.selectionEnd]
+      input.value = nuevo
+      if (a != null && b != null) input.setSelectionRange(a, b)
+    })
+  }
+  const limpiarError = (ev: Event) => {
+    ;(ev.target as HTMLElement).removeAttribute('aria-invalid')
+    if (estado.classList.contains('error')) decir('')
+  }
+  form.addEventListener('input', limpiarError)
+  form.addEventListener('change', limpiarError)
+
+  form.addEventListener('submit', async (ev) => {
+    ev.preventDefault()
+    const campos = [...form.querySelectorAll<HTMLInputElement | HTMLSelectElement>('input, select')]
+    const vacio = campos.find((c) => !c.value.trim())
+    if (vacio) {
+      vacio.setAttribute('aria-invalid', 'true')
+      vacio.focus()
+      const nombre = vacio.closest('label')?.querySelector('span')?.textContent?.toLowerCase() ?? 'ese dato'
+      decir(vacio.tagName === 'SELECT' ? 'Elija su área.' : `Escriba su ${nombre === 'nombres' ? 'nombre' : nombre === 'apellidos' ? 'apellido' : nombre}.`, 'error')
+      return
+    }
+    boton.disabled = true
+    decir('Registrando…')
+    try {
+      await enviar({ accion: 'registrar', ...Object.fromEntries(campos.map((c) => [c.name, c.value])) })
+      location.reload()
+    } catch (err) {
+      decir(err instanceof Error ? err.message : 'No se pudo registrar. Intente de nuevo.', 'error')
+      boton.disabled = false
+    }
+  })
+}
 
 function montar(raiz: HTMLElement) {
   const $ = (s: string) => raiz.querySelector<HTMLElement>(s)!
-  const kicker = $('[data-sl-kicker]')
-  const titulo = $('[data-sl-titulo]')
+    const titulo = $('[data-sl-titulo]')
   const sub = $('[data-sl-sub]')
   const lista = $('[data-sl-preguntas]')
   const estado = $('[data-sl-estado]')
@@ -39,8 +99,7 @@ function montar(raiz: HTMLElement) {
     if (!taller || Date.now() - ultimaEntrada < 30_000) return
     ultimaEntrada = Date.now()
     try {
-      const r = await enviar({ accion: 'entrar', taller })
-      if (r.asistencia) kicker.textContent = 'Asistencia registrada'
+      await enviar({ accion: 'entrar' })
     } catch {
       ultimaEntrada = 0
     }
@@ -125,9 +184,13 @@ function montar(raiz: HTMLElement) {
       decir('')
       return
     }
+    // El pase es de una capacitación y un día: si ya no sirve, se vuelve al registro.
+    if (!e.registrado) {
+      location.reload()
+      return
+    }
     taller = e.taller!
     entrar()
-    if (kicker.textContent !== 'Asistencia registrada') kicker.textContent = `Capacitación ${e.taller} · ${e.titulo}`
     const id = e.interaccion?.id ?? ''
     if (id === abierta) return
     abierta = id

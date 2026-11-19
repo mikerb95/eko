@@ -33,20 +33,22 @@ export function leerDatos<T = DatosTaller>(id = 'tl-datos'): T | null {
 }
 
 const API = '/api/academia/taller'
+/** La sala del celular, pública y sin cuenta. */
+export const API_SALA = '/api/academia/sala'
 
-export async function consultar<T = any>(params: Record<string, string | number>): Promise<T> {
+export async function consultar<T = any>(params: Record<string, string | number>, api = API): Promise<T> {
   const qs = new URLSearchParams(Object.entries(params).map(([k, v]) => [k, String(v)]))
-  const r = await fetch(`${API}?${qs}`, { headers: { accept: 'application/json' } })
+  const r = await fetch(`${api}?${qs}`, { headers: { accept: 'application/json' } })
   const j = await r.json().catch(() => ({}))
   if (!r.ok) throw new Error(j?.error || `Error ${r.status}`)
   return j as T
 }
 
-export async function enviar<T = any>(cuerpo: Record<string, unknown>, ms = 15_000): Promise<T> {
+export async function enviar<T = any>(cuerpo: Record<string, unknown>, ms = 15_000, api = API): Promise<T> {
   const ctl = new AbortController()
   const reloj = setTimeout(() => ctl.abort(), ms)
   try {
-    const r = await fetch(API, { method: 'POST', headers: { 'content-type': 'application/json' }, body: JSON.stringify(cuerpo), signal: ctl.signal })
+    const r = await fetch(api, { method: 'POST', headers: { 'content-type': 'application/json' }, body: JSON.stringify(cuerpo), signal: ctl.signal })
     const j = await r.json().catch(() => ({}))
     if (!r.ok) throw new Error(j?.error || `Error ${r.status}`)
     return j as T

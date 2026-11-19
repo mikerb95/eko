@@ -601,6 +601,26 @@ export const TABLAS: readonly string[] = [
     PRIMARY KEY (taller, interaccion, pregunta, usuario_id)
   )`,
 
+  // Quién se registró en la sala desde el QR (nombre, cargo y área, sin
+  // cuenta ni contraseña). Una fila por persona, capacitación y día; clave es
+  // el nombre completo sin tildes, para reconocer a quien se registra dos
+  // veces. usuario_id es la cuenta de la academia con el mismo nombre, si hay
+  // (0 si no): con ella se marca la asistencia que cuenta para el certificado.
+  // En ac_taller_respuestas y ac_taller_sala, usuario_id es el id de esta tabla.
+  `CREATE TABLE IF NOT EXISTS ac_taller_asistentes (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    taller INTEGER NOT NULL,
+    fecha TEXT NOT NULL,
+    nombre TEXT NOT NULL,
+    apellido TEXT NOT NULL,
+    cargo TEXT NOT NULL,
+    area TEXT NOT NULL,
+    clave TEXT NOT NULL,
+    usuario_id INTEGER NOT NULL DEFAULT 0,
+    created_at TEXT NOT NULL,
+    UNIQUE (taller, fecha, clave)
+  )`,
+
   // Quién está en la sala (celular abierto en /academia/sala).
   `CREATE TABLE IF NOT EXISTS ac_taller_sala (
     taller INTEGER NOT NULL,
@@ -658,6 +678,7 @@ export const TABLAS_ESPERADAS: readonly string[] = [
   'ac_practicas',
   'ac_progreso',
   'ac_sesiones',
+  'ac_taller_asistentes',
   'ac_taller_estado',
   'ac_taller_respuestas',
   'ac_taller_sala',

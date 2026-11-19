@@ -88,7 +88,7 @@ function montar(d: DatosPr) {
   const avisos = () => {
     const e = d.escenas[i]!
     const lista: string[] = []
-    if (sesionesHoy && !sesionesHoy.length) lista.push('No hay un bloque de la academia programado para hoy con esta capacitación: la asistencia no se está marcando. Prográmelo en el panel de la academia.')
+    if (sesionesHoy && !sesionesHoy.length) lista.push('No hay un bloque de la academia programado para hoy con esta capacitación: la lista de registrados se guarda, pero no suma horas al certificado de la academia. Prográmelo en el panel de la academia.')
     if (e.provisional) lista.push('Esta escena tiene contenido de ejemplo: reemplácelo con material real de Ekosolv antes de la sesión.')
     $('[data-avisos]').replaceChildren(
       ...lista.map((t) => {
@@ -165,6 +165,17 @@ function montar(d: DatosPr) {
       .then((r) => {
         $('[data-sala]').textContent = String(r.sala)
         $('[data-asistentes]').textContent = String(r.asistentes)
+        $('[data-lista]').replaceChildren(
+          ...(r.lista as { nombre: string; cargo: string; area: string; cuenta: boolean }[]).map((a) => {
+            const li = document.createElement('li')
+            const b = document.createElement('b')
+            b.textContent = a.nombre
+            const sp = document.createElement('span')
+            sp.textContent = `${a.cargo} · ${a.area}${a.cuenta ? ' · con cuenta en la academia' : ''}`
+            li.append(b, sp)
+            return li
+          }),
+        )
         sesionesHoy = r.sesiones
         avisos()
       })

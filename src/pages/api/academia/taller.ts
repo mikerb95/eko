@@ -1,34 +1,21 @@
 import type { APIRoute } from 'astro'
 import { fail, json } from '../../../lib/apiError'
 import { hoyEnBogota } from '../../../lib/agente/diasHabiles'
-import { areaInscrita, cuentaDe } from '../../../lib/academia/datos'
+import { nombreModulo } from '../../../lib/academia/reglas'
 import { tallerDe } from '../../../lib/talleres'
-import { compararEvaluacion, contarVotos, interaccionDe, interaccionPublica, votoValido } from '../../../lib/talleres/reglas'
-import {
-  asistentesDeHoy,
-  enCurso,
-  enSala,
-  entrarASala,
-  fijarEstado,
-  leerEstado,
-  misRespuestas,
-  respuestas,
-  sesionesDeHoy,
-  tallerEnCurso,
-  votar,
-} from '../../../lib/talleres/datos'
+import { compararEvaluacion, contarVotos, interaccionDe } from '../../../lib/talleres/reglas'
+import { asistentesDeHoy, enSala, fijarEstado, respuestas, sesionesDeHoy } from '../../../lib/talleres/datos'
 import { preguntarDemo } from '../../../lib/talleres/motorIA'
 
-// Capacitaciones en vivo (/academia/taller/<n> y /academia/sala). El
-// middleware ya exige sesión. Mover la presentación, ver el tablero del
-// presentador y pedirle a Claude es solo de admin; votar y entrar a la sala,
-// de cualquier cuenta activa.
+// Capacitaciones en vivo (/academia/taller/<n>). El middleware ya exige
+// sesión. Mover la presentación, ver el tablero del presentador y pedirle a
+// Claude es solo de admin. Lo del celular (registrarse y votar, sin cuenta)
+// vive en /api/academia/sala.
 //
-// GET ?que=sala            → lo que ve el celular (capacitación en curso, pregunta abierta, sus respuestas)
 // GET ?que=resultados&n&i  → conteo de una interacción (proyector)
 // GET ?que=comparacion&n   → evaluación de entrada contra salida
 // GET ?que=panel&n         → sala, asistencia y aviso de bloque del día (presentador)
-// POST {accion}            → estado | entrar | votar | ia
+// POST {accion}            → estado | ia
 
 export const prerender = false
 
@@ -37,23 +24,6 @@ const esAdmin = (locals: App.Locals) => String(locals.role || '') === 'admin'
 export const GET: APIRoute = async ({ url, locals }) => {
   try {
     const que = url.searchParams.get('que')
-    if (que === 'sala') {
-      const cuenta = await cuentaDe(String(locals.username || ''))
-      if (!cuenta) return json({ error: 'Su cuenta no está activa' }, 403)
-      const e = await tallerEnCurso()
-      const t = e ? tallerDe(e.taller) : null
-      if (!e || !t) return json({ enCurso: false })
-      const i = e.interaccion ? interaccionDe(t, e.interaccion) : null
-      return json({
-        enCurso: true,
-        taller: t.n,
-        titulo: t.titulo,
-        escena: t.escenas.find((x) => x.id === e.escena)?.titulo ?? '',
-        interaccion: i ? interaccionPublica(i) : null,
-        mias: i ? await misRespuestas(t.n, i.id, cuenta.id) : {},
-      })
-    }
-
     const t = tallerDe(url.searchParams.get('n'))
     if (!t) return json({ error: 'Esa capacitación no existe' }, 404)
 
@@ -74,8 +44,13 @@ export const GET: APIRoute = async ({ url, locals }) => {
     if (que === 'panel') {
       if (!esAdmin(locals)) return json({ error: 'Solo administradores' }, 403)
       const hoy = hoyEnBogota()
-      const [sala, asistentes, sesiones] = await Promise.all([enSala(t.n), asistentesDeHoy(t, hoy), sesionesDeHoy(t, hoy)])
-      return json({ sala, asistentes, sesiones: sesiones.map((s) => s.titulo) })
+      const [sala, asistentes, sesiones] = await Promise.all([enSala(t.n), asistentesDeHoy(t.n, hoy), sesionesDeHoy(t, hoy)])
+      return json({
+        sala,
+        asistentes: asistentes.length,
+        lista: asistentes.map((a) => ({ nombre: `${a.nombre} ${a.apellido}`, cargo: a.cargo, area: nombreModulo(a.area), cuenta: a.usuario_id > 0 })),
+        sesiones: sesiones.map((s) => s.titulo),
+      })
     }
 
     return json({ error: 'Consulta desconocida' }, 400)
@@ -109,23 +84,6 @@ export const POST: APIRoute = async ({ request, locals }) => {
         const r = await preguntarDemo(t, b.demo, b.version)
         if (!r) return json({ error: 'Esa versión de la demo no existe' }, 400)
         return json(r)
-      }
-
-      case 'entrar':
-      case 'votar': {
-        const cuenta = await cuentaDe(String(locals.username || ''))
-        if (!cuenta) return json({ error: 'Su cuenta no está activa' }, 403)
-        const e = await leerEstado(t.n)
-        if (!enCurso(e)) return json({ error: 'Esta capacitación no está en curso' }, 409)
-        if (b.accion === 'entrar') {
-          const marcados = await entrarASala(t, cuenta.id, await areaInscrita(cuenta.id), hoyEnBogota())
-          return json({ ok: true, asistencia: marcados > 0 })
-        }
-        if (!votoValido(t, e!.interaccion, b.interaccion, b.pregunta, b.valor)) {
-          return json({ error: 'Esa pregunta ya se cerró' }, 409)
-        }
-        await votar(t.n, b.interaccion, b.pregunta, cuenta.id, b.valor)
-        return json({ ok: true })
       }
 
       default:

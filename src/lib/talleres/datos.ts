@@ -5,7 +5,7 @@
 import { asegurarEsquema, cliente } from '../db.ts'
 import { rutaDe } from '../academia/reglas.ts'
 import type { Taller } from './tipos.ts'
-import type { FilaVoto } from './reglas.ts'
+import { claveNombre, type FilaVoto, type RegistroSala } from './reglas.ts'
 
 const ahora = () => new Date().toISOString()
 const str = (v: unknown) => (v == null ? '' : String(v))
@@ -72,28 +72,83 @@ export async function sesionesDeHoy(t: Taller, hoy: string): Promise<{ id: numbe
     .filter((s) => s.modulos.some((m) => t.modulos.includes(m)))
 }
 
+export interface Asistente extends RegistroSala {
+  id: number
+  taller: number
+  fecha: string
+  usuario_id: number
+}
+
+const filaAsistente = (x: any): Asistente => ({
+  id: num(x.id),
+  taller: num(x.taller),
+  fecha: str(x.fecha),
+  nombre: str(x.nombre),
+  apellido: str(x.apellido),
+  cargo: str(x.cargo),
+  area: str(x.area),
+  usuario_id: num(x.usuario_id),
+})
+
 /**
- * La persona abrió la sala desde su celular: queda en la sala y, si está
- * inscrita y hoy hay un bloque de su ruta para esta capacitación, queda
- * marcada su asistencia. Devuelve cuántos bloques se marcaron.
+ * Registro desde el QR. Si la misma persona (mismo nombre completo, sin
+ * importar tildes ni mayúsculas) ya se registró hoy en esta capacitación, se
+ * actualizan su cargo y área y se devuelve el mismo registro: así no se
+ * duplica si cambia de celular o borra las cookies.
+ *
+ * Si hay una cuenta activa de la academia con ese mismo nombre, queda
+ * vinculada y se marca su asistencia en los bloques de hoy de su ruta (la que
+ * cuenta para el certificado). Devuelve el registro y cuántos bloques marcó.
  */
-export async function entrarASala(t: Taller, usuario_id: number, area: string, hoy: string): Promise<number> {
+export async function registrarAsistente(t: Taller, hoy: string, r: RegistroSala): Promise<{ asistente: Asistente; marcados: number }> {
   const c = await db()
-  await c.execute({
-    sql: `INSERT INTO ac_taller_sala (taller, usuario_id, visto_at) VALUES (?, ?, ?)
-          ON CONFLICT (taller, usuario_id) DO UPDATE SET visto_at = excluded.visto_at`,
-    args: [t.n, usuario_id, ahora()],
+  const clave = claveNombre(`${r.nombre} ${r.apellido}`)
+  const cuentas = await c.execute(
+    `SELECT u.id, u.name, i.area FROM users u JOIN ac_inscripciones i ON i.usuario_id = u.id WHERE u.active = 1`,
+  )
+  const cuenta = cuentas.rows.find((x: any) => claveNombre(str(x.name)) === clave) as any
+  const usuario_id = cuenta ? num(cuenta.id) : 0
+  const res = await c.execute({
+    sql: `INSERT INTO ac_taller_asistentes (taller, fecha, nombre, apellido, cargo, area, clave, usuario_id, created_at)
+          VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
+          ON CONFLICT (taller, fecha, clave) DO UPDATE SET nombre = excluded.nombre, apellido = excluded.apellido,
+            cargo = excluded.cargo, area = excluded.area, usuario_id = excluded.usuario_id
+          RETURNING *`,
+    args: [t.n, hoy, r.nombre, r.apellido, r.cargo, r.area, clave, usuario_id, ahora()],
   })
-  if (!area) return 0
+  const asistente = filaAsistente(res.rows[0])
+  const marcados = cuenta ? await marcarAsistenciaAcademia(t, usuario_id, str(cuenta.area), hoy) : 0
+  return { asistente, marcados }
+}
+
+export async function asistenteDe(id: number): Promise<Asistente | null> {
+  const c = await db()
+  const r = await c.execute({ sql: 'SELECT * FROM ac_taller_asistentes WHERE id = ?', args: [id] })
+  return r.rows[0] ? filaAsistente(r.rows[0]) : null
+}
+
+/** Asistencia de la academia (certificado): bloques de hoy de la ruta de la cuenta. */
+async function marcarAsistenciaAcademia(t: Taller, usuario_id: number, area: string, hoy: string): Promise<number> {
   const ruta = rutaDe(area)
   const sesiones = (await sesionesDeHoy(t, hoy)).filter((s) => s.modulos.some((m) => ruta.includes(m) && t.modulos.includes(m)))
   if (!sesiones.length) return 0
+  const c = await db()
   const ts = ahora()
   await c.batch(
     sesiones.map((s) => ({ sql: 'INSERT OR IGNORE INTO ac_asistencia (sesion_id, usuario_id, created_at) VALUES (?, ?, ?)', args: [s.id, usuario_id, ts] })),
     'write',
   )
   return sesiones.length
+}
+
+/** El celular sigue abierto en la sala: alimenta el contador del proyector. */
+export async function marcarEnSala(taller: number, asistente_id: number): Promise<void> {
+  const c = await db()
+  await c.execute({
+    sql: `INSERT INTO ac_taller_sala (taller, usuario_id, visto_at) VALUES (?, ?, ?)
+          ON CONFLICT (taller, usuario_id) DO UPDATE SET visto_at = excluded.visto_at`,
+    args: [taller, asistente_id, ahora()],
+  })
 }
 
 export async function enSala(taller: number): Promise<number> {
@@ -103,16 +158,11 @@ export async function enSala(taller: number): Promise<number> {
   return num((r.rows[0] as any)?.n)
 }
 
-/** Asistentes marcados hoy en los bloques de esta capacitación. */
-export async function asistentesDeHoy(t: Taller, hoy: string): Promise<number> {
-  const sesiones = await sesionesDeHoy(t, hoy)
-  if (!sesiones.length) return 0
+/** Quienes se registraron hoy en esta capacitación, en orden de llegada. */
+export async function asistentesDeHoy(taller: number, hoy: string): Promise<Asistente[]> {
   const c = await db()
-  const r = await c.execute({
-    sql: `SELECT COUNT(DISTINCT usuario_id) AS n FROM ac_asistencia WHERE sesion_id IN (${sesiones.map(() => '?').join(',')})`,
-    args: sesiones.map((s) => s.id),
-  })
-  return num((r.rows[0] as any)?.n)
+  const r = await c.execute({ sql: 'SELECT * FROM ac_taller_asistentes WHERE taller = ? AND fecha = ? ORDER BY id', args: [taller, hoy] })
+  return r.rows.map(filaAsistente)
 }
 
 export async function votar(taller: number, interaccion: string, pregunta: string, usuario_id: number, valor: string): Promise<void> {

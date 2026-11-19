@@ -12,8 +12,10 @@ interface Props {
   nombre?: string
   rol?: string
   ancho?: boolean
+  /** Sin la navegación de la academia (la sala pública del QR, sin cuenta). */
+  sinNav?: boolean
 }
-const { titulo, activo = '', nombre = '', rol = '', ancho = false } = Astro.props
+const { titulo, activo = '', nombre = '', rol = '', ancho = false, sinNav = false } = Astro.props
 const iniciales = nombre.split(/\s+/).filter(Boolean).slice(0, 2).map((p) => p[0]!.toUpperCase()).join('') || '·'
 const verPanel = rol && rol !== 'participante'
 ---
@@ -41,11 +43,11 @@ const verPanel = rol && rol !== 'participante'
           <img src="/brand/ekosolv-horizontal.png" alt="EKOSOLV" width="249" height="72" />
           <span class="ac-tag">Academia de IA</span>
         </a>
-        <nav class="ac-nav" aria-label="Academia">
+        {!sinNav && <nav class="ac-nav" aria-label="Academia">
           <a href="/academia" aria-current={activo === 'inicio' ? 'page' : undefined}>Mi ruta</a>
           <a href="/academia/certificado" aria-current={activo === 'certificado' ? 'page' : undefined}>Certificado</a>
           {verPanel && <a href="/admin">Panel</a>}
-        </nav>
+        </nav>}
         {nombre && (
           <div class="ac-cuenta">
             <span class="ac-avatar" aria-hidden="true">{iniciales}</span>

@@ -189,3 +189,41 @@ export function tokenizarAprox(texto: string): string[] {
   }
   return out
 }
+
+// ---------- Registro en la sala (QR) ----------
+
+/**
+ * Primera letra de cada palabra en mayúscula y el resto en minúscula:
+ * "maría JOSÉ" → "María José". Respeta los espacios tal como vienen para no
+ * mover el cursor mientras la persona escribe; registroSala los limpia.
+ */
+export function capitalizarNombre(s: string): string {
+  return s.toLocaleLowerCase('es-CO').replace(/(^|[\s'-])(\p{L})/gu, (_, a: string, l: string) => a + l.toLocaleUpperCase('es-CO'))
+}
+
+const limpio = (v: unknown, max: number) => String(v ?? '').replace(/\s+/g, ' ').trim().slice(0, max)
+
+/** Clave para reconocer a la misma persona: sin tildes, minúsculas, espacios simples. */
+export function claveNombre(nombreCompleto: string): string {
+  return nombreCompleto.normalize('NFD').replace(/\p{M}/gu, '').toLowerCase().replace(/\s+/g, ' ').trim()
+}
+
+export interface RegistroSala {
+  nombre: string
+  apellido: string
+  cargo: string
+  area: string
+}
+
+/** Valida lo que llega del formulario del celular. Devuelve los datos limpios o el error. */
+export function registroSala(b: any, areas: readonly string[]): RegistroSala | { error: string } {
+  const nombre = capitalizarNombre(limpio(b?.nombre, 60))
+  const apellido = capitalizarNombre(limpio(b?.apellido, 60))
+  const cargo = limpio(b?.cargo, 80)
+  const area = String(b?.area ?? '')
+  if (!nombre) return { error: 'Escriba su nombre.' }
+  if (!apellido) return { error: 'Escriba su apellido.' }
+  if (!cargo) return { error: 'Escriba su cargo.' }
+  if (!areas.includes(area)) return { error: 'Elija su área.' }
+  return { nombre, apellido, cargo, area }
+}

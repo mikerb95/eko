@@ -2,8 +2,8 @@ import { expect, test, type Page } from '@playwright/test'
 
 // Capacitación en vivo de punta a punta: quien dicta mueve la presentación
 // (proyector y vista de presentador sincronizados), una persona entra a la
-// sala desde el celular, queda con asistencia, responde la evaluación y su
-// voto llega al proyector. La demo con IA cae en la respuesta guardada
+// sala desde el celular con nombre, cargo y área (sin contraseña), queda en la
+// lista de registrados, responde la evaluación y su voto llega al proyector. La demo con IA cae en la respuesta guardada
 // (modelo simulado), y fuera del ancho de proyector la página es un documento.
 
 test.describe.configure({ mode: 'serial' })
@@ -44,32 +44,68 @@ test('presentación, sala, votos y asistencia', async ({ browser }) => {
   await expect(proyector.locator('.tl-escena.activa')).toHaveAttribute('data-escena', 'pre')
   await expect(presentador.locator('[data-notas] li').first()).toContainText('No es un examen')
 
-  // Celular del participante: entra a la sala y responde.
+  // Celular: el QR abre la sala sin usuario ni contraseña. Nombres y
+  // apellidos quedan con mayúscula inicial mientras se escriben.
   const ctxCel = await browser.newContext({ viewport: { width: 390, height: 844 }, isMobile: true, hasTouch: true })
   const cel = await ctxCel.newPage()
-  await entrar(cel, PARTICIPANTE.username, PARTICIPANTE.password)
   await cel.goto('/academia/sala')
+  await expect(cel).toHaveURL(/\/academia\/sala$/)
+  await expect(cel.getByRole('heading', { name: 'Antes de empezar, ¿quién es usted?' })).toBeVisible()
+  await cel.getByRole('button', { name: 'Entrar a la sala' }).click()
+  await expect(cel.locator('[data-sl-estado]')).toHaveText('Escriba su nombre.')
+  await cel.getByLabel('Nombres').pressSequentially('luis')
+  await expect(cel.getByLabel('Nombres')).toHaveValue('Luis')
+  await cel.getByLabel('Apellidos').pressSequentially('MORA')
+  await expect(cel.getByLabel('Apellidos')).toHaveValue('Mora')
+  await cel.getByLabel('Cargo').fill('Coordinador de operaciones')
+  await cel.getByLabel('Área').selectOption('operaciones')
+  await cel.screenshot({ path: 'test-results/taller-registro-celular.png', fullPage: true })
+  expect(await cel.evaluate(() => document.documentElement.scrollWidth)).toBeLessThanOrEqual(390)
+  await cel.getByRole('button', { name: 'Entrar a la sala' }).click()
+
+  await expect(cel.locator('[data-sl-kicker]')).toHaveText('Asistencia registrada · Luis Mora')
   await expect(cel.getByRole('heading', { name: 'Antes de empezar: cinco preguntas' })).toBeVisible()
   const op = cel.locator('[data-pregunta="e1"] [data-op="b"]')
   await op.click()
   await expect(op).toHaveAttribute('aria-pressed', 'true')
-  await expect(cel.locator('[data-sl-kicker]')).toHaveText('Asistencia registrada')
   await cel.screenshot({ path: 'test-results/taller-sala-celular.png', fullPage: true })
 
-  // El voto y la asistencia llegan al proyector y al panel.
+  // El voto y el registro llegan al proyector y al presentador. Como el
+  // nombre coincide con una cuenta inscrita, también queda su asistencia.
   await proyector.bringToFront()
   await expect(proyector.locator('.activa [data-respondieron]')).toHaveText('1', { timeout: 8000 })
   const panel = await (await proyector.request.get('/api/academia/taller?que=panel&n=1')).json()
-  expect(panel).toMatchObject({ sala: 1, asistentes: 1 })
+  expect(panel).toMatchObject({ sala: 1, asistentes: 1, lista: [{ nombre: 'Luis Mora', cargo: 'Coordinador de operaciones', area: 'Operaciones', cuenta: true }] })
 
-  // Mientras la sesión está en curso, el participante no ve la presentación
-  // (tiene las respuestas) y no puede votar en una pregunta cerrada.
-  await cel.goto('/academia/taller/1')
-  await expect(cel.getByRole('heading', { name: 'La capacitación está en curso' })).toBeVisible()
-  const cerrada = await cel.request.post('/api/academia/taller', { data: { accion: 'votar', taller: 1, interaccion: 'post', pregunta: 'e1', valor: 'b' } })
+  // Registrarse otra vez con el mismo nombre (otro celular) no duplica.
+  const otro = await browser.newContext()
+  const r2 = await otro.request.post('/api/academia/sala', { data: { accion: 'registrar', nombre: 'LUIS', apellido: 'mora', cargo: 'Coordinador', area: 'operaciones' } })
+  expect(r2.ok()).toBeTruthy()
+  expect((await (await proyector.request.get('/api/academia/taller?que=panel&n=1')).json()).asistentes).toBe(1)
+  // Ese segundo celular queda con el mismo registro: su voto reemplaza, no suma.
+  expect((await otro.request.post('/api/academia/sala', { data: { accion: 'votar', interaccion: 'pre', pregunta: 'e1', valor: 'b' } })).status()).toBe(200)
+  await otro.close()
+  await expect(proyector.locator('.activa [data-respondieron]')).toHaveText('1')
+  // Sin registro no se vota, y el pase de la sala no abre nada más.
+  const anonimo = await browser.newContext()
+  expect((await anonimo.request.post('/api/academia/sala', { data: { accion: 'votar', interaccion: 'pre', pregunta: 'e1', valor: 'b' } })).status()).toBe(401)
+  await anonimo.close()
+  const cerrada = await cel.request.post('/api/academia/sala', { data: { accion: 'votar', interaccion: 'post', pregunta: 'e1', valor: 'b' } })
   expect(cerrada.status()).toBe(409)
-  expect((await cel.request.post('/api/academia/taller', { data: { accion: 'estado', taller: 1, escena: 'portada' } })).status()).toBe(403)
-  expect((await cel.request.post('/api/academia/taller', { data: { accion: 'ia', taller: 1, demo: 'auto', version: 'v1' } })).status()).toBe(403)
+  expect((await cel.request.get('/api/academia/taller?que=resultados&n=1&i=pre')).status()).toBe(401)
+  await cel.goto('/academia/taller/1')
+  await expect(cel).toHaveURL(/\/admin\/login/)
+
+  // Una cuenta de la academia tampoco ve la presentación mientras está en
+  // curso (tiene las respuestas) ni puede moverla o usar la IA.
+  const ctxPart = await browser.newContext()
+  const part = await ctxPart.newPage()
+  await entrar(part, PARTICIPANTE.username, PARTICIPANTE.password)
+  await part.goto('/academia/taller/1')
+  await expect(part.getByRole('heading', { name: 'La capacitación está en curso' })).toBeVisible()
+  expect((await part.request.post('/api/academia/taller', { data: { accion: 'estado', taller: 1, escena: 'portada' } })).status()).toBe(403)
+  expect((await part.request.post('/api/academia/taller', { data: { accion: 'ia', taller: 1, demo: 'auto', version: 'v1' } })).status()).toBe(403)
+  await ctxPart.close()
 
   // Demo con IA: con el modelo simulado sale la respuesta guardada, marcada.
   const constructor = await proyector.$$eval('.tl-escena', (els) => els.findIndex((e) => (e as HTMLElement).dataset.escena === 'constructor') + 1)

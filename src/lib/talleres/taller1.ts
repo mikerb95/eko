@@ -278,7 +278,7 @@ export const TALLER_1: Taller = {
       minutos: 5,
       pasos: 0,
       notas: [
-        'Que escaneen el código y entren con su cuenta de la academia. Quien no tenga cuenta, que se siente con un compañero.',
+        'Que escaneen el código y escriban su nombre, apellido, cargo y área. No necesitan usuario ni contraseña: con eso queda su asistencia.',
         'Al entrar queda marcada la asistencia de hoy. El contador sube en pantalla: esperar a la mayoría antes de seguir.',
       ],
     },
