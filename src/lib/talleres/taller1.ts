@@ -530,12 +530,12 @@ export const TALLER_1: Taller = {
       ],
       datos: {
         areas: [
-          { id: 'operaciones', nombre: 'Operaciones', ejemplo: 'Sacar de un auto las obligaciones, plazos y responsables, citando el artículo.' },
-          { id: 'logistica', nombre: 'Logística', ejemplo: 'Pasar un lote de certificados a una tabla y detectar diferencias con lo recolectado.' },
+          { id: 'operaciones', nombre: 'Operaciones', ejemplo: 'Sacar de un auto de la ANLA o la CAR las obligaciones, los plazos y las vigencias, citando el artículo.' },
+          { id: 'logistica', nombre: 'Logística', ejemplo: 'Leer el correo, pasar las solicitudes de recolección a Zoho y avisarle al cliente.' },
           { id: 'ventas', nombre: 'Ventas', ejemplo: 'Convertir un Brief de Zoho en el borrador de una propuesta.' },
           { id: 'mercadeo', nombre: 'Mercadeo / Redes', ejemplo: 'Convertir una norma nueva en un artículo y tres publicaciones.' },
-          { id: 'gerencia', nombre: 'Gerencia General', ejemplo: 'El resumen ejecutivo de un contrato largo, con sus puntos clave.' },
-          { id: 'finanzas', nombre: 'Finanzas', ejemplo: 'Explicar en lenguaje sencillo las variaciones de un reporte de Zoho Books.' },
+          { id: 'gerencia', nombre: 'Gerencia General', ejemplo: 'El borrador de una propuesta a partir de la oportunidad en Zoho.' },
+          { id: 'finanzas', nombre: 'Finanzas', ejemplo: 'Convertir el proceso de nómina o de cierre de mes en un procedimiento escrito para el manual.' },
         ],
       },
     },

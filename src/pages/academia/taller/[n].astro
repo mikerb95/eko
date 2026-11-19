@@ -16,6 +16,7 @@ import { enCurso, leerEstado } from '../../../lib/talleres/datos'
 import { cuentaDe } from '../../../lib/academia/datos'
 import { listarRespuestas } from '../../../lib/diagnostico/datos'
 import { resumir, SEMANAS_MES } from '../../../lib/diagnostico/resumen'
+import { SITE_URL } from '../../../lib/site'
 
 const t = tallerDe(Astro.params.n)
 if (!t) return new Response('Esta capacitación todavía no está publicada.', { status: 404, headers: { 'content-type': 'text/plain; charset=utf-8' } })
@@ -28,7 +29,10 @@ if (!admin) {
   else if (enCurso(await leerEstado(t.n).catch(() => null))) bloqueo = 'en_curso'
 }
 
-const origen = Astro.url.origin
+// Los QR apuntan siempre al dominio público. Si la presentación se abre desde
+// una URL de despliegue de Vercel (eko-….vercel.app), esa URL pide el login de
+// Vercel, y ningún QR debe llevar a un login. En desarrollo se usa la URL local.
+const origen = import.meta.env.DEV ? Astro.url.origin : SITE_URL
 const urlSala = `${origen}/academia/sala`
 const urlResumen = `${origen}/academia/taller/${t.n}/resumen`
 const qr = (url: string, oscuro = false) =>
