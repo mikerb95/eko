@@ -139,36 +139,68 @@ function montar() {
     }, 250)
   }
 
-  function ir(k: number, p: number, local = true) {
-    k = Math.max(0, Math.min(total - 1, k))
-    const el = els[k]!
-    p = Math.max(0, Math.min(pasosDe(el), p))
-    const cambia = k !== i
-    const previo = cambia ? -1 : paso
-    if (cambia) {
-      if (i >= 0) salir(i)
-      i = k
-      paso = p
-      el.classList.add('activa')
-      limpiezas.set(k, [])
-      aplicarPasos(el, p, p, false)
-      entrada(k)
-      try {
-        HOOKS[el.dataset.tipo!]?.entrar?.(el, apiPara(k), p)
-      } catch (e) {
-        console.error('[taller] entrar', e)
-      }
-      if (local) guardarEstado()
-    } else {
-      paso = p
-      aplicarPasos(el, p, previo, true)
-    }
+  // Cambio de escena con View Transitions: la escena que sale se desliza hacia
+  // un lado y la nueva entra por el otro (según se avance o se retroceda).
+  // Sin soporte del navegador o con movimiento reducido, el cambio es directo.
+  // Si llega otro clic a mitad de la transición, la anterior se termina de
+  // golpe y arranca la nueva.
+  let transicionActual: { skipTransition(): void; finished: Promise<void> } | null = null
+  const transicion = (cambiar: () => void, adelante: boolean) => {
+    const doc = document as Document & { startViewTransition?: (fn: () => void) => { skipTransition(): void; finished: Promise<void> } }
+    if (!doc.startViewTransition || reducido()) return cambiar()
+    document.documentElement.dataset.tlDir = adelante ? 'adelante' : 'atras'
+    transicionActual?.skipTransition()
+    const t = doc.startViewTransition(cambiar)
+    transicionActual = t
+    t.finished.finally(() => {
+      if (transicionActual === t) transicionActual = null
+    }).catch(() => {})
+  }
+
+  const pasoHook = (el: HTMLElement, k: number, p: number, previo: number) => {
     try {
       HOOKS[el.dataset.tipo!]?.paso?.(el, p, previo, apiPara(k))
     } catch (e) {
       console.error('[taller] paso', e)
     }
-    actualizarPie()
+  }
+
+  function ir(k: number, p: number, local = true) {
+    k = Math.max(0, Math.min(total - 1, k))
+    const el = els[k]!
+    p = Math.max(0, Math.min(pasosDe(el), p))
+    if (k !== i) {
+      // El estado cambia ya (para que el siguiente clic cuente desde aquí);
+      // el DOM cambia dentro de la transición.
+      const anterior = i
+      i = k
+      paso = p
+      const montar = () => {
+        // Si mientras tanto se movió un paso dentro de esta misma escena, vale ese.
+        const pp = i === k ? paso : p
+        if (anterior >= 0) salir(anterior)
+        el.classList.add('activa')
+        limpiezas.set(k, [])
+        aplicarPasos(el, pp, pp, false)
+        entrada(k)
+        try {
+          HOOKS[el.dataset.tipo!]?.entrar?.(el, apiPara(k), pp)
+        } catch (e) {
+          console.error('[taller] entrar', e)
+        }
+        pasoHook(el, k, pp, -1)
+        actualizarPie()
+      }
+      if (anterior >= 0) transicion(montar, k > anterior)
+      else montar()
+      if (local) guardarEstado()
+    } else {
+      const previo = paso
+      paso = p
+      aplicarPasos(el, p, previo, true)
+      pasoHook(el, k, p, previo)
+      actualizarPie()
+    }
     history.replaceState(null, '', `#${i + 1}.${paso}`)
     if (local) avisar({ tipo: 'ir', i, paso })
   }

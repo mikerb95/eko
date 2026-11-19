@@ -102,7 +102,24 @@
   gap: 28px;
   visibility: hidden;
 }
-.tl-on .tl-escena.activa { visibility: visible; z-index: 2; }
+.tl-on .tl-escena.activa { visibility: visible; z-index: 2; view-transition-name: tl-escena; }
+
+/* Transición entre escenas (View Transitions, ver ir() en proyector.ts). La
+   escena que sale se corre y se desvanece; la nueva entra desde el otro lado.
+   El resto de la página (pie con el avance) cambia sin animación. */
+::view-transition-old(root), ::view-transition-new(root) { animation: none; }
+::view-transition-group(tl-escena) { animation-duration: .6s; }
+::view-transition-old(tl-escena) { animation: tl-vt-sale .45s cubic-bezier(.4, 0, .2, 1) both; }
+::view-transition-new(tl-escena) { animation: tl-vt-entra .6s cubic-bezier(.16, 1, .3, 1) both; }
+[data-tl-dir='atras']::view-transition-old(tl-escena) { animation-name: tl-vt-sale-atras; }
+[data-tl-dir='atras']::view-transition-new(tl-escena) { animation-name: tl-vt-entra-atras; }
+@keyframes tl-vt-sale { to { opacity: 0; transform: translateX(-5%) scale(.97); } }
+@keyframes tl-vt-entra { from { opacity: 0; transform: translateX(7%); } }
+@keyframes tl-vt-sale-atras { to { opacity: 0; transform: translateX(5%) scale(.97); } }
+@keyframes tl-vt-entra-atras { from { opacity: 0; transform: translateX(-7%); } }
+@media (prefers-reduced-motion: reduce) {
+  ::view-transition-group(*), ::view-transition-old(*), ::view-transition-new(*) { animation: none !important; }
+}
 .tl-on .tl-kicker { font-size: 19px; }
 .tl-on .tl-kicker::before { width: 12px; height: 12px; }
 .tl-on .tl-titulo { font-size: 66px; max-width: 24ch; }
