@@ -13,7 +13,8 @@
  * celular los marca así. Enfoque por área que pidió Mike (2026-11-19):
  * - Gerencia: Zoho, tableros de control, cierre de oportunidades, propuestas y
  *   automatización de procesos.
- * - Finanzas: Siigo Nube, costeos, nómina, procedimientos para el manual,
+ * - Finanzas: Zoho Books (facturas, recaudos, cartera) y Siigo Nube (nómina,
+ *   costeos, contabilidad), procedimientos para el manual,
  *   automatización y revisiones, bancos, DIAN y Secretaría de Hacienda.
  * - Operaciones: normativa, autoridades (ANLA, CAR), autos administrativos,
  *   vigencias y cambios en las leyes.
@@ -42,7 +43,7 @@ export const CELULAR_TALLER1: Record<string, GuiaCelular> = {
       ventas: { titulo: 'El cliente no usa las palabras del catálogo', texto: 'Un prospecto escribe: "tenemos unos equipos viejos y unas canecas de aceite". Ningún formulario lo clasifica. La IA entiende que habla de RAEE y de RESPEL.' },
       mercadeo: { titulo: 'Comentarios en redes', texto: 'Clasificar comentarios por palabras clave falla con la ironía o con preguntas mal escritas. La IA los agrupa por lo que la persona quiso decir.' },
       gerencia: { titulo: 'Oportunidades que se enfrían', texto: 'Un tablero con reglas fijas solo marca la oportunidad que lleva 30 días quieta. La IA puede leer el último correo del cliente y notar que dijo "lo miramos el otro año", aunque en Zoho la etapa siga abierta.' },
-      finanzas: { titulo: 'Pagos que no se llaman igual', texto: 'El extracto dice "PAGO PSE 8901..." y en Siigo Nube la factura figura con el nombre del cliente. Una regla exacta no los cruza. La IA reconoce que es el mismo pago y propone la conciliación para que usted la confirme.' },
+      finanzas: { titulo: 'Pagos que no se llaman igual', texto: 'El extracto dice "PAGO PSE 8901..." y en Zoho Books la factura figura con el nombre del cliente. Una regla exacta no los cruza. La IA reconoce que es el mismo pago y propone la conciliación para que usted la confirme.' },
     },
   },
   perillas: {
@@ -86,7 +87,7 @@ export const CELULAR_TALLER1: Record<string, GuiaCelular> = {
       ventas: { titulo: 'Cotización, propuesta, oferta', texto: 'Para la IA son vecinas. Puede pedirle "la oferta para el cliente" y entiende que se trata de la propuesta comercial.' },
       mercadeo: { titulo: 'Cerca no es igual', texto: '"Sostenibilidad", "economía circular" y "aprovechamiento" quedan cerca, y la IA tiende a usarlas como sinónimos. Revise que cada palabra diga lo que Ekosolv quiere decir.' },
       gerencia: { titulo: 'Propuesta, cotización, oferta', texto: 'Para la IA son vecinas. Puede pedirle "la oferta para el cliente" y entiende que habla de la propuesta comercial, aunque en Zoho el registro tenga otro nombre.' },
-      finanzas: { titulo: 'Cartera, cuentas por cobrar, saldos vencidos', texto: 'La IA entiende que hablan de lo mismo, aunque en el reporte de Siigo Nube la columna tenga otro nombre.' },
+      finanzas: { titulo: 'Cartera, cuentas por cobrar, saldos vencidos', texto: 'La IA entiende que hablan de lo mismo, aunque en el reporte de Zoho Books la columna tenga otro nombre.' },
     },
   },
   etapas: {
@@ -119,7 +120,7 @@ export const CELULAR_TALLER1: Record<string, GuiaCelular> = {
       ventas: { titulo: 'Zoho y la IA', texto: 'Hoy se copia el Brief de Zoho y se pega en la conversación. Una herramienta conectada podría leerlo directamente: eso es darle "manos" a la IA.' },
       mercadeo: { titulo: 'La IA dentro de otras aplicaciones', texto: 'Canva, LinkedIn o Copilot traen IA adentro, y detrás hay un modelo como Claude o GPT. Las reglas para pedir bien son las mismas.' },
       gerencia: { titulo: 'Un tablero que se explica', texto: 'Conectada a Zoho, la IA puede leer el tablero de oportunidades y decirle cuáles llevan días sin moverse y qué falta para cerrarlas. Es un agente: hace varios pasos solo, y su resultado se revisa.' },
-      finanzas: { titulo: 'Siigo, bancos y Excel', texto: 'Claude puede leer un Excel exportado de Siigo Nube o un extracto bancario y hacer cálculos. Pídale que muestre los pasos o las fórmulas para poder verificarlos.' },
+      finanzas: { titulo: 'Zoho Books, Siigo y Excel', texto: 'Claude puede leer un Excel exportado de Zoho Books o de Siigo Nube, o un extracto bancario y hacer cálculos. Pídale que muestre los pasos o las fórmulas para poder verificarlos.' },
     },
   },
   areas: {
@@ -152,7 +153,7 @@ export const CELULAR_TALLER1: Record<string, GuiaCelular> = {
       ventas: { titulo: 'Antes de enviar la propuesta', texto: 'Revise que precios, alcance y plazos sean los del Brief y no los que la IA supuso. Lo que dice la propuesta compromete a Ekosolv.' },
       mercadeo: { titulo: 'Antes de publicar', texto: 'Confirme cifras, nombres de normas y lo que se dice de los servicios. Una publicación con un dato falso queda circulando aunque la borre.' },
       gerencia: { titulo: 'Antes de enviar la propuesta', texto: 'Revise que precios, alcance y plazos sean los de la oportunidad en Zoho y no los que la IA supuso. Lo que dice la propuesta compromete a Ekosolv.' },
-      finanzas: { titulo: 'Antes de pagar o declarar', texto: 'Cruce cada cifra con Siigo Nube y con el extracto del banco. Lo que va a la nómina, a un pago o a una declaración ante la DIAN o la Secretaría de Hacienda se recalcula siempre.' },
+      finanzas: { titulo: 'Antes de pagar o declarar', texto: 'Cruce cada cifra con Zoho Books o Siigo Nube, según de dónde salga, y con el extracto del banco. Lo que va a la nómina, a un pago o a una declaración ante la DIAN o la Secretaría de Hacienda se recalcula siempre.' },
     },
   },
   descanso: {
@@ -177,7 +178,7 @@ export const CELULAR_TALLER1: Record<string, GuiaCelular> = {
       ventas: { titulo: 'La diferencia con una tarea suya', texto: 'Corta: "Haz una propuesta." Completa: "Soy comercial de Ekosolv. Con este Brief, redacta el borrador de la propuesta con nuestras secciones. No inventes precios: deja [PRECIO] donde vaya."' },
       mercadeo: { titulo: 'La diferencia con una tarea suya', texto: 'Corta: "Escribe un post sobre RAEE." Completa: "Con esta guía de voz, escribe una publicación de LinkedIn de 100 palabras sobre esta norma, para jefes de planta. Cierra con una pregunta."' },
       gerencia: { titulo: 'La diferencia con una tarea suya', texto: 'Corta: "Haz una propuesta." Completa: "Soy gerente de Ekosolv. Con esta oportunidad de Zoho, redacta el borrador de la propuesta con nuestras secciones. No inventes precios: deja [PRECIO] donde vaya."' },
-      finanzas: { titulo: 'La diferencia con una tarea suya', texto: 'Corta: "Revisa la conciliación." Completa: "Llevo la tesorería de Ekosolv. Cruza este extracto bancario con los recaudos de Siigo Nube y lista en una tabla los movimientos que no coinciden, con fecha y valor."' },
+      finanzas: { titulo: 'La diferencia con una tarea suya', texto: 'Corta: "Revisa la conciliación." Completa: "Llevo la tesorería de Ekosolv. Cruza este extracto bancario con los recaudos de Zoho Books y lista en una tabla los movimientos que no coinciden, con fecha y valor."' },
     },
   },
   iterar: {
