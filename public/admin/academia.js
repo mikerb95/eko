@@ -411,7 +411,7 @@ asisForm.addEventListener('submit', (e) => {
   e.preventDefault()
   const ids = $$('#asis-lista input:checked').map((i) => Number(i.value))
   conBoton(asisForm.querySelector('[type=submit]'), $('#asis-err'), async () => {
-    await enviar('guardar_asistencia', { sesion_id: sesion.id, usuario_ids: ids })
+    await enviar('guardar_asistencia', { sesion_id: sesion.id, usuario_ids: ids, antes: $$('#asis-lista input').filter((i) => i.defaultChecked).map((i) => Number(i.value)) })
     cerrar(sesDrawer)
   })
 })

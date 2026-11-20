@@ -675,6 +675,23 @@ export const TABLAS: readonly string[] = [
     emitido_por TEXT NOT NULL DEFAULT '',
     revocado_at TEXT NOT NULL DEFAULT ''
   )`,
+
+  // Bitácora: solo se agregan filas, nunca se editan ni se borran. Guarda lo
+  // que las demás tablas reemplazan (el voto anterior, el correo con que se
+  // registró alguien, la escena en que iba la presentación) y lo que ninguna
+  // guardaba (inicios de sesión, entradas a la sala, PC vinculados). Así nada
+  // de lo que pasa en una capacitación se pierde. Ver src/lib/bitacora.ts.
+  `CREATE TABLE IF NOT EXISTS bitacora (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    tipo TEXT NOT NULL,
+    quien TEXT NOT NULL DEFAULT '',
+    taller INTEGER NOT NULL DEFAULT 0,
+    detalle TEXT NOT NULL DEFAULT '',
+    ip TEXT NOT NULL DEFAULT '',
+    created_at TEXT NOT NULL
+  )`,
+  `CREATE INDEX IF NOT EXISTS bitacora_tipo ON bitacora (tipo, created_at)`,
+  `CREATE INDEX IF NOT EXISTS bitacora_taller ON bitacora (taller, created_at)`,
 ]
 
 /**

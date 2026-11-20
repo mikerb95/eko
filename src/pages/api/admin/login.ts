@@ -3,6 +3,7 @@ import { createSession, SESSION_COOKIE, SESSION_TTL_SECONDS } from '../../../lib
 import { verifyLogin } from '../../../lib/users'
 import { checkRateLimit, clientIp, resetRateLimit } from '../../../lib/rateLimit'
 import { json } from '../../../lib/apiError'
+import { anotar } from '../../../lib/bitacora'
 
 export const prerender = false
 
@@ -43,6 +44,7 @@ export const POST: APIRoute = async (context) => {
   }
   if (!user) {
     console.warn(`[login] intento fallido usuario="${String(username ?? '').slice(0, 60)}" ip=${ip}`)
+    await anotar('login_fallido', { quien: String(username ?? '').slice(0, 60), ip })
     return json({ error: 'Usuario o contraseña incorrectos' }, 401)
   }
   resetRateLimit(rateLimitKey)
@@ -54,5 +56,6 @@ export const POST: APIRoute = async (context) => {
     secure: import.meta.env.PROD,
     maxAge: SESSION_TTL_SECONDS,
   })
+  await anotar('login', { quien: user.username, detalle: { rol: user.role, agente: request.headers.get('user-agent') ?? '' }, ip })
   return json({ ok: true })
 }

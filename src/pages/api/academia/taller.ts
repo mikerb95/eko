@@ -6,6 +6,7 @@ import { tallerDe } from '../../../lib/talleres'
 import { compararEvaluacion, contarVotos, interaccionDe } from '../../../lib/talleres/reglas'
 import { asistentesDeHoy, enSala, fijarEstado, guardarRespuestaIA, marcarRespondida, preguntaSala, preguntasPendientes, respuestas, sesionesDeHoy } from '../../../lib/talleres/datos'
 import { preguntarDemo, responderPregunta } from '../../../lib/talleres/motorIA'
+import { anotar } from '../../../lib/bitacora'
 
 // Capacitaciones en vivo (/academia/taller/<n>). El middleware ya exige
 // sesión. Mover la presentación, ver el tablero del presentador y pedirle a
@@ -85,6 +86,7 @@ export const POST: APIRoute = async ({ request, locals }) => {
         if (!escena) return json({ error: 'Esa escena no existe' }, 400)
         const paso = Number.isInteger(b.paso) ? Math.max(0, Math.min(escena.pasos, b.paso)) : 0
         await fijarEstado(t.n, escena.id, escena.interaccion ?? '', paso)
+        await anotar('escena', { quien: String(locals.username ?? ''), taller: t.n, detalle: { escena: escena.id, paso } })
         return json({ ok: true })
       }
 

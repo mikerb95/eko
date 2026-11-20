@@ -10,6 +10,8 @@ import { practicar, PracticaNoDisponible } from '../../../lib/academia/motorPrac
 import { interaccionDe, interaccionPublica, PREGUNTAS_DIA, registroSala, validarPregunta, votoValido, MAX_PREGUNTA } from '../../../lib/talleres/reglas'
 import { codigoPC, codigoVigente, MINUTOS_CODIGO_PC, guardarPracticaSala, guardarPregunta, marcarEnSala, misRespuestas, practicasSalaDeHoy, preguntasDeHoyDe, liberarEnlace, registrarAsistente, reservarEnlace, votar } from '../../../lib/talleres/datos'
 import { salaActual } from '../../../lib/talleres/sala'
+import { anotar } from '../../../lib/bitacora'
+import { clientIp } from '../../../lib/rateLimit'
 import type { PasoGuiado } from '../../../lib/talleres/tipos'
 
 // La sala del celular (/academia/sala). Pública: se llega por el QR del
@@ -72,7 +74,7 @@ export const GET: APIRoute = async ({ cookies }) => {
   }
 }
 
-export const POST: APIRoute = async ({ request, cookies, url }) => {
+export const POST: APIRoute = async ({ request, cookies, url, clientAddress }) => {
   let b: any
   try {
     b = await request.json()
@@ -87,7 +89,13 @@ export const POST: APIRoute = async ({ request, cookies, url }) => {
       const r = registroSala(b, AREA_IDS)
       if ('error' in r) return json(r, 400)
       const hoy = hoyEnBogota()
-      const { asistente: a } = await registrarAsistente(t, hoy, r)
+      const { asistente: a, marcados } = await registrarAsistente(t, hoy, r)
+      await anotar('sala_registro', {
+        quien: `asistente:${a.id}`,
+        taller: t.n,
+        detalle: { nombre: r.nombre, apellido: r.apellido, correo: r.correo, area: r.area, cuenta: a.usuario_id, bloques: marcados },
+        ip: clientIp(request, clientAddress ?? ''),
+      })
       // En desarrollo el enlace apunta al servidor local; en producción,
       // siempre al dominio público (una URL de Vercel pediría su login).
       const origen = import.meta.env.DEV ? url.origin : SITE_URL
@@ -121,6 +129,7 @@ export const POST: APIRoute = async ({ request, cookies, url }) => {
     if (b?.accion === 'votar') {
       if (!votoValido(t, estado.interaccion, b.interaccion, b.pregunta, b.valor)) return json({ error: 'Esa pregunta ya se cerró' }, 409)
       await votar(t.n, b.interaccion, b.pregunta, asistente.id, b.valor)
+      await anotar('voto', { quien: `asistente:${asistente.id}`, taller: t.n, detalle: { interaccion: b.interaccion, pregunta: b.pregunta, valor: b.valor } })
       return json({ ok: true })
     }
 

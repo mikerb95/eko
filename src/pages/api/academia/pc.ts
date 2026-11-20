@@ -6,6 +6,7 @@ import { checkRateLimit, clientIp, isRateLimited } from '../../../lib/rateLimit'
 import { tallerDe } from '../../../lib/talleres'
 import { asistenteDe, canjearCodigoPC, tallerEnCurso } from '../../../lib/talleres/datos'
 import { vistaPC } from '../../../lib/talleres/pc'
+import { anotar } from '../../../lib/bitacora'
 
 // El PC vinculado (/pc). Público (excepción en src/middleware.ts): quien ya
 // entró a la sala desde el celular escribe aquí el código de dos números que
@@ -54,6 +55,7 @@ export const POST: APIRoute = async ({ request, cookies, clientAddress }) => {
       return json({ error: 'Ese código no sirve o ya venció. Pida uno nuevo en el celular.' }, 400)
     }
     const pase = await crearPaseSala({ a: asistente.id, t: t.n, f: asistente.fecha })
+    await anotar('pc_vinculado', { quien: `asistente:${asistente.id}`, taller: t.n, detalle: { agente: request.headers.get('user-agent') ?? '' }, ip: clientIp(request, clientAddress ?? 'local') })
     cookies.set(PC_COOKIE, pase, { path: '/', httpOnly: true, sameSite: 'lax', secure: import.meta.env.PROD, maxAge: SALA_TTL_SECONDS })
     return json({ ok: true, url: `/academia/taller/${t.n}`, nombre: asistente.nombre })
   } catch (e) {

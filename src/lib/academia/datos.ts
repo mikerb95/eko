@@ -648,18 +648,27 @@ export async function eliminarSesion(id: unknown): Promise<void> {
   )
 }
 
-/** Reemplaza la lista de asistentes de un bloque. */
-export async function guardarAsistencia(sesion_id: unknown, usuario_ids: unknown): Promise<void> {
+/**
+ * Guarda la asistencia de un bloque como cambios sobre lo que el panel tenía
+ * en pantalla (`antes`): agrega a quien se marcó y quita solo a quien se
+ * desmarcó. Así no se borra la asistencia que el QR de la sala marcó mientras
+ * el panel estaba abierto (antes se reemplazaba la lista completa y se perdía).
+ * Sin `antes` (cliente viejo) se trata como lista vacía: solo agrega, nunca quita.
+ */
+export async function guardarAsistencia(sesion_id: unknown, usuario_ids: unknown, antes?: unknown): Promise<void> {
   const db = await preparar()
   const sid = idValido(sesion_id, 'El bloque')
   const s = await db.execute({ sql: 'SELECT id FROM ac_sesiones WHERE id = ?', args: [sid] })
   if (!s.rows.length) throw new UserError('Ese bloque ya no existe', 404)
-  const ids = [...new Set((Array.isArray(usuario_ids) ? usuario_ids : []).map((v) => idValido(v, 'La persona')))].slice(0, 300)
+  const lista = (v: unknown) => new Set((Array.isArray(v) ? v : []).slice(0, 300).map((x) => idValido(x, 'La persona')))
+  const ahoraIds = lista(usuario_ids)
+  const previos = lista(antes)
+  const quitar = [...previos].filter((id) => !ahoraIds.has(id))
   const ts = ahora()
   await db.batch(
     [
-      { sql: 'DELETE FROM ac_asistencia WHERE sesion_id = ?', args: [sid] },
-      ...ids.map((uid) => ({ sql: 'INSERT INTO ac_asistencia (sesion_id, usuario_id, created_at) VALUES (?, ?, ?)', args: [sid, uid, ts] })),
+      ...quitar.map((uid) => ({ sql: 'DELETE FROM ac_asistencia WHERE sesion_id = ? AND usuario_id = ?', args: [sid, uid] })),
+      ...[...ahoraIds].map((uid) => ({ sql: 'INSERT OR IGNORE INTO ac_asistencia (sesion_id, usuario_id, created_at) VALUES (?, ?, ?)', args: [sid, uid, ts] })),
     ],
     'write',
   )

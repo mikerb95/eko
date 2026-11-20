@@ -11,6 +11,8 @@
 export const prerender = false
 import AcademiaLayout from '../../layouts/AcademiaLayout.astro'
 import { SALA_COOKIE, SALA_TTL_SECONDS, verificarPaseSala } from '../../lib/auth'
+import { anotar } from '../../lib/bitacora'
+import { clientIp } from '../../lib/rateLimit'
 import { AREAS_ACADEMIA } from '../../lib/academia/reglas'
 import { salaActual } from '../../lib/talleres/sala'
 import { TALLERES } from '../../lib/talleres'
@@ -27,7 +29,9 @@ Astro.response.headers.set('cache-control', 'no-store')
 const enlace = Astro.url.searchParams.get('e')
 let enlaceVencido = false
 if (enlace) {
-  if (await verificarPaseSala(enlace)) {
+  const pase = await verificarPaseSala(enlace)
+  if (pase) {
+    await anotar('sala_entrada', { quien: `asistente:${pase.a}`, taller: pase.t, detalle: { agente: Astro.request.headers.get('user-agent') ?? '' }, ip: clientIp(Astro.request, Astro.clientAddress ?? '') })
     Astro.cookies.set(SALA_COOKIE, enlace, { path: '/', httpOnly: true, sameSite: 'lax', secure: import.meta.env.PROD, maxAge: SALA_TTL_SECONDS })
     return Astro.redirect('/academia/sala')
   }
