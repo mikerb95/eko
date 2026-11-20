@@ -46,7 +46,7 @@ function montar() {
   let red: ReturnType<typeof seguirRed> | null = null
 
   const avisar = canal(datos.n, (m: Mensaje) => {
-    if (!activo) return
+    if (!activo || datos.vista) return
     if (m.tipo === 'ir') {
       red?.local()
       ir(m.i, m.paso, false)
@@ -245,7 +245,7 @@ function montar() {
   // Con transición, la cortina ya anima título, kicker y cuerpo.
   const entrada = (k: number, conTransicion: boolean) => {
     const el = els[k]!
-    if (reducido() || conTransicion) return
+    if (reducido() || conTransicion || datos.vista) return
     const palabras = palabrasTitulo(k)
     if (palabras.length) gsap.fromTo(palabras, { yPercent: 110 }, { yPercent: 0, duration: 0.9, stagger: 0.045, ease: 'expo.out' })
     gsap.fromTo(el.querySelector('.tl-kicker'), { autoAlpha: 0, x: -14 }, { autoAlpha: 1, x: 0, duration: 0.5, ease: CURVA, clearProps: 'all' })
@@ -317,7 +317,7 @@ function montar() {
         // Con cortina, el pie cambia cuando el panel termina de pasar.
         if (!conTransicion) actualizarPie()
       }
-      if (anterior >= 0 && cortina && !reducido()) {
+      if (anterior >= 0 && cortina && !reducido() && !datos.vista) {
         const bv = datos.escenas[anterior]!.bloque
         const bn = datos.escenas[k]!.bloque
         const nb = datos.bloques.findIndex((b) => b.id === bn)
@@ -342,7 +342,7 @@ function montar() {
       if (local) guardarEstado()
     }
     history.replaceState(null, '', `#${i + 1}.${paso}`)
-    if (local) avisar({ tipo: 'ir', i, paso })
+    if (local && !datos.vista) avisar({ tipo: 'ir', i, paso })
   }
 
   const avanzar = (dir: 1 | -1) => {
@@ -357,7 +357,7 @@ function montar() {
   }
 
   const tecla = (ev: KeyboardEvent) => {
-    if (!activo) return
+    if (!activo || datos.vista) return
     // El PC vinculado no se mueve con el teclado: sigue a quien dicta (solo F).
     if (datos.seguir && ev.key !== 'f' && ev.key !== 'F') return
     const d = direccionTecla(ev)
@@ -430,6 +430,14 @@ function montar() {
   }
   evaluar()
   if (datos.seguir) seguirPresentacion()
+  // Vista previa del control remoto: la página que la contiene dice qué escena mostrar.
+  if (datos.vista) {
+    addEventListener('message', (ev) => {
+      if (ev.origin !== location.origin || ev.data?.tipo !== 'vista' || !activo) return
+      const k = Number(ev.data.i)
+      if (Number.isInteger(k)) ir(k, Number(ev.data.paso) || 0, false)
+    })
+  }
 
   // PC vinculado: cada 2 segundos pregunta dónde va quien dicta y se mueve ahí.
   function seguirPresentacion() {

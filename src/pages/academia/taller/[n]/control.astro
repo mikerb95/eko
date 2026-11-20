@@ -1,0 +1,76 @@
+---
+// Control remoto para el celular de quien dicta (solo admin). Arriba, las
+// notas de la escena (las mismas de la vista de presentador); abajo, volver
+// al paso anterior y una sección grande para avanzar, con la vista previa de
+// la escena siguiente. Mientras el siguiente toque solo revela elementos de
+// la escena actual, la vista previa está borrosa; queda nítida cuando el
+// siguiente toque ya cambia de escena. Se sincroniza con el proyector y la
+// vista de presentador por el servidor (y por el canal si está en el mismo equipo).
+export const prerender = false
+import '../../../../styles/global.css'
+import '../../../../styles/control.css'
+import { tallerDe } from '../../../../lib/talleres'
+
+const t = tallerDe(Astro.params.n)
+if (!t) return new Response('Esta capacitación no existe.', { status: 404 })
+if (String(Astro.locals.role || '') !== 'admin') return Astro.redirect(`/academia/taller/${t.n}`)
+
+const datos = {
+  n: t.n,
+  escenas: t.escenas.map((e) => ({
+    id: e.id,
+    kicker: e.kicker,
+    titulo: e.titulo,
+    notas: e.notas,
+    siPreguntan: e.siPreguntan ?? [],
+    pasos: e.pasos,
+  })),
+}
+---
+
+<!doctype html>
+<html lang="es">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+    <meta name="robots" content="noindex, nofollow, noarchive" />
+    <meta name="theme-color" content="#0E1C26" />
+    <title>{`Control · Capacitación ${t.n}`}</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,400..700&family=Geist:wght@300..700&family=Geist+Mono:wght@400..500&display=swap" rel="stylesheet" />
+  </head>
+  <body class="ct">
+    <section class="ct-notas" aria-live="polite">
+      <p class="ct-meta"><span data-numero></span><span data-paso></span></p>
+      <p class="ct-kicker" data-kicker></p>
+      <h1 data-titulo></h1>
+      <ol class="ct-lista" data-notas></ol>
+      <section class="ct-preguntan" data-preguntan hidden>
+        <h2>Si preguntan</h2>
+        <div data-preguntan-lista></div>
+      </section>
+    </section>
+
+    <section class="ct-mando">
+      <button type="button" class="ct-ant" data-anterior>
+        <span aria-hidden="true">←</span> Anterior
+      </button>
+      <div class="ct-avance">
+        <button type="button" class="ct-sig" data-siguiente>
+          <span class="ct-sig-txt">Siguiente <span aria-hidden="true">→</span></span>
+          <span class="ct-sig-que" data-sig-que></span>
+        </button>
+        <div class="ct-prev" data-prev aria-hidden="true">
+          <iframe src={`/academia/taller/${t.n}?vista=1#2.0`} title="Vista previa de la escena siguiente" tabindex="-1" loading="eager" data-prev-frame></iframe>
+          <span class="ct-prev-fin" data-prev-fin hidden>Fin</span>
+        </div>
+      </div>
+    </section>
+
+    <script type="application/json" id="ct-datos" set:html={JSON.stringify(datos).replace(/</g, '\\u003c')} />
+    <script>
+      import '../../../../scripts/taller/control'
+    </script>
+  </body>
+</html>

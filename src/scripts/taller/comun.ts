@@ -18,6 +18,8 @@ export interface DatosTaller {
   admin: boolean
   /** PC vinculado (/pc): la presentación sigue la escena de quien dicta. */
   seguir?: boolean
+  /** Vista previa del control remoto: no guarda, no oye teclas ni el canal, solo obedece a postMessage. */
+  vista?: boolean
   bloques: { id: string; titulo: string; minutos: number }[]
   escenas: EscenaCliente[]
   demos: { id: string; versiones: { id: string; parte: string; respaldo: string }[] }[]
