@@ -1,13 +1,22 @@
 ---
-// Clawd, la mascota de Claude Code, en pixel art para la portada del taller.
+// Clawd, la mascota de Claude Code, en pixel art. Aparece solo en las escenas
+// donde tiene un papel (ver PAPELES en Escena.astro) y el motor
+// (src/scripts/taller/clawd.ts) lo hace actuar con los pasos del presentador.
 // Se dibuja con rectángulos sobre una cuadrícula (1 unidad = 1 pixel del
-// personaje) para que se vea nítido a cualquier escala. Las piezas que se
-// mueven van en grupos con data-clawd-*; el motor (src/scripts/taller/clawd.ts)
-// las anima: teclea, lanza tokens a la cinta y salta cuando entra alguien a la
-// sala. Sin JS o con movimiento reducido queda quieto, solo con el parpadeo.
+// personaje) para que se vea nítido a cualquier escala. Sin JS o con
+// movimiento reducido queda quieto, solo con el parpadeo.
 //
 // Silueta (18 x 10), tomada del logo de la terminal de Claude Code:
 //   cuerpo 12 x 8, ojos de 1 x 2, bracitos a los lados, cuatro patitas.
+// Accesorios: teclado (escribe), mesa (escritorio con pila de hojas) o nada
+// (de pie, se le ven las patitas).
+
+interface Props {
+  accesorio?: 'teclado' | 'mesa' | 'nada'
+  lugar: string
+  frases?: string[]
+}
+const { accesorio = 'nada', lugar, frases } = Astro.props
 
 const C = {
   cuerpo: '#D97757',
@@ -18,6 +27,12 @@ const C = {
   borde: '#2C3F4C',
   base: '#121D25',
   tecla: '#4A6377',
+  madera: '#7A5C44',
+  maderaLuz: '#94735A',
+  maderaBase: '#5B4332',
+  hoja: '#FFFFFF',
+  hojaB: '#E4DED6',
+  sudor: '#8FD3F2',
 }
 
 // Teclado: 26 de ancho, de x = -4 a 21, de y = 7 a 10, delante de las patitas.
@@ -26,11 +41,15 @@ const teclas: { x: number; y: number; w: number }[] = []
 for (let x = -3; x <= 20; x += 2) teclas.push({ x, y: 8, w: 1 })
 for (let x = -3; x <= 20; x += 2) if (x < 3 || x > 13) teclas.push({ x, y: 9, w: 1 })
 teclas.push({ x: 3, y: 9, w: 11 })
+
+// Pila de hojas sobre el escritorio, a la derecha de Clawd (x = 17 a 21). La
+// hoja k va en y = 6 - k. Se dibujan todas y el motor muestra las que tocan.
+const HOJAS = 14
 ---
 
-<div class="clawd" data-clawd aria-hidden="true">
+<div class:list={['clawd', `clawd--${lugar}`, `clawd-con-${accesorio}`]} data-clawd data-clawd-frases={frases ? JSON.stringify(frases) : undefined} aria-hidden="true">
   <svg viewBox="-5 -7 28 19" shape-rendering="crispEdges" overflow="visible">
-    <rect class="clawd-piso" x="-3" y="11" width="24" height="1" />
+    <rect class="clawd-piso" x="-3" y={accesorio === 'nada' ? 10 : 11} width="24" height="1" />
 
     <g data-clawd-salto>
       <g class="clawd-respira">
@@ -46,20 +65,47 @@ teclas.push({ x: 3, y: 9, w: 11 })
         <rect x="4" y="0" width="10" height="1" fill={C.luz} />
         <rect x="3" y="7" width="12" height="1" fill={C.sombra} />
         <g data-clawd-mirada>
-          <g class="clawd-parpado" fill={C.ojo}>
-            <rect x="5" y="2" width="1" height="2" />
-            <rect x="12" y="2" width="1" height="2" />
+          <g class="clawd-ojos" fill={C.ojo}>
+            <g class="clawd-parpado">
+              <rect class="clawd-ojo-i" x="5" y="2" width="1" height="2" />
+              <rect class="clawd-ojo-d" x="12" y="2" width="1" height="2" />
+            </g>
+            <g class="clawd-planos">
+              <rect class="clawd-ojo-i" x="4" y="3" width="2" height="1" />
+              <rect class="clawd-ojo-d" x="12" y="3" width="2" height="1" />
+            </g>
           </g>
+        </g>
+        <g class="clawd-sudor" data-clawd-sudor>
+          <rect x="16" y="-1" width="1" height="1" fill={C.sudor} />
+          <rect x="16" y="0" width="1" height="1" fill={C.sudor} />
+          <rect x="17" y="0" width="1" height="1" fill="#C9ECFA" />
         </g>
       </g>
     </g>
 
-    <g class="clawd-teclado">
-      <rect x="-4" y="7" width="26" height="4" fill={C.teclado} />
-      <rect x="-4" y="7" width="26" height="1" fill={C.borde} />
-      <rect x="-4" y="10" width="26" height="1" fill={C.base} />
-      {teclas.map((k) => <rect data-clawd-tecla x={k.x} y={k.y} width={k.w} height="1" fill={C.tecla} />)}
-    </g>
+    {accesorio === 'teclado' && (
+      <g class="clawd-teclado">
+        <rect x="-4" y="7" width="26" height="4" fill={C.teclado} />
+        <rect x="-4" y="7" width="26" height="1" fill={C.borde} />
+        <rect x="-4" y="10" width="26" height="1" fill={C.base} />
+        {teclas.map((k) => <rect data-clawd-tecla x={k.x} y={k.y} width={k.w} height="1" fill={C.tecla} />)}
+      </g>
+    )}
+
+    {accesorio === 'mesa' && (
+      <g class="clawd-mesa">
+        <rect x="-4" y="7" width="26" height="4" fill={C.madera} />
+        <rect x="-4" y="7" width="26" height="1" fill={C.maderaLuz} />
+        <rect x="-4" y="10" width="26" height="1" fill={C.maderaBase} />
+        <g data-clawd-pila>
+          {Array.from({ length: HOJAS }, (_, k) => (
+            <rect data-clawd-hoja x="17" y={6 - k} width="5" height="1" fill={k % 2 ? C.hojaB : C.hoja} visibility="hidden" />
+          ))}
+        </g>
+      </g>
+    )}
   </svg>
   <span class="clawd-globo" data-clawd-globo></span>
+  <span class="clawd-zzz" data-clawd-zzz><i>z</i><i>z</i><i>z</i></span>
 </div>

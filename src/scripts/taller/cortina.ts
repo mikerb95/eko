@@ -31,8 +31,12 @@ export interface Cambio {
   palabras: (escena: HTMLElement) => { kicker: HTMLElement[]; titulo: HTMLElement[] }
   /** Cambia el DOM a la escena nueva (la vieja ya no es la activa). */
   cambiar: () => void
-  /** Se llama cuando el panel va por la mitad (o al saltar al final). */
-  mitad?: () => void
+  /**
+   * Se llama al terminar (o al saltar al final). El pie se actualiza aquí y
+   * no a mitad de camino: cambiarlo con el recorte en marcha obliga a
+   * repintar todo y se nota un tirón.
+   */
+  alFinal?: () => void
 }
 
 const bezier = (c: Curva) => `cubic-bezier(${c.join(',')})`
@@ -158,20 +162,10 @@ export function crearCortina(lienzo: HTMLElement) {
       anims.push(rueda(p.n).animate([{ transform: 'translateY(110%)' }, { transform: 'translateY(0)' }], { duration: 520, delay: tn, easing: 'cubic-bezier(.16,1,.3,1)', fill: 'both' }))
     }
 
-    let mitadHecha = false
-    const enMitad = () => {
-      if (mitadHecha) return
-      mitadHecha = true
-      c.mitad?.()
-    }
-    const reloj = setTimeout(enMitad, ms / 2)
-
     let hecho = false
     const fin = () => {
       if (hecho) return
       hecho = true
-      clearTimeout(reloj)
-      enMitad()
       for (const a of anims) a.cancel()
       for (const el of ocultas) el.style.visibility = ''
       for (const p of numeros) {
@@ -182,6 +176,7 @@ export function crearCortina(lienzo: HTMLElement) {
       c.viejo.classList.remove('saliendo')
       cortina.className = 'tl-cortina'
       if (terminar === fin) terminar = null
+      c.alFinal?.()
     }
     terminar = fin
     Promise.all(anims.map((a) => a.finished)).then(fin, () => {})

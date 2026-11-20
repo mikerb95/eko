@@ -266,7 +266,7 @@ function montar() {
           console.error('[taller] entrar', e)
         }
         pasoHook(el, k, pp, -1)
-        // Con cortina, el pie cambia cuando el panel va por la mitad.
+        // Con cortina, el pie cambia cuando el panel termina de pasar.
         if (!conTransicion) actualizarPie()
       }
       if (anterior >= 0 && cortina && !reducido()) {
@@ -280,7 +280,7 @@ function montar() {
           bloque: bv !== bn && nb >= 0 ? { titulo: datos.bloques[nb]!.titulo, rotulo: `Bloque ${nb + 1} de ${datos.bloques.length}` } : null,
           palabras: (esc) => ({ kicker: palabrasKicker(esc), titulo: palabrasTitulo(els.indexOf(esc)) }),
           cambiar: () => mostrar(true),
-          mitad: actualizarPie,
+          alFinal: actualizarPie,
         })
       } else mostrar(false)
       if (local) guardarEstado()
