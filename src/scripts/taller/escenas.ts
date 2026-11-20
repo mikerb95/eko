@@ -619,6 +619,17 @@ const constructor: Hook = {
   },
 }
 
+/** Práctica guiada: marca el paso actual en la ruta y muestra solo su maqueta. */
+const conectar: Hook = {
+  paso(el, paso) {
+    for (const x of $$(el, '[data-cx-k]')) {
+      const k = Number(x.dataset.cxK)
+      x.classList.toggle('actual', k === paso)
+      x.classList.toggle('hecho', k < paso)
+    }
+  },
+}
+
 export const HOOKS: Record<string, Hook> = {
   portada,
   sala,
@@ -641,4 +652,5 @@ export const HOOKS: Record<string, Hook> = {
   descanso: cuenta,
   practica: cuenta,
   constructor,
+  conectar,
 }
