@@ -39,6 +39,9 @@ export interface BancoCapacitacion {
   habitos: typeof HABITOS
   dondePegar: typeof DONDE_PEGAR
   guias: { titulo: string; intro: string; pasos: PasoGuiado[] }[]
+  /** Preguntas frecuentes por bloque de la capacitación. */
+  preguntas: { bloque: string; items: { p: string; r: string }[] }[]
+  glosario: Termino[]
   descargas: Enlace[]
   /** Tarjeta resumen pública de la capacitación. */
   resumen: string
@@ -52,6 +55,54 @@ const ENFOQUE: Record<string, string> = {
   ventas: 'Briefs, propuestas y seguimiento comercial.',
   mercadeo: 'Contenido, redes y blog.',
 }
+
+export interface Termino {
+  termino: string
+  definicion: string
+}
+
+/**
+ * Preguntas frecuentes de una capacitación: las "si preguntan" de la vista de
+ * presentador, agrupadas por bloque. Quedan fuera las escenas que solo
+ * aplican durante la sesión (registro en la sala, cifras de la encuesta) y
+ * las respuestas que otra escena dejó desactualizadas.
+ */
+const ESCENAS_SIN_FAQ = new Set(['sala', 'diagnostico'])
+const PREGUNTAS_FUERA = new Set([
+  // La práctica final sí conecta Zoho; esta respuesta decía que primero a mano.
+  '¿Se puede conectar Claude a nuestro Zoho?',
+])
+function preguntasDe(t: typeof TALLER_1): BancoCapacitacion['preguntas'] {
+  return t.bloques
+    .map((b) => ({
+      bloque: b.id === 'apertura' ? 'Para empezar' : b.titulo,
+      items: t.escenas
+        .filter((e) => e.bloque === b.id && !ESCENAS_SIN_FAQ.has(e.id))
+        .flatMap((e) => e.siPreguntan ?? [])
+        .filter((q) => !PREGUNTAS_FUERA.has(q.p)),
+    }))
+    .filter((g) => g.items.length > 0)
+}
+
+/** Glosario de la capacitación 1: las palabras que se usan en la sesión. */
+const GLOSARIO_TALLER1: Termino[] = [
+  { termino: 'Modelo de IA', definicion: 'Programa que aprendió de una cantidad enorme de texto a predecir cómo sigue un escrito. Claude, GPT y Gemini son modelos.' },
+  { termino: 'Token', definicion: 'Pedazo de texto con el que trabaja la IA: una palabra corta, parte de una palabra larga o unas cifras. Lo que cabe y lo que cuesta se mide en tokens.' },
+  { termino: 'Predecir el siguiente token', definicion: 'Lo único que hace el modelo: elegir, uno tras otro, el pedazo de texto más probable. Por eso suena natural y por eso puede decir algo falso con seguridad.' },
+  { termino: 'Alucinación', definicion: 'Cuando la IA escribe algo que suena bien pero no es cierto: una norma, un artículo, una cifra o una fecha que no existen.' },
+  { termino: 'Fecha de corte', definicion: 'Hasta dónde llega lo que el modelo leyó en su entrenamiento. Lo posterior, o lo interno de Ekosolv, no lo conoce si usted no se lo muestra.' },
+  { termino: 'Ventana de contexto', definicion: 'La mesa de trabajo de la IA: la conversación y los archivos que tiene a la vista. Lo que no está ahí no lo tiene en cuenta, y una conversación nueva empieza vacía.' },
+  { termino: 'Instrucción (prompt)', definicion: 'Lo que usted le escribe a la IA. Una buena instrucción tiene contexto, tarea, formato y, si lo tiene, un ejemplo.' },
+  { termino: 'Proyecto de Claude', definicion: 'Espacio donde se guardan documentos e instrucciones fijas para no repetirlos en cada conversación.' },
+  { termino: 'Cuenta de Ekosolv', definicion: 'La cuenta de empresa de Claude. Ahí se pegan los documentos de trabajo completos; en una cuenta personal, nunca.' },
+  { termino: 'Dato sensible', definicion: 'Dato personal con protección reforzada en la Ley 1581 de 2012, como los de salud. Solo se usa si la tarea de verdad lo necesita.' },
+  { termino: 'MCP', definicion: 'El idioma común con el que una IA se conecta con otras herramientas, como Zoho.' },
+  { termino: 'Conector', definicion: 'Una conexión ya armada entre Claude y una herramienta concreta. El de Zoho CRM lo hizo Zoho.' },
+  { termino: 'Autorización', definicion: 'El paso en que usted le da permiso a Claude en la página de Zoho. La contraseña se escribe en Zoho, nunca en Claude, y el permiso se puede quitar cuando quiera.' },
+  { termino: 'Solo lectura', definicion: 'Consultar sin crear, cambiar ni borrar nada. En el conector se logra dejando bloqueadas las herramientas de escritura.' },
+  { termino: 'Modo Auto y modo Manual', definicion: 'En Auto, Claude usa las herramientas sin preguntar. En Manual, le muestra qué va a hacer y espera su permiso.' },
+  { termino: 'Claude in Chrome', definicion: 'Extensión de Google Chrome que deja que Claude use una pestaña como usted: leer, hacer clic y escribir.' },
+]
 
 export const AREAS_RECURSOS: AreaRecursos[] = ENTREGABLES_TALLER1.map((a) => ({ id: a.id, nombre: a.nombre, enfoque: ENFOQUE[a.id] ?? '' }))
 
@@ -74,6 +125,8 @@ export function temarioDe(b: BancoCapacitacion): TemaBanco[] {
     { id: 'verificar', titulo: 'Antes de usar la respuesta', etiqueta: `${b.habitos.length} hábitos` },
     { id: 'pegar', titulo: 'Dónde pegar', etiqueta: 'Ley 1581' },
     ...b.guias.map((g, i) => ({ id: `guia-${i + 1}`, titulo: g.titulo, etiqueta: `Guía · ${g.pasos.length} pasos` })),
+    { id: 'preguntas', titulo: 'Preguntas frecuentes', etiqueta: `${b.preguntas.reduce((s, g) => s + g.items.length, 0)} preguntas` },
+    { id: 'glosario', titulo: 'Glosario', etiqueta: `${b.glosario.length} términos` },
     { id: 'descargas', titulo: 'Checklist, guía rápida y tarjeta resumen', etiqueta: 'PDF' },
   ]
 }
@@ -127,6 +180,8 @@ function taller1(area: string): BancoCapacitacion | null {
     habitos: HABITOS,
     dondePegar: DONDE_PEGAR,
     guias: [GUIA_ZOHO],
+    preguntas: preguntasDe(TALLER_1),
+    glosario: GLOSARIO_TALLER1,
     descargas: [
       { titulo: 'Guía rápida', texto: 'La hoja con la plantilla, las instrucciones y dónde pegar.', href: pdfEntregable(1, area, 'guia') },
       { titulo: 'Checklist', texto: 'Los temas de la capacitación para marcar lo que ya domina.', href: pdfEntregable(1, area, 'checklist') },

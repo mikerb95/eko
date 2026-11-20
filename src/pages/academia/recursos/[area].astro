@@ -109,6 +109,30 @@ const dos = (n: number) => String(n).padStart(2, '0')
               </section>
             ))}
 
+            <section id={ancla(b.n, 'preguntas')}>
+              <h3>Preguntas frecuentes</h3>
+              <div class="faq">
+                {b.preguntas.map((g) => (
+                  <div class="faq-grupo">
+                    <h4>{g.bloque}</h4>
+                    {g.items.map((q) => (
+                      <details>
+                        <summary>{q.p}</summary>
+                        <p>{q.r}</p>
+                      </details>
+                    ))}
+                  </div>
+                ))}
+              </div>
+            </section>
+
+            <section id={ancla(b.n, 'glosario')}>
+              <h3>Glosario</h3>
+              <dl class="glosario">
+                {b.glosario.map((x) => <div><dt>{x.termino}</dt><dd>{x.definicion}</dd></div>)}
+              </dl>
+            </section>
+
             <section id={ancla(b.n, 'descargas')}>
               <h3>Descargas</h3>
               <div class="enlaces">
@@ -228,6 +252,22 @@ const dos = (n: number) => String(n).padStart(2, '0')
   .paso p.que { font-size: 14px; color: var(--ink-2); background: var(--paper-warm); border-radius: 10px; padding: 10px 12px; }
   .paso .ilustracion { font-size: 13px; background: var(--paper-warm); border-radius: 12px; padding: 14px; overflow: hidden; }
 
+  .faq { display: grid; gap: 22px; }
+  .faq-grupo { display: grid; gap: 6px; }
+  .faq h4 { font: 600 15px/1.2 var(--font-display); margin: 0 0 4px; display: flex; align-items: center; gap: 8px; }
+  .faq h4::before { content: ''; width: 8px; height: 8px; border-radius: 50%; background: var(--c); }
+  .faq details { background: #fff; border-radius: var(--r-md); }
+  .faq summary { list-style: none; cursor: pointer; display: flex; justify-content: space-between; gap: 14px; padding: 13px 16px; font-weight: 550; font-size: 15px; line-height: 1.4; }
+  .faq summary::-webkit-details-marker { display: none; }
+  .faq summary::after { content: '+'; flex: none; color: var(--mute); font-size: 18px; line-height: 1.1; }
+  .faq details[open] summary::after { content: '−'; }
+  .faq details p { margin: 0; padding: 0 16px 14px; font-size: 14.5px; line-height: 1.55; color: var(--ink-2); }
+
+  .glosario { margin: 0; display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+  .glosario div { background: #fff; border-radius: var(--r-md); padding: 13px 16px; }
+  .glosario dt { font: 600 15px/1.2 var(--font-display); margin-bottom: 4px; }
+  .glosario dd { margin: 0; font-size: 14px; line-height: 1.5; color: var(--ink-2); }
+
   .enlaces { display: grid; gap: 8px; }
   .enlaces a { display: grid; grid-template-columns: 1fr auto; gap: 2px 12px; align-items: center; background: #fff; border-radius: var(--r-md); padding: 14px 16px; color: var(--ink); text-decoration: none; transition: background .15s; }
   .enlaces a:hover { background: color-mix(in oklab, var(--c) 7%, #fff); }
@@ -253,6 +293,7 @@ const dos = (n: number) => String(n).padStart(2, '0')
   @media (max-width: 640px) {
     .plantilla { grid-template-columns: 1fr 1fr; }
     .doble { grid-template-columns: 1fr; gap: 32px; }
+    .glosario { grid-template-columns: 1fr; }
     .paso { padding-left: 16px; }
   }
 </style>
