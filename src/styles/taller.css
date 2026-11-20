@@ -127,7 +127,7 @@
 .tl-cortina-txt b { font: 600 104px/1 var(--font-display); letter-spacing: -.02em; max-width: 14ch; text-wrap: balance; }
 /* Palabras que vuelan de un título al otro y números que ruedan. */
 .tl-vuelo { position: absolute; inset: 0; z-index: 9; pointer-events: none; }
-.tl-vuela { position: absolute; white-space: nowrap; transform-origin: 0 0; will-change: transform; }
+.tl-vuela { position: absolute; white-space: nowrap; transform-origin: 0 0; opacity: 0; will-change: transform; }
 .tl-rueda { overflow: clip; }
 .tl-rueda > span { display: inline-block; }
 .tl-on .tl-kicker { font-size: 19px; }

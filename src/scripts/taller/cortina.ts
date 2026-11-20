@@ -152,8 +152,9 @@ export function crearCortina(lienzo: HTMLElement) {
       anims.push(
         clon.animate(
           [
-            { transform: 'translate(0, 0) scale(1)', color: p.color },
-            { transform: `translate(${hasta.x - p.desde.x}px, ${hasta.y - p.desde.y}px) scale(${s})`, color: colorN },
+            // Invisible (opacity 0 en el CSS) hasta que le llega el turno.
+            { transform: 'translate(0, 0) scale(1)', color: p.color, opacity: 1 },
+            { transform: `translate(${hasta.x - p.desde.x}px, ${hasta.y - p.desde.y}px) scale(${s})`, color: colorN, opacity: 1 },
           ],
           { duration: Math.min(ms * 0.8, 380 + distancia * 0.35), delay: sale, easing: bezier(VUELO), fill: 'forwards' },
         ),
