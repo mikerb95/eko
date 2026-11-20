@@ -6,11 +6,11 @@ import { defineConfig, devices } from '@playwright/test'
 // apunta a producción) y con el modelo simulado, así que no gastan API.
 
 const PUERTO = 4391
-const BASE = 'file:./data/e2e.db'
+const BASE = 'file:./data/e2e-tmp.db'
 
 export default defineConfig({
   testDir: './e2e',
-  globalSetup: './e2e/preparar.ts',
+  globalSetup: './e2e/preparar.tmp.ts',
   timeout: 60_000,
   fullyParallel: false,
   workers: 1,
