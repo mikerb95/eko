@@ -1,0 +1,59 @@
+---
+// Formulario de cierre de la capacitación, uno por área. Cada celular llega
+// aquí solo cuando la presentación pasa a su última escena (la sala lo
+// redirige). Muestra el formulario del área con la que la persona se
+// registró, con una sugerencia en cada campo para empezar a escribir. No es
+// anónimo: lo ven solo admin y gerencia en /admin/academia (pestaña
+// Opiniones). Si ya lo envió, se precarga para corregirlo.
+// Campos: src/lib/talleres/opinion.ts. Envío: POST /api/academia/sala {accion: 'opinion'}.
+export const prerender = false
+import AcademiaLayout from '../../../layouts/AcademiaLayout.astro'
+import { SALA_COOKIE } from '../../../lib/auth'
+import { nombreModulo } from '../../../lib/academia/reglas'
+import { salaActual } from '../../../lib/talleres/sala'
+import { opinionDe } from '../../../lib/talleres/datos'
+import { camposOpinion, MAX_RESPUESTA_OPINION } from '../../../lib/talleres/opinion'
+
+Astro.response.headers.set('cache-control', 'no-store')
+
+const { t, asistente } = await salaActual(Astro.cookies.get(SALA_COOKIE)?.value)
+const campos = asistente && t ? camposOpinion(asistente.area, t.n) : []
+const previas = asistente ? await opinionDe(asistente.id) : null
+---
+
+<AcademiaLayout titulo="Su opinión · Academia de IA · Ekosolv" sinNav>
+  {asistente && t ? (
+    <section class="sl sl-opinion">
+      <p class="sl-quien">{asistente.nombre} {asistente.apellido} · {nombreModulo(asistente.area)}</p>
+      <p class="ac-kicker">Capacitación {t.n} · Cierre</p>
+      <h1>¿Cómo le fue hoy?</h1>
+      <p class="sl-sub">Sus respuestas no son anónimas: solo las leen quien dicta y la gerencia, para hacerle seguimiento a cada duda hasta resolverla.</p>
+      <form class="sl-form" data-op-form data-taller={t.n} novalidate hidden={!!previas}>
+        {campos.map((c) => (
+          <label>
+            <span>{c.pregunta}</span>
+            <textarea name={c.id} rows="3" maxlength={MAX_RESPUESTA_OPINION} placeholder={c.sugerencia}>{previas?.[c.id] ?? ''}</textarea>
+          </label>
+        ))}
+        <button type="submit" class="ac-btn">Enviar</button>
+        <p class="sl-estado" data-op-estado role="status"></p>
+      </form>
+      <div class="sl-enviado" data-op-gracias hidden={!previas}>
+        <h2>Gracias</h2>
+        <p>Recibimos sus respuestas. Si dejó una duda, le vamos a responder antes de la próxima capacitación.</p>
+        <a class="ac-btn" href={`/academia/taller/${t.n}/resumen`}>Ver la tarjeta resumen</a>
+        <button type="button" class="ac-btn ac-btn-sec" data-op-corregir>Corregir mis respuestas</button>
+      </div>
+    </section>
+  ) : (
+    <section class="sl">
+      <p class="ac-kicker">Sala de la capacitación</p>
+      <h1>Primero, entre a la sala</h1>
+      <p class="sl-sub">Este formulario es para quienes están registrados en la capacitación de hoy. Escanee el código de la pantalla o abra el enlace que le llegó al correo.</p>
+      <a class="ac-btn" href="/academia/sala">Ir a la sala</a>
+    </section>
+  )}
+  <script>
+    import '../../../scripts/taller/opinion'
+  </script>
+</AcademiaLayout>

@@ -339,6 +339,16 @@
 .sl-duda textarea:focus { outline: 2px solid color-mix(in oklab, var(--deep) 35%, transparent); outline-offset: 1px; }
 .sl .ac-revision { border-top: 0; margin-top: 4px; padding-top: 0; }
 
+/* Formulario de cierre por área (/academia/sala/opinion): la pregunta es el
+   rótulo, en letra normal; la sugerencia va de placeholder. */
+.sl-opinion .sl-form { gap: 20px; }
+.sl-opinion .sl-form[hidden] { display: none; }
+.sl-opinion .sl-form label > span { font: 600 16.5px/1.35 var(--font-sans); letter-spacing: 0; text-transform: none; color: var(--ink); }
+.sl-opinion textarea { width: 100%; min-width: 0; font: 16px/1.5 var(--font-sans); color: var(--ink); background: #fff; border: 1px solid var(--line); border-radius: 14px; padding: 13px 14px; resize: vertical; field-sizing: content; min-height: 5.2em; }
+.sl-opinion textarea::placeholder { color: color-mix(in oklab, var(--ink) 42%, transparent); }
+.sl-opinion textarea:focus { outline: 2px solid color-mix(in oklab, var(--deep) 35%, transparent); outline-offset: 1px; }
+.sl-opinion .sl-enviado .ac-btn { text-decoration: none; }
+
 /* ---------- PC vinculado (/pc) y código en la sala ---------- */
 .pc .pc-codigo { font: 600 44px/1 var(--font-mono); letter-spacing: .3em; text-align: center; padding: 18px 14px; max-width: 200px; }
 .sl-pc { display: flex; flex-direction: column; gap: 10px; padding: 16px 18px; border-radius: var(--r-lg); background: #fff; box-shadow: 0 1px 0 rgba(14, 28, 38, .05); }

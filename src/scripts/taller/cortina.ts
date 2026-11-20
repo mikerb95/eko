@@ -45,7 +45,9 @@ const FRANJA = { w: 0.035, t: 1.05, curva: [0.5, 0, 0.3, 1] as Curva }
 // El panel de bloque entra rápido, frena en el centro para que se lea el
 // nombre y sale rápido.
 const PANEL = { w: 1.3, t: 1.6, curva: [0.2, 0.85, 0.8, 0.15] as Curva }
-const VUELO: Curva = [0.65, 0, 0.35, 1]
+// El vuelo arranca de una vez y llega pronto: si dura lo mismo que la
+// franja, la palabra se encima con las vecinas que la franja va descubriendo.
+const VUELO: Curva = [0.45, 0, 0.2, 1]
 
 export function crearCortina(lienzo: HTMLElement) {
   const cortina = document.createElement('div')
@@ -137,6 +139,7 @@ export function crearCortina(lienzo: HTMLElement) {
       Object.assign(clon.style, p.tipo, { left: `${p.desde.x}px`, top: `${p.desde.y}px`, color: p.color })
       capaVuelo.append(clon)
       const s = hasta.h / (p.desde.h || 1)
+      const distancia = Math.hypot(hasta.x - p.desde.x, hasta.y - p.desde.y)
       const colorN = getComputedStyle(p.n).color
       for (const el of [p.v, p.n]) {
         el.style.visibility = 'hidden'
@@ -148,7 +151,7 @@ export function crearCortina(lienzo: HTMLElement) {
             { transform: 'translate(0, 0) scale(1)', color: p.color },
             { transform: `translate(${hasta.x - p.desde.x}px, ${hasta.y - p.desde.y}px) scale(${s})`, color: colorN },
           ],
-          { duration: ms * 0.8, delay: ms * 0.08, easing: bezier(VUELO), fill: 'both' },
+          { duration: Math.min(ms * 0.8, 380 + distancia * 0.35), easing: bezier(VUELO), fill: 'both' },
         ),
       )
     }
