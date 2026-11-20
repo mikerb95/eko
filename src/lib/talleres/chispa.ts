@@ -19,9 +19,9 @@ function rayo(i: number, largo: number): string {
     const y = 50 + r * sin + t * cos
     return `${x.toFixed(2)} ${y.toFixed(2)}`
   }
-  const base = 4
+  const base = 0
   const punta = largo - 4
-  return `<path style="--i:${i}" d="M${p(base, -1.4)} L${p(punta, -4.2)} A4.2 4.2 0 0 1 ${p(punta, 4.2)} L${p(base, 1.4)} Z"/>`
+  return `<path style="--i:${i}" d="M${p(base, -2)} L${p(punta, -4.2)} A4.2 4.2 0 0 1 ${p(punta, 4.2)} L${p(base, 2)} Z"/>`
 }
 
 const RAYOS = LARGOS.map((l, i) => rayo(i, l)).join('')

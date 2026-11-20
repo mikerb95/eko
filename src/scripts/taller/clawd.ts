@@ -20,8 +20,11 @@ export type Ojos = 'normal' | 'cerrados' | 'entrecerrados' | 'blanco' | 'confund
 export type Opcion = string | { texto: string; nota?: string }
 
 export interface Clawd {
-  /** Teclea en ráfagas hasta que se apague. `alRafaga` corre al final de cada una. */
-  teclear(on: boolean, o?: { alRafaga?: () => void; descansos?: boolean }): void
+  /**
+   * Teclea en ráfagas hasta que se apague. `alRafaga` corre al final de cada
+   * una y `alGolpe` con cada tecla.
+   */
+  teclear(on: boolean, o?: { alRafaga?: () => void; alGolpe?: () => void; descansos?: boolean }): void
   /** Salto con aterrizaje; con `brazos` los levanta y con `saludo` saluda al bajar. */
   saltar(o?: { brazos?: boolean; saludo?: boolean; alto?: number }): Promise<void>
   /** Globo. Sin `ms` el texto queda fijo; con `ms` se ve ese tiempo y vuelve el fijo. */
@@ -98,13 +101,23 @@ function crear(escena: HTMLElement, raiz: HTMLElement): Clawd {
   const varita = q<SVGGElement>('[data-clawd-varita]')
   const pompa = q<SVGGElement>('[data-clawd-pompa]')
   const boca = q<SVGRectElement>('[data-clawd-boca]')
+  const bengala = q<SVGGElement>('[data-clawd-bengala]')
+  const punta = q<SVGRectElement>('[data-clawd-punta]')
+  const pc = q<SVGGElement>('[data-clawd-pc]')
+  const monitor = q<SVGGElement>('[data-clawd-monitor]')
+  const tecladoPc = q<SVGGElement>('[data-clawd-teclado-pc]')
+  const pantalla = q<SVGRectElement>('[data-clawd-pantalla]')
+  const codigo = q<SVGGElement>('[data-clawd-codigo]')
+  const cursor = q<SVGRectElement>('[data-clawd-cursor]')
+  const colorPunta = punta?.getAttribute('fill') ?? '#5A4A42'
+  const colorPantalla = pantalla?.getAttribute('fill') ?? '#0B151B'
   /** Con la varita en la mano el brazo izquierdo queda arriba. */
   let conJuguete = false
   const alturaI = () => (conJuguete ? -2 : 0)
 
   let vivo = true
   let tecleando = false
-  let opcTeclear: { alRafaga?: () => void; descansos?: boolean } = {}
+  let opcTeclear: { alRafaga?: () => void; alGolpe?: () => void; descansos?: boolean } = {}
   let bucle: gsap.core.Animation | null = null
   let rafagas = 0
   let saltando = false
@@ -145,6 +158,7 @@ function crear(escena: HTMLElement, raiz: HTMLElement): Clawd {
     const brazo = k % 2 ? brazoD : brazoI
     gsap.set(brazo, { y: 1 })
     seguir(gsap.delayedCall(0.07, () => gsap.set(brazo, { y: 0 })))
+    opcTeclear.alGolpe?.()
     if (!teclas.length) return
     const mitad = Math.floor(teclas.length / 2)
     const lado = k % 2 ? teclas.slice(mitad) : teclas.slice(0, mitad)
@@ -189,7 +203,7 @@ function crear(escena: HTMLElement, raiz: HTMLElement): Clawd {
     )
   }
 
-  function teclear(on: boolean, o: { alRafaga?: () => void; descansos?: boolean } = {}) {
+  function teclear(on: boolean, o: { alRafaga?: () => void; alGolpe?: () => void; descansos?: boolean } = {}) {
     if (!anim) return
     if (on) {
       opcTeclear = o
@@ -517,6 +531,7 @@ function crear(escena: HTMLElement, raiz: HTMLElement): Clawd {
 
   let soplando = false
   let turno = 0
+  let vuelta = 0
   let pasoB: gsap.core.Animation | null = null
   const paso = (a: gsap.core.Animation) => ((pasoB = a), esperar(a))
   const pausa = (s: number) => paso(gsap.delayedCall(s, () => {}))
@@ -600,6 +615,234 @@ function crear(escena: HTMLElement, raiz: HTMLElement): Clawd {
     ojos('normal')
   }
 
+  // ---------- Bengala de chispitas ----------
+  let tickChispas: (() => void) | null = null
+  let resplandor: HTMLElement | null = null
+
+  function chispa(p: { x: number; y: number }) {
+    const s = document.createElement('i')
+    s.className = Math.random() < 0.25 ? 'clawd-chispa cruz' : 'clawd-chispa'
+    s.style.setProperty('--c', ['#FFF4C2', '#FFD66B', '#FFB347', '#FFFFFF'][entero(0, 3)]!)
+    raiz.append(s)
+    sueltos.add(s)
+    const ang = azar(0, Math.PI * 2)
+    const v = azar(16, 58)
+    const t = azar(0.25, 0.55)
+    gsap.set(s, { x: p.x, y: p.y })
+    seguir(
+      gsap
+        .timeline({ onComplete: () => (s.remove(), sueltos.delete(s)) })
+        .to(s, { x: p.x + Math.cos(ang) * v, duration: t, ease: 'power2.out' }, 0)
+        // Sale disparada y la gravedad la jala hacia abajo.
+        .to(s, { y: p.y + Math.sin(ang) * v + azar(10, 28), duration: t, ease: 'power1.in' }, 0)
+        .to(s, { autoAlpha: 0, scale: 0.4, duration: t * 0.6 }, t * 0.4),
+    )
+  }
+
+  /** Humito gris que sube de la punta cuando la bengala se apaga. */
+  function humo() {
+    if (!punta) return
+    const p = enRaiz(punta)
+    for (let k = 0; k < 4; k++) {
+      const h = document.createElement('i')
+      h.className = 'clawd-humo'
+      raiz.append(h)
+      sueltos.add(h)
+      gsap.set(h, { x: p.x, y: p.y })
+      seguir(
+        gsap
+          .timeline({ delay: k * 0.18, onComplete: () => (h.remove(), sueltos.delete(h)) })
+          .fromTo(h, { autoAlpha: 0.75, scale: 0.6 }, { y: p.y - azar(34, 56), x: p.x + azar(-12, 12), scale: 1.6, autoAlpha: 0, duration: 1.3, ease: 'sine.out' }),
+      )
+    }
+  }
+
+  function pararChispas() {
+    if (tickChispas) gsap.ticker.remove(tickChispas)
+    tickChispas = null
+    resplandor?.remove()
+    resplandor = null
+  }
+
+  /** Saca la bengala, la agita echando chispas, se apaga y la tira. */
+  async function chispitas(sigue: () => boolean) {
+    if (!bengala || !punta) return
+    conJuguete = true
+    bengala.setAttribute('visibility', 'visible')
+    mirar(-1, -1)
+    await paso(
+      gsap
+        .timeline()
+        .set(brazoI, { y: -1 })
+        .set(brazoI, { y: -2 }, 0.06)
+        .fromTo(bengala, { y: 6 }, { y: 0, duration: 0.4, ease: 'back.out(2.4)', snap: { y: 1 } }, 0)
+        .call(() => {}, [], 0.6),
+    )
+    if (!sigue()) return
+    // Se enciende: brasa amarilla, resplandor y chispas cada cuadro.
+    const estado = { fuerza: 1 }
+    punta.setAttribute('fill', '#FFF4C2')
+    resplandor = document.createElement('span')
+    resplandor.className = 'clawd-resplandor'
+    raiz.append(resplandor)
+    tickChispas = () => {
+      if (document.hidden) return
+      const p = enRaiz(punta)
+      gsap.set(resplandor, { x: p.x, y: p.y, autoAlpha: estado.fuerza })
+      const n = Math.random() < estado.fuerza ? (Math.random() < 0.5 ? 2 : 1) : 0
+      for (let k = 0; k < n; k++) chispa(p)
+    }
+    gsap.ticker.add(tickChispas)
+    ojos('entrecerrados')
+    // La agita: el brazo sube y baja, la bengala va de lado a lado.
+    const agita = gsap.timeline()
+    const dura = azar(3.5, 4.5)
+    for (let t = 0, k = 0; t < dura; t += 0.1, k++) {
+      agita.set(brazoI, { y: k % 2 ? -3 : -1 }, t)
+      agita.set(bengala, { x: k % 4 < 2 ? -1 : 0 }, t)
+      if (k % 10 === 0) agita.call(() => mirar(k % 20 ? 0 : -1, -1), [], t)
+    }
+    agita.set(brazoI, { y: -2 }).set(bengala, { x: 0 })
+    await paso(agita)
+    if (!sigue()) return
+    // Se apaga: cada vez menos chispas y la brasa pasa a naranja y a gris.
+    ojos('normal')
+    await paso(
+      gsap
+        .timeline()
+        .to(estado, { fuerza: 0, duration: 1.4, ease: 'power1.in' })
+        .call(() => punta.setAttribute('fill', '#FFB347'), [], 0.4)
+        .call(() => punta.setAttribute('fill', '#C2552F'), [], 0.9)
+        .call(() => punta.setAttribute('fill', '#4A4A4A'), [], 1.3),
+    )
+    pararChispas()
+    humo()
+    ojos('confundido')
+    mirar(-1, -1)
+    await pausa(1)
+    if (!sigue()) return
+    ojos('normal')
+    // La tira por encima del hombro: sube, gira y cae fuera de la tarjeta.
+    await paso(
+      gsap
+        .timeline()
+        .set(brazoI, { y: -3 })
+        .set(brazoI, { y: -1 }, 0.14)
+        .to(bengala, { x: -14, duration: 0.85, ease: 'none' }, 0.14)
+        .to(bengala, { y: -5, duration: 0.25, ease: 'power2.out' }, 0.14)
+        .to(bengala, { y: 20, duration: 0.6, ease: 'power2.in' }, 0.39)
+        .to(bengala, { rotation: -320, transformOrigin: '50% 50%', duration: 0.85, ease: 'none' }, 0.14)
+        .to(bengala, { autoAlpha: 0, duration: 0.2 }, 0.8)
+        .call(() => mirar(-1, 1), [], 0.5),
+    )
+    bengala.setAttribute('visibility', 'hidden')
+    gsap.set(bengala, { clearProps: 'all' })
+    punta.setAttribute('fill', colorPunta)
+    conJuguete = false
+    if (!saltando) gsap.set(brazoI, { y: 0 })
+    await pausa(0.5)
+    mirar(0, 0)
+  }
+
+  // ---------- PC ----------
+  const NS = 'http://www.w3.org/2000/svg'
+  const COLORES_CODIGO = ['#6fd2c9', '#F07FA8', '#F2C94C', '#c4d3dc', '#b9a5ff']
+  /** Escritura en la pantalla: filas de medio pixel, cada tecla alarga el trozo actual. */
+  const pluma = { fila: -1, x: 0, inicio: 0, largo: 0, trozo: null as SVGRectElement | null, meta: 0 }
+  const IZQ = -13.5
+  const DER = -5.5
+
+  function nuevaLinea() {
+    if (!codigo) return
+    pluma.fila++
+    if (pluma.fila > 5) {
+      // Pantalla llena: todo sube una fila y la de arriba sale.
+      for (const r of [...codigo.children]) {
+        const y = Number(r.getAttribute('y')) - 1
+        if (y < -2) r.remove()
+        else r.setAttribute('y', String(y))
+      }
+      pluma.fila = 5
+    }
+    pluma.inicio = IZQ + entero(0, 2) * 0.75
+    pluma.x = pluma.inicio
+    pluma.largo = azar(3, 7.5)
+    pluma.trozo = null
+  }
+
+  function teclaCodigo() {
+    if (!codigo) return
+    const t = pluma.trozo
+    const w = t ? Number(t.getAttribute('width')) : 0
+    if (!t || w >= pluma.meta) {
+      if (t) pluma.x += w + 0.5
+      if (pluma.x - pluma.inicio >= pluma.largo || pluma.x > DER - 0.5) nuevaLinea()
+      const r = document.createElementNS(NS, 'rect')
+      r.setAttribute('x', String(pluma.x))
+      r.setAttribute('y', String(-1.5 + pluma.fila))
+      r.setAttribute('height', '.5')
+      r.setAttribute('width', '0')
+      r.setAttribute('fill', COLORES_CODIGO[entero(0, COLORES_CODIGO.length - 1)]!)
+      codigo.append(r)
+      pluma.trozo = r
+      pluma.meta = Math.min(entero(1, 5) * 0.5, DER - pluma.x)
+    }
+    const r = pluma.trozo!
+    const nw = Math.min(pluma.meta, Number(r.getAttribute('width')) + 0.5)
+    r.setAttribute('width', String(nw))
+    cursor?.setAttribute('x', String(pluma.x + nw + 0.25))
+    cursor?.setAttribute('y', r.getAttribute('y')!)
+  }
+
+  function esconderPc() {
+    teclear(false)
+    pc?.setAttribute('visibility', 'hidden')
+    gsap.set([monitor, tecladoPc].filter(Boolean), { clearProps: 'all' })
+  }
+
+  /** Aparece un PC, codea unos segundos, queda contento y lo guarda. */
+  async function codear(sigue: () => boolean) {
+    if (!pc || !monitor || !tecladoPc || !codigo) return
+    codigo.replaceChildren()
+    pluma.fila = -1
+    nuevaLinea()
+    cursor?.setAttribute('x', String(pluma.inicio))
+    cursor?.setAttribute('y', '-1.5')
+    pc.setAttribute('visibility', 'visible')
+    mirar(-1, 0)
+    await paso(
+      gsap
+        .timeline()
+        .fromTo(monitor, { y: 12 }, { y: 0, duration: 0.45, ease: 'back.out(1.8)', snap: { y: 1 } }, 0)
+        .fromTo(tecladoPc, { y: 5 }, { y: 0, duration: 0.35, ease: 'back.out(2)', snap: { y: 1 } }, 0.1)
+        // La pantalla se prende con un destello.
+        .call(() => pantalla?.setAttribute('fill', '#3D7C84'), [], 0.5)
+        .call(() => pantalla?.setAttribute('fill', colorPantalla), [], 0.6)
+        .call(() => {}, [], 0.8),
+    )
+    if (!sigue()) return esconderPc()
+    teclear(true, { alGolpe: teclaCodigo })
+    await pausa(azar(5, 7))
+    teclear(false)
+    if (!sigue()) return esconderPc()
+    // Listo: queda contento y da un saltico.
+    ojos('entrecerrados')
+    void saltar({ alto: 3, brazos: true })
+    await pausa(1)
+    ojos('normal')
+    if (!sigue()) return esconderPc()
+    await paso(
+      gsap
+        .timeline()
+        .call(() => pantalla?.setAttribute('fill', '#000'))
+        .to(tecladoPc, { y: 5, duration: 0.3, ease: 'back.in(2)', snap: { y: 1 } }, 0.15)
+        .to(monitor, { y: 12, duration: 0.4, ease: 'back.in(1.6)', snap: { y: 1 } }, 0.2),
+    )
+    pantalla?.setAttribute('fill', colorPantalla)
+    esconderPc()
+    mirar(0, 0)
+  }
+
   async function bucleBurbujas() {
     const yo = ++turno
     const sigue = () => vivo && soplando && turno === yo
@@ -614,6 +857,14 @@ function crear(escena: HTMLElement, raiz: HTMLElement): Clawd {
       if (!sigue()) return
       await paso(guardar())
       if (!sigue()) return
+      // Una vuelta sí y otra no: bengala de chispitas y luego a codear.
+      if (vuelta++ % 2 === 1) {
+        await pausa(0.6)
+        if (sigue()) await chispitas(sigue)
+        if (sigue()) await pausa(0.8)
+        if (sigue()) await codear(sigue)
+        if (!sigue()) return
+      }
       await pausa(azar(2.5, 4.5))
     }
   }
@@ -623,7 +874,14 @@ function crear(escena: HTMLElement, raiz: HTMLElement): Clawd {
     turno++
     pasoB?.kill()
     pasoB = null
-    gsap.killTweensOf([varita, pompa, respira].filter(Boolean))
+    gsap.killTweensOf([varita, pompa, respira, bengala, monitor, tecladoPc].filter(Boolean))
+    pararChispas()
+    esconderPc()
+    bengala?.setAttribute('visibility', 'hidden')
+    if (bengala) gsap.set(bengala, { clearProps: 'all' })
+    punta?.setAttribute('fill', colorPunta)
+    pantalla?.setAttribute('fill', colorPantalla)
+    raiz.dataset.ojos = 'normal'
     gsap.set(respira, { clearProps: 'transform' })
     if (pompa) gsap.set(pompa, { clearProps: 'all' })
     varita?.setAttribute('visibility', 'hidden')
