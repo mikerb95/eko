@@ -7,7 +7,7 @@ test('captura espera', async ({ browser }) => {
   await expect(p.locator('body')).toHaveClass(/tl-on/)
   await p.keyboard.press('ArrowRight')
   await p.waitForTimeout(800)
-  const r = await p.request.post('/api/academia/taller', { data: { accion: 'aviso', n: 1, minutos: 15 } })
+  const r = await p.request.post('/api/academia/taller', { data: { accion: 'aviso', taller: 1, minutos: 15 } })
   expect(r.ok(), await r.text()).toBeTruthy()
   await expect(p.locator('.tl-espera.on')).toBeVisible({ timeout: 8000 })
   await p.waitForTimeout(4000)
