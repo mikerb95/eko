@@ -277,7 +277,7 @@
 .esc-sala .url { font: 500 1em/1.3 var(--font-mono); color: var(--c-deep); word-break: break-all; }
 /* Dirección de la sala: el dominio queda de apoyo (para quien no puede
    escanear y la escribe) y la ruta corta es lo que se lee de un vistazo. */
-.url-dom { color: #8a99a4; font-weight: 400; }
+.url-dom { color: #56687a; font-weight: 500; }
 .url-ruta { color: var(--c-deep); font-weight: 600; font-size: 1.5em; }
 .esc-sala ol, .esc-practica ol { margin: 0; padding: 0; list-style: none; display: grid; gap: 14px; counter-reset: p; }
 .esc-sala li, .esc-practica li { counter-increment: p; display: flex; gap: 16px; align-items: baseline; }
