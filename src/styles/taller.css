@@ -181,7 +181,8 @@
 .esc-portada .tl-titulo { font-size: clamp(36px, 10vw, 56px); max-width: 14ch; }
 .tl-on .esc-portada .tl-titulo { font-size: 128px; line-height: .96; }
 .esc-portada .sub { font-size: 1.05em; color: #b9c6ce; max-width: 40ch; }
-.esc-portada .firma { font: 500 .6em/1.3 var(--font-mono); letter-spacing: .08em; text-transform: uppercase; color: #8fa2ae; }
+.esc-portada .firma { font: 400 .7em/1.3 var(--font-sans); color: #8fa2ae; }
+.esc-portada .firma b { font-weight: 600; color: #dbe4ea; }
 .esc-portada .cinta { display: flex; gap: 10px; flex-wrap: wrap; opacity: .9; }
 .tl-on .esc-portada .cinta { position: absolute; top: 470px; left: 0; flex-wrap: nowrap; width: max-content; font-size: 30px; }
 .tl-on .esc-portada .tl-titulo { margin-top: 30px; }
