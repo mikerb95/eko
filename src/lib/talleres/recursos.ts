@@ -19,6 +19,8 @@ import type { PasoGuiado } from './tipos.ts'
 export interface AreaRecursos {
   id: string
   nombre: string
+  /** De qué trata la ruta del área (enfoque por área de Mike, 2026-11-19). */
+  enfoque: string
 }
 
 export interface Enlace {
@@ -42,7 +44,39 @@ export interface BancoCapacitacion {
   resumen: string
 }
 
-export const AREAS_RECURSOS: AreaRecursos[] = ENTREGABLES_TALLER1.map((a) => ({ id: a.id, nombre: a.nombre }))
+const ENFOQUE: Record<string, string> = {
+  gerencia: 'Zoho, propuestas, cierre de oportunidades y automatización de procesos.',
+  finanzas: 'Zoho Books, Siigo Nube, nómina, cartera y manuales de procedimiento.',
+  operaciones: 'Autos de la ANLA y la CAR, obligaciones, vigencias y cambios de norma.',
+  logistica: 'Correo, solicitudes de recolección, avisos y tableros en Zoho.',
+  ventas: 'Briefs, propuestas y seguimiento comercial.',
+  mercadeo: 'Contenido, redes y blog.',
+}
+
+export const AREAS_RECURSOS: AreaRecursos[] = ENTREGABLES_TALLER1.map((a) => ({ id: a.id, nombre: a.nombre, enfoque: ENFOQUE[a.id] ?? '' }))
+
+/** Total de capacitaciones del programa (las que faltan se muestran como próximas, sin temas). */
+export const TOTAL_PROGRAMA = 4
+
+export interface TemaBanco {
+  /** id de la sección en la página del área. */
+  id: string
+  titulo: string
+  etiqueta: string
+}
+
+/** Temario de una capacitación en el banco: las secciones, en el orden de la página. */
+export function temarioDe(b: BancoCapacitacion): TemaBanco[] {
+  return [
+    { id: 'plantilla', titulo: 'Una buena instrucción tiene cuatro partes', etiqueta: 'Plantilla' },
+    { id: 'instrucciones', titulo: 'Instrucciones para copiar', etiqueta: `${b.instrucciones.length} instrucciones` },
+    { id: 'iterar', titulo: 'Si no sirve, dígale qué cambiar', etiqueta: `${b.siNoSirve.length} frases` },
+    { id: 'verificar', titulo: 'Antes de usar la respuesta', etiqueta: `${b.habitos.length} hábitos` },
+    { id: 'pegar', titulo: 'Dónde pegar', etiqueta: 'Ley 1581' },
+    ...b.guias.map((g, i) => ({ id: `guia-${i + 1}`, titulo: g.titulo, etiqueta: `Guía · ${g.pasos.length} pasos` })),
+    { id: 'descargas', titulo: 'Checklist, guía rápida y tarjeta resumen', etiqueta: 'PDF' },
+  ]
+}
 
 export const areaRecursos = (id: unknown) => AREAS_RECURSOS.find((a) => a.id === id) ?? null
 
