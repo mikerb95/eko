@@ -1,0 +1,48 @@
+---
+// Dirección corta para abrir la presentación en el PC del participante
+// (ekosolv.codebymike.net/pc). Pública: pide el código de dos números que le
+// muestra la sala en el celular; con él, este PC queda vinculado a esa
+// persona y la presentación sigue la escena de quien dicta.
+// API: /api/academia/pc. Motor de la presentación: src/scripts/taller/proyector.ts.
+export const prerender = false
+import AcademiaLayout from '../layouts/AcademiaLayout.astro'
+import { PC_COOKIE } from '../lib/auth'
+import { vistaPC } from '../lib/talleres/pc'
+import { tallerEnCurso } from '../lib/talleres/datos'
+import { tallerDe } from '../lib/talleres'
+
+Astro.response.headers.set('cache-control', 'no-store')
+
+// Ya vinculado y con la capacitación en curso: directo a la presentación.
+const v = await vistaPC(Astro.cookies.get(PC_COOKIE)?.value)
+if (v) return Astro.redirect(`/academia/taller/${v.estado.taller}`)
+
+const estado = await tallerEnCurso()
+const t = estado ? tallerDe(estado.taller) : null
+---
+
+<AcademiaLayout titulo="Ver la presentación en su PC · Ekosolv" sinNav>
+  <section class="sl pc">
+    <p class="ac-kicker">{t ? `Capacitación ${t.n} · ${t.titulo}` : 'Presentación en su PC'}</p>
+    <h1>Escriba el código de su celular</h1>
+    {t ? (
+      <>
+        <p class="sl-sub">En la sala del celular toque <b>Abrir en mi PC</b>. Le aparecen dos números: escríbalos aquí.</p>
+        <form class="sl-form" data-pc novalidate>
+          <label>
+            <span>Código</span>
+            <input class="pc-codigo" name="codigo" inputmode="numeric" pattern="[0-9]*" maxlength="2" autocomplete="one-time-code" placeholder="00" required autofocus />
+          </label>
+          <button type="submit" class="ac-btn">Abrir la presentación</button>
+          <p class="sl-estado" data-pc-estado role="status"></p>
+        </form>
+        <p class="sl-nota">La presentación se mueve sola, al ritmo de quien dicta. Para votar y enviar preguntas siga usando el celular.</p>
+      </>
+    ) : (
+      <p class="sl-sub">La capacitación todavía no ha empezado. Cuando quien dicta abra la presentación, recargue esta página.</p>
+    )}
+  </section>
+  <script>
+    import '../scripts/taller/pc'
+  </script>
+</AcademiaLayout>

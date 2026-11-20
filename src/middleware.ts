@@ -1,5 +1,6 @@
 import { defineMiddleware } from 'astro:middleware'
-import { SESSION_COOKIE, verifySession } from './lib/auth'
+import { PC_COOKIE, SESSION_COOKIE, verifySession } from './lib/auth'
+import { pasePC } from './lib/talleres/pc'
 import { canWrite } from './lib/reglasEscritura'
 
 const PUBLIC_ADMIN_PATHS = new Set(['/admin/login'])
@@ -12,8 +13,13 @@ const PUBLIC_API_PATHS = new Set(['/api/admin/login', '/api/admin/logout'])
 // que solo sirve para votar en la capacitación en curso.
 // Regla: ningún QR de las capacitaciones lleva a un login. La tarjeta resumen
 // (QR del cierre) también es pública; solo tiene el contenido de la capacitación.
-const PUBLIC_SALA_PATHS = new Set(['/academia/sala', '/api/academia/sala'])
+const PUBLIC_SALA_PATHS = new Set(['/academia/sala', '/api/academia/sala', '/api/academia/pc'])
 const esResumenTaller = (p: string) => /^\/academia\/taller\/\d+\/resumen$/.test(p)
+// El PC vinculado con el código del celular (/pc, cookie eko_pc) puede abrir
+// la presentación y leer los resultados de las votaciones, sin cuenta. Qué
+// capacitación y si está en curso lo decide la página (src/lib/talleres/pc.ts).
+const esVistaPC = (p: string, method: string) =>
+  /^\/academia\/taller\/\d+$/.test(p) || (p === '/api/academia/taller' && SAFE_METHODS.has(method.toUpperCase()))
 
 // Páginas internas del proyecto (las del pie de página, columna "Proyecto").
 // No son parte del sitio público: exigen sesión igual que /admin.
@@ -93,6 +99,7 @@ export const onRequest = defineMiddleware(async (context, next) => {
   const session = await verifySession(token)
 
   if (!session) {
+    if (esVistaPC(normalize(pathname), context.request.method) && (await pasePC(context.cookies.get(PC_COOKIE)?.value))) return next()
     if (isAdminApi || isAcademiaApi) {
       return new Response(JSON.stringify({ error: 'No autorizado' }), {
         status: 401,

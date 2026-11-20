@@ -338,3 +338,24 @@
 .sl-duda textarea { width: 100%; min-width: 0; font: 16px/1.5 var(--font-sans); color: var(--ink); background: #fff; border: 1px solid var(--line); border-radius: 14px; padding: 13px 14px; resize: vertical; }
 .sl-duda textarea:focus { outline: 2px solid color-mix(in oklab, var(--deep) 35%, transparent); outline-offset: 1px; }
 .sl .ac-revision { border-top: 0; margin-top: 4px; padding-top: 0; }
+
+/* ---------- PC vinculado (/pc) y código en la sala ---------- */
+.pc .pc-codigo { font: 600 44px/1 var(--font-mono); letter-spacing: .3em; text-align: center; padding: 18px 14px; max-width: 200px; }
+.sl-pc { display: flex; flex-direction: column; gap: 10px; padding: 16px 18px; border-radius: var(--r-lg); background: #fff; box-shadow: 0 1px 0 rgba(14, 28, 38, .05); }
+.sl-pc[hidden] { display: none; }
+.sl-pc p { margin: 0; font-size: 15px; color: var(--ink-2); }
+.sl-pc .sl-pc-url { font: 600 17px/1.2 var(--font-mono); color: var(--ink); word-break: break-all; }
+.sl-pc .sl-pc-codigo { font: 600 64px/1 var(--font-mono); letter-spacing: .25em; color: var(--deep); text-align: center; padding: 6px 0; }
+.sl-pc-fila { display: flex; align-items: center; justify-content: space-between; gap: 12px; flex-wrap: wrap; }
+
+/* ---------- Paso guiado en el celular (escena conectar) ---------- */
+.sl-guia { display: flex; flex-direction: column; gap: 14px; }
+.sl-guia .mq { font-size: 13px; }
+.sl-guia-hacer { font-size: 17px; line-height: 1.5; margin: 0; color: var(--ink); }
+.sl-guia-quees { margin: 0; padding: 14px 16px; border-radius: var(--r-lg); background: color-mix(in oklab, var(--deep) 7%, #fff); font-size: 15px; line-height: 1.5; color: var(--ink-2); }
+.sl-guia-quees b { display: block; margin-bottom: 4px; font: 500 11.5px/1.2 var(--font-mono); letter-spacing: .08em; text-transform: uppercase; color: var(--deep); }
+.sl-guia-barra { display: flex; gap: 4px; }
+.sl-guia-barra i { flex: 1; height: 4px; border-radius: 99px; background: var(--line); }
+.sl-guia-barra i.hecho { background: var(--forest); }
+.sl-guia-barra i.actual { background: var(--deep); }
+.sl-nota-mq { font-size: 12px; color: var(--mute); margin: -6px 0 0; }
