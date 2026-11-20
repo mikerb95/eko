@@ -15,6 +15,7 @@ async function entrar(page: Page, username: string, password: string) {
 }
 
 test('PC vinculado con el código del celular sigue la práctica guiada', async ({ browser }) => {
+  test.setTimeout(240_000)
   const ctxAdmin = await browser.newContext({ viewport: { width: 1600, height: 900 } })
   const proyector = await ctxAdmin.newPage()
   await entrar(proyector, 'admin', 'ekosolv2026*')

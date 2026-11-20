@@ -25,7 +25,7 @@ export function montarClawd(escena: HTMLElement, api: Api): void {
   const brazoI = q<SVGGElement>('[data-clawd-brazo="i"]')
   const brazoD = q<SVGGElement>('[data-clawd-brazo="d"]')
   const mirada = q<SVGGElement>('[data-clawd-mirada]')
-  const teclado = q<SVGGElement>('.clawd-teclado')
+  const cuerpo = q<SVGRectElement>('[data-clawd-cuerpo]')
   const globo = q<HTMLElement>('[data-clawd-globo]')
   const teclas = [...raiz.querySelectorAll<SVGRectElement>('[data-clawd-tecla]')]
   const colorTecla = teclas[0]?.getAttribute('fill') ?? '#3A5061'
@@ -75,7 +75,7 @@ export function montarClawd(escena: HTMLElement, api: Api): void {
     const tk = tokens[siguiente++ % tokens.length]
     const esc = escena.getBoundingClientRect()
     const escala = esc.width / escena.offsetWidth || 1
-    const kb = teclado.getBoundingClientRect()
+    const cab = cuerpo.getBoundingClientRect()
     const ci = cinta.getBoundingClientRect()
 
     const el = document.createElement('span')
@@ -85,8 +85,9 @@ export function montarClawd(escena: HTMLElement, api: Api): void {
     volando.add(el)
     const w = el.offsetWidth
     const h = el.offsetHeight
-    const x0 = (kb.left + kb.width / 2 - esc.left) / escala - w / 2
-    const y0 = (kb.top - esc.top) / escala - h
+    // Nace detrás de la cabeza (Clawd va encima) y asoma al subir.
+    const x0 = (cab.left + cab.width / 2 - esc.left) / escala - w / 2
+    const y0 = (cab.top - esc.top) / escala + h * 0.4
     const y1 = (ci.top - esc.top) / escala + (ci.height / escala - h) / 2
 
     gsap.set(el, { x: x0, y: y0, scale: 0.3, autoAlpha: 0 })
@@ -94,8 +95,8 @@ export function montarClawd(escena: HTMLElement, api: Api): void {
       .timeline({ onComplete: () => (el.remove(), volando.delete(el)) })
       .to(el, { autoAlpha: 1, scale: 1, duration: 0.2, ease: 'back.out(2)' }, 0)
       .to(el, { x: x0 - azar(90, 180), duration: 1.15, ease: 'power1.in' }, 0)
-      .to(el, { y: y1, duration: 1.15, ease: 'power3.out' }, 0)
-      .to(el, { autoAlpha: 0, scale: 1.12, duration: 0.3, ease: 'power1.out' }, 1.05)
+      .to(el, { y: y1 + h * 0.35, duration: 1.15, ease: 'power3.out' }, 0)
+      .to(el, { autoAlpha: 0, scale: 0.92, duration: 0.35, ease: 'power1.in' }, 0.85)
 
     // Lo sigue con la mirada.
     gsap.set(mirada, { y: -1 })

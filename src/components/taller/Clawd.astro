@@ -17,13 +17,15 @@ const C = {
   teclado: '#1C2A34',
   borde: '#2C3F4C',
   base: '#121D25',
-  tecla: '#3A5061',
+  tecla: '#4A6377',
 }
 
 // Teclado: 26 de ancho, de x = -4 a 21, de y = 7 a 10, delante de las patitas.
+// Dos filas de teclas en las mismas columnas; la de abajo con barra espaciadora.
 const teclas: { x: number; y: number; w: number }[] = []
 for (let x = -3; x <= 20; x += 2) teclas.push({ x, y: 8, w: 1 })
-teclas.push({ x: -2, y: 9, w: 3 }, { x: 2, y: 9, w: 1 }, { x: 4, y: 9, w: 10 }, { x: 15, y: 9, w: 1 }, { x: 17, y: 9, w: 3 })
+for (let x = -3; x <= 20; x += 2) if (x < 3 || x > 13) teclas.push({ x, y: 9, w: 1 })
+teclas.push({ x: 3, y: 9, w: 11 })
 ---
 
 <div class="clawd" data-clawd aria-hidden="true">
@@ -40,7 +42,7 @@ teclas.push({ x: -2, y: 9, w: 3 }, { x: 2, y: 9, w: 1 }, { x: 4, y: 9, w: 10 }, 
         </g>
         <g data-clawd-brazo="i"><rect x="1" y="4" width="2" height="2" fill={C.cuerpo} /></g>
         <g data-clawd-brazo="d"><rect x="15" y="4" width="2" height="2" fill={C.cuerpo} /></g>
-        <rect x="3" y="0" width="12" height="8" fill={C.cuerpo} />
+        <rect data-clawd-cuerpo x="3" y="0" width="12" height="8" fill={C.cuerpo} />
         <rect x="4" y="0" width="10" height="1" fill={C.luz} />
         <rect x="3" y="7" width="12" height="1" fill={C.sombra} />
         <g data-clawd-mirada>
