@@ -1,0 +1,134 @@
+/* Control remoto del celular (/academia/taller/<n>/control). Oscuro para no
+   encandilar en la sala; mitad superior para las notas y mitad inferior
+   para el mando, con zonas de toque grandes al alcance del pulgar. */
+.ct {
+  margin: 0;
+  height: 100vh;
+  height: 100dvh;
+  display: grid;
+  grid-template-rows: minmax(0, 1fr) 48dvh;
+  overflow: hidden;
+  background: #0B151D;
+  color: #E9EEF1;
+  font-family: var(--font-sans);
+  -webkit-tap-highlight-color: transparent;
+}
+.ct p, .ct h1, .ct h2 { margin: 0; }
+
+/* ---------- Notas (mitad superior) ---------- */
+.ct-notas {
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  padding: max(18px, env(safe-area-inset-top)) 20px 18px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+.ct-meta { display: flex; justify-content: space-between; gap: 12px; font: 500 12px/1.2 var(--font-mono); letter-spacing: .06em; text-transform: uppercase; color: #7D8B96; }
+.ct-kicker { font: 500 12px/1.2 var(--font-mono); letter-spacing: .1em; text-transform: uppercase; color: #3FC2B5; }
+.ct h1 { font-family: var(--font-display); font-weight: var(--display-weight); font-size: 24px; line-height: 1.1; letter-spacing: -0.02em; color: #fff; }
+.ct-lista { margin: 4px 0 0; padding-left: 1.2em; display: grid; gap: 12px; font-size: 18px; line-height: 1.45; color: #C5CFD6; }
+.ct-lista li.ya { color: #5E6B75; }
+.ct-lista li.ahora { color: #fff; font-weight: 500; }
+.ct-lista li.ahora::marker { color: #3FC2B5; }
+.ct-preguntan { margin-top: 6px; padding: 12px 14px; border-radius: 14px; background: #13222D; display: grid; gap: 2px; }
+.ct-preguntan[hidden] { display: none; }
+.ct-preguntan h2 { font: 600 12px/1.2 var(--font-sans); letter-spacing: .06em; text-transform: uppercase; color: #7D8B96; margin-bottom: 4px; }
+.ct-preguntan details { border-top: 1px solid #1F3241; padding: 8px 0; }
+.ct-preguntan details:first-of-type { border-top: 0; }
+.ct-preguntan summary { cursor: pointer; font-size: 16px; font-weight: 500; color: #E9EEF1; }
+.ct-preguntan summary::marker { color: #3FC2B5; }
+.ct-preguntan details p { margin-top: 6px; font-size: 15px; line-height: 1.45; color: #AEBAC3; }
+
+/* ---------- Mando (mitad inferior) ---------- */
+.ct-mando {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  padding: 10px 12px max(12px, env(safe-area-inset-bottom));
+  background: #0E1C26;
+  box-shadow: 0 -1px 0 #1C2D3A;
+}
+.ct-ant,
+.ct-sig {
+  border: 0;
+  cursor: pointer;
+  font: 600 18px/1.2 var(--font-sans);
+  touch-action: manipulation;
+  user-select: none;
+  -webkit-user-select: none;
+}
+.ct-ant {
+  flex: none;
+  height: 60px;
+  border-radius: 18px;
+  color: #E9EEF1;
+  background: #172A37;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+}
+.ct-ant:active { background: #1F3746; }
+.ct-ant:disabled { color: #4E5C66; cursor: default; }
+
+/* Toda la sección avanza; la vista previa queda encima, abajo a la izquierda,
+   y no recibe toques (los deja pasar al botón). */
+.ct-avance { position: relative; flex: 1; min-height: 0; }
+.ct-sig {
+  position: absolute;
+  inset: 0;
+  border-radius: 22px;
+  color: #fff;
+  background: #124E7D;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  justify-content: flex-end;
+  gap: 6px;
+  padding: 18px 20px;
+  transition: background-color .15s;
+}
+.ct-sig:active { background: #0F416A; }
+.ct-sig:disabled { background: #172A37; color: #4E5C66; cursor: default; }
+.ct-sig-txt { font: 600 28px/1 var(--font-display); letter-spacing: -0.01em; }
+.ct-sig-que { font: 500 12.5px/1.2 var(--font-mono); letter-spacing: .05em; text-transform: uppercase; color: #A9C6DD; }
+.ct-sig:disabled .ct-sig-que { color: #4E5C66; }
+
+.ct-prev {
+  --s: .12;
+  --borroso: 14px;
+  --opaco: .35;
+  position: absolute;
+  left: 12px;
+  bottom: 12px;
+  width: min(56%, 300px);
+  aspect-ratio: 16 / 9;
+  border-radius: 12px;
+  overflow: hidden;
+  pointer-events: none;
+  background: #0b141b;
+  box-shadow: 0 6px 18px rgb(0 0 0 / .35), 0 0 0 1px rgb(255 255 255 / .08);
+}
+.ct-prev iframe {
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 1600px;
+  height: 900px;
+  border: 0;
+  transform: scale(var(--s));
+  transform-origin: 0 0;
+  filter: blur(calc(var(--borroso) / var(--s)));
+  opacity: var(--opaco);
+  transition: filter .45s ease, opacity .45s ease;
+}
+.ct-prev iframe[hidden] { display: none; }
+/* Nítida: el siguiente toque cambia de escena. */
+.ct-prev.nitida { box-shadow: 0 6px 18px rgb(0 0 0 / .35), 0 0 0 2px #3FC2B5; }
+.ct-prev-fin { position: absolute; inset: 0; display: grid; place-items: center; font: 600 18px/1 var(--font-display); color: #7D8B96; }
+.ct-prev-fin[hidden] { display: none; }
+
+@media (prefers-reduced-motion: reduce) {
+  .ct-prev iframe { transition: none; }
+}

@@ -15,6 +15,9 @@ const PUBLIC_API_PATHS = new Set(['/api/admin/login', '/api/admin/logout'])
 // (QR del cierre) también es pública; solo tiene el contenido de la capacitación.
 const PUBLIC_SALA_PATHS = new Set(['/academia/sala', '/academia/sala/opinion', '/api/academia/sala', '/api/academia/pc'])
 const esResumenTaller = (p: string) => /^\/academia\/taller\/\d+\/resumen$/.test(p)
+// Banco de recursos (QR de la guía rápida impresa): público, solo contenido de
+// las capacitaciones (docs/plan-recursos.md).
+const esRecursos = (p: string) => p === '/academia/recursos' || p.startsWith('/academia/recursos/')
 // El PC vinculado con el código del celular (/pc, cookie eko_pc) puede abrir
 // la presentación y leer los resultados de las votaciones, sin cuenta. Qué
 // capacitación y si está en curso lo decide la página (src/lib/talleres/pc.ts).
@@ -93,7 +96,7 @@ export const onRequest = defineMiddleware(async (context, next) => {
   const isAcademiaApi = pathname === '/api/academia' || pathname.startsWith('/api/academia/')
 
   if (!isAdminPage && !isAdminApi && !isDocPage && !isAcademia && !isAcademiaApi) return next()
-  if (PUBLIC_ADMIN_PATHS.has(pathname) || PUBLIC_API_PATHS.has(pathname) || PUBLIC_SALA_PATHS.has(normalize(pathname)) || esResumenTaller(normalize(pathname))) return next()
+  if (PUBLIC_ADMIN_PATHS.has(pathname) || PUBLIC_API_PATHS.has(pathname) || PUBLIC_SALA_PATHS.has(normalize(pathname)) || esResumenTaller(normalize(pathname)) || esRecursos(normalize(pathname))) return next()
 
   const token = context.cookies.get(SESSION_COOKIE)?.value
   const session = await verifySession(token)

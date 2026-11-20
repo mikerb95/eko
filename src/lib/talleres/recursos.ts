@@ -67,7 +67,7 @@ const FUENTES_AREA: Record<string, Enlace[]> = {
   gerencia: [{ titulo: 'Ministerio de Ambiente', texto: 'Normativa ambiental nacional.', href: 'https://www.minambiente.gov.co/' }],
   mercadeo: [{ titulo: 'Ministerio de Ambiente', texto: 'Normativa ambiental nacional, para citar bien en publicaciones.', href: 'https://www.minambiente.gov.co/' }],
   ventas: [{ titulo: 'Ministerio de Ambiente', texto: 'Normativa ambiental nacional.', href: 'https://www.minambiente.gov.co/' }],
-  logistica: [{ titulo: 'ANLA', texto: 'Trámites y normativa de gestión de residuos.', href: 'https://www.anla.gov.co/' }],
+  logistica: [{ titulo: 'Ministerio de Ambiente', texto: 'Normativa de gestión de residuos (RAEE, RESPEL).', href: 'https://www.minambiente.gov.co/' }],
 }
 
 /** Fuentes oficiales para verificar: las comunes y las del área. */
