@@ -152,13 +152,13 @@
 .mq-aprobar .mq-botones { align-self: flex-end; }
 
 /* ---------- Las dos autorizaciones de Zoho ---------- */
-.mq-dos { position: relative; min-height: 15em; }
+.mq-dos { position: relative; min-height: 19.5em; }
 .mq-pantalla { display: flex; flex-direction: column; gap: .45em; padding: .9em 1em; border-radius: .7em; background: #fff; border: 1px solid var(--mq-linea); }
 .mq-pantalla b { font-size: .92em; line-height: 1.25; }
 .mq-pantalla .mq-botones { align-self: center; margin-top: .2em; }
 .mq-primera { animation: mq-atras .4s ease 2.3s both; }
 @keyframes mq-atras { to { opacity: .35; transform: scale(.96) translateY(-.4em); } }
-.mq-segunda { position: absolute; left: 1.1em; right: 1.1em; top: 3.2em; box-shadow: 0 .8em 2em rgba(14, 28, 38, .16); }
+.mq-segunda { position: absolute; left: 1.1em; right: 1.1em; top: 2.6em; box-shadow: 0 .8em 2em rgba(14, 28, 38, .16); }
 .mq-scopes { margin: 0; padding-left: 1.1em; font-size: .8em; color: var(--mq-mute); display: grid; gap: .15em; }
 .mq-scopes .mq-ojo { color: var(--mq-zoho); font-weight: 600; }
 
