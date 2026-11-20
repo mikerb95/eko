@@ -37,6 +37,18 @@ interface Estado {
   idea?: string
   ejemplo?: { area: string; titulo: string; texto: string } | null
   practica?: { consigna: string; maximo: number } | null
+  guia?: Guia | null
+}
+
+/** Paso de una práctica guiada (escena conectar), con su maqueta animada. */
+interface Guia {
+  paso: number
+  total: number
+  concepto: string
+  titulo: string
+  hacer: string
+  queEs: string
+  maqueta: string
 }
 
 const raiz = document.querySelector<HTMLElement>('[data-sala]')
@@ -180,6 +192,7 @@ function montar(raiz: HTMLElement) {
   let ejemploVisto = ''
   const ejemplo = $('[data-sl-ejemplo]')
   montarDuda(raiz.querySelector<HTMLFormElement>('[data-sl-duda]')!)
+  montarPC(raiz)
 
   const pintarEjemplo = (e: Estado['ejemplo']) => {
     const clave = e ? e.titulo + e.texto : ''
@@ -321,6 +334,43 @@ function montar(raiz: HTMLElement) {
     lista.replaceChildren(form, res)
   }
 
+  // Práctica guiada: el paso que va mostrando quien dicta, con su animación,
+  // lo que hay que hacer en el PC y el concepto que aparece.
+  const pintarGuia = (g: Guia) => {
+    titulo.textContent = g.titulo
+    kicker.textContent = g.paso === 0 ? 'Práctica final · antes de empezar' : `Paso ${g.paso} de ${g.total} · ${g.concepto}`
+    sub.textContent = ''
+    const caja = document.createElement('div')
+    caja.className = 'sl-guia'
+    const barra = document.createElement('div')
+    barra.className = 'sl-guia-barra'
+    for (let k = 1; k <= g.total; k++) {
+      const i = document.createElement('i')
+      if (k < g.paso) i.className = 'hecho'
+      else if (k === g.paso) i.className = 'actual'
+      barra.append(i)
+    }
+    caja.append(barra)
+    const plantilla = raiz.querySelector<HTMLTemplateElement>(`template[data-mq-plantilla="${CSS.escape(g.maqueta)}"]`)
+    if (plantilla) {
+      caja.append(plantilla.content.cloneNode(true))
+      const nota = document.createElement('p')
+      nota.className = 'sl-nota-mq'
+      nota.textContent = 'Ilustración: en su pantalla puede verse un poco distinto.'
+      caja.append(nota)
+    }
+    const hacer = document.createElement('p')
+    hacer.className = 'sl-guia-hacer'
+    hacer.textContent = g.hacer
+    const quees = document.createElement('p')
+    quees.className = 'sl-guia-quees'
+    const b = document.createElement('b')
+    b.textContent = `Qué es · ${g.concepto}`
+    quees.append(b, g.queEs)
+    caja.append(hacer, quees)
+    lista.replaceChildren(caja)
+  }
+
   const espera = (texto: string) => {
     const p = document.createElement('p')
     p.className = 'sl-espera'
@@ -355,12 +405,13 @@ function montar(raiz: HTMLElement) {
     taller = e.taller!
     entrar()
     pintarEjemplo(e.ejemplo ?? null)
-    const id = e.interaccion?.id ?? (e.practica ? 'practica' : `escena:${e.escena}`)
+    const id = e.interaccion?.id ?? (e.practica ? 'practica' : e.guia ? `guia:${e.escena}:${e.guia.paso}` : `escena:${e.escena}`)
     if (id === abierta) return
     abierta = id
     kicker.textContent = e.kicker ?? ''
     decir('')
     if (e.interaccion) pintarPreguntas(e)
+    else if (e.guia) pintarGuia(e.guia)
     else if (e.practica) pintarPractica(e.practica)
     else {
       // Sin nada que votar: la idea de la escena y, debajo, el ejemplo del área.
@@ -369,9 +420,65 @@ function montar(raiz: HTMLElement) {
       if (e.idea) lista.replaceChildren()
       else espera('Mire la pantalla. Cuando haya una pregunta, aparece aquí.')
     }
-    sub.classList.toggle('idea', !e.interaccion && !e.practica && !!e.idea)
+    sub.classList.toggle('idea', !e.interaccion && !e.practica && !e.guia && !!e.idea)
   }
 
   refrescar()
   setInterval(refrescar, 2000)
+}
+
+/**
+ * "Abrir en mi PC": pide el código de dos números y lo muestra grande, con
+ * la dirección corta que se escribe en el PC (/pc) y cuánto le queda.
+ */
+function montarPC(raiz: HTMLElement) {
+  const abrir = raiz.querySelector<HTMLButtonElement>('[data-sl-pc-abrir]')
+  const caja = raiz.querySelector<HTMLElement>('[data-sl-pc]')
+  if (!abrir || !caja) return
+  const codigo = caja.querySelector<HTMLElement>('[data-sl-pc-codigo]')!
+  const vence = caja.querySelector<HTMLElement>('[data-sl-pc-vence]')!
+  let reloj: ReturnType<typeof setInterval> | null = null
+
+  const parar = () => {
+    if (reloj) clearInterval(reloj)
+    reloj = null
+  }
+  const cerrar = () => {
+    parar()
+    caja.hidden = true
+    abrir.hidden = false
+  }
+  const pedir = async () => {
+    abrir.disabled = true
+    try {
+      const r = (await enviar({ accion: 'codigo_pc' })) as { codigo: string; vence: string }
+      codigo.textContent = r.codigo
+      codigo.style.opacity = ''
+      abrir.hidden = true
+      caja.hidden = false
+      parar()
+      const fin = Date.parse(r.vence)
+      const contar = () => {
+        const s = Math.max(0, Math.round((fin - Date.now()) / 1000))
+        if (s > 0) {
+          vence.textContent = `Sirve una vez, por ${Math.floor(s / 60)}:${String(s % 60).padStart(2, '0')} minutos.`
+          return
+        }
+        parar()
+        codigo.style.opacity = '.3'
+        vence.textContent = 'Este código venció.'
+        abrir.textContent = 'Pedir otro código'
+        abrir.hidden = false
+      }
+      contar()
+      reloj = setInterval(contar, 1000)
+    } catch (err) {
+      vence.textContent = ''
+      abrir.textContent = err instanceof Error ? err.message : 'No se pudo. Toque para intentar de nuevo.'
+    } finally {
+      abrir.disabled = false
+    }
+  }
+  abrir.addEventListener('click', () => void pedir())
+  caja.querySelector<HTMLButtonElement>('[data-sl-pc-cerrar]')!.addEventListener('click', cerrar)
 }

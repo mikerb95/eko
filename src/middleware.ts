@@ -98,8 +98,9 @@ export const onRequest = defineMiddleware(async (context, next) => {
   const token = context.cookies.get(SESSION_COOKIE)?.value
   const session = await verifySession(token)
 
+  if (!session && esVistaPC(normalize(pathname), context.request.method) && (await pasePC(context.cookies.get(PC_COOKIE)?.value))) return next()
+
   if (!session) {
-    if (esVistaPC(normalize(pathname), context.request.method) && (await pasePC(context.cookies.get(PC_COOKIE)?.value))) return next()
     if (isAdminApi || isAcademiaApi) {
       return new Response(JSON.stringify({ error: 'No autorizado' }), {
         status: 401,

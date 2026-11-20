@@ -16,6 +16,8 @@ export interface EscenaCliente {
 export interface DatosTaller {
   n: number
   admin: boolean
+  /** PC vinculado (/pc): la presentación sigue la escena de quien dicta. */
+  seguir?: boolean
   bloques: { id: string; titulo: string; minutos: number }[]
   escenas: EscenaCliente[]
   demos: { id: string; versiones: { id: string; parte: string; respaldo: string }[] }[]
@@ -35,6 +37,8 @@ export function leerDatos<T = DatosTaller>(id = 'tl-datos'): T | null {
 const API = '/api/academia/taller'
 /** La sala del celular, pública y sin cuenta. */
 export const API_SALA = '/api/academia/sala'
+/** El PC vinculado con el código del celular. */
+export const API_PC = '/api/academia/pc'
 
 export async function consultar<T = any>(params: Record<string, string | number>, api = API): Promise<T> {
   const qs = new URLSearchParams(Object.entries(params).map(([k, v]) => [k, String(v)]))

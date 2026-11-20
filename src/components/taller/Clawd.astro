@@ -1,0 +1,63 @@
+---
+// Clawd, la mascota de Claude Code, en pixel art para la portada del taller.
+// Se dibuja con rectángulos sobre una cuadrícula (1 unidad = 1 pixel del
+// personaje) para que se vea nítido a cualquier escala. Las piezas que se
+// mueven van en grupos con data-clawd-*; el motor (src/scripts/taller/clawd.ts)
+// las anima: teclea, lanza tokens a la cinta y salta cuando entra alguien a la
+// sala. Sin JS o con movimiento reducido queda quieto, solo con el parpadeo.
+//
+// Silueta (18 x 10), tomada del logo de la terminal de Claude Code:
+//   cuerpo 12 x 8, ojos de 1 x 2, bracitos a los lados, cuatro patitas.
+
+const C = {
+  cuerpo: '#D97757',
+  luz: '#E8957A',
+  sombra: '#B65E40',
+  ojo: '#16110E',
+  teclado: '#1C2A34',
+  borde: '#2C3F4C',
+  base: '#121D25',
+  tecla: '#3A5061',
+}
+
+// Teclado: 26 de ancho, de x = -4 a 21, de y = 7 a 10, delante de las patitas.
+const teclas: { x: number; y: number; w: number }[] = []
+for (let x = -3; x <= 20; x += 2) teclas.push({ x, y: 8, w: 1 })
+teclas.push({ x: -2, y: 9, w: 3 }, { x: 2, y: 9, w: 1 }, { x: 4, y: 9, w: 10 }, { x: 15, y: 9, w: 1 }, { x: 17, y: 9, w: 3 })
+---
+
+<div class="clawd" data-clawd aria-hidden="true">
+  <svg viewBox="-5 -7 28 19" shape-rendering="crispEdges" overflow="visible">
+    <rect class="clawd-piso" x="-3" y="11" width="24" height="1" />
+
+    <g data-clawd-salto>
+      <g class="clawd-respira">
+        <g fill={C.cuerpo}>
+          <rect x="4" y="8" width="1" height="2" />
+          <rect x="6" y="8" width="1" height="2" />
+          <rect x="11" y="8" width="1" height="2" />
+          <rect x="13" y="8" width="1" height="2" />
+        </g>
+        <g data-clawd-brazo="i"><rect x="1" y="4" width="2" height="2" fill={C.cuerpo} /></g>
+        <g data-clawd-brazo="d"><rect x="15" y="4" width="2" height="2" fill={C.cuerpo} /></g>
+        <rect x="3" y="0" width="12" height="8" fill={C.cuerpo} />
+        <rect x="4" y="0" width="10" height="1" fill={C.luz} />
+        <rect x="3" y="7" width="12" height="1" fill={C.sombra} />
+        <g data-clawd-mirada>
+          <g class="clawd-parpado" fill={C.ojo}>
+            <rect x="5" y="2" width="1" height="2" />
+            <rect x="12" y="2" width="1" height="2" />
+          </g>
+        </g>
+      </g>
+    </g>
+
+    <g class="clawd-teclado">
+      <rect x="-4" y="7" width="26" height="4" fill={C.teclado} />
+      <rect x="-4" y="7" width="26" height="1" fill={C.borde} />
+      <rect x="-4" y="10" width="26" height="1" fill={C.base} />
+      {teclas.map((k) => <rect data-clawd-tecla x={k.x} y={k.y} width={k.w} height="1" fill={C.tecla} />)}
+    </g>
+  </svg>
+  <span class="clawd-globo" data-clawd-globo></span>
+</div>

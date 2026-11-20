@@ -15,7 +15,7 @@
  * por BroadcastChannel; las órdenes del presentador llegan por el mismo canal.
  */
 import { CURVA, SplitText, amarrarSignos, gsap, reducido } from '../motion/core'
-import { canal, direccionTecla, enviar, leerDatos, type Mensaje } from './comun'
+import { API_PC, canal, consultar, direccionTecla, enviar, leerDatos, type Mensaje } from './comun'
 import { HOOKS, type Api } from './escenas'
 import { crearCortina, soportaTransiciones } from './cortina'
 
@@ -243,6 +243,8 @@ function montar() {
 
   const tecla = (ev: KeyboardEvent) => {
     if (!activo) return
+    // El PC vinculado no se mueve con el teclado: sigue a quien dicta (solo F).
+    if (datos.seguir && ev.key !== 'f' && ev.key !== 'F') return
     const d = direccionTecla(ev)
     if (d) {
       ev.preventDefault()
@@ -302,6 +304,26 @@ function montar() {
   addEventListener('resize', evaluar)
   addEventListener('keydown', tecla)
   evaluar()
+  if (datos.seguir) seguirPresentacion()
+
+  // PC vinculado: cada 2 segundos pregunta dónde va quien dicta y se mueve ahí.
+  function seguirPresentacion() {
+    const ids = datos!.escenas.map((e) => e.id)
+    const mirar = async () => {
+      if (!activo || document.hidden) return
+      try {
+        const r = await consultar<{ enCurso: boolean; escena?: string; paso?: number }>({}, API_PC)
+        if (!r.enCurso) return void location.reload()
+        const k = ids.indexOf(r.escena ?? '')
+        if (k >= 0 && (k !== i || (r.paso ?? 0) !== paso)) ir(k, r.paso ?? 0, false)
+      } catch (e) {
+        console.error('[taller] seguir', e)
+      }
+    }
+    void mirar()
+    setInterval(mirar, 2000)
+    document.addEventListener('visibilitychange', () => void mirar())
+  }
 }
 
 montar()

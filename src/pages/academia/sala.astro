@@ -13,6 +13,11 @@ import AcademiaLayout from '../../layouts/AcademiaLayout.astro'
 import { SALA_COOKIE, SALA_TTL_SECONDS, verificarPaseSala } from '../../lib/auth'
 import { AREAS_ACADEMIA } from '../../lib/academia/reglas'
 import { salaActual } from '../../lib/talleres/sala'
+import { TALLERES } from '../../lib/talleres'
+import type { PasoGuiado } from '../../lib/talleres/tipos'
+import { SITE_URL } from '../../lib/site'
+import Maqueta from '../../components/taller/Maqueta.astro'
+import '../../styles/maquetas.css'
 
 Astro.response.headers.set('cache-control', 'no-store')
 
@@ -32,6 +37,15 @@ if (enlace) {
 const { estado, t, asistente } = await salaActual(Astro.cookies.get(SALA_COOKIE)?.value)
 // Un pase válido pero de otro día u otra capacitación no deja entrar.
 if (!asistente && Astro.cookies.get(SALA_COOKIE)?.value) enlaceVencido = true
+
+// Dirección corta que se escribe en el PC para ver la presentación (/pc).
+const dirPC = `${(import.meta.env.DEV ? Astro.url.origin : SITE_URL).replace(/^https?:\/\//, '')}/pc`
+// Maquetas de las prácticas guiadas: quedan en <template> y la sala las clona en cada paso.
+const maquetas = [
+  ...new Set(
+    Object.values(TALLERES).flatMap((t) => t.escenas.filter((e) => e.tipo === 'conectar').flatMap((e) => ((e.datos?.pasos ?? []) as PasoGuiado[]).map((p) => p.maqueta))),
+  ),
+]
 ---
 
 <AcademiaLayout titulo="Sala · Academia de IA · Ekosolv" sinNav>
@@ -49,6 +63,24 @@ if (!asistente && Astro.cookies.get(SALA_COOKIE)?.value) enlaceVencido = true
         <p data-sl-ej-texto></p>
         <p class="sl-nota">Ejemplo ilustrativo</p>
       </aside>
+      <div class="sl-pc-zona">
+        <button type="button" class="ac-btn ac-btn-sec" data-sl-pc-abrir>Abrir en mi PC</button>
+        <div class="sl-pc" data-sl-pc hidden>
+          <p>En el navegador de su PC escriba esta dirección:</p>
+          <p class="sl-pc-url">{dirPC}</p>
+          <p>Y cuando se la pida, este código:</p>
+          <p class="sl-pc-codigo" data-sl-pc-codigo>··</p>
+          <div class="sl-pc-fila">
+            <p data-sl-pc-vence role="status"></p>
+            <button type="button" class="ac-btn ac-btn-sec" data-sl-pc-cerrar>Listo</button>
+          </div>
+        </div>
+      </div>
+      {maquetas.map((id) => (
+        <template data-mq-plantilla={id}>
+          <Maqueta id={id} />
+        </template>
+      ))}
       <form class="sl-form sl-duda" data-sl-duda novalidate>
         <label>
           <span>¿Tiene una pregunta?</span>

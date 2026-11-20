@@ -581,3 +581,4 @@
 .tl-on .cx-quees { font-size: 21px; line-height: 1.45; padding: 18px 22px; border-radius: 16px; }
 @keyframes cx-entra { from { opacity: 0; transform: translateY(18px); } }
 @media (prefers-reduced-motion: reduce) { .tl-on .cx-paso.actual { animation: none; } }
+.tl-barra-nota { margin-left: auto; font-size: 14px; color: var(--mute); }
