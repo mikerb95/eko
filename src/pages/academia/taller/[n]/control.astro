@@ -62,7 +62,9 @@ const datos = {
           <span class="ct-sig-que" data-sig-que></span>
         </button>
         <div class="ct-prev" data-prev aria-hidden="true">
-          <iframe src={`/academia/taller/${t.n}?vista=1#2.0`} title="Vista previa de la escena siguiente" tabindex="-1" loading="eager" data-prev-frame></iframe>
+          <div class="ct-prev-img">
+            <iframe src={`/academia/taller/${t.n}?vista=1#2.0`} title="Vista previa de la escena siguiente" tabindex="-1" loading="eager" data-prev-frame></iframe>
+          </div>
           <span class="ct-prev-fin" data-prev-fin hidden>Fin</span>
         </div>
       </div>

@@ -119,7 +119,12 @@
   border: 0;
   transform: scale(var(--s));
   transform-origin: 0 0;
-  filter: blur(calc(var(--borroso) / var(--s)));
+}
+/* El desenfoque va en el recuadro ya escalado: es más liviano que desenfocar el lienzo de 1600 px. */
+.ct-prev-img {
+  position: absolute;
+  inset: 0;
+  filter: blur(var(--borroso));
   opacity: var(--opaco);
   transition: filter .45s ease, opacity .45s ease;
 }
@@ -130,5 +135,5 @@
 .ct-prev-fin[hidden] { display: none; }
 
 @media (prefers-reduced-motion: reduce) {
-  .ct-prev iframe { transition: none; }
+  .ct-prev-img { transition: none; }
 }
