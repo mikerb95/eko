@@ -103,44 +103,34 @@
   visibility: hidden;
 }
 .tl-on .tl-escena.activa { visibility: visible; z-index: 2; }
-.tl-kw { display: inline-block; }
+.tl-kw, .tl-kw > span { display: inline-block; }
 
-/* Cortina entre escenas (View Transitions, ver scripts/taller/cortina.ts).
-   Cada pieza se recorta con clip-path donde pasa el borde de la cortina; los
-   valores de inicio y fin (--c0, --c1) y los tiempos los escribe el script
-   por pieza. El resto de la página no se anima. */
-::view-transition-old(root) { animation: none; opacity: 0; }
-::view-transition-new(root) { animation: none; }
-::view-transition-group(tl-cortina) { z-index: 100; }
-::view-transition-new(tl-cortina) { animation: none; }
-@keyframes tl-vt-clip { from { clip-path: inset(var(--c0)); } to { clip-path: inset(var(--c1)); } }
-@keyframes tl-vt-sube { to { transform: translateY(-105%); } }
-@keyframes tl-vt-sube-entra { from { transform: translateY(105%); } }
-@media (prefers-reduced-motion: reduce) {
-  ::view-transition-group(*), ::view-transition-old(*), ::view-transition-new(*) { animation: none !important; }
-}
-/* La franja (o el panel de bloque) es un elemento real: la transición lo
-   muestra en vivo por encima de todo y al terminar queda fuera del lienzo. */
+/* Cortina entre escenas (ver scripts/taller/cortina.ts). La escena que sale
+   se queda quieta debajo; la nueva, encima, se descubre con un recorte que
+   sigue al panel. Solo se animan un recorte y transforms. */
+.tl-on .tl-escena.saliendo { visibility: visible; z-index: 1; }
 .tl-cortina { position: absolute; inset: 0; z-index: 8; overflow: hidden; pointer-events: none; display: none; }
-.tl-cortina.on { display: block; view-transition-name: tl-cortina; }
+.tl-cortina.on { display: block; }
 .tl-cortina-panel {
   position: absolute;
   top: 0;
   bottom: 0;
-  left: 100%;
-  width: calc(var(--w) * 100%);
+  left: 0;
   background: var(--c);
+  box-shadow: 0 0 48px rgba(14, 28, 38, .18);
   display: grid;
   place-items: center;
-  animation: tl-cortina var(--t) var(--curva) both;
+  will-change: transform;
 }
-.tl-cortina.atras .tl-cortina-panel { animation-name: tl-cortina-atras; }
-@keyframes tl-cortina { from { left: calc(var(--w) * -100%); } to { left: 100%; } }
-@keyframes tl-cortina-atras { from { left: 100%; } to { left: calc(var(--w) * -100%); } }
 .tl-cortina-txt { display: none; }
 .tl-cortina.bloque .tl-cortina-txt { display: grid; gap: 22px; justify-items: center; text-align: center; color: #fff; }
 .tl-cortina-txt span { font: 500 20px/1 var(--font-mono); letter-spacing: .14em; text-transform: uppercase; opacity: .8; }
 .tl-cortina-txt b { font: 600 104px/1 var(--font-display); letter-spacing: -.02em; max-width: 14ch; text-wrap: balance; }
+/* Palabras que vuelan de un título al otro y números que ruedan. */
+.tl-vuelo { position: absolute; inset: 0; z-index: 9; pointer-events: none; }
+.tl-vuela { position: absolute; white-space: nowrap; transform-origin: 0 0; will-change: transform; }
+.tl-rueda { overflow: clip; }
+.tl-rueda > span { display: inline-block; }
 .tl-on .tl-kicker { font-size: 19px; }
 .tl-on .tl-kicker::before { width: 12px; height: 12px; }
 .tl-on .tl-titulo { font-size: 66px; max-width: 24ch; }

@@ -17,7 +17,7 @@
 import { CURVA, SplitText, amarrarSignos, gsap, reducido } from '../motion/core'
 import { API_PC, canal, consultar, direccionTecla, enviar, leerAviso, leerDatos, type Aviso, type Mensaje } from './comun'
 import { HOOKS, type Api } from './escenas'
-import { crearCortina, soportaTransiciones } from './cortina'
+import { crearCortina } from './cortina'
 
 const ANCHO_MIN = 760
 
@@ -185,9 +185,11 @@ function montar() {
       env.className = 'tl-kicker-txt'
       ;(kicker.textContent ?? '').trim().split(/\s+/).filter(Boolean).forEach((w, q) => {
         if (q) env.append(' ')
+        // Envoltorio + texto: el envoltorio recorta cuando el número rueda.
         const s = document.createElement('span')
         s.className = 'tl-kw'
-        s.textContent = w
+        s.append(document.createElement('span'))
+        s.firstElementChild!.textContent = w
         env.append(s)
       })
       kicker.replaceChildren(env)
@@ -228,9 +230,9 @@ function montar() {
     }, 250)
   }
 
-  // Cambio de escena con cortina (ver cortina.ts). Sin soporte del navegador
-  // o con movimiento reducido, el cambio es directo.
-  const cortina = soportaTransiciones() ? crearCortina(lienzo, pie) : null
+  // Cambio de escena con cortina (ver cortina.ts). Con movimiento reducido,
+  // el cambio es directo.
+  const cortina = typeof Element.prototype.animate === 'function' ? crearCortina(lienzo) : null
 
   const pasoHook = (el: HTMLElement, k: number, p: number, previo: number) => {
     try {
@@ -264,7 +266,8 @@ function montar() {
           console.error('[taller] entrar', e)
         }
         pasoHook(el, k, pp, -1)
-        actualizarPie()
+        // Con cortina, el pie cambia cuando el panel va por la mitad.
+        if (!conTransicion) actualizarPie()
       }
       if (anterior >= 0 && cortina && !reducido()) {
         const bv = datos.escenas[anterior]!.bloque
@@ -277,6 +280,7 @@ function montar() {
           bloque: bv !== bn && nb >= 0 ? { titulo: datos.bloques[nb]!.titulo, rotulo: `Bloque ${nb + 1} de ${datos.bloques.length}` } : null,
           palabras: (esc) => ({ kicker: palabrasKicker(esc), titulo: palabrasTitulo(els.indexOf(esc)) }),
           cambiar: () => mostrar(true),
+          mitad: actualizarPie,
         })
       } else mostrar(false)
       if (local) guardarEstado()

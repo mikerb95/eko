@@ -143,7 +143,12 @@ export function crearCortina(lienzo: HTMLElement) {
     // nuevo entra desde abajo cuando el borde trasero lo descubre.
     const rueda = (el: HTMLElement) => {
       el.classList.add('tl-rueda')
-      return el.firstElementChild instanceof HTMLElement ? el.firstElementChild : el
+      if (!(el.firstElementChild instanceof HTMLElement)) {
+        const s = document.createElement('span')
+        s.append(...el.childNodes)
+        el.append(s)
+      }
+      return el.firstElementChild as HTMLElement
     }
     for (const p of numeros) {
       const xn = local(p.n)
