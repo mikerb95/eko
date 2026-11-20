@@ -1,0 +1,135 @@
+---
+// Chuleta de rutas: /atajos. Oculta (sin enlaces desde el sitio, fuera de
+// src/lib/rutas.ts y del sitemap, noindex). Solo lista direcciones: cada
+// página de destino sigue pidiendo su propio acceso. Al crear una página nueva
+// de la academia, el panel o las capacitaciones, agregarla aquí.
+import Layout from '../layouts/Layout.astro'
+import { TALLERES } from '../lib/talleres'
+
+type Acceso = 'Pública' | 'Admin' | 'Cuenta academia' | 'Sesión'
+interface Ruta { path: string; texto: string; acceso: Acceso; enlace?: boolean }
+interface Grupo { titulo: string; nota?: string; rutas: Ruta[] }
+
+const numeros = Object.keys(TALLERES).map(Number).sort((a, b) => a - b)
+
+const grupos: Grupo[] = [
+  {
+    titulo: 'Atajos del día de la capacitación',
+    nota: 'Direcciones cortas para dictar en voz alta o escribir a mano.',
+    rutas: [
+      { path: '/sala', texto: 'El QR del proyector: cada participante entra a la sala desde el celular.', acceso: 'Pública' },
+      { path: '/pc', texto: 'El participante abre la presentación en su computador con el código de la sala.', acceso: 'Pública' },
+      { path: '/proyector', texto: 'Presentación en el computador del proyector (la capacitación en curso, o la 1). /proyector/2 para otra.', acceso: 'Admin' },
+      { path: '/control', texto: 'Control remoto en tu celular (la capacitación en curso, o la 1). /control/2 para otra.', acceso: 'Admin' },
+      { path: '/ia', texto: 'Página del equipo para la capacitación en IA, con la encuesta del diagnóstico.', acceso: 'Pública' },
+    ],
+  },
+  ...numeros.map((n): Grupo => ({
+    titulo: `Capacitación ${n}: ${TALLERES[n].titulo}`,
+    rutas: [
+      { path: `/academia/taller/${n}`, texto: 'La presentación que se proyecta.', acceso: 'Admin' },
+      { path: `/academia/taller/${n}/presentador`, texto: 'Vista de presentador: notas, cronómetro, escena siguiente y estado de la sala.', acceso: 'Admin' },
+      { path: `/academia/taller/${n}/control`, texto: 'Control remoto del celular de quien dicta.', acceso: 'Admin' },
+      { path: `/academia/taller/${n}/resumen`, texto: 'Tarjeta resumen para guardar en PDF o imprimir (QR del cierre).', acceso: 'Pública' },
+      { path: `/academia/taller/${n}/entregables`, texto: 'Entregables impresos: checklist y guía rápida por área.', acceso: 'Admin' },
+    ],
+  })),
+  {
+    titulo: 'Sala (celular del participante)',
+    rutas: [
+      { path: '/academia/sala', texto: 'Registro con nombre, correo y área; votaciones durante la capacitación.', acceso: 'Pública' },
+      { path: '/academia/sala/opinion', texto: 'Formulario de cierre por área; la sala lleva ahí al terminar.', acceso: 'Pública' },
+    ],
+  },
+  {
+    titulo: 'Academia de IA',
+    rutas: [
+      { path: '/academia', texto: 'Ruta de cada persona, avance, sábados y estado del certificado.', acceso: 'Cuenta academia' },
+      { path: '/academia/leccion/<id>', texto: 'Una lección: contenido, práctica con el revisor de IA y entrega.', acceso: 'Cuenta academia', enlace: false },
+      { path: '/academia/certificado', texto: 'Certificado; se emite al abrirlo cuando la persona cumple los requisitos.', acceso: 'Cuenta academia' },
+      { path: '/verificar/<código>', texto: 'Verificación pública de un certificado con el código impreso.', acceso: 'Pública', enlace: false },
+    ],
+  },
+  {
+    titulo: 'Panel',
+    rutas: [
+      { path: '/admin', texto: 'Inicio del panel con el asistente de IA.', acceso: 'Sesión' },
+      { path: '/admin/login', texto: 'Entrada al panel.', acceso: 'Pública' },
+      { path: '/admin/academia', texto: 'Participantes, entregas, lecciones, sábados, certificados y opiniones.', acceso: 'Admin' },
+      { path: '/admin/diagnostico', texto: 'Diagnóstico de IA por área: enlace de la encuesta, resumen y respuestas.', acceso: 'Admin' },
+      { path: '/admin/diagnostico/informe', texto: 'Informe para Gerencia en horas y en pesos.', acceso: 'Admin' },
+      { path: '/admin/talento', texto: 'Talento humano: fichas, documentos, vacaciones, capacitación y desempeño.', acceso: 'Admin' },
+      { path: '/admin/cumplimiento', texto: 'Agente de cumplimiento: expedientes, actos, alertas y reglas.', acceso: 'Sesión' },
+      { path: '/admin/propuesta', texto: 'La propuesta en línea: enlace, plan elegido y preguntas al chat.', acceso: 'Admin' },
+    ],
+  },
+  {
+    titulo: 'Comercial e internas',
+    rutas: [
+      { path: '/propuesta', texto: 'Propuesta comercial en línea con simulador, chat IA y elección de plan.', acceso: 'Pública' },
+      { path: '/docs', texto: 'Documentación interna del proyecto.', acceso: 'Admin' },
+      { path: '/docs/kanban', texto: 'Tablero de tareas.', acceso: 'Admin' },
+      { path: '/docs/radar', texto: 'Radar del proyecto.', acceso: 'Admin' },
+      { path: '/oportunidades2630', texto: 'Oportunidades 2026 a 2030 por eje.', acceso: 'Admin' },
+    ],
+  },
+]
+
+const clase: Record<Acceso, string> = { 'Pública': 'pub', 'Admin': 'adm', 'Cuenta academia': 'cta', 'Sesión': 'ses' }
+---
+
+<Layout path="/atajos" title="Atajos · Ekosolv" description="Rutas del proyecto." noindex>
+  <section class="page-head wrap at">
+    <div class="page-strip"><div class="l">Uso interno</div></div>
+    <h1 class="display" style="margin-top:40px">Atajos</h1>
+    <p class="lede" style="margin-top:24px; max-width:60ch">
+      Todas las rutas que hemos creado, con quién puede abrir cada una.
+      Dominio: <span class="at-dom">ekosolv.codebymike.net</span>
+    </p>
+  </section>
+
+  <section class="section wrap at-grupos" style="padding-top:0">
+    {grupos.map((g) => (
+      <div class="at-grupo">
+        <h2 class="at-titulo">{g.titulo}</h2>
+        {g.nota && <p class="at-nota">{g.nota}</p>}
+        <ul class="at-lista">
+          {g.rutas.map((r) => (
+            <li>
+              {r.enlace === false
+                ? <span class="at-path">{r.path}</span>
+                : <a class="at-path" href={r.path}>{r.path}</a>}
+              <span class="at-texto">{r.texto}</span>
+              <span class={`at-acceso ${clase[r.acceso]}`}>{r.acceso}</span>
+            </li>
+          ))}
+        </ul>
+      </div>
+    ))}
+  </section>
+</Layout>
+
+<style>
+  .at-dom { font-family: var(--font-mono, ui-monospace, monospace); font-size: .9em; color: var(--ink); }
+  .at-grupos { display: grid; gap: 56px; }
+  .at-titulo { font-family: var(--font-display); font-weight: var(--display-weight); font-size: 24px; letter-spacing: -0.01em; margin: 0; }
+  .at-nota { margin: 6px 0 0; color: var(--mute); font-size: 15px; }
+  .at-lista { list-style: none; margin: 18px 0 0; padding: 0; border-top: 1px solid var(--line); }
+  .at-lista li {
+    display: grid; grid-template-columns: minmax(220px, 300px) 1fr auto; gap: 8px 24px; align-items: baseline;
+    padding: 14px 8px; border-bottom: 1px solid var(--line);
+  }
+  .at-path { font-family: var(--font-mono, ui-monospace, monospace); font-size: 15px; color: var(--ink); text-decoration: none; overflow-wrap: anywhere; }
+  a.at-path:hover { color: var(--forest); text-decoration: underline; text-underline-offset: 3px; }
+  .at-texto { font-size: 15px; color: var(--mute); line-height: 1.45; }
+  .at-acceso { font-size: 12px; letter-spacing: .04em; padding: 3px 10px; border-radius: 999px; white-space: nowrap; }
+  .at-acceso.pub { background: color-mix(in oklab, var(--forest) 14%, transparent); color: var(--forest); }
+  .at-acceso.adm { background: color-mix(in oklab, var(--ink) 10%, transparent); color: var(--ink); }
+  .at-acceso.cta { background: color-mix(in oklab, #c7802f 16%, transparent); color: #8a5418; }
+  .at-acceso.ses { background: color-mix(in oklab, var(--ink) 6%, transparent); color: var(--mute); }
+
+  @media (max-width: 760px) {
+    .at-lista li { grid-template-columns: 1fr auto; }
+    .at-texto { grid-column: 1 / -1; grid-row: 2; }
+  }
+</style>

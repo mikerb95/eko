@@ -16,10 +16,18 @@ test('las seis áreas abren sin sesión, con su contenido y sus PDF', async ({ p
   }
 })
 
-test('un área que no existe muestra el índice, no un 404', async ({ page }) => {
+test('el inicio del banco abre sin sesión y lleva a las seis rutas', async ({ page }) => {
+  const r = await page.goto('/academia/recursos')
+  expect(r?.status()).toBe(200)
+  await expect(page.locator('.rc-rutas a')).toHaveCount(AREAS.length)
+  await page.locator('.rc-rutas a', { hasText: 'Finanzas' }).click()
+  await expect(page).toHaveURL(/\/academia\/recursos\/finanzas$/)
+})
+
+test('un área que no existe lleva al inicio del banco, no a un 404', async ({ page }) => {
   const r = await page.goto('/academia/recursos/no-existe')
   expect(r?.status()).toBe(200)
-  await expect(page.locator('.indice a')).toHaveCount(AREAS.length)
+  await expect(page).toHaveURL(/\/academia\/recursos$/)
 })
 
 test('el botón Copiar copia la instrucción', async ({ page, context }) => {

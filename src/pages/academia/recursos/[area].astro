@@ -1,0 +1,258 @@
+---
+// Ruta de un área en el banco de recursos (docs/plan-recursos.md): destino del
+// QR de la guía rápida impresa. Mismo armazón que la academia, sin cuenta.
+// Un área que no existe lleva al inicio del banco, no a un 404, porque un QR
+// impreso ya no se puede corregir. Pública (excepción en src/middleware.ts).
+export const prerender = false
+import '../../../styles/maquetas.css'
+import AcademiaLayout from '../../../layouts/AcademiaLayout.astro'
+import Maqueta from '../../../components/taller/Maqueta.astro'
+import { colorDe } from '../../../lib/academia/ui'
+import { AREAS_RECURSOS, TOTAL_PROGRAMA, areaRecursos, bancoDe, fuentesDe, rutaRecursos, temarioDe } from '../../../lib/talleres/recursos'
+
+const area = areaRecursos(Astro.params.area)
+if (!area) return Astro.redirect('/academia/recursos')
+const banco = bancoDe(area.id)
+const fuentes = fuentesDe(area.id)
+const color = colorDe(area.id)
+const colorNivel = { si: '#179C91', cuidado: '#D9A43B', no: '#C2513F' }
+const partes = [
+  { id: 'contexto', nombre: 'Contexto', ayuda: 'Quién es usted y qué hay que saber', color: '#124E7D' },
+  { id: 'tarea', nombre: 'Tarea', ayuda: 'Qué quiere, con un verbo claro', color: '#179C91' },
+  { id: 'formato', nombre: 'Formato', ayuda: 'Cómo lo quiere recibir', color: '#B8926F' },
+  { id: 'ejemplo', nombre: 'Ejemplo', ayuda: 'Cómo debe quedar, si lo tiene', color: '#6B7580' },
+] as const
+// Las secciones llevan el número de la capacitación para no repetir ids.
+const ancla = (n: number, id: string) => `c${n}-${id}`
+const nav = [
+  { href: '/academia/recursos', texto: 'Inicio' },
+  { href: '/academia/recursos#rutas', texto: 'Rutas por área' },
+]
+const dos = (n: number) => String(n).padStart(2, '0')
+---
+
+<AcademiaLayout titulo={`${area.nombre} · Banco de recursos · Ekosolv`} inicio="/academia/recursos" etiqueta="Academia de IA" nav={nav}>
+  <div class="rc" style={`--c:${color}`}>
+    <section class="rc-cab">
+      <p class="ac-kicker"><span class="ac-punto" aria-hidden="true"></span> Ruta de {area.nombre}</p>
+      <h1>Lo que necesita para usar la IA en <span>{area.nombre}</span></h1>
+      <p class="ac-lede">{area.enfoque} Copie las instrucciones, siga las guías y descargue las hojas de cada capacitación.</p>
+      <nav class="rc-areas" aria-label="Otras áreas">
+        {AREAS_RECURSOS.map((a) => <a href={rutaRecursos(a.id)} aria-current={a.id === area.id ? 'page' : undefined}>{a.nombre}</a>)}
+      </nav>
+    </section>
+
+    <div class="ac-grid rc-grid">
+      <div class="rc-cuerpo">
+        {banco.map((b) => (
+          <section class="rc-cap" aria-label={`Capacitación ${b.n}`}>
+            <header class="rc-cap-cab">
+              <span class="rc-num">{b.n}</span>
+              <div><small>Capacitación {b.n} de {TOTAL_PROGRAMA}</small><h2>{b.titulo}</h2></div>
+            </header>
+
+            <section id={ancla(b.n, 'plantilla')}>
+              <h3>Una buena instrucción tiene cuatro partes</h3>
+              <div class="plantilla">
+                {partes.map((p) => (
+                  <div class="parte" style={`--pc: ${p.color}`}><b>{p.nombre}</b><small>{p.ayuda}</small><p>{b.plantilla[p.id]}</p></div>
+                ))}
+              </div>
+            </section>
+
+            <section id={ancla(b.n, 'instrucciones')}>
+              <h3>Instrucciones para copiar</h3>
+              <div class="instr">
+                {b.instrucciones.map((x) => (
+                  <article>
+                    <div class="cab"><b>{x.titulo}</b><button type="button" class="copiar">Copiar</button></div>
+                    <pre>{x.texto}</pre>
+                  </article>
+                ))}
+              </div>
+            </section>
+
+            <div class="doble">
+              <section id={ancla(b.n, 'iterar')}>
+                <h3>Si no sirve, dígale qué cambiar</h3>
+                <ul class="frases">{b.siNoSirve.map((x) => <li>{x}</li>)}</ul>
+              </section>
+              <section id={ancla(b.n, 'verificar')}>
+                <h3>Antes de usar la respuesta</h3>
+                <ul class="lista">{b.habitos.map((x) => <li><b>{x.titulo}.</b> {x.texto}</li>)}</ul>
+              </section>
+            </div>
+
+            <section id={ancla(b.n, 'pegar')}>
+              <h3>Dónde pegar</h3>
+              <div class="caja pegar">
+                {b.dondePegar.map((x) => <div style={`--pc: ${colorNivel[x.nivel]}`}><span><b>{x.titulo}.</b> {x.texto}</span></div>)}
+              </div>
+            </section>
+
+            {b.guias.map((g, i) => (
+              <section class="guia" id={ancla(b.n, `guia-${i + 1}`)}>
+                <h3>Guía paso a paso</h3>
+                <p class="intro"><b>{g.titulo}.</b> {g.intro}</p>
+                <div class="pasos">
+                  {g.pasos.map((p) => (
+                    <details>
+                      <summary><span><small>{p.concepto}</small><b>{p.titulo}</b></span></summary>
+                      <div class="paso">
+                        <p>{p.hacer}</p>
+                        <p class="que">{p.queEs}</p>
+                        <div class="ilustracion"><Maqueta id={p.maqueta} /></div>
+                      </div>
+                    </details>
+                  ))}
+                </div>
+              </section>
+            ))}
+
+            <section id={ancla(b.n, 'descargas')}>
+              <h3>Descargas</h3>
+              <div class="enlaces">
+                {b.descargas.map((d) => <a href={d.href} download><b>{d.titulo}</b><span>{d.texto}</span><i>PDF</i></a>)}
+                <a href={b.resumen}><b>Tarjeta resumen</b><span>Las ideas para llevarse de la capacitación {b.n}.</span><i>Ver</i></a>
+              </div>
+            </section>
+          </section>
+        ))}
+
+        <section class="rc-fuentes" id="fuentes">
+          <h3>Fuentes oficiales para verificar</h3>
+          <div class="enlaces">
+            {fuentes.map((f) => <a href={f.href} target="_blank" rel="noopener"><b>{f.titulo}</b><span>{f.texto}</span><i>Abrir</i></a>)}
+          </div>
+        </section>
+      </div>
+
+      <aside class="ac-lado rc-lado">
+        {banco.map((b) => (
+          <details class="ac-caja rc-temario" open>
+            <summary><h2>Temario · Capacitación {b.n}</h2></summary>
+            <ol class="rc-indice">
+              {temarioDe(b).map((t, i) => (
+                <li><a href={`#${ancla(b.n, t.id)}`}><span class="ac-num">{dos(i + 1)}</span><span>{t.titulo}</span></a></li>
+              ))}
+              <li><a href="#fuentes"><span class="ac-num">{dos(temarioDe(b).length + 1)}</span><span>Fuentes oficiales</span></a></li>
+            </ol>
+          </details>
+        ))}
+      </aside>
+    </div>
+  </div>
+
+  <script>
+    // En el celular el temario arranca plegado para no tapar el contenido.
+    if (matchMedia('(max-width: 900px)').matches) document.querySelectorAll('details.rc-temario').forEach((d) => d.removeAttribute('open'))
+    document.querySelectorAll<HTMLButtonElement>('.copiar').forEach((b) =>
+      b.addEventListener('click', async () => {
+        const texto = b.closest('article')?.querySelector('pre')?.textContent ?? ''
+        try {
+          await navigator.clipboard.writeText(texto)
+        } catch {
+          const t = document.createElement('textarea')
+          t.value = texto
+          document.body.append(t)
+          t.select()
+          document.execCommand('copy')
+          t.remove()
+        }
+        b.textContent = 'Copiada'
+        b.classList.add('ok')
+        setTimeout(() => { b.textContent = 'Copiar'; b.classList.remove('ok') }, 1800)
+      }),
+    )
+  </script>
+</AcademiaLayout>
+
+<style>
+  .rc { --azul: #124E7D; --verde: #179C91; }
+  .rc-cab h1 { font-size: clamp(32px, 4.6vw, 54px); line-height: 1.02; margin: 12px 0 0; max-width: 18ch; }
+  .rc-cab h1 span { color: var(--c); }
+  .rc-cab .ac-kicker { display: flex; align-items: center; gap: 8px; }
+  .rc-areas { display: flex; gap: 8px; overflow-x: auto; margin: 24px calc(var(--pad) * -1) 32px; padding: 0 var(--pad) 4px; scrollbar-width: none; }
+  .rc-areas a { flex: none; font: 600 14px/1 var(--font-sans); padding: 9px 14px; border-radius: 999px; background: #fff; color: var(--ink); text-decoration: none; border: 1px solid var(--line); }
+  .rc-areas a[aria-current='page'] { background: var(--c); border-color: var(--c); color: #fff; }
+
+  .rc-cuerpo { display: grid; gap: 40px; min-width: 0; }
+  .rc-cap { display: grid; gap: 32px; }
+  .rc-cap > section, .rc-fuentes { scroll-margin-top: 90px; }
+  .rc-cap-cab { display: flex; align-items: center; gap: 14px; padding-bottom: 16px; border-bottom: 1px solid var(--line); }
+  .rc-num { flex: none; width: 44px; height: 44px; border-radius: 50%; background: var(--ink); color: #fff; display: grid; place-items: center; font: 600 18px/1 var(--font-display); }
+  .rc-cap-cab h2 { font-size: 26px; line-height: 1.1; margin: 0; }
+  .rc-cap-cab small { display: block; font: 500 11px/1.2 var(--font-mono); letter-spacing: .1em; text-transform: uppercase; color: var(--mute); margin-bottom: 4px; }
+
+  h3 { font: 500 12px/1 var(--font-mono); letter-spacing: .12em; text-transform: uppercase; color: var(--mute); margin: 0 0 12px; }
+  .caja { background: #fff; border-radius: var(--r-md); padding: 16px 18px; }
+
+  .plantilla { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; }
+  .parte { background: #fff; border-radius: var(--r-md); padding: 14px; display: flex; flex-direction: column; gap: 4px; }
+  .parte b { font: 600 15px/1.1 var(--font-display); display: flex; align-items: center; gap: 7px; }
+  .parte b::before { content: ''; width: 8px; height: 8px; border-radius: 50%; background: var(--pc); }
+  .parte small { font-size: 12px; color: var(--mute); line-height: 1.3; }
+  .parte p { margin: 2px 0 0; font-size: 14px; line-height: 1.4; overflow-wrap: anywhere; }
+
+  .instr { display: grid; gap: 10px; }
+  .instr article { background: #fff; border-radius: var(--r-md); padding: 14px 16px 12px; display: grid; gap: 8px; }
+  .instr .cab { display: flex; justify-content: space-between; align-items: center; gap: 10px; }
+  .instr b { font: 600 16px/1.2 var(--font-display); }
+  .instr pre { margin: 0; white-space: pre-wrap; font: 400 13.5px/1.55 var(--font-mono); color: var(--azul); }
+  .copiar { flex: none; border: 0; cursor: pointer; font: 600 13px/1 var(--font-sans); padding: 8px 12px; border-radius: 999px; background: #E6F3F1; color: #0F6B63; }
+  .copiar.ok { background: var(--verde); color: #fff; }
+
+  .doble { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; }
+  .frases, .lista { list-style: none; margin: 0; padding: 0; display: grid; gap: 8px; }
+  .frases li { font: 400 13.5px/1.45 var(--font-mono); color: var(--azul); background: #fff; border-radius: 10px; padding: 10px 12px; }
+  .lista { gap: 10px; }
+  .lista li { font-size: 15px; line-height: 1.45; }
+  .lista b, .pegar b { font-weight: 600; }
+  .pegar { display: grid; gap: 10px; }
+  .pegar div { display: grid; grid-template-columns: 14px 1fr; gap: 10px; font-size: 15px; line-height: 1.45; }
+  .pegar div::before { content: ''; width: 12px; height: 12px; border-radius: 50%; margin-top: 5px; background: var(--pc); }
+
+  .guia .intro { font-size: 15px; line-height: 1.5; margin: 0 0 12px; color: var(--ink-2); }
+  .pasos { display: grid; gap: 8px; counter-reset: paso; }
+  .pasos details { background: #fff; border-radius: var(--r-md); }
+  .pasos summary { list-style: none; cursor: pointer; display: grid; grid-template-columns: 30px 1fr 16px; gap: 12px; align-items: center; padding: 14px 16px; }
+  .pasos summary::-webkit-details-marker { display: none; }
+  .pasos summary::before { counter-increment: paso; content: counter(paso); width: 30px; height: 30px; border-radius: 50%; background: #E6F3F1; color: #0F6B63; display: grid; place-items: center; font: 600 14px/1 var(--font-display); }
+  .pasos summary::after { content: '+'; color: var(--mute); font-size: 18px; }
+  .pasos details[open] summary::after { content: '−'; }
+  .pasos summary span { display: grid; gap: 2px; }
+  .pasos summary small { font: 500 11px/1.2 var(--font-mono); letter-spacing: .08em; text-transform: uppercase; color: var(--verde); }
+  .pasos summary b { font: 600 15px/1.25 var(--font-display); }
+  .paso { padding: 0 16px 16px 58px; display: grid; gap: 12px; }
+  .paso p { margin: 0; font-size: 15px; line-height: 1.5; }
+  .paso p.que { font-size: 14px; color: var(--ink-2); background: var(--paper-warm); border-radius: 10px; padding: 10px 12px; }
+  .paso .ilustracion { font-size: 13px; background: var(--paper-warm); border-radius: 12px; padding: 14px; overflow: hidden; }
+
+  .enlaces { display: grid; gap: 8px; }
+  .enlaces a { display: grid; grid-template-columns: 1fr auto; gap: 2px 12px; align-items: center; background: #fff; border-radius: var(--r-md); padding: 14px 16px; color: var(--ink); text-decoration: none; transition: background .15s; }
+  .enlaces a:hover { background: color-mix(in oklab, var(--c) 7%, #fff); }
+  .enlaces b { font: 600 16px/1.2 var(--font-display); }
+  .enlaces span { grid-column: 1; font-size: 13.5px; line-height: 1.4; color: var(--mute); }
+  .enlaces i { grid-column: 2; grid-row: 1 / span 2; font-style: normal; font: 500 12px/1 var(--font-mono); color: var(--verde); }
+
+  .rc-temario summary { list-style: none; cursor: pointer; display: flex; justify-content: space-between; align-items: center; gap: 12px; }
+  .rc-temario summary::-webkit-details-marker { display: none; }
+  .rc-temario summary h2 { margin: 0; }
+  .rc-temario[open] summary { margin-bottom: 12px; }
+  .rc-indice { list-style: none; margin: 0; padding: 0; display: grid; gap: 2px; }
+  .rc-indice a { display: flex; align-items: center; gap: 12px; padding: 8px; margin: 0 -8px; border-radius: 10px; text-decoration: none; color: var(--ink); font-size: 14.5px; line-height: 1.3; transition: background .15s; }
+  .rc-indice a:hover { background: color-mix(in oklab, var(--c) 8%, #fff); }
+  .rc-indice .ac-num { width: 28px; height: 28px; font-size: 11px; }
+
+  @media (max-width: 900px) {
+    .rc-lado { order: -1; }
+    .rc-temario summary::after { content: '+'; color: var(--mute); font-size: 20px; }
+    .rc-temario[open] summary::after { content: '−'; }
+    .rc-grid { display: flex; flex-direction: column; }
+  }
+  @media (max-width: 640px) {
+    .plantilla { grid-template-columns: 1fr 1fr; }
+    .doble { grid-template-columns: 1fr; gap: 32px; }
+    .paso { padding-left: 16px; }
+  }
+</style>
