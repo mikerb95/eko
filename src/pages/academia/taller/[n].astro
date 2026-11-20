@@ -18,13 +18,20 @@ import { cuentaDe } from '../../../lib/academia/datos'
 import { listarRespuestas } from '../../../lib/diagnostico/datos'
 import { resumir, SEMANAS_MES } from '../../../lib/diagnostico/resumen'
 import { SITE_URL } from '../../../lib/site'
+import { PC_COOKIE } from '../../../lib/auth'
+import { vistaPC } from '../../../lib/talleres/pc'
 
 const t = tallerDe(Astro.params.n)
 if (!t) return new Response('Esta capacitación todavía no está publicada.', { status: 404, headers: { 'content-type': 'text/plain; charset=utf-8' } })
 
 const admin = String(Astro.locals.role || '') === 'admin'
+// PC vinculado con el código del celular (/pc): sigue la escena de quien dicta
+// mientras la capacitación esté en curso. No necesita cuenta.
+const pc = admin ? null : await vistaPC(Astro.cookies.get(PC_COOKIE)?.value).catch(() => null)
+const seguir = !!pc && pc.estado.taller === t.n
 let bloqueo = ''
-if (!admin) {
+if (!admin && !seguir && !Astro.locals.username) bloqueo = 'pc'
+else if (!admin && !seguir) {
   const cuenta = await cuentaDe(String(Astro.locals.username || ''))
   if (!cuenta) bloqueo = 'cuenta'
   else if (enCurso(await leerEstado(t.n).catch(() => null))) bloqueo = 'en_curso'
@@ -69,6 +76,7 @@ const ctx: Contexto = {
 const datos = {
   n: t.n,
   admin,
+  seguir,
   bloques: t.bloques,
   escenas: t.escenas.map((e) => ({ id: e.id, tipo: e.tipo, pasos: e.pasos, minutos: e.minutos, bloque: e.bloque, interaccion: e.interaccion ?? '', demo: e.demo ?? '', oscura: TIPOS_OSCUROS.has(e.tipo) })),
   demos: t.demos.map((d) => ({ id: d.id, versiones: d.versiones.map((v) => ({ id: v.id, parte: v.parte, respaldo: v.respaldo })) })),
@@ -102,12 +110,19 @@ const datos = {
         <a class="tl-btn" href="/academia/sala">Ir a la sala</a>
       </main>
     )}
+    {bloqueo === 'pc' && (
+      <main class="tl-aviso">
+        <h1>La capacitación ya no está en curso</h1>
+        <p>Este PC seguía la presentación mientras duraba la sesión. Para repasarla, entre con su cuenta de la academia.</p>
+        <a class="tl-btn" href="/academia">Ir a la academia</a>
+      </main>
+    )}
     {!bloqueo && (
       <>
         <header class="tl-barra">
           <img src="/brand/ekosolv-horizontal.png" alt="EKOSOLV" width="249" height="72" />
           <span class="tl-barra-tit">Capacitación {t.n} · {t.titulo}</span>
-          <a href="/academia">Volver a la academia</a>
+          {seguir ? <span class="tl-barra-nota">La presentación sigue a quien dicta</span> : <a href="/academia">Volver a la academia</a>}
         </header>
         <div class="tl-escenario" data-taller-raiz>
           <div class="tl-lienzo" data-lienzo>
