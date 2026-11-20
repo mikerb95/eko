@@ -66,6 +66,28 @@ export type Mensaje =
   | { tipo: 'ir'; i: number; paso: number }
   | { tipo: 'hola' }
   | { tipo: 'accion'; nombre: 'pedir' | 'generar' }
+  /** Aviso "Empezamos en 00:00" sobre el proyector. fin: hora de llegada a cero (ms), null lo quita. */
+  | { tipo: 'aviso'; fin: number | null }
+
+/**
+ * El aviso de inicio también queda en localStorage: si el proyector se abre o
+ * se recarga después de lanzarlo, lo retoma donde va.
+ */
+const claveAviso = (n: number) => `ekosolv-taller-${n}-aviso`
+export function leerAviso(n: number): number | null {
+  try {
+    const fin = Number(localStorage.getItem(claveAviso(n)) || 0)
+    return fin > 0 ? fin : null
+  } catch {
+    return null
+  }
+}
+export function guardarAviso(n: number, fin: number | null): void {
+  try {
+    if (fin) localStorage.setItem(claveAviso(n), String(fin))
+    else localStorage.removeItem(claveAviso(n))
+  } catch {}
+}
 
 export function canal(n: number, alRecibir: (m: Mensaje) => void): (m: Mensaje) => void {
   if (typeof BroadcastChannel === 'undefined') return () => {}

@@ -66,3 +66,15 @@
 .pr-duda-ia.esperando p { color: #8a949d; }
 .pr-dudas li button { align-self: flex-start; border: 0; cursor: pointer; font: 600 13px/1 var(--font-sans); color: #124E7D; background: #fff; padding: 8px 12px; border-radius: 999px; box-shadow: inset 0 0 0 1px #D9D5CF; }
 .pr-dudas li button:hover { background: #EAF1F7; }
+/* Aviso de inicio ("Empezamos en 00:00" en el proyector). */
+.pr-espera.on { background: color-mix(in oklab, #179C91 10%, #fff); }
+.pr-espera.on b { color: #0b5c55; }
+.pr-espera b { font-size: 22px; }
+.pr-espera-txt { grid-column: 1 / -1; font-size: 13px; color: #6B7580; }
+.pr-espera-form { grid-column: 1 / -1; display: flex; gap: 8px; align-items: center; }
+.pr-espera-form label { flex: 1; display: flex; align-items: center; gap: 8px; padding: 0 14px; border-radius: 999px; background: #fff; box-shadow: inset 0 0 0 1px #D9D5CF; }
+.pr-espera-form label:focus-within { box-shadow: inset 0 0 0 2px #179C91; }
+.pr-espera-form input { width: 100%; min-width: 0; border: 0; outline: 0; background: none; padding: 12px 0; font: 600 18px/1 var(--font-sans); font-variant-numeric: tabular-nums; color: #0E1C26; }
+.pr-espera-form label span { font-size: 14px; color: #6B7580; }
+.pr-espera-form .pr-btn { padding: 12px 18px; }
+.pr-espera > .pr-btn { grid-column: 1 / -1; }

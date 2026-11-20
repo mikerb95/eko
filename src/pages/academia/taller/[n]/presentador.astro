@@ -78,6 +78,19 @@ const datos = {
       </section>
 
       <aside class="pr-lado">
+        <section class="pr-caja pr-espera" data-espera>
+          <span>Aviso de inicio</span>
+          <b data-espera-resta>apagado</b>
+          <p class="pr-espera-txt">Muestra en el proyector "Empezamos en" con una cuenta regresiva.</p>
+          <form class="pr-espera-form" data-espera-form>
+            <label>
+              <input type="number" name="minutos" min="1" max="120" step="1" value="10" inputmode="numeric" required data-espera-min />
+              <span>minutos</span>
+            </label>
+            <button type="submit" class="pr-btn" data-espera-mostrar>Mostrar</button>
+          </form>
+          <button type="button" class="pr-btn sec" data-espera-quitar hidden>Quitar aviso</button>
+        </section>
         <div class="pr-caja">
           <span>En la sala</span><b data-sala>0</b>
           <span>Registrados hoy</span><b data-asistentes>0</b>
