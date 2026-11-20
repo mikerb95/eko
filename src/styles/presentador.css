@@ -56,9 +56,13 @@
 .pr-lista li b { font: 600 15px/1.25 var(--font-sans); }
 .pr-lista li span { font-size: 13px; }
 .pr-dudas .pr-dudas-vacio { grid-column: 1 / -1; margin: 0; font-size: 13px; color: #6B7580; }
-.pr-dudas ol { grid-column: 1 / -1; list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 10px; max-height: 340px; overflow: auto; }
+.pr-dudas ol { grid-column: 1 / -1; list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 10px; max-height: 560px; overflow: auto; }
 .pr-dudas li { display: flex; flex-direction: column; gap: 6px; padding: 12px; border-radius: 12px; background: #F4F7FA; }
 .pr-dudas li p { margin: 0; font: 500 15.5px/1.4 var(--font-sans); color: #0E1C26; }
 .pr-dudas li span { font-size: 12.5px; }
+.pr-duda-ia { display: grid; gap: 4px; padding: 10px 12px; border-radius: 10px; background: #fff; box-shadow: inset 0 0 0 1px #D6E9E6; }
+.pr-duda-ia small { font: 600 11.5px/1.2 var(--font-sans); letter-spacing: .04em; text-transform: uppercase; color: #179C91; }
+.pr-dudas li .pr-duda-ia p { font: 400 14.5px/1.45 var(--font-sans); color: #33404B; }
+.pr-duda-ia.esperando p { color: #8a949d; }
 .pr-dudas li button { align-self: flex-start; border: 0; cursor: pointer; font: 600 13px/1 var(--font-sans); color: #124E7D; background: #fff; padding: 8px 12px; border-radius: 999px; box-shadow: inset 0 0 0 1px #D9D5CF; }
 .pr-dudas li button:hover { background: #EAF1F7; }

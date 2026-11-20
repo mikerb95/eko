@@ -164,6 +164,10 @@ test('presentación, sala, votos y asistencia', async ({ browser }) => {
   await expect(duda).toContainText('¿Un auto escaneado también se parte en tokens?', { timeout: 8000 })
   await expect(duda).toContainText('Luis Mora · Operaciones · en "La IA no lee letras ni palabras: lee tokens"')
   await expect(presentador.locator('[data-n-dudas]')).toHaveText('1')
+  // La IA le prepara la respuesta a quien dicta (modelo simulado) y queda guardada.
+  await expect(duda.locator('.pr-duda-ia')).toContainText('Respuesta de prueba del modelo simulado', { timeout: 10000 })
+  const guardada = (await (await proyector.request.get('/api/academia/taller?que=panel&n=1')).json()).preguntas[0]
+  expect(guardada.respuesta).toContain('modelo simulado')
   await presentador.screenshot({ path: 'test-results/taller-dudas-presentador.png' })
   await duda.getByRole('button', { name: 'Respondida' }).click()
   await expect(presentador.locator('[data-dudas] li')).toHaveCount(0)

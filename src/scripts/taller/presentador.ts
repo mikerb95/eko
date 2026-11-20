@@ -173,8 +173,36 @@ function montar(d: DatosPr) {
     ritmo.className = Math.abs(desfase) <= 2 ? '' : desfase > 0 ? 'tarde' : 'antes'
   }, 1000)
 
-  // Preguntas que llegan del celular. Al marcarla como respondida sale de la lista.
-  const pintarDudas = (ps: { id: number; texto: string; nombre: string; area: string; escena: string }[]) => {
+  // Preguntas que llegan del celular, cada una con una respuesta sugerida que
+  // prepara la IA (se pide una sola vez por pregunta; el servidor la guarda).
+  // Al marcarla como respondida sale de la lista.
+  const respuestasIA = new Map<number, string>()
+  const pidiendo = new Set<number>()
+  const fallidas = new Set<number>()
+
+  const pintarRespuesta = (caja: HTMLElement, id: number) => {
+    const texto = respuestasIA.get(id)
+    caja.classList.toggle('esperando', !texto && !fallidas.has(id))
+    caja.querySelector('p')!.textContent = texto ?? (fallidas.has(id) ? 'No se pudo preparar la respuesta con IA. Respóndala con las notas de la escena.' : 'Preparando la respuesta…')
+  }
+
+  const pedirRespuesta = (id: number) => {
+    if (respuestasIA.has(id) || pidiendo.has(id) || fallidas.has(id)) return
+    pidiendo.add(id)
+    enviar<{ texto: string }>({ accion: 'respuesta_ia', taller: d.n, id }, 40_000)
+      .then((r) => (r.texto ? respuestasIA.set(id, r.texto) : fallidas.add(id)))
+      .catch((err) => {
+        console.error('[presentador] respuesta_ia', err)
+        fallidas.add(id)
+      })
+      .finally(() => {
+        pidiendo.delete(id)
+        const caja = document.querySelector<HTMLElement>(`[data-ia-id="${id}"]`)
+        if (caja) pintarRespuesta(caja, id)
+      })
+  }
+
+  const pintarDudas = (ps: { id: number; texto: string; nombre: string; area: string; escena: string; respuesta: string }[]) => {
     $('[data-n-dudas]').textContent = String(ps.length)
     $('[data-dudas-vacio]').hidden = ps.length > 0
     $('[data-dudas]').replaceChildren(
@@ -199,7 +227,16 @@ function montar(d: DatosPr) {
             b.disabled = false
           }
         })
-        li.append(tx, sp, b)
+        if (p.respuesta) respuestasIA.set(p.id, p.respuesta)
+        const ia = document.createElement('div')
+        ia.className = 'pr-duda-ia'
+        ia.dataset.iaId = String(p.id)
+        const et = document.createElement('small')
+        et.textContent = 'Respuesta sugerida por la IA'
+        ia.append(et, document.createElement('p'))
+        pintarRespuesta(ia, p.id)
+        pedirRespuesta(p.id)
+        li.append(tx, sp, ia, b)
         return li
       }),
     )

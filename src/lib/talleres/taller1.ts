@@ -52,14 +52,14 @@ const EVALUACION: Pregunta[] = [
   },
   {
     id: 'e4',
-    enunciado: '¿Puede pegar en la IA un certificado con la cédula y el teléfono del conductor?',
+    enunciado: '¿Dónde puede pegar un certificado con la cédula y el teléfono del conductor?',
     opciones: [
-      { id: 'a', texto: 'Sí, es un documento de trabajo' },
-      { id: 'b', texto: 'No sin antes quitar los datos personales' },
+      { id: 'a', texto: 'Sí, en la cuenta de IA de Ekosolv' },
+      { id: 'b', texto: 'Sí, en la que tenga abierta, incluso la personal' },
       { id: 'c', texto: 'Solo si el cliente es antiguo' },
     ],
-    correcta: 'b',
-    explicacion: 'La Ley 1581 de 2012 protege los datos personales: se anonimiza antes de compartir.',
+    correcta: 'a',
+    explicacion: 'En la cuenta de la empresa el proveedor no entrena con lo que se pega y trata los datos bajo contrato, como pide la Ley 1581 de 2012. En una cuenta personal, no.',
   },
   {
     id: 'e5',
@@ -205,11 +205,11 @@ export const TALLER_1: Taller = {
       tipo: 'voto',
       titulo: '¿Se sube o no se sube?',
       preguntas: [
-        { id: 's1', enunciado: 'El texto de una resolución publicada por la autoridad ambiental.', opciones: OPCIONES_SEMAFORO(), correcta: 'si', explicacion: 'Es un documento público: se puede compartir.' },
-        { id: 's2', enunciado: 'Un certificado de disposición final con el nombre y la cédula del conductor.', opciones: OPCIONES_SEMAFORO(), correcta: 'anon', explicacion: 'Sirve para la tarea, pero primero se tapan nombre y cédula.' },
-        { id: 's3', enunciado: 'La lista del personal con sus incapacidades médicas.', opciones: OPCIONES_SEMAFORO(), correcta: 'no', explicacion: 'Los datos de salud son sensibles: no se suben.' },
-        { id: 's4', enunciado: 'El correo de un cliente, con su celular personal, para redactar la respuesta.', opciones: OPCIONES_SEMAFORO(), correcta: 'anon', explicacion: 'Se quita el celular y el nombre si no hacen falta para responder.' },
-        { id: 's5', enunciado: 'La contraseña de Zoho, para que la IA "revise" algo.', opciones: OPCIONES_SEMAFORO(), correcta: 'no', explicacion: 'Contraseñas y claves de acceso, nunca.' },
+        { id: 's1', enunciado: 'El texto de una resolución publicada por la autoridad ambiental.', opciones: OPCIONES_SEMAFORO(), correcta: 'si', explicacion: 'Es un documento público.' },
+        { id: 's2', enunciado: 'En la cuenta de Ekosolv: un certificado con el nombre y la cédula del conductor.', opciones: OPCIONES_SEMAFORO(), correcta: 'si', explicacion: 'En la cuenta de la empresa se pega completo.' },
+        { id: 's3', enunciado: 'En la cuenta de Ekosolv: las incapacidades del personal, para contar días perdidos.', opciones: OPCIONES_SEMAFORO(), correcta: 'anon', explicacion: 'Dato de salud: bastan las cifras, sin nombres ni diagnósticos.' },
+        { id: 's4', enunciado: 'El correo de un cliente, con su celular, en su IA personal gratuita.', opciones: OPCIONES_SEMAFORO(), correcta: 'no', explicacion: 'En la cuenta personal no hay contrato que proteja los datos.' },
+        { id: 's5', enunciado: 'La contraseña de Zoho, para que la IA "revise" algo.', opciones: OPCIONES_SEMAFORO(), correcta: 'no', explicacion: 'Contraseñas y claves, nunca.' },
       ],
     },
   ],
@@ -796,12 +796,12 @@ export const TALLER_1: Taller = {
       interaccion: 'semaforo',
       provisional: true,
       notas: [
-        'Contexto legal en 30 segundos: la Ley 1581 de 2012 protege los datos personales y la vigila la Superintendencia de Industria y Comercio, que puede imponer multas de hasta 2.000 salarios mínimos. Pegar datos de personas en una IA es tratarlos, y como los servidores están fuera de Colombia, esos datos salen del país. Además del riesgo legal está la confianza del cliente.',
+        'Contexto legal en 30 segundos: la Ley 1581 de 2012 protege los datos personales y la vigila la Superintendencia de Industria y Comercio, que puede imponer multas de hasta 2.000 salarios mínimos. Pegar datos de personas en una IA es tratarlos, y como los servidores están fuera de Colombia, esos datos salen del país. Por eso importa la cuenta: la de Ekosolv es plan Team, el proveedor no entrena con lo que se pega y firma un acuerdo de tratamiento de datos, igual que Google con el correo o Zoho con el CRM. Una cuenta personal no tiene nada de eso. Diga antes de votar que los casos 1 a 3 son en la cuenta de Ekosolv.',
         'Paso 1, la resolución publicada: se sube. Es un documento público.',
-        'Paso 2, el certificado con nombre y cédula del conductor: se sube anonimizado. La tarea (kilos, residuo, fecha) no necesita saber quién manejaba. Regla: si el dato personal no hace falta para la tarea, se quita.',
-        'Paso 3, las incapacidades médicas: no se sube. Los datos de salud son datos sensibles (artículo 5 de la ley) y tienen protección reforzada. Ni anonimizados vale la pena: en un equipo pequeño es fácil reconocer a la persona.',
-        'Paso 4, el correo del cliente con su celular: anonimizado. Para redactar la respuesta basta "el jefe de planta". Muchos votan "se sube" porque es un cliente; recalque que el contacto del cliente también es dueño de sus datos.',
-        'Paso 5, la contraseña de Zoho: nunca. Ni contraseñas, ni claves bancarias, ni códigos de acceso, en ninguna IA. Regla corta para cerrar: documentos públicos, sí; documentos de trabajo, anonimizados; datos sensibles y contraseñas, nunca. Los casos son de ejemplo: ajústelos con situaciones reales de Ekosolv.',
+        'Paso 2, el certificado con nombre y cédula del conductor: se sube completo. Muchos votarán "anonimizado" por costumbre; aclare que en la cuenta de la empresa no hace falta tapar nombres, cédulas ni celulares. La diapositiva siguiente lo muestra.',
+        'Paso 3, las incapacidades médicas: anonimizado. Los datos de salud son sensibles (artículo 5 de la ley) y tienen protección reforzada, así que solo se usan si la tarea de verdad los necesita. Para contar días perdidos bastan las cifras: quite nombres y diagnósticos. Ojo: en un equipo pequeño, aun sin nombre, a veces se reconoce a la persona.',
+        'Paso 4, el correo del cliente en la IA gratuita del celular: no se sube. Es el caso más común en la vida real: se está afuera, se tiene la app personal a mano y se pega "rapidito". En la cuenta de Ekosolv ese mismo correo se pegaría completo; lo que cambia es la cuenta, no el documento.',
+        'Paso 5, la contraseña de Zoho: nunca. Ni contraseñas, ni claves bancarias, ni códigos de acceso, en ninguna IA. Regla corta para cerrar: documentos de trabajo, en la cuenta de Ekosolv y completos; datos de salud, solo lo que la tarea necesite; contraseñas, nunca; y nada de trabajo en la cuenta personal. Los casos son de ejemplo: ajústelos con situaciones reales de Ekosolv.',
       ],
       siPreguntan: [
         { p: '¿Y la información de la empresa que no es personal, como precios o contratos?', r: 'La Ley 1581 no la cubre, pero es confidencial. En los planes de empresa de Anthropic las conversaciones no se usan para entrenar, lo que reduce el riesgo; aun así, lo estratégico (precios negociados, contratos con cláusula de confidencialidad) se comparte solo si hace falta para la tarea. Ante la duda, se consulta con Gerencia.' },
@@ -900,7 +900,7 @@ export const TALLER_1: Taller = {
       pasos: 0,
       notas: [
         'Pida que escaneen el código para guardar la tarjeta resumen, con las ideas y las instrucciones de hoy. Se puede imprimir y tener a la mano.',
-        'Frase de cierre: "La IA es como un practicante muy rápido y muy seguro de sí mismo. Le puede ahorrar horas, pero lo que entrega se revisa siempre, y lo personal no se le da." Agradezca y responda las preguntas del celular que quedaron pendientes.',
+        'Frase de cierre: "La IA es como un practicante muy rápido y muy seguro de sí mismo. Le puede ahorrar horas, pero lo que entrega se revisa siempre, y se le habla desde la cuenta de Ekosolv." Agradezca y responda las preguntas del celular que quedaron pendientes.',
       ],
     },
   ],
@@ -912,7 +912,7 @@ export const TALLER_1: Taller = {
       { titulo: 'Trabaja con lo que está en la mesa', texto: 'Solo tiene en cuenta la conversación y sus adjuntos. Una conversación nueva empieza vacía.' },
       { titulo: 'Puede inventar con seguridad', texto: 'Normas, cifras y fechas se verifican siempre contra la fuente.' },
       { titulo: 'Cuatro partes', texto: 'Contexto, tarea, formato y ejemplo. Si no sirve, dígale qué cambiar.' },
-      { titulo: 'Datos personales, no', texto: 'Anonimice antes de pegar. Datos sensibles y contraseñas, nunca (Ley 1581 de 2012).' },
+      { titulo: 'La cuenta de Ekosolv, no la suya', texto: 'Los documentos de trabajo se pegan completos solo en la cuenta de la empresa. Datos de salud, solo si la tarea los necesita. Contraseñas, nunca (Ley 1581 de 2012).' },
     ],
     instrucciones: [
       {

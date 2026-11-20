@@ -4,8 +4,8 @@ import { hoyEnBogota } from '../../../lib/agente/diasHabiles'
 import { nombreModulo } from '../../../lib/academia/reglas'
 import { tallerDe } from '../../../lib/talleres'
 import { compararEvaluacion, contarVotos, interaccionDe } from '../../../lib/talleres/reglas'
-import { asistentesDeHoy, enSala, fijarEstado, marcarRespondida, preguntasPendientes, respuestas, sesionesDeHoy } from '../../../lib/talleres/datos'
-import { preguntarDemo } from '../../../lib/talleres/motorIA'
+import { asistentesDeHoy, enSala, fijarEstado, guardarRespuestaIA, marcarRespondida, preguntaSala, preguntasPendientes, respuestas, sesionesDeHoy } from '../../../lib/talleres/datos'
+import { preguntarDemo, responderPregunta } from '../../../lib/talleres/motorIA'
 
 // Capacitaciones en vivo (/academia/taller/<n>). El middleware ya exige
 // sesión. Mover la presentación, ver el tablero del presentador y pedirle a
@@ -15,7 +15,7 @@ import { preguntarDemo } from '../../../lib/talleres/motorIA'
 // GET ?que=resultados&n&i  → conteo de una interacción (proyector)
 // GET ?que=comparacion&n   → evaluación de entrada contra salida
 // GET ?que=panel&n         → sala, asistencia, preguntas de la sala y aviso de bloque del día (presentador)
-// POST {accion}            → estado | ia | respondida
+// POST {accion}            → estado | ia | respuesta_ia | respondida
 
 export const prerender = false
 
@@ -56,6 +56,7 @@ export const GET: APIRoute = async ({ url, locals }) => {
           nombre: p.nombre,
           area: nombreModulo(p.area),
           escena: t.escenas.find((e) => e.id === p.escena)?.titulo ?? '',
+          respuesta: p.respuesta_ia,
         })),
       })
     }
@@ -90,6 +91,20 @@ export const POST: APIRoute = async ({ request, locals }) => {
         if (!esAdmin(locals)) return json({ error: 'Solo quien dicta usa la demo en vivo' }, 403)
         const r = await preguntarDemo(t, b.demo, b.version)
         if (!r) return json({ error: 'Esa versión de la demo no existe' }, 400)
+        return json(r)
+      }
+
+      // Respuesta preparada por la IA para una pregunta de la sala. Se guarda la
+      // primera vez; las siguientes se devuelve la guardada, sin gastar de nuevo.
+      case 'respuesta_ia': {
+        if (!esAdmin(locals)) return json({ error: 'Solo administradores' }, 403)
+        const id = Number(b.id)
+        if (!Number.isInteger(id) || id <= 0) return json({ error: 'Pregunta inválida' }, 400)
+        const p = await preguntaSala(t.n, id)
+        if (!p) return json({ error: 'Esa pregunta no existe' }, 404)
+        if (p.respuesta_ia) return json({ texto: p.respuesta_ia, fuente: 'vivo' })
+        const r = await responderPregunta(t, p.escena, nombreModulo(p.area), p.texto)
+        if (r.texto) await guardarRespuestaIA(t.n, id, r.texto)
         return json(r)
       }
 
