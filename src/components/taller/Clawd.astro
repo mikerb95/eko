@@ -15,7 +15,10 @@ interface Props {
   accesorio?: 'teclado' | 'mesa' | 'nada'
   lugar: string
   frases?: string[]
-  /** Dibuja la varita de burbujas (la saca y sopla con `burbujas(true)` en clawd.ts). */
+  /**
+   * Dibuja los juguetes del aviso "Empezamos en": la varita de burbujas, la
+   * bengala de chispitas y el PC (los usa `burbujas(true)` en clawd.ts).
+   */
   burbujas?: boolean
 }
 const { accesorio = 'nada', lugar, frases, burbujas = false } = Astro.props
@@ -39,6 +42,9 @@ const C = {
   aro: '#F07FA8',
   aroLuz: '#F7AFC9',
   jabon: '#BFE9FF',
+  metal: '#A7B3BC',
+  polvora: '#5A4A42',
+  pantalla: '#0B151B',
 }
 
 // Teclado: 26 de ancho, de x = -4 a 21, de y = 7 a 10, delante de las patitas.
@@ -91,6 +97,25 @@ const HOJAS = 14
               </g>
             </g>
           )}
+          {burbujas && (
+            // Bengala de chispitas: varilla de metal con la punta recubierta y
+            // la brasa en el extremo (el motor le cambia el color al apagarse).
+            <g class="clawd-bengala" data-clawd-bengala visibility="hidden">
+              <g transform="translate(1 4) scale(.7) translate(-1 -4)">
+                <g fill={C.metal}>
+                  <rect x="0" y="3" width="1" height="1" />
+                  <rect x="-1" y="2" width="1" height="1" />
+                  <rect x="-2" y="1" width="1" height="1" />
+                </g>
+                <g fill={C.polvora}>
+                  <rect x="-3" y="0" width="1" height="1" />
+                  <rect x="-4" y="-1" width="1" height="1" />
+                  <rect x="-5" y="-2" width="1" height="1" />
+                </g>
+                <rect data-clawd-punta x="-6" y="-3" width="1" height="1" fill={C.polvora} />
+              </g>
+            </g>
+          )}
           <rect x="1" y="4" width="2" height="2" fill={C.cuerpo} />
         </g>
         <g data-clawd-brazo="d"><rect x="15" y="4" width="2" height="2" fill={C.cuerpo} /></g>
@@ -117,6 +142,28 @@ const HOJAS = 14
         </g>
       </g>
     </g>
+
+    {burbujas && (
+      // PC para codear: monitor a la izquierda (el motor escribe el código en
+      // data-clawd-codigo) y un teclado delante de las patitas.
+      <g class="clawd-pc" data-clawd-pc visibility="hidden">
+        <g data-clawd-monitor>
+          <rect x="-11" y="6" width="3" height="3" fill={C.teclado} />
+          <rect x="-13" y="9" width="7" height="1" fill={C.base} />
+          <rect x="-15" y="-3" width="11" height="9" fill={C.borde} />
+          <rect x="-15" y="-3" width="11" height="1" fill="#3A5263" />
+          <rect data-clawd-pantalla x="-14" y="-2" width="9" height="7" fill={C.pantalla} />
+          <g data-clawd-codigo />
+          <rect class="clawd-cursor" data-clawd-cursor x="-13.5" y="-1.5" width=".5" height=".5" fill="#fff" />
+        </g>
+        <g data-clawd-teclado-pc>
+          <rect x="0" y="7" width="18" height="3" fill={C.teclado} />
+          <rect x="0" y="7" width="18" height="1" fill={C.borde} />
+          <rect x="0" y="9" width="18" height="1" fill={C.base} />
+          {Array.from({ length: 9 }, (_, k) => <rect data-clawd-tecla x={1 + k * 2} y="8" width="1" height="1" fill={C.tecla} />)}
+        </g>
+      </g>
+    )}
 
     {accesorio === 'teclado' && (
       <g class="clawd-teclado">
