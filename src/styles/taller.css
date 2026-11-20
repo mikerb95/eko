@@ -200,7 +200,7 @@
 .tl-on .clawd--piensa { left: 120px; bottom: 26px; width: 300px; --globo: 22px; }
 .tl-on .clawd--inventa { right: 110px; bottom: 26px; width: 300px; --globo: 22px; }
 .tl-on .clawd--mesa { right: 110px; top: 40px; width: 400px; --globo: 24px; }
-.tl-on .clawd--constructor { right: 96px; bottom: 4px; width: 170px; --globo: 18px; }
+.tl-on .clawd--constructor { right: 110px; top: 92px; width: 250px; --globo: 22px; }
 .tl-on .clawd--votos { right: 96px; bottom: 10px; width: 180px; --globo: 18px; }
 .tl-on .clawd--descanso { right: 180px; bottom: 140px; width: 380px; --globo: 26px; }
 .tl-on .clawd--practica { left: 500px; bottom: 26px; width: 250px; --globo: 20px; }
@@ -231,10 +231,11 @@
 .clawd-globo { position: absolute; left: 50%; top: -6%; translate: -50% 0; font: 600 var(--globo)/1.15 var(--font-mono); color: var(--tinta); background: #6fd2c9; padding: .3em .55em; border-radius: 4px; opacity: 0; visibility: hidden; pointer-events: none; white-space: nowrap; box-shadow: 0 4px 0 #2f8f87; }
 .clawd-globo[data-tipo='pregunta'] { background: var(--c-rojo); color: #fff; box-shadow: 0 4px 0 #7d2c1d; }
 .clawd-globo[data-tipo='ok'] { background: #7fd49c; box-shadow: 0 4px 0 #2e8b57; }
-.clawd--votos .clawd-globo, .clawd--constructor .clawd-globo { left: auto; right: 0; translate: 0 0; top: -22%; }
 .clawd--piensa .clawd-globo { left: 0; translate: 0 0; }
 .clawd--inventa .clawd-piensa { left: auto; right: -40px; translate: 0 0; }
-.clawd--mesa .clawd-globo { left: auto; right: 88%; top: 34%; translate: 0 0; }
+/* Globo al costado (donde arriba no hay espacio). */
+.clawd--mesa .clawd-globo, .clawd--constructor .clawd-globo, .clawd--votos .clawd-globo { left: auto; right: 88%; top: 34%; translate: 0 0; }
+.clawd--votos .clawd-globo { top: 44%; }
 
 /* Zzz del descanso. */
 .clawd-zzz { position: absolute; left: 66%; top: 4%; display: none; font: 600 calc(var(--globo) * 1.3)/1 var(--font-mono); color: #6fd2c9; pointer-events: none; }
