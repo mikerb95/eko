@@ -78,3 +78,6 @@
 .pr-espera-form label span { font-size: 14px; color: #6B7580; }
 .pr-espera-form .pr-btn { padding: 12px 18px; }
 .pr-espera > .pr-btn { grid-column: 1 / -1; }
+.pr-espera-error { grid-column: 1 / -1; font-size: 13px; color: #B4442F; }
+.pr-espera-error[hidden] { display: none; }
+.pr-espera .pr-btn:disabled { opacity: .6; cursor: progress; }

@@ -167,6 +167,8 @@ function montar(d: DatosPr) {
   // minutos reinicia la cuenta. El panel (cada 5 s) lo trae si lo cambió otro equipo.
   let aviso: Aviso | null = null
   let avisoOcupado = false
+  // Sube con cada cambio propio: una respuesta del panel pedida antes no lo pisa.
+  let avisoVersion = 0
   const pintarAviso = () => {
     const resta = $('[data-espera-resta]')
     $('[data-espera-quitar]').hidden = !aviso
@@ -179,6 +181,7 @@ function montar(d: DatosPr) {
   const ponerAviso = async (minutos: number | null) => {
     if (avisoOcupado) return
     avisoOcupado = true
+    avisoVersion++
     const botones = [$<HTMLButtonElement>('[data-espera-mostrar]'), $<HTMLButtonElement>('[data-espera-quitar]')]
     botones.forEach((b) => (b.disabled = true))
     $('[data-espera-error]').hidden = true
@@ -293,8 +296,9 @@ function montar(d: DatosPr) {
     )
   }
 
-  const panel = () =>
-    consultar({ que: 'panel', n: d.n })
+  const panel = () => {
+    const version = avisoVersion
+    return consultar({ que: 'panel', n: d.n })
       .then((r) => {
         $('[data-sala]').textContent = String(r.sala)
         $('[data-asistentes]').textContent = String(r.asistentes)
@@ -310,7 +314,7 @@ function montar(d: DatosPr) {
           }),
         )
         pintarDudas(r.preguntas ?? [])
-        if (!avisoOcupado) {
+        if (!avisoOcupado && version === avisoVersion) {
           aviso = avisoLocal(r.aviso, aviso)
           pintarAviso()
         }
@@ -318,6 +322,7 @@ function montar(d: DatosPr) {
         avisos()
       })
       .catch(() => {})
+  }
   panel()
   setInterval(panel, 5000)
 
