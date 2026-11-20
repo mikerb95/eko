@@ -13,7 +13,7 @@ const PUBLIC_API_PATHS = new Set(['/api/admin/login', '/api/admin/logout'])
 // que solo sirve para votar en la capacitación en curso.
 // Regla: ningún QR de las capacitaciones lleva a un login. La tarjeta resumen
 // (QR del cierre) también es pública; solo tiene el contenido de la capacitación.
-const PUBLIC_SALA_PATHS = new Set(['/academia/sala', '/api/academia/sala', '/api/academia/pc'])
+const PUBLIC_SALA_PATHS = new Set(['/academia/sala', '/academia/sala/opinion', '/api/academia/sala', '/api/academia/pc'])
 const esResumenTaller = (p: string) => /^\/academia\/taller\/\d+\/resumen$/.test(p)
 // El PC vinculado con el código del celular (/pc, cookie eko_pc) puede abrir
 // la presentación y leer los resultados de las votaciones, sin cuenta. Qué

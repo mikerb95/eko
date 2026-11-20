@@ -17,6 +17,7 @@ export type TipoBitacora =
   | 'sala_entrada' // abrió el enlace del correo en el celular
   | 'pc_vinculado' // abrió la presentación en su PC con el código
   | 'voto' // cada respuesta, también las que luego cambió
+  | 'opinion' // envió (o corrigió) el formulario de cierre de su área
   | 'escena' // quien dicta movió la presentación
 
 export async function anotar(
