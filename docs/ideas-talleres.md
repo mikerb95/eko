@@ -30,6 +30,6 @@ Estado: **construida** (2026-11-19). Lo que pidió Mike y lo que se decidió est
 
 - **Capturas reales** de la pantalla de autorización de Zoho y de la de permisos por herramienta, con una cuenta de Zoho de Ekosolv, y ajustar las maquetas `oauth` y `permisos` de `src/components/taller/Maqueta.astro`. Para eso hay que darle "Connect" al conector con una cuenta real (no se hizo).
 - Confirmar en la consola de administración del plan Team que los conectores y Claude in Chrome estén habilitados para todos.
-- **Tiempo**: el bloque "Conectar Zoho" suma 40 minutos y la capacitación 1 pasó de 4 h a 4 h 40. Decidir si se recorta otro bloque o se alarga la sesión.
+- ~~Tiempo~~ Resuelto (Mike, 2026-11-19): todo se dicta en 4 horas y el descanso sigue de 15 min. Quedó así: Apertura 12, Por dentro 55, Alcances 30, Descanso 15, Cómo pedir 38, Práctica guiada 25, Seguridad 17, Conectar Zoho 35, Cierre 13.
 - Saber quién tiene usuario propio en Zoho y Claude Desktop instalado (los pasos 4 a 7 también se pueden hacer desde claude.ai en Chrome).
 - Plan B para quien no pueda instalar la extensión o la aplicación por permisos del equipo: seguir en la pantalla grande y el celular.

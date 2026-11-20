@@ -154,7 +154,7 @@ test('repaso toma preguntas de la capacitación anterior', () => {
 })
 
 test('tiempos', () => {
-  assert.deepEqual(inicioDeEscenas(TALLER_1.escenas).slice(0, 4), [0, 2, 7, 12])
+  assert.deepEqual(inicioDeEscenas(TALLER_1.escenas).slice(0, 4), [0, 2, 6, 10])
   assert.equal(reloj(0), '0:00')
   assert.equal(reloj(65), '1:05')
   assert.equal(reloj(3725), '1:02:05')

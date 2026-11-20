@@ -137,6 +137,22 @@ const datos = {
               </span>
               <span class="tl-num" data-num>1 / {t.escenas.length}</span>
             </footer>
+            {admin && (
+              <div class="tl-espera" data-espera aria-live="polite">
+                <span class="tl-espera-luz l1" aria-hidden="true" />
+                <span class="tl-espera-luz l2" aria-hidden="true" />
+                <header class="tl-espera-top">
+                  <img src="/brand/ekosolv-horizontal-white.png" alt="EKOSOLV" width="249" height="72" />
+                  <span>Capacitación {t.n}</span>
+                </header>
+                <div class="tl-espera-centro">
+                  <p class="tl-espera-kicker"><i aria-hidden="true" /><span data-espera-kicker>Empezamos en</span></p>
+                  <p class="tl-espera-reloj" data-espera-reloj>00:00</p>
+                  <p class="tl-espera-titulo">{t.titulo}</p>
+                </div>
+                <span class="tl-espera-barra" aria-hidden="true"><i data-espera-barra /></span>
+              </div>
+            )}
           </div>
         </div>
         <script type="application/json" id="tl-datos" set:html={JSON.stringify(datos).replace(/</g, '\\u003c')} />

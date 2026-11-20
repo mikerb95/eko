@@ -4,7 +4,7 @@
  * pregunta en los celulares), y la actualiza cuando el proyector avanza.
  */
 import { inicioDeEscenas, reloj } from '../../lib/talleres/reglas'
-import { canal, consultar, direccionTecla, enviar, guardarAviso, leerAviso, leerDatos, type Mensaje } from './comun'
+import { canal, consultar, direccionTecla, enviar, guardarAviso, leerAviso, leerDatos, type Aviso, type Mensaje } from './comun'
 
 interface EscenaPr {
   id: string
@@ -164,27 +164,27 @@ function montar(d: DatosPr) {
 
   // Aviso de inicio: "Empezamos en 00:00" a pantalla completa en el proyector.
   // Volver a mostrarlo con otros minutos reinicia la cuenta.
-  let finAviso = leerAviso(d.n)
+  let aviso = leerAviso(d.n)
   const pintarAviso = () => {
     const resta = $('[data-espera-resta]')
-    $('[data-espera-quitar]').hidden = !finAviso
-    $('[data-espera-mostrar]').textContent = finAviso ? 'Cambiar' : 'Mostrar'
-    $('[data-espera]').classList.toggle('on', !!finAviso)
-    if (!finAviso) return void (resta.textContent = 'apagado')
-    const s = (finAviso - Date.now()) / 1000
+    $('[data-espera-quitar]').hidden = !aviso
+    $('[data-espera-mostrar]').textContent = aviso ? 'Cambiar' : 'Mostrar'
+    $('[data-espera]').classList.toggle('on', !!aviso)
+    if (!aviso) return void (resta.textContent = 'apagado')
+    const s = (aviso.fin - Date.now()) / 1000
     resta.textContent = s > 0 ? reloj(Math.ceil(s)) : 'en cero'
   }
-  const ponerAviso = (fin: number | null) => {
-    finAviso = fin
-    guardarAviso(d.n, fin)
-    avisar({ tipo: 'aviso', fin })
+  const ponerAviso = (a: Aviso | null) => {
+    aviso = a
+    guardarAviso(d.n, a)
+    avisar({ tipo: 'aviso', aviso: a })
     pintarAviso()
   }
   $<HTMLFormElement>('[data-espera-form]').addEventListener('submit', (ev) => {
     ev.preventDefault()
     const min = Math.round(Number($<HTMLInputElement>('[data-espera-min]').value))
     if (!(min >= 1 && min <= 120)) return
-    ponerAviso(Date.now() + min * 60_000)
+    ponerAviso({ fin: Date.now() + min * 60_000, ms: min * 60_000 })
   })
   $('[data-espera-quitar]').addEventListener('click', () => ponerAviso(null))
   pintarAviso()

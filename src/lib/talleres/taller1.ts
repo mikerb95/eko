@@ -111,17 +111,17 @@ export const TALLER_1: Taller = {
   titulo: 'Inteligencia artificial, por dentro',
   subtitulo: 'Qué es, cómo funciona, en qué sirve y cómo usarla con seguridad en Ekosolv',
   modulos: ['general'],
-  minutosTotales: 280,
+  minutosTotales: 240,
   bloques: [
-    { id: 'apertura', titulo: 'Apertura', minutos: 15 },
-    { id: 'dentro', titulo: 'Qué es la IA por dentro', minutos: 65 },
-    { id: 'alcances', titulo: 'Alcances y límites', minutos: 35 },
+    { id: 'apertura', titulo: 'Apertura', minutos: 12 },
+    { id: 'dentro', titulo: 'Qué es la IA por dentro', minutos: 55 },
+    { id: 'alcances', titulo: 'Alcances y límites', minutos: 30 },
     { id: 'descanso', titulo: 'Descanso', minutos: 15 },
-    { id: 'pedir', titulo: 'Cómo pedir', minutos: 45 },
-    { id: 'practica', titulo: 'Práctica guiada', minutos: 30 },
-    { id: 'seguridad', titulo: 'Seguridad y Ley 1581', minutos: 20 },
-    { id: 'conectar', titulo: 'Conectar Zoho', minutos: 40 },
-    { id: 'cierre', titulo: 'Cierre', minutos: 15 },
+    { id: 'pedir', titulo: 'Cómo pedir', minutos: 38 },
+    { id: 'practica', titulo: 'Práctica guiada', minutos: 25 },
+    { id: 'seguridad', titulo: 'Seguridad y Ley 1581', minutos: 17 },
+    { id: 'conectar', titulo: 'Conectar Zoho', minutos: 35 },
+    { id: 'cierre', titulo: 'Cierre', minutos: 13 },
   ],
   evaluacion: { pre: 'pre', post: 'post' },
   interacciones: [
@@ -282,7 +282,7 @@ export const TALLER_1: Taller = {
       tipo: 'sala',
       kicker: 'Antes de empezar',
       titulo: 'Saque el celular: hoy usted también responde',
-      minutos: 5,
+      minutos: 4,
       pasos: 0,
       notas: [
         'Mientras escanean, rompa el hielo a mano alzada: "¿Quién usó una IA esta semana? ¿Para qué?" Anote dos o tres usos reales: los puede retomar en "Dónde le ahorra horas" y en la práctica.',
@@ -299,7 +299,7 @@ export const TALLER_1: Taller = {
       tipo: 'evaluacion',
       kicker: 'Cinco preguntas',
       titulo: 'Lo que sabemos hoy, antes de empezar',
-      minutos: 5,
+      minutos: 4,
       pasos: 0,
       interaccion: 'pre',
       notas: [
@@ -314,7 +314,7 @@ export const TALLER_1: Taller = {
       tipo: 'diagnostico',
       kicker: 'Lo que ustedes respondieron',
       titulo: 'Por qué estamos aquí',
-      minutos: 3,
+      minutos: 2,
       pasos: 3,
       notas: [
         'Diga: "Antes de hablar de tecnología, hablemos de ustedes. Estas cifras no son de un estudio de otra empresa: salen de la encuesta que ustedes respondieron."',
@@ -334,7 +334,7 @@ export const TALLER_1: Taller = {
       tipo: 'reglas',
       kicker: 'Idea 1 · Aprender de ejemplos',
       titulo: 'Un programa sigue reglas. Un modelo aprende de ejemplos',
-      minutos: 8,
+      minutos: 7,
       pasos: 3,
       notas: [
         'La idea que hay que dejar: la IA no es un programa más con más reglas, es otra forma de construir software. Si esto queda claro, todo lo demás del día tiene sentido.',
@@ -365,7 +365,7 @@ export const TALLER_1: Taller = {
       tipo: 'perillas',
       kicker: 'Idea 2 · Entrenar',
       titulo: 'Millones de perillas que se ajustan solas',
-      minutos: 8,
+      minutos: 7,
       pasos: 3,
       notas: [
         'Esta escena le quita la magia a la IA: por dentro no hay nadie pensando, hay números. Cuanto más concreto lo diga, mejor lo entienden.',
@@ -384,7 +384,7 @@ export const TALLER_1: Taller = {
       tipo: 'tokens',
       kicker: 'Idea 3 · Tokens',
       titulo: 'La IA no lee letras ni palabras: lee tokens',
-      minutos: 8,
+      minutos: 7,
       pasos: 1,
       notas: [
         'Pida a la sala una palabra o el nombre de un cliente y escríbalo en vivo. Las palabras comunes van enteras; las largas, los nombres propios y las cifras se parten. Muestre "Resolución" y un número de radicado: los números se parten en muchos pedazos. Como referencia, una página de texto en español ronda los 700 a 1.000 tokens.',
@@ -403,7 +403,7 @@ export const TALLER_1: Taller = {
       tipo: 'siguiente',
       kicker: 'Idea 4 · Predecir',
       titulo: 'Todo lo que hace es predecir el siguiente token',
-      minutos: 10,
+      minutos: 8,
       pasos: 2,
       notas: [
         'Diga: "Si se llevan una sola idea de hoy, que sea esta: la IA no busca la respuesta, la escribe palabra por palabra eligiendo la más probable." Lea la frase en pantalla y pregunte cómo la completarían: casi todos dirán "gestor". Eso mismo calcula el modelo.',
@@ -432,7 +432,7 @@ export const TALLER_1: Taller = {
       tipo: 'mapa',
       kicker: 'Idea 5 · Significado',
       titulo: 'Para la IA, el significado es cercanía',
-      minutos: 7,
+      minutos: 6,
       pasos: 3,
       notas: [
         'Esta escena explica por qué la IA entiende sinónimos y también por qué a veces confunde términos vecinos. Para Operaciones es clave: en la norma, palabras cercanas no siempre significan lo mismo.',
@@ -476,7 +476,7 @@ export const TALLER_1: Taller = {
       tipo: 'etapas',
       kicker: 'Idea 6 · De dónde sale lo que sabe',
       titulo: 'Primero lee casi todo. Después aprende a ayudar',
-      minutos: 8,
+      minutos: 7,
       pasos: 3,
       notas: [
         'Esta escena responde dos preguntas que siempre salen: de dónde saca lo que sabe y por qué no sabe lo reciente.',
@@ -502,7 +502,7 @@ export const TALLER_1: Taller = {
       tipo: 'contexto',
       kicker: 'Idea 7 · Memoria de trabajo',
       titulo: 'La ventana de contexto es su mesa de trabajo',
-      minutos: 8,
+      minutos: 7,
       pasos: 3,
       notas: [
         'Diga: "Todo lo que la IA tiene en cuenta está sobre la mesa: sus mensajes, lo que adjuntó y lo que ella misma respondió. Lo que no está en la mesa no existe para ella."',
@@ -528,7 +528,7 @@ export const TALLER_1: Taller = {
       tipo: 'ecosistema',
       kicker: 'Idea 8 · El mapa',
       titulo: 'Modelos, aplicaciones y herramientas',
-      minutos: 5,
+      minutos: 4,
       pasos: 3,
       notas: [
         'Esta escena ordena el vocabulario: modelo, aplicación, herramienta y agente. Mucha confusión viene de mezclarlos.',
@@ -554,7 +554,7 @@ export const TALLER_1: Taller = {
       tipo: 'voto',
       kicker: 'Comprobación',
       titulo: '¿Quedó claro?',
-      minutos: 3,
+      minutos: 2,
       pasos: 2,
       interaccion: 'comp',
       notas: [
@@ -571,7 +571,7 @@ export const TALLER_1: Taller = {
       tipo: 'areas',
       kicker: 'En qué es buena',
       titulo: 'Dónde le ahorra horas a cada área',
-      minutos: 8,
+      minutos: 7,
       pasos: 6,
       notas: [
         'Pase de la teoría al trabajo: "Hasta aquí, cómo funciona. Ahora, dónde le ahorra horas a cada uno." En cada área, pregúntele a alguien de esa área cuánto le toma hoy esa tarea.',
@@ -602,7 +602,7 @@ export const TALLER_1: Taller = {
       tipo: 'verdad',
       kicker: 'Juego',
       titulo: '¿Verdad o alucinación?',
-      minutos: 14,
+      minutos: 12,
       pasos: 4,
       interaccion: 'verdad',
       provisional: true,
@@ -623,7 +623,7 @@ export const TALLER_1: Taller = {
       tipo: 'inventa',
       kicker: 'Por qué pasa',
       titulo: 'Suena bien no significa que exista',
-      minutos: 6,
+      minutos: 5,
       pasos: 2,
       notas: [
         'Conecte con la idea 4: "¿Recuerdan que elige la palabra más probable? Miren qué pasa cuando le toca escribir un número de resolución." Señale que ningún número destaca: todos son más o menos igual de probables.',
@@ -652,7 +652,7 @@ export const TALLER_1: Taller = {
       tipo: 'verificar',
       kicker: 'Cómo revisar',
       titulo: 'Cuatro hábitos antes de usar una respuesta',
-      minutos: 7,
+      minutos: 6,
       pasos: 4,
       notas: [
         'La imagen que debe quedar: el trabajo de la IA se revisa como el de un practicante muy rápido y muy seguro de sí mismo. Es útil, pero nadie firma lo que entrega un practicante sin leerlo.',
@@ -694,7 +694,7 @@ export const TALLER_1: Taller = {
       tipo: 'metodo',
       kicker: 'El método',
       titulo: 'Una buena instrucción tiene cuatro partes',
-      minutos: 10,
+      minutos: 9,
       pasos: 4,
       notas: [
         'Diga: "Casi todos los malos resultados vienen de instrucciones de una línea. La IA no lo conoce, no sabe para quién es ni qué va a hacer con la respuesta: si no se lo dice, lo adivina." Pedirle a la IA es como delegarle a alguien nuevo muy capaz.',
@@ -722,7 +722,7 @@ export const TALLER_1: Taller = {
       tipo: 'constructor',
       kicker: 'En vivo con Claude',
       titulo: 'La misma tarea, cuatro instrucciones',
-      minutos: 25,
+      minutos: 20,
       pasos: 3,
       demo: 'auto',
       provisional: true,
@@ -742,7 +742,7 @@ export const TALLER_1: Taller = {
       tipo: 'iterar',
       kicker: 'Cuando no sirve',
       titulo: 'No empiece de cero: dígale qué cambiar',
-      minutos: 10,
+      minutos: 9,
       pasos: 3,
       notas: [
         'El error más común después de una mala respuesta es borrar todo y empezar de nuevo, o rendirse. La IA conserva todo lo de la conversación: corregir por partes es más rápido.',
@@ -767,13 +767,13 @@ export const TALLER_1: Taller = {
       tipo: 'practica',
       kicker: 'Práctica guiada',
       titulo: 'Ahora usted: una tarea real de su puesto',
-      minutos: 30,
+      minutos: 25,
       pasos: 0,
       notas: [
         'Consigna en una frase: "Elija una tarea que haga cada semana y le quite tiempo, y escriba la instrucción con las cuatro partes." El revisor del celular dice qué le faltó, no hace la tarea. En el revisor se escribe la instrucción; no se pegan documentos con datos personales. Quien cerró la sala vuelve a escanear el código.',
         'Primeros cinco minutos: muchos se bloquean eligiendo la tarea. Recorra la sala y sugiera por área: Operaciones, la matriz de un auto o las vigencias de los permisos de un cliente; Logística, clasificar los correos de solicitudes; Gerencia, la propuesta desde una oportunidad de Zoho; Finanzas, el procedimiento de la nómina o la conciliación con el banco; Ventas, del Brief a la propuesta; Mercadeo, una publicación a partir de una norma.',
         'Lo que más falta en las instrucciones: el contexto (no dicen quiénes son ni para quién es) y qué hacer cuando falta un dato. Si ve el mismo error en varias personas, dígalo en voz alta para todos.',
-        'A los 20 minutos: pida dos o tres voluntarios de áreas distintas y muestre su instrucción antes y después del revisor. Cierre: "Guárdenla: es la base de su entrega en la academia."',
+        'A los 15 minutos: pida dos o tres voluntarios de áreas distintas y muestre su instrucción antes y después del revisor. Cierre: "Guárdenla: es la base de su entrega en la academia."',
       ],
       datos: {
         pasos: [
@@ -793,7 +793,7 @@ export const TALLER_1: Taller = {
       tipo: 'semaforo',
       kicker: 'Ley 1581 de 2012',
       titulo: '¿Se sube o no se sube?',
-      minutos: 12,
+      minutos: 10,
       pasos: 5,
       interaccion: 'semaforo',
       provisional: true,
@@ -815,7 +815,7 @@ export const TALLER_1: Taller = {
       tipo: 'anonimizar',
       kicker: 'Dónde pegar',
       titulo: 'Use la cuenta de Ekosolv, no la suya',
-      minutos: 8,
+      minutos: 7,
       pasos: 1,
       provisional: true,
       notas: [
@@ -859,7 +859,7 @@ export const TALLER_1: Taller = {
       tipo: 'evaluacion',
       kicker: 'Para cerrar',
       titulo: 'Las mismas cinco preguntas',
-      minutos: 6,
+      minutos: 5,
       pasos: 0,
       interaccion: 'post',
       notas: [
@@ -886,7 +886,7 @@ export const TALLER_1: Taller = {
       tipo: 'sigue',
       kicker: 'Lo que viene',
       titulo: 'Tres sábados más, todo el equipo',
-      minutos: 3,
+      minutos: 2,
       pasos: 0,
       notas: [
         'Todo el equipo asiste a los tres sábados que faltan, sin separar por áreas. Los temas de cada sábado se ajustan con las respuestas de la encuesta: no prometa temas concretos todavía.',

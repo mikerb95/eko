@@ -97,7 +97,7 @@ export const ESCENA_ZOHO: Escena = {
   tipo: 'conectar',
   kicker: 'Práctica final',
   titulo: 'Conecte Claude con su Zoho, solo para leer',
-  minutos: 40,
+  minutos: 35,
   pasos: PASOS_ZOHO.length - 1,
   notas: [
     'Llegada. Esta práctica junta todo lo del día en una tarea real: cada uno sale con Claude conectado a su propio Zoho CRM. La idea que debe quedar: a Claude se le da un objetivo y un límite, no una lista de clics. Hoy el límite es solo lectura, y se dice así desde el principio. Pida que abran el PC y, quien quiera seguir la presentación ahí, que toque "Abrir en mi PC" en el celular: escribe la dirección que le sale y el código de dos números. El PC sigue la escena sola; si lo minimizan, el celular les muestra cada paso con su animación.',
