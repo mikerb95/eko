@@ -50,9 +50,6 @@ const nDatos = segmentos.filter((s) => s.dato).length
       {e.tipo === 'siguiente' && (
         <>
           <div class="historial" data-historial aria-live="polite" />
-          <div class="acciones">
-            <button type="button" class="tl-btn" data-generar>Elegir el siguiente token</button>
-          </div>
         </>
       )}
       {e.tipo === 'inventa' && (
