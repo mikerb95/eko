@@ -26,10 +26,25 @@ Estado: **construida** (2026-11-19). Lo que pidió Mike y lo que se decidió est
 - **Claude in Chrome solo funciona en Google Chrome**, no en Edge, Brave ni otros navegadores Chromium (soporte de Anthropic). En plan Team viene habilitada por defecto y el administrador la puede apagar.
 - Fuentes de terceros sobre Zoho MCP dicen que en Claude cada herramienta se puede dejar en permitir, pedir aprobación o bloquear. No se pudo ver sin conectar una cuenta.
 
-### Pendiente antes del sábado
+### Pendientes (trazabilidad)
 
-- **Capturas reales** de la pantalla de autorización de Zoho y de la de permisos por herramienta, con una cuenta de Zoho de Ekosolv, y ajustar las maquetas `oauth` y `permisos` de `src/components/taller/Maqueta.astro`. Para eso hay que darle "Connect" al conector con una cuenta real (no se hizo).
-- Confirmar en la consola de administración del plan Team que los conectores y Claude in Chrome estén habilitados para todos.
-- ~~Tiempo~~ Resuelto (Mike, 2026-11-19): todo se dicta en 4 horas y el descanso sigue de 15 min. Quedó así: Apertura 12, Por dentro 55, Alcances 30, Descanso 15, Cómo pedir 38, Práctica guiada 25, Seguridad 17, Conectar Zoho 35, Cierre 13.
-- Saber quién tiene usuario propio en Zoho y Claude Desktop instalado (los pasos 4 a 7 también se pueden hacer desde claude.ai en Chrome).
-- Plan B para quien no pueda instalar la extensión o la aplicación por permisos del equipo: seguir en la pantalla grande y el celular.
+Cada pendiente con la fecha en que se abrió. Al cerrarlo, se pasa a "Resueltos" con la fecha y cómo se resolvió; nunca se borra.
+
+| # | Abierto | Pendiente | Quién | Estado |
+|---|---|---|---|---|
+| P1 | 2026-11-19 | **Capturas reales** de la pantalla de autorización de Zoho y de la de permisos por herramienta, con una cuenta de Zoho de Ekosolv. Con ellas, ajustar las maquetas `oauth` y `permisos` de `src/components/taller/Maqueta.astro`. Hay que darle "Connect" al conector con una cuenta real (el inicio de sesión en Zoho lo hace Mike). | Mike + Claude | Abierto |
+| P2 | 2026-11-19 | **Confirmar el plan Team**: que la cuenta de Ekosolv sea Team y no Pro, y que en la administración estén habilitados los conectores y Claude in Chrome para todos. | Mike | Abierto |
+| P3 | 2026-11-19 | Confirmar cómo se ve hoy el menú de conectores en **Claude Desktop** (en claude.ai ya se llama "Plugins") y ajustar las notas del paso 4 si cambia. | Mike + Claude | Abierto |
+| P4 | 2026-11-19 | Saber **quién tiene usuario propio en Zoho** y Claude Desktop instalado. Los pasos 4 a 7 también se pueden hacer desde claude.ai en Chrome. | Mike | Abierto |
+| P5 | 2026-11-19 | **Plan B** para quien no pueda instalar la extensión o la aplicación por permisos del equipo: seguir en la pantalla grande y en el celular. Confirmar si los PC de Ekosolv dejan instalar extensiones. | Mike | Abierto |
+| P6 | 2026-11-19 | Probar el **PC vinculado en producción** (ekosolv.codebymike.net/pc) con un celular y un PC reales antes del sábado. En local ya pasó la prueba `e2e/zoho-pc.spec.ts`. | Mike | Abierto |
+
+### Resueltos
+
+| # | Abierto | Cerrado | Qué era | Cómo se resolvió |
+|---|---|---|---|---|
+| R1 | 2026-11-19 | 2026-11-19 | Tiempo: con el bloque de Zoho la capacitación 1 pasaba de 4 h a 4 h 40. | Mike: todo se dicta en 4 h y el descanso sigue en 15 min. Apertura 12, Por dentro 55, Alcances 30, Descanso 15, Cómo pedir 38, Práctica guiada 25, Seguridad 17, Conectar Zoho 35, Cierre 13. |
+| R2 | 2026-11-19 | 2026-11-19 | Si el PC vinculado sigue la escena o se navega libre. | Mike: sigue la escena de quien dicta. |
+| R3 | 2026-11-19 | 2026-11-19 | Con qué cuenta entra cada persona. | Mike: cada uno con su cuenta, probablemente del plan Team (confirmar en P2). |
+| R4 | 2026-11-19 | 2026-11-19 | Permisos del conector en el taller. | Mike: solo lectura. |
+| R5 | 2026-11-19 | 2026-11-19 | Navegadores compatibles con la extensión. | Revisado en el soporte de Anthropic: solo Google Chrome, no Edge ni Brave. Corregido en el contenido. |
