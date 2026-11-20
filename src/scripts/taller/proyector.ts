@@ -13,9 +13,11 @@
  * Con cuenta de admin, cada cambio de escena se guarda en el servidor (abre
  * o cierra la pregunta de los celulares) y se avisa a la vista de presentador
  * por BroadcastChannel; las órdenes del presentador llegan por el mismo canal.
+ * Si el presentador está en otro equipo, escena, paso y órdenes llegan por el
+ * servidor (seguirRed en comun.ts).
  */
 import { CURVA, SplitText, amarrarSignos, gsap, reducido } from '../motion/core'
-import { API_PC, avisoLocal, canal, consultar, cuentaAviso, direccionTecla, enviar, leerDatos, type Aviso, type AvisoRed, type Mensaje } from './comun'
+import { API_PC, avisoLocal, canal, seguirRed, consultar, cuentaAviso, direccionTecla, enviar, leerDatos, type Aviso, type AvisoRed, type Mensaje } from './comun'
 import { HOOKS, type Api } from './escenas'
 import { crearCortina } from './cortina'
 import { clawdSuelto } from './clawd'
@@ -40,11 +42,19 @@ function montar() {
   const oyentes = new Map<string, () => void>()
   const titulos = new Map<number, SplitText>()
 
+  // Seguimiento por el servidor (presentador en otro equipo). Se crea al final.
+  let red: ReturnType<typeof seguirRed> | null = null
+
   const avisar = canal(datos.n, (m: Mensaje) => {
     if (!activo) return
-    if (m.tipo === 'ir') ir(m.i, m.paso, false)
-    else if (m.tipo === 'hola') avisar({ tipo: 'ir', i, paso })
-    else if (m.tipo === 'accion') oyentes.get(m.nombre)?.()
+    if (m.tipo === 'ir') {
+      red?.local()
+      ir(m.i, m.paso, false)
+    } else if (m.tipo === 'hola') avisar({ tipo: 'ir', i, paso })
+    else if (m.tipo === 'accion') {
+      if (m.id) red?.orden(m.id)
+      oyentes.get(m.nombre)?.()
+    }
   })
 
   // ---------- Aviso de inicio ("Empezamos en 00:00") ----------
@@ -107,15 +117,10 @@ function montar() {
     gsap.fromTo(espera, { autoAlpha: 0 }, { autoAlpha: 1, duration: 0.6, ease: CURVA })
     gsap.fromTo(espera.querySelectorAll('.tl-espera-centro > *'), { autoAlpha: 0, y: 40 }, { autoAlpha: 1, y: 0, duration: 0.9, stagger: 0.1, delay: 0.15, ease: 'expo.out', clearProps: 'transform,opacity,visibility' })
   }
-  // El proyector de quien dicta lo consulta cada 2 s; el PC vinculado lo
-  // recibe en la consulta con la que sigue la escena (seguirPresentacion).
+  // El proyector de quien dicta lo recibe en la consulta de seguirRed (al
+  // final); el PC vinculado, en la consulta con la que sigue la escena
+  // (seguirPresentacion).
   if (datos.admin && espera) {
-    const mirarAviso = () =>
-      consultar<{ aviso: AvisoRed | null }>({ que: 'aviso', n: datos.n })
-        .then((r) => ponerEspera(r.aviso))
-        .catch((e) => console.error('[taller] aviso', e))
-    void mirarAviso()
-    setInterval(mirarAviso, 2000)
 
     // Mientras el aviso está puesto, Clawd saluda por su nombre a quien se
     // registra en la sala con el QR. Los que ya estaban registrados cuando
@@ -262,11 +267,14 @@ function montar() {
   let estadoPend: ReturnType<typeof setTimeout> | null = null
   const guardarEstado = () => {
     if (!datos.admin) return
+    red?.local()
     if (estadoPend) clearTimeout(estadoPend)
     const escena = datos.escenas[i]!.id
     const p = paso
     estadoPend = setTimeout(() => {
-      enviar({ accion: 'estado', taller: datos.n, escena, paso: p }).catch((e) => console.error('[taller] estado', e))
+      enviar<{ mov?: number }>({ accion: 'estado', taller: datos.n, escena, paso: p })
+        .then((r) => red?.guardado(r.mov))
+        .catch((e) => console.error('[taller] estado', e))
     }, 250)
   }
 
@@ -410,6 +418,18 @@ function montar() {
 
   addEventListener('resize', evaluar)
   addEventListener('keydown', tecla)
+  if (datos.admin && !datos.seguir) {
+    red = seguirRed(datos.n, {
+      ids: datos.escenas.map((e) => e.id),
+      alAviso: ponerEspera,
+      alMover: (k, p) => {
+        if (activo && (k !== i || p !== paso)) ir(k, p, false)
+      },
+      alOrden: (nombre) => {
+        if (activo) oyentes.get(nombre)?.()
+      },
+    })
+  }
   evaluar()
   if (datos.seguir) seguirPresentacion()
 

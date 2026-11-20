@@ -1,10 +1,11 @@
 /**
  * Vista de presentador. Lleva su propia copia de la posición (escena y paso),
  * la manda al proyector por BroadcastChannel y al servidor (para abrir la
- * pregunta en los celulares), y la actualiza cuando el proyector avanza.
+ * pregunta en los celulares), y la actualiza cuando el proyector avanza. Si
+ * el proyector está en otro equipo, se siguen por el servidor (seguirRed).
  */
 import { inicioDeEscenas, reloj } from '../../lib/talleres/reglas'
-import { avisoLocal, canal, consultar, cuentaAviso, direccionTecla, enviar, leerDatos, type Aviso, type AvisoRed, type Mensaje } from './comun'
+import { avisoLocal, canal, idOrden, seguirRed, consultar, cuentaAviso, direccionTecla, enviar, leerDatos, type Aviso, type AvisoRed, type Mensaje } from './comun'
 
 interface EscenaPr {
   id: string
@@ -44,6 +45,7 @@ function montar(d: DatosPr) {
 
   const avisar = canal(d.n, (m: Mensaje) => {
     if (m.tipo === 'ir') {
+      red.local()
       if (m.i !== i) llegada = Date.now()
       i = m.i
       paso = m.paso
@@ -118,15 +120,32 @@ function montar(d: DatosPr) {
   const guardar = (k: number, p: number) => {
     if (guardarPend) clearTimeout(guardarPend)
     guardarPend = setTimeout(() => {
-      enviar({ accion: 'estado', taller: d.n, escena: d.escenas[k]!.id, paso: p }).catch((e) => console.error('[presentador] estado', e))
+      enviar<{ mov?: number }>({ accion: 'estado', taller: d.n, escena: d.escenas[k]!.id, paso: p })
+        .then((r) => red.guardado(r.mov))
+        .catch((e) => console.error('[presentador] estado', e))
     }, 250)
   }
+
+  // Proyector en otro equipo: su avance llega por el servidor.
+  const red = seguirRed(d.n, {
+    ids: d.escenas.map((e) => e.id),
+    alMover: (k, p) => {
+      if (k === i && p === paso) return
+      if (k !== i) llegada = Date.now()
+      i = k
+      paso = p
+      pintar()
+    },
+  })
 
   const ir = (k: number, p: number) => {
     k = Math.max(0, Math.min(d.escenas.length - 1, k))
     p = Math.max(0, Math.min(d.escenas[k]!.pasos, p))
     if (k !== i) llegada = Date.now()
-    if (k !== i || p !== paso) guardar(k, p)
+    if (k !== i || p !== paso) {
+      red.local()
+      guardar(k, p)
+    }
     i = k
     paso = p
     pintar()
@@ -144,8 +163,15 @@ function montar(d: DatosPr) {
 
   $('[data-siguiente]').addEventListener('click', () => avanzar(1))
   $('[data-anterior]').addEventListener('click', () => avanzar(-1))
-  $('[data-pedir]').addEventListener('click', () => avisar({ tipo: 'accion', nombre: 'pedir' }))
-  $('[data-generar]').addEventListener('click', () => avisar({ tipo: 'accion', nombre: 'generar' }))
+  // Botones para el proyector: por el canal (mismo equipo) y por el servidor
+  // (otro equipo). El id evita que el proyector lo atienda dos veces.
+  const ordenar = (nombre: 'pedir' | 'generar') => {
+    const id = idOrden()
+    avisar({ tipo: 'accion', nombre, id })
+    enviar({ accion: 'orden', taller: d.n, nombre, id }).catch((e) => console.error('[presentador] orden', e))
+  }
+  $('[data-pedir]').addEventListener('click', () => ordenar('pedir'))
+  $('[data-generar]').addEventListener('click', () => ordenar('generar'))
   $('[data-iniciar]').addEventListener('click', () => {
     inicio = Date.now()
     try {
