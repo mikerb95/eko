@@ -11,7 +11,7 @@ import { CURVA, gsap, reducido } from '../motion/core'
 import { aplicarTemperatura, muestrear, tokenizarAprox } from '../../lib/talleres/reglas'
 import { aHtml } from '../../lib/talleres/formato'
 import { consultar, enviar, type DatosTaller } from './comun'
-import { montarClawd } from './clawd'
+import { clawdDe, clawdEn, papelPortada, papelVotos } from './clawd'
 
 export interface Api {
   n: number
@@ -62,23 +62,30 @@ function sondear(el: HTMLElement, api: Api, pintar: (r: any) => void, ms = 2000)
   if (!i) return
   api.cada(() => {
     consultar({ que: 'resultados', n: api.n, i })
-      .then(pintar)
+      .then((r) => {
+        pintar(r)
+        // Clawd (papelVotos) lleva la cuenta de quién ya respondió.
+        el.dispatchEvent(new CustomEvent('tl:resultados', { detail: r }))
+      })
       .catch(() => {})
   }, ms)
 }
 
 /** Cuenta regresiva que sigue corriendo aunque se salga y se vuelva a la escena. */
 const inicios = new Map<string, number>()
-function regresiva(el: HTMLElement, api: Api) {
+function regresiva(el: HTMLElement, api: Api, alSegundo?: (s: number) => void) {
   const c = $(el, '[data-cuenta-regresiva]')
   if (!c) return
   const total = Number(c.dataset.cuentaRegresiva)
   const id = el.dataset.escena!
   if (!inicios.has(id)) inicios.set(id, Date.now())
-  api.cada(() => {
+  const tic = () => {
     const s = Math.max(0, total - Math.floor((Date.now() - inicios.get(id)!) / 1000))
     c.textContent = `${Math.floor(s / 60)}:${String(s % 60).padStart(2, '0')}`
-  }, 1000)
+    alSegundo?.(s)
+  }
+  tic()
+  api.cada(tic, 1000)
 }
 
 /**
@@ -116,7 +123,7 @@ function escribir(destino: HTMLElement, html: string) {
 
 const portada: Hook = {
   entrar(el, api) {
-    montarClawd(el, api)
+    papelPortada(el, api)
     const cinta = $(el, '[data-cinta]')
     if (!cinta || reducido()) return
     const tw = gsap.to(cinta, { xPercent: -50, duration: 80, ease: 'none', repeat: -1 })
@@ -142,6 +149,7 @@ const sala: Hook = {
 
 const evaluacion: Hook = {
   entrar(el, api) {
+    papelVotos(el, api)
     const b = $(el, '[data-respondieron]')
     const barra = $<SVGCircleElement>(el, '.anillo .barra')
     let sala = 0
@@ -283,6 +291,7 @@ function mostrarNueva(el: HTMLElement, palabra: string) {
 
 const siguiente: Hook = {
   entrar(el, api, paso) {
+    clawdDe(el, api)
     const c = candidatos(el)
     const temp = $<HTMLInputElement>(el, '[data-temp]')
     const tempV = $(el, '[data-temp-v]')
@@ -294,19 +303,38 @@ const siguiente: Hook = {
       if (tempV) tempV.textContent = t.toFixed(1).replace('.', ',')
       c.pintar(probs)
     }
+    const palabra = (j: number) => $(c.filas[j]!, '.tk')!.textContent || ''
+    let pensando = false
     const generar = () => {
+      if (pensando) return
       const k = muestrear(probs, Math.random())
-      c.filas.forEach((f, j) => f.classList.toggle('elegido', j === k))
-      const w = $(c.filas[k]!, '.tk')!.textContent || ''
-      mostrarNueva(el, w)
-      if (historial) {
-        const s = document.createElement('span')
-        s.className = `tk t${k % 4}`
-        s.textContent = w
-        historial.append(s)
-        while (historial.children.length > 12) historial.firstElementChild?.remove()
-        if (!reducido()) gsap.from(s, { scale: 0.5, autoAlpha: 0, duration: 0.3, ease: 'back.out(2)' })
+      const w = palabra(k)
+      const aplicar = () => {
+        c.filas.forEach((f, j) => f.classList.toggle('elegido', j === k))
+        mostrarNueva(el, w)
+        if (historial) {
+          const s = document.createElement('span')
+          s.className = `tk t${k % 4}`
+          s.textContent = w
+          historial.append(s)
+          while (historial.children.length > 12) historial.firstElementChild?.remove()
+          if (!reducido()) gsap.from(s, { scale: 0.5, autoAlpha: 0, duration: 0.3, ease: 'back.out(2)' })
+        }
       }
+      // Clawd duda entre las más probables (con la temperatura de ese momento),
+      // se queda con la sorteada y la lleva a la frase.
+      const clawd = clawdEn(el)
+      if (!clawd) return aplicar()
+      const orden = probs.map((p, j) => [p, j] as const).sort((a, b) => b[0] - a[0]).slice(0, 4).map(([, j]) => j)
+      if (!orden.includes(k)) orden[orden.length - 1] = k
+      pensando = true
+      clawd
+        .pensar(orden.map(palabra), w, $(el, '[data-frase-nueva]'))
+        .catch(() => {})
+        .then(() => {
+          pensando = false
+          aplicar()
+        })
     }
     const btn = $(el, '[data-generar]')
     btn?.addEventListener('click', generar)
@@ -333,8 +361,43 @@ const siguiente: Hook = {
   },
 }
 
+/**
+ * Clawd en "Suena bien no significa que exista": duda entre números parecidos,
+ * escoge uno con total seguridad y, cuando cae el sello, la sala le pide la
+ * fuente y se queda en blanco.
+ */
+function inventaClawd(el: HTMLElement, paso: number, animar: boolean) {
+  const c = clawdEn(el)
+  if (!c) return
+  if (paso === 0) {
+    c.reposo()
+    c.ojos('confundido')
+    c.decir('¿Cuál será?')
+    return
+  }
+  if (!animar) {
+    c.reposo()
+    c.ojos('blanco')
+    c.sudor(true)
+    c.decir('¿Fuente?', { tipo: 'pregunta' })
+    return
+  }
+  c.callar()
+  c.ojos('normal')
+  c.teclear(true)
+  c.decir('Es la 2290, seguro')
+  setTimeout(() => {
+    if (clawdEn(el) !== c) return
+    c.teclear(false)
+    c.decir('¿Fuente?', { tipo: 'pregunta' })
+    c.ojos('blanco')
+    c.sudor(true)
+  }, 2600)
+}
+
 const inventa: Hook = {
-  entrar(el, _api, paso) {
+  entrar(el, api, paso) {
+    clawdDe(el, api)
     const c = candidatos(el)
     c.pintar(c.base)
     if (paso === 0) {
@@ -346,12 +409,33 @@ const inventa: Hook = {
   paso(el, paso, previo) {
     const c = candidatos(el)
     if (paso >= 1) {
-      c.filas.forEach((f, j) => f.classList.toggle('elegido', j === 1))
-      if (previo < 1) mostrarNueva(el, $(c.filas[1]!, '.tk')!.textContent || '')
-      if (previo === 0) sellar($$(el, '[data-inventa-sigue] .sello'))
+      const w = $(c.filas[1]!, '.tk')!.textContent || ''
+      const clawd = clawdEn(el)
+      const marcar = () => {
+        c.filas.forEach((f, j) => f.classList.toggle('elegido', j === 1))
+        if (previo < 1) mostrarNueva(el, w)
+      }
+      if (previo === 0 && clawd && !reducido()) {
+        // Primero escoge Clawd; la frase que sigue y el sello llegan después.
+        const sigue = $(el, '[data-inventa-sigue]')
+        gsap.set(sigue, { autoAlpha: 0 })
+        const palabras = c.filas.map((f) => $(f, '.tk')!.textContent || '').slice(0, 4)
+        clawd.pensar(palabras, w, $(el, '[data-frase-nueva]')).then(() => {
+          if (clawdEn(el) !== clawd) return
+          marcar()
+          inventaClawd(el, 1, true)
+          gsap.to(sigue, { autoAlpha: 1, duration: 0.4, delay: 0.5, clearProps: 'opacity,visibility' })
+          gsap.delayedCall(2.4, () => sellar($$(el, '[data-inventa-sigue] .sello')))
+        })
+      } else {
+        marcar()
+        if (previo === 0) sellar($$(el, '[data-inventa-sigue] .sello'))
+        if (previo < 1) inventaClawd(el, paso, false)
+      }
     } else {
       c.filas.forEach((f) => f.classList.remove('elegido'))
       $(el, '[data-frase-nueva]')!.textContent = ''
+      inventaClawd(el, 0, false)
     }
   },
 }
@@ -405,8 +489,47 @@ const etapas: Hook = {
   },
 }
 
+/** Clawd en la mesa de trabajo: recibe hojas con cada documento y, si no caben, se le caen. */
+const FRASES_MESA = ['', 'Cabe de sobra', 'Cabe, pero llena la mesa', 'No cabe todo: ¿qué le doy?']
+function mesaClawd(el: HTMLElement, paso: number, animar: boolean) {
+  const c = clawdEn(el)
+  if (!c) return
+  const frases = (() => {
+    try {
+      return JSON.parse(el.querySelector<HTMLElement>('[data-clawd]')?.dataset.clawdFrases || 'null') ?? FRASES_MESA
+    } catch {
+      return FRASES_MESA
+    }
+  })() as string[]
+  const cara = () => {
+    c.ojos(paso >= 3 ? 'blanco' : paso === 2 ? 'entrecerrados' : 'normal')
+    c.sudor(paso >= 2)
+    if (frases[paso]) c.decir(frases[paso]!)
+    else c.callar()
+  }
+  if (!animar) {
+    c.apilar(paso >= 3 ? 7 : [0, 2, 7][paso]!)
+    cara()
+    return
+  }
+  // Las hojas llegan cuando la barra del documento termina de crecer.
+  setTimeout(() => {
+    if (clawdEn(el) !== c) return
+    if (paso >= 3) c.derrumbar().then(() => clawdEn(el) === c && cara())
+    else {
+      c.apilar([0, 2, 7][paso]!, true)
+      cara()
+      if (paso === 1) c.saltar({ alto: 3 })
+    }
+  }, 700)
+}
+
 const contexto: Hook = {
+  entrar(el, api) {
+    clawdDe(el, api)
+  },
   paso(el, paso, previo) {
+    mesaClawd(el, paso, previo >= 0 && paso > previo)
     if (reducido() || previo < 0) return
     for (const d of reveladosAhora(el, paso, previo, '[data-doc]')) {
       gsap.fromTo(d, { scaleX: 0, transformOrigin: 'left' }, { scaleX: 1, duration: 0.9, ease: CURVA, clearProps: 'transform' })
@@ -418,6 +541,7 @@ const contexto: Hook = {
 /** Votación con revelado por pregunta (comprobación, repaso). */
 const voto: Hook = {
   entrar(el, api) {
+    papelVotos(el, api)
     sondear(el, api, (r) => {
       for (const v of $$(el, '.voto')) {
         const c = r.preguntas?.[v.dataset.pregunta!]
@@ -463,15 +587,37 @@ function reparto(el: HTMLElement, api: Api, etiquetas: Record<string, string>) {
 
 const verdad: Hook = {
   entrar(el, api) {
+    papelVotos(el, api)
     reparto(el, api, { v: 'Verdad', i: 'Inventada' })
   },
   paso(el, paso, previo) {
-    sellar(reveladosAhora(el, paso, previo).map((x) => $(x, '.sello')!).filter(Boolean))
+    const nuevos = reveladosAhora(el, paso, previo).map((x) => $(x, '.sello')!).filter(Boolean)
+    sellar(nuevos)
+    // Clawd: si lo que se revela es inventado, la sala le pide la fuente y se
+    // queda en blanco; si es verdad, se alegra.
+    const c = clawdEn(el)
+    const ultimo = nuevos[nuevos.length - 1]
+    if (!c || !ultimo) return
+    if (ultimo.classList.contains('ok')) {
+      c.ojos('normal')
+      c.sudor(false)
+      c.decir('Esa existe', { ms: 2200, tipo: 'ok' })
+      c.saltar({ alto: 3 })
+    } else {
+      c.decir('¿Fuente?', { ms: 3200, tipo: 'pregunta' })
+      c.ojos('blanco')
+      c.sudor(true)
+      setTimeout(() => {
+        c.ojos('normal')
+        c.sudor(false)
+      }, 3200)
+    }
   },
 }
 
 const semaforo: Hook = {
   entrar(el, api) {
+    papelVotos(el, api)
     reparto(el, api, {})
   },
   paso(el, paso, previo) {
@@ -528,9 +674,34 @@ const comparacion: Hook = {
   },
 }
 
+/**
+ * Cuentas regresivas. En el descanso Clawd duerme y se despierta en el último
+ * minuto; en la práctica teclea mientras la gente trabaja y avisa cuando se
+ * acaba el tiempo.
+ */
 const cuenta: Hook = {
   entrar(el, api) {
-    regresiva(el, api)
+    const c = clawdDe(el, api)
+    const descanso = el.dataset.tipo === 'descanso'
+    let fase = ''
+    regresiva(el, api, (s) => {
+      if (!c) return
+      const nueva = s === 0 ? 'fin' : descanso && s <= 60 ? 'casi' : 'corre'
+      if (nueva === fase) return
+      const antes = fase
+      fase = nueva
+      if (descanso) {
+        if (nueva === 'corre') return c.dormir(true)
+        c.dormir(false)
+        c.decir(nueva === 'fin' ? '¡Seguimos!' : '¡Ya casi!')
+        if (antes) c.saltar({ brazos: true, saludo: nueva === 'fin' })
+        return
+      }
+      if (nueva === 'corre') return c.teclear(true, { descansos: true })
+      c.teclear(false)
+      c.decir('¡Tiempo!', { tipo: 'ok' })
+      if (antes) c.saltar({ brazos: true, saludo: true })
+    })
   },
 }
 
@@ -546,6 +717,16 @@ const constructor: Hook = {
     const cache = new Map<number, { texto: string; fuente: string }>()
     let k = paso
     let enCurso = 0
+    // Clawd dice qué le falta a cada versión de la instrucción y teclea
+    // mientras llega la respuesta.
+    const clawd = clawdDe(el, api)
+    const frasesClawd: string[] = (() => {
+      try {
+        return JSON.parse(el.querySelector<HTMLElement>('[data-clawd]')?.dataset.clawdFrases || '[]')
+      } catch {
+        return []
+      }
+    })()
 
     const mostrar = (r: { texto: string; fuente: string }, animar: boolean) => {
       fuente.className = `fuente ${r.fuente}`
@@ -566,8 +747,13 @@ const constructor: Hook = {
       if (!api.admin) {
         cache.set(k, guardada)
         mostrar(guardada, true)
+        if (clawd) {
+          clawd.teclear(true)
+          setTimeout(() => clawd.teclear(false), 900)
+        }
         return
       }
+      clawd?.teclear(true)
       btn.disabled = true
       fuente.className = 'fuente'
       fuente.textContent = 'Claude está escribiendo'
@@ -579,6 +765,7 @@ const constructor: Hook = {
         r = guardada
       }
       if (id !== enCurso) return
+      clawd?.teclear(false)
       btn.disabled = false
       cache.set(k, r)
       mostrar(r, true)
@@ -598,7 +785,9 @@ const constructor: Hook = {
       enCurso++
       btn.disabled = false
     })
-    ;(el as any)._version = (nuevo: number) => {
+    let animarVersion = false
+    ;(el as any)._version = (nuevo: number, animar = false) => {
+      animarVersion = animar
       k = nuevo
       enCurso++
       btn.disabled = false
@@ -612,12 +801,20 @@ const constructor: Hook = {
       if (nombre) nombre.textContent = demo.versiones[k]?.parte ?? ''
       const c = cache.get(k)
       c ? mostrar(c, false) : vacia()
+      if (clawd) {
+        clawd.teclear(false)
+        const ultima = k === demo.versiones.length - 1
+        clawd.ojos(k === 0 ? 'confundido' : 'normal')
+        if (frasesClawd[k]) clawd.decir(frasesClawd[k]!, ultima ? { tipo: 'ok' } : {})
+        else clawd.callar()
+        if (ultima && animarVersion) clawd.saltar({ brazos: true })
+      }
       if (!reducido()) gsap.fromTo($(el, `[data-instr="${k}"] mark`), { backgroundColor: 'rgba(23,156,145,0.6)' }, { backgroundColor: 'rgba(23,156,145,0.2)', duration: 1.2, clearProps: 'backgroundColor' })
     }
     ;(el as any)._version(k)
   },
   paso(el, paso, previo) {
-    if (previo >= 0) (el as any)._version?.(paso)
+    if (previo >= 0) (el as any)._version?.(paso, paso > previo)
   },
 }
 

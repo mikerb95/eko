@@ -734,7 +734,8 @@ export const TALLER_1: Taller = {
       ],
       siPreguntan: [
         { p: '¿Cuánto toma escribir una instrucción así?', r: 'Dos o tres minutos la primera vez. Después se guarda y se reutiliza cambiando solo lo que va entre corchetes. Por eso la entrega de hoy es una instrucción guardada.' },
-      ],
+      ],      // Lo que Clawd dice con cada versión: lo que todavía le falta saber.
+      datos: { clawd: ['¿Qué auto? ¿Para quién?', '¿Cómo se lo entrego?', '¿Me muestra un ejemplo?', 'Ahora sí: entendido'] },
     },
     {
       id: 'iterar',
