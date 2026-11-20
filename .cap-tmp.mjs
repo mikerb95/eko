@@ -1,0 +1,15 @@
+import { chromium } from '@playwright/test'
+const S = process.argv[2]
+const b = await chromium.launch()
+const ctx = await b.newContext({ viewport: { width: 1600, height: 900 } })
+const p = await ctx.newPage()
+await p.request.post('http://localhost:4377/api/admin/login', { data: { username: 'admin', password: 'ekosolv2026*' } })
+await p.goto('http://localhost:4377/academia/taller/1')
+const idx = await p.$$eval('.tl-escena', (es) => es.findIndex((e) => e.dataset.escena === 'anonimizar'))
+await p.goto(`http://localhost:4377/academia/taller/1#${idx + 1}.0`)
+await p.reload(); await p.waitForTimeout(1500); console.log(idx, await p.$eval(".tl-escena.activa", e => e.dataset.escena))
+await p.screenshot({ path: S + '/p0.png' })
+await p.keyboard.press('ArrowRight')
+await p.waitForTimeout(3500)
+await p.screenshot({ path: S + '/p1.png' })
+await b.close()
