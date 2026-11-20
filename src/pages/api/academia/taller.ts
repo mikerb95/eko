@@ -4,7 +4,7 @@ import { hoyEnBogota } from '../../../lib/agente/diasHabiles'
 import { nombreModulo } from '../../../lib/academia/reglas'
 import { tallerDe } from '../../../lib/talleres'
 import { compararEvaluacion, contarVotos, interaccionDe } from '../../../lib/talleres/reglas'
-import { asistentesDeHoy, enSala, fijarEstado, guardarRespuestaIA, marcarRespondida, preguntaSala, preguntasPendientes, respuestas, sesionesDeHoy } from '../../../lib/talleres/datos'
+import { asistentesDeHoy, avisoPublico, enSala, fijarAviso, fijarEstado, leerEstado, guardarRespuestaIA, marcarRespondida, preguntaSala, preguntasPendientes, respuestas, sesionesDeHoy } from '../../../lib/talleres/datos'
 import { preguntarDemo, responderPregunta } from '../../../lib/talleres/motorIA'
 import { anotar } from '../../../lib/bitacora'
 
@@ -15,8 +15,9 @@ import { anotar } from '../../../lib/bitacora'
 //
 // GET ?que=resultados&n&i  → conteo de una interacción (proyector)
 // GET ?que=comparacion&n   → evaluación de entrada contra salida
-// GET ?que=panel&n         → sala, asistencia, preguntas de la sala y aviso de bloque del día (presentador)
-// POST {accion}            → estado | ia | respuesta_ia | respondida
+// GET ?que=panel&n         → sala, asistencia, preguntas de la sala, aviso de bloque del día y aviso de inicio (presentador)
+// GET ?que=aviso&n         → aviso "Empezamos en 00:00" (proyector de quien dicta)
+// POST {accion}            → estado | aviso | ia | respuesta_ia | respondida
 
 export const prerender = false
 
@@ -42,11 +43,17 @@ export const GET: APIRoute = async ({ url, locals }) => {
       return json(compararEvaluacion(pre, post, a, b))
     }
 
+    if (que === 'aviso') {
+      if (!esAdmin(locals)) return json({ error: 'Solo administradores' }, 403)
+      return json({ aviso: avisoPublico(await leerEstado(t.n)) })
+    }
+
     if (que === 'panel') {
       if (!esAdmin(locals)) return json({ error: 'Solo administradores' }, 403)
       const hoy = hoyEnBogota()
-      const [sala, asistentes, sesiones, preguntas] = await Promise.all([enSala(t.n), asistentesDeHoy(t.n, hoy), sesionesDeHoy(t, hoy), preguntasPendientes(t.n, hoy)])
+      const [sala, asistentes, sesiones, preguntas, estado] = await Promise.all([enSala(t.n), asistentesDeHoy(t.n, hoy), sesionesDeHoy(t, hoy), preguntasPendientes(t.n, hoy), leerEstado(t.n)])
       return json({
+        aviso: avisoPublico(estado),
         sala,
         asistentes: asistentes.length,
         lista: asistentes.map((a) => ({ nombre: `${a.nombre} ${a.apellido}`, correo: a.correo, area: nombreModulo(a.area), cuenta: a.usuario_id > 0 })),
@@ -88,6 +95,19 @@ export const POST: APIRoute = async ({ request, locals }) => {
         await fijarEstado(t.n, escena.id, escena.interaccion ?? '', paso)
         await anotar('escena', { quien: String(locals.username ?? ''), taller: t.n, detalle: { escena: escena.id, paso } })
         return json({ ok: true })
+      }
+
+      // Aviso "Empezamos en 00:00": {minutos} lo pone (o lo relanza), {minutos: null} lo quita.
+      case 'aviso': {
+        if (!esAdmin(locals)) return json({ error: 'Solo quien dicta pone el aviso' }, 403)
+        const quitar = b.minutos == null
+        const min = Math.round(Number(b.minutos))
+        if (!quitar && !(min >= 1 && min <= 120)) return json({ error: 'Escriba entre 1 y 120 minutos' }, 400)
+        const ms = min * 60_000
+        const primera = t.escenas[0]!
+        await fijarAviso(t.n, quitar ? null : { fin: Date.now() + ms, ms }, primera.id, primera.interaccion ?? '')
+        await anotar('aviso_inicio', { quien: String(locals.username ?? ''), taller: t.n, detalle: { minutos: quitar ? null : min } })
+        return json({ aviso: avisoPublico(await leerEstado(t.n)) })
       }
 
       case 'ia': {

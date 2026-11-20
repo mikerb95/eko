@@ -199,7 +199,7 @@
 .tl-on .clawd--portada { right: 120px; bottom: 34px; width: 392px; }
 .tl-on .clawd--piensa { left: 120px; bottom: 26px; width: 300px; --globo: 22px; }
 .tl-on .clawd--inventa { right: 110px; bottom: 26px; width: 300px; --globo: 22px; }
-.tl-on .clawd--mesa { right: 96px; bottom: 6px; width: 250px; --globo: 20px; }
+.tl-on .clawd--mesa { right: 110px; top: 40px; width: 400px; --globo: 24px; }
 .tl-on .clawd--constructor { right: 96px; bottom: 4px; width: 170px; --globo: 18px; }
 .tl-on .clawd--votos { right: 96px; bottom: 10px; width: 180px; --globo: 18px; }
 .tl-on .clawd--descanso { right: 180px; bottom: 140px; width: 380px; --globo: 26px; }

@@ -8,7 +8,7 @@ import { AREA_IDS, nombreModulo } from '../../../lib/academia/reglas'
 import { MAX_INSTRUCCION, MIN_INSTRUCCION, PRACTICAS_DIA, validarInstruccion } from '../../../lib/academia/practica'
 import { practicar, PracticaNoDisponible } from '../../../lib/academia/motorPractica'
 import { interaccionDe, interaccionPublica, PREGUNTAS_DIA, registroSala, validarPregunta, votoValido, MAX_PREGUNTA } from '../../../lib/talleres/reglas'
-import { codigoPC, codigoVigente, MINUTOS_CODIGO_PC, guardarOpinion, guardarPracticaSala, guardarPregunta, marcarEnSala, misRespuestas, opinionDe, practicasSalaDeHoy, preguntasDeHoyDe, liberarEnlace, registrarAsistente, reservarEnlace, votar } from '../../../lib/talleres/datos'
+import { avisoPublico, codigoPC, codigoVigente, MINUTOS_CODIGO_PC, guardarOpinion, guardarPracticaSala, guardarPregunta, marcarEnSala, misRespuestas, opinionDe, practicasSalaDeHoy, preguntasDeHoyDe, liberarEnlace, registrarAsistente, reservarEnlace, votar } from '../../../lib/talleres/datos'
 import { validarOpinion } from '../../../lib/talleres/opinion'
 import { salaActual } from '../../../lib/talleres/sala'
 import { anotar } from '../../../lib/bitacora'
@@ -57,6 +57,8 @@ export const GET: APIRoute = async ({ cookies }) => {
       escenaId: estado.escena,
       paso: estado.paso,
       kicker: escena?.kicker ?? '',
+      // Aviso "Empezamos en 00:00" que puso quien dicta.
+      aviso: avisoPublico(estado),
       // Práctica guiada: el paso actual, con su maqueta (el celular la anima).
       guia: (() => {
         const pasos = escena?.tipo === 'conectar' ? ((escena.datos?.pasos ?? []) as PasoGuiado[]) : []

@@ -4,7 +4,7 @@ import { PC_COOKIE, SALA_TTL_SECONDS, crearPaseSala } from '../../../lib/auth'
 import { hoyEnBogota } from '../../../lib/agente/diasHabiles'
 import { checkRateLimit, clientIp, isRateLimited } from '../../../lib/rateLimit'
 import { tallerDe } from '../../../lib/talleres'
-import { asistenteDe, canjearCodigoPC, tallerEnCurso } from '../../../lib/talleres/datos'
+import { asistenteDe, avisoPublico, canjearCodigoPC, tallerEnCurso } from '../../../lib/talleres/datos'
 import { vistaPC } from '../../../lib/talleres/pc'
 import { anotar } from '../../../lib/bitacora'
 
@@ -13,7 +13,7 @@ import { anotar } from '../../../lib/bitacora'
 // le muestra el celular (vence en minutos y sirve una vez). El PC recibe la
 // cookie eko_pc, que solo deja ver la presentación siguiendo la escena.
 //
-// GET  → dónde va la presentación (escena y paso), si este PC está vinculado
+// GET  → dónde va la presentación (escena, paso y aviso de inicio), si este PC está vinculado
 // POST {codigo} → vincula este PC
 //
 // Los intentos fallidos se cuentan por IP. El límite es holgado porque todos
@@ -27,7 +27,7 @@ export const GET: APIRoute = async ({ cookies }) => {
   try {
     const v = await vistaPC(cookies.get(PC_COOKIE)?.value)
     if (!v) return json({ enCurso: false })
-    return json({ enCurso: true, taller: v.estado.taller, escena: v.estado.escena, paso: v.estado.paso })
+    return json({ enCurso: true, taller: v.estado.taller, escena: v.estado.escena, paso: v.estado.paso, aviso: avisoPublico(v.estado) })
   } catch (e) {
     return fail('academia/pc', e)
   }
