@@ -935,7 +935,11 @@ function crear(escena: HTMLElement, raiz: HTMLElement): Clawd {
 
 // ---------- Papeles que se repiten ----------
 
-/** Portada: teclea los tokens de la cinta y celebra cuando entra alguien a la sala. */
+/**
+ * Portada: escribe el subtítulo y la firma palabra por palabra (una por
+ * ráfaga de teclas), luego sigue tecleando los tokens de la cinta y celebra
+ * cuando entra alguien a la sala.
+ */
 export function papelPortada(escena: HTMLElement, api: Api): void {
   const c = clawdDe(escena, api)
   if (!c) return
@@ -946,14 +950,35 @@ export function papelPortada(escena: HTMLElement, api: Api): void {
     .map((f) => ({ texto: f.textContent ?? '', clase: f.className }))
     .filter((t) => t.texto.trim() && t.texto.trim() !== '·')
   let siguiente = 0
-  c.teclear(true, {
-    descansos: true,
-    alRafaga: () => {
-      if (!cinta || !tokens.length) return
-      const tk = tokens[siguiente++ % tokens.length]!
-      c.lanzar(tk.texto, tk.clase, cinta)
-    },
-  })
+  const aLaCinta = () => {
+    c.teclear(true, {
+      descansos: true,
+      alRafaga: () => {
+        if (!cinta || !tokens.length) return
+        const tk = tokens[siguiente++ % tokens.length]!
+        c.lanzar(tk.texto, tk.clase, cinta)
+      },
+    })
+  }
+
+  // Sin animación (movimiento reducido) el texto ya está completo en el HTML.
+  const palabras = reducido() ? [] : [...escena.querySelectorAll<HTMLElement>('[data-escribe] .pal-c')]
+  palabras.forEach((p) => p.classList.add('oculta'))
+  api.limpiar(() => palabras.forEach((p) => (p.classList.remove('oculta'), gsap.killTweensOf(p), gsap.set(p, { clearProps: 'all' }))))
+  let escritas = 0
+  if (!palabras.length) aLaCinta()
+  else {
+    c.teclear(true, {
+      alRafaga: () => {
+        const p = palabras[escritas++]
+        if (p) {
+          p.classList.remove('oculta')
+          gsap.fromTo(p, { opacity: 0, y: 6, filter: 'blur(4px)' }, { opacity: 1, y: 0, filter: 'blur(0px)', duration: 0.3, ease: 'power2.out', clearProps: 'all' })
+        }
+        if (escritas >= palabras.length) aLaCinta()
+      },
+    })
+  }
   if (!api.admin) return
   let ultimo: number | null = null
   api.cada(() => {
