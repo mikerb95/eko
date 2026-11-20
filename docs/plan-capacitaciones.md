@@ -22,6 +22,14 @@
 - **PC vinculado**: en la sala, "Abrir en mi PC" muestra la dirección corta `/pc` y un código de dos números (10 a 99, único entre los vigentes, vence en 5 minutos, sirve una vez; tabla `ac_taller_codigos_pc`). En `/pc` se escribe y el PC recibe la cookie `eko_pc` (el mismo pase firmado de la sala, en otra cookie): con ella abre `/academia/taller/<n>` sin cuenta y la presentación sigue la escena y el paso de quien dicta (consulta `/api/academia/pc` cada 2 s; el teclado no la mueve). Con `eko_pc` no se vota ni se pregunta. Los intentos fallidos se limitan por IP (30 cada 10 min, holgado porque la oficina sale por una sola IP). Cuando el PC usa el código, el celular lo avisa. Al terminar la sesión, el PC muestra que ya no está en curso.
 - Prueba en navegador: `e2e/zoho-pc.spec.ts` (va después de `taller.spec.ts` porque esa espera la base limpia).
 
+## Formulario de cierre por área (Mike, 2026-11-19)
+
+- Cuando la presentación llega a su **última escena**, cada celular pasa solo a `/academia/sala/opinion`, con el formulario del área con la que la persona se registró (si ya lo envió, no lo vuelve a mandar).
+- Cuatro preguntas abiertas: duda sin resolver, qué va a poner en práctica, qué cambiaría y **qué le gustaría ver o solucionar en la siguiente capacitación** (en la 4 dice "después de estas capacitaciones"). Cada campo trae una sugerencia de cómo empezar (placeholder) con el lenguaje de su área. Hay que responder al menos una. Campos y sugerencias: `src/lib/talleres/opinion.ts` (Ventas y Mercadeo con sugerencias generales hasta iterar su contenido).
+- **No es anónimo**: la persona lo ve dicho en el formulario. Se guarda en `ac_taller_opiniones` (una fila por asistente; si lo corrige, se actualiza) y solo se lee en `/admin/academia`, pestaña **Opiniones** (solo admin; gerencia entra como admin). Ahí se anota cómo se resolvió cada duda y queda fecha y quién; el contador de la pestaña son las dudas pendientes.
+- Después de enviarlo, el celular ofrece la tarjeta resumen.
+- Prueba en navegador: `e2e/zz-cierre.spec.ts` (va de último porque deja registros en la base).
+
 ## Cómo se dicta
 
 1. Programar en `/admin/academia` el bloque del día con el módulo de la capacitación (para la 1: `general`). La lista de registrados se guarda siempre (el presentador la muestra); la asistencia que cuenta para el certificado solo se marca si hay bloque programado y el nombre registrado coincide con el de una cuenta inscrita en la academia. Sin bloque, el presentador lo avisa.
