@@ -64,7 +64,7 @@ if (!asistente && Astro.cookies.get(SALA_COOKIE)?.value) enlaceVencido = true
       <h1>Antes de empezar, ¿quién es usted?</h1>
       <p class="sl-sub">
         {estado
-          ? 'Le enviamos a su correo el enlace para entrar. No necesita usuario ni contraseña.'
+          ? 'Escriba sus datos y le enviamos a su correo el enlace para entrar. No necesita usuario ni contraseña.'
           : 'La sesión todavía no ha empezado. Puede llenar sus datos cuando quien dicta abra la presentación.'}
       </p>
       {enlaceVencido && <p class="sl-estado error" role="alert">Ese enlace ya no sirve: es de otro día o de otra capacitación. Llene sus datos y le enviamos uno nuevo.</p>}
