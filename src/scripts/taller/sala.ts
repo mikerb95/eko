@@ -45,6 +45,8 @@ interface Estado {
   codigoPC?: string | null
   /** Última escena: 'pendiente' lleva al formulario de cierre del área. */
   opinion?: 'pendiente' | 'enviada' | null
+  /** Aviso "Empezamos en 00:00" que puso quien dicta. */
+  aviso?: AvisoRed | null
 }
 
 /** Paso de una práctica guiada (escena conectar), con su maqueta animada. */
