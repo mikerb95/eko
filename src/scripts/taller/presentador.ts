@@ -4,7 +4,7 @@
  * pregunta en los celulares), y la actualiza cuando el proyector avanza.
  */
 import { inicioDeEscenas, reloj } from '../../lib/talleres/reglas'
-import { canal, consultar, direccionTecla, enviar, guardarAviso, leerAviso, leerDatos, type Aviso, type Mensaje } from './comun'
+import { avisoLocal, canal, consultar, cuentaAviso, direccionTecla, enviar, leerDatos, type Aviso, type AvisoRed, type Mensaje } from './comun'
 
 interface EscenaPr {
   id: string
@@ -162,31 +162,46 @@ function montar(d: DatosPr) {
     }
   })
 
-  // Aviso de inicio: "Empezamos en 00:00" a pantalla completa en el proyector.
-  // Volver a mostrarlo con otros minutos reinicia la cuenta.
-  let aviso = leerAviso(d.n)
+  // Aviso de inicio: "Empezamos en 00:00" en el proyector, los PC vinculados y
+  // los celulares. Se guarda en el servidor; volver a mostrarlo con otros
+  // minutos reinicia la cuenta. El panel (cada 5 s) lo trae si lo cambió otro equipo.
+  let aviso: Aviso | null = null
+  let avisoOcupado = false
   const pintarAviso = () => {
     const resta = $('[data-espera-resta]')
     $('[data-espera-quitar]').hidden = !aviso
     $('[data-espera-mostrar]').textContent = aviso ? 'Cambiar' : 'Mostrar'
     $('[data-espera]').classList.toggle('on', !!aviso)
     if (!aviso) return void (resta.textContent = 'apagado')
-    const s = (aviso.fin - Date.now()) / 1000
-    resta.textContent = s > 0 ? reloj(Math.ceil(s)) : 'en cero'
+    const c = cuentaAviso(aviso)
+    resta.textContent = c.resta ? reloj(c.resta) : 'en cero'
   }
-  const ponerAviso = (a: Aviso | null) => {
-    aviso = a
-    guardarAviso(d.n, a)
-    avisar({ tipo: 'aviso', aviso: a })
-    pintarAviso()
+  const ponerAviso = async (minutos: number | null) => {
+    if (avisoOcupado) return
+    avisoOcupado = true
+    const botones = [$<HTMLButtonElement>('[data-espera-mostrar]'), $<HTMLButtonElement>('[data-espera-quitar]')]
+    botones.forEach((b) => (b.disabled = true))
+    $('[data-espera-error]').hidden = true
+    try {
+      const r = await enviar<{ aviso: AvisoRed | null }>({ accion: 'aviso', taller: d.n, minutos })
+      aviso = avisoLocal(r.aviso, null)
+    } catch (err) {
+      console.error('[presentador] aviso', err)
+      const e = $('[data-espera-error]')
+      e.textContent = err instanceof Error ? err.message : 'No se pudo guardar el aviso.'
+      e.hidden = false
+    } finally {
+      avisoOcupado = false
+      botones.forEach((b) => (b.disabled = false))
+      pintarAviso()
+    }
   }
   $<HTMLFormElement>('[data-espera-form]').addEventListener('submit', (ev) => {
     ev.preventDefault()
     const min = Math.round(Number($<HTMLInputElement>('[data-espera-min]').value))
-    if (!(min >= 1 && min <= 120)) return
-    ponerAviso({ fin: Date.now() + min * 60_000, ms: min * 60_000 })
+    if (min >= 1 && min <= 120) void ponerAviso(min)
   })
-  $('[data-espera-quitar]').addEventListener('click', () => ponerAviso(null))
+  $('[data-espera-quitar]').addEventListener('click', () => void ponerAviso(null))
   pintarAviso()
   setInterval(pintarAviso, 1000)
 
@@ -295,6 +310,10 @@ function montar(d: DatosPr) {
           }),
         )
         pintarDudas(r.preguntas ?? [])
+        if (!avisoOcupado) {
+          aviso = avisoLocal(r.aviso, aviso)
+          pintarAviso()
+        }
         sesionesHoy = r.sesiones
         avisos()
       })

@@ -123,7 +123,10 @@ export function crearCortina(lienzo: HTMLElement) {
     titulo.textContent = c.bloque?.titulo ?? ''
     cortina.className = `tl-cortina on${c.bloque ? ' bloque' : ''}`
     const [x0, x1] = c.adelante ? [-W * ancho, ancho] : [ancho, -W * ancho]
-    anims.push(panel.animate([{ transform: `translateX(${x0}px)` }, { transform: `translateX(${x1}px)` }], opciones()))
+    // `left` y no transform: así el panel se dibuja en el mismo hilo y en el
+    // mismo cuadro que el recorte (con transform corre en la GPU y queda un
+    // cuadro adelante, y se cuela texto viejo detrás de la franja).
+    anims.push(panel.animate([{ left: `${x0}px` }, { left: `${x1}px` }], opciones()))
     const recorte = c.adelante
       ? [`inset(0 ${(1 + W) * ancho}px 0 0)`, 'inset(0 0px 0 0)']
       : [`inset(0 0 0 ${(1 + W) * ancho}px)`, 'inset(0 0 0 0px)']
@@ -141,17 +144,18 @@ export function crearCortina(lienzo: HTMLElement) {
       const s = hasta.h / (p.desde.h || 1)
       const distancia = Math.hypot(hasta.x - p.desde.x, hasta.y - p.desde.y)
       const colorN = getComputedStyle(p.n).color
-      for (const el of [p.v, p.n]) {
-        el.style.visibility = 'hidden'
-        ocultas.push(el)
-      }
+      // La palabra vieja se queda quieta hasta que la franja la tapa; ahí
+      // aparece el clon, ya sobre la escena nueva, y vuela a su sitio.
+      p.n.style.visibility = 'hidden'
+      ocultas.push(p.n)
+      const sale = c.adelante ? pasoPor(p.desde.x + p.desde.w, true) : pasoPor(p.desde.x, true)
       anims.push(
         clon.animate(
           [
             { transform: 'translate(0, 0) scale(1)', color: p.color },
             { transform: `translate(${hasta.x - p.desde.x}px, ${hasta.y - p.desde.y}px) scale(${s})`, color: colorN },
           ],
-          { duration: Math.min(ms * 0.8, 380 + distancia * 0.35), easing: bezier(VUELO), fill: 'both' },
+          { duration: Math.min(ms * 0.8, 380 + distancia * 0.35), delay: sale, easing: bezier(VUELO), fill: 'forwards' },
         ),
       )
     }
