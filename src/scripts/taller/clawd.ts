@@ -236,16 +236,21 @@ function crear(escena: HTMLElement, raiz: HTMLElement): Clawd {
 
   function decir(texto: string, o: { ms?: number; tipo?: 'pregunta' | 'ok' } = {}) {
     if (!vivo) return
-    temporal?.kill()
-    temporal = null
     if (o.ms) {
+      temporal?.kill()
       pintarGlobo(texto, o.tipo ?? '')
-      temporal = seguir(gsap.delayedCall(o.ms / 1000, () => pintarGlobo(fijo, tipoFijo)))
-    } else {
-      fijo = texto
-      tipoFijo = o.tipo ?? ''
-      pintarGlobo(texto, tipoFijo)
+      temporal = seguir(
+        gsap.delayedCall(o.ms / 1000, () => {
+          temporal = null
+          pintarGlobo(fijo, tipoFijo)
+        }),
+      )
+      return
     }
+    // El texto fijo se guarda; si hay uno temporal a la vista, sale cuando ese termine.
+    fijo = texto
+    tipoFijo = o.tipo ?? ''
+    if (!temporal) pintarGlobo(texto, tipoFijo)
   }
 
   function callar() {
