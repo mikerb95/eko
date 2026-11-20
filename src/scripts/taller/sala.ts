@@ -20,7 +20,7 @@
  *
  * Mientras la página esté abierta, la pantalla del celular no se apaga.
  */
-import { capitalizarNombre } from '../../lib/talleres/reglas'
+import { capitalizarNombre, soloLetrasNombre } from '../../lib/talleres/reglas'
 import { pintarRevision } from '../academia/revision'
 import { API_SALA, avisoLocal, consultar as consultarTaller, cuentaAviso, enviar as enviarTaller, type Aviso, type AvisoRed } from './comun'
 
@@ -99,15 +99,18 @@ function montarRegistro(form: HTMLFormElement) {
     estado.className = `sl-estado ${clase}`
   }
 
-  // Mayúscula inicial en cada palabra mientras se escribe. La longitud no
-  // cambia, así que el cursor se deja donde estaba.
+  // Solo letras (se descartan números y signos) y mayúscula inicial en cada
+  // palabra mientras se escribe. El cursor retrocede lo que se haya quitado
+  // antes de él.
   for (const input of form.querySelectorAll<HTMLInputElement>('[data-capitalizar]')) {
     input.addEventListener('input', () => {
-      const nuevo = capitalizarNombre(input.value)
+      const nuevo = capitalizarNombre(soloLetrasNombre(input.value))
       if (nuevo === input.value) return
       const [a, b] = [input.selectionStart, input.selectionEnd]
+      const quitados = (n: number) => n - soloLetrasNombre(input.value.slice(0, n)).length
+      const [qa, qb] = [a != null ? quitados(a) : 0, b != null ? quitados(b) : 0]
       input.value = nuevo
-      if (a != null && b != null) input.setSelectionRange(a, b)
+      if (a != null && b != null) input.setSelectionRange(a - qa, b - qb)
     })
   }
   const limpiarError = (ev: Event) => {

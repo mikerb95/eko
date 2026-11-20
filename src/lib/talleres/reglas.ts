@@ -212,6 +212,14 @@ export function capitalizarNombre(s: string): string {
   return s.toLocaleLowerCase('es-CO').replace(/(^|[\s'-])(\p{L})/gu, (_, a: string, l: string) => a + l.toLocaleUpperCase('es-CO'))
 }
 
+/**
+ * Deja solo lo que cabe en un nombre: letras (con tildes y ñ), espacios,
+ * apóstrofo y guion. Quita números, signos y emojis.
+ */
+export function soloLetrasNombre(s: string): string {
+  return s.replace(/[^\p{L}\p{M}\s'’-]/gu, '')
+}
+
 const limpio = (v: unknown, max: number) => String(v ?? '').replace(/\s+/g, ' ').trim().slice(0, max)
 
 /** Clave para reconocer a la misma persona: sin tildes, minúsculas, espacios simples. */
@@ -234,8 +242,8 @@ export function correoValido(v: unknown): string {
 
 /** Valida lo que llega del formulario del celular. Devuelve los datos limpios o el error. */
 export function registroSala(b: any, areas: readonly string[]): RegistroSala | { error: string } {
-  const nombre = capitalizarNombre(limpio(b?.nombre, 60))
-  const apellido = capitalizarNombre(limpio(b?.apellido, 60))
+  const nombre = capitalizarNombre(limpio(soloLetrasNombre(String(b?.nombre ?? '')), 60))
+  const apellido = capitalizarNombre(limpio(soloLetrasNombre(String(b?.apellido ?? '')), 60))
   const correo = correoValido(b?.correo)
   const area = String(b?.area ?? '')
   if (!nombre) return { error: 'Escriba su nombre.' }
