@@ -126,7 +126,7 @@ export function crearCortina(lienzo: HTMLElement) {
     // `left` y no transform: así el panel se dibuja en el mismo hilo y en el
     // mismo cuadro que el recorte (con transform corre en la GPU y queda un
     // cuadro adelante, y se cuela texto viejo detrás de la franja).
-    anims.push(panel.animate([{ left: `${x0}px` }, { left: `${x1}px` }], opciones()))
+    anims.push(panel.animate([{ transform: `translateX(${x0}px)` }, { transform: `translateX(${x1}px)` }], opciones()))
     const recorte = c.adelante
       ? [`inset(0 ${(1 + W) * ancho}px 0 0)`, 'inset(0 0px 0 0)']
       : [`inset(0 0 0 ${(1 + W) * ancho}px)`, 'inset(0 0 0 0px)']
