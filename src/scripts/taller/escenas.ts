@@ -10,6 +10,7 @@
 import { CURVA, gsap, reducido } from '../motion/core'
 import { aplicarTemperatura, muestrear, tokenizarAprox } from '../../lib/talleres/reglas'
 import { aHtml } from '../../lib/talleres/formato'
+import { chispa } from '../../lib/talleres/chispa'
 import { consultar, enviar, type DatosTaller } from './comun'
 import { clawdDe, clawdEn, papelPortada, papelVotos } from './clawd'
 
@@ -760,7 +761,7 @@ const constructor: Hook = {
       btn.disabled = true
       fuente.className = 'fuente'
       fuente.textContent = 'Claude está escribiendo'
-      texto.innerHTML = '<span class="pensando" aria-label="Esperando la respuesta"><i></i><i></i><i></i></span>'
+      texto.innerHTML = `<span class="pensando chispa-fila" role="status">${chispa()}<span>Pensando</span></span>`
       let r: { texto: string; fuente: string }
       try {
         r = await enviar({ accion: 'ia', taller: api.n, demo: demo.id, version: v.id }, 30_000)
