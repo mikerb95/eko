@@ -382,7 +382,7 @@
 .sl-espera-kicker i { position: relative; width: 8px; height: 8px; border-radius: 50%; background: #6fd2c9; }
 .sl-espera-kicker i::after { content: ''; position: absolute; inset: 0; border-radius: 50%; background: #6fd2c9; animation: sl-espera-pulso 1.6s ease-out infinite; }
 @keyframes sl-espera-pulso { from { transform: scale(1); opacity: .7; } to { transform: scale(3.2); opacity: 0; } }
-.sl-espera-reloj { margin: 0; font: 700 clamp(64px, 22vw, 96px)/.95 var(--font-display); letter-spacing: -0.03em; font-variant-numeric: tabular-nums; text-shadow: 0 0 40px rgba(23, 156, 145, .4); }
+.sl-espera-reloj { margin: 0; font: 700 clamp(64px, 22vw, 96px)/.95 var(--font-display); letter-spacing: 0; font-variant-numeric: tabular-nums; text-shadow: 0 0 40px rgba(23, 156, 145, .4); }
 .sl-espera-barra { position: absolute; left: 0; right: 0; bottom: 0; height: 5px; background: rgba(255, 255, 255, .1); }
 .sl-espera-barra i { display: block; height: 100%; transform-origin: left; transform: scaleX(var(--p, 1)); background: linear-gradient(90deg, #179C91, #6fd2c9); transition: transform .25s linear; }
 .sl-espera.cero .sl-espera-reloj { color: #6fd2c9; animation: sl-espera-late 1.4s ease-in-out infinite; }
