@@ -11,6 +11,7 @@ import { CURVA, gsap, reducido } from '../motion/core'
 import { aplicarTemperatura, muestrear, tokenizarAprox } from '../../lib/talleres/reglas'
 import { aHtml } from '../../lib/talleres/formato'
 import { consultar, enviar, type DatosTaller } from './comun'
+import { montarClawd } from './clawd'
 
 export interface Api {
   n: number
@@ -115,6 +116,7 @@ function escribir(destino: HTMLElement, html: string) {
 
 const portada: Hook = {
   entrar(el, api) {
+    montarClawd(el, api)
     const cinta = $(el, '[data-cinta]')
     if (!cinta || reducido()) return
     const tw = gsap.to(cinta, { xPercent: -50, duration: 80, ease: 'none', repeat: -1 })
