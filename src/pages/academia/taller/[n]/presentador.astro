@@ -1,8 +1,9 @@
 ---
 // Vista de presentador (solo admin): notas, cronómetro, escena siguiente y
-// estado de la sala. Se abre en el portátil (tecla P en el proyector) y se
-// sincroniza con la ventana del proyector por BroadcastChannel; también mueve
-// la presentación por su cuenta si el proyector no está abierto.
+// estado de la sala. Se abre en su propia pestaña o equipo
+// (/academia/taller/<n>/presentador) y se sincroniza con el proyector por
+// BroadcastChannel y por el servidor; también mueve la presentación por su
+// cuenta si el proyector no está abierto.
 export const prerender = false
 import '../../../../styles/global.css'
 import '../../../../styles/presentador.css'

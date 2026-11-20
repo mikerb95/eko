@@ -34,7 +34,7 @@
 ## Cómo se dicta
 
 1. Programar en `/admin/academia` el bloque del día con el módulo de la capacitación (para la 1: `general`). La lista de registrados se guarda siempre (el presentador la muestra); la asistencia que cuenta para el certificado solo se marca si hay bloque programado y el nombre registrado coincide con el de una cuenta inscrita en la academia. Sin bloque, el presentador lo avisa.
-2. Abrir `/academia/taller/1` en la pantalla del proyector (F = pantalla completa) y la tecla P abre la vista de presentador en el portátil.
+2. Abrir `/academia/taller/1` en la pantalla del proyector (F = pantalla completa) y la vista de presentador en `/academia/taller/1/presentador`, en el mismo equipo o en otro. Los PC de los participantes entran por `/pc` con el código de dos números que les muestra el celular.
 3. Flechas, PageDown, barra espaciadora o clicker: cada clic revela el siguiente paso de la escena; sin pasos, pasa a la siguiente.
 4. Al cambiar de escena se abre en los celulares la pregunta de esa escena. Mientras la sesión está en curso (movida en las últimas 6 h), los participantes no ven la presentación, solo la sala.
 

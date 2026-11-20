@@ -371,8 +371,6 @@ function montar() {
     else if (ev.key === 'f' || ev.key === 'F') {
       if (document.fullscreenElement) document.exitFullscreen()
       else document.documentElement.requestFullscreen?.().catch(() => {})
-    } else if ((ev.key === 'p' || ev.key === 'P') && datos.admin) {
-      window.open(`${location.pathname.replace(/\/$/, '')}/presentador`, 'ekosolv-presentador', 'width=1280,height=800')
     }
   }
 
