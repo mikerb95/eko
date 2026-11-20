@@ -137,7 +137,7 @@ const datos = {
               </span>
               <span class="tl-num" data-num>1 / {t.escenas.length}</span>
             </footer>
-            {admin && (
+            {(admin || seguir) && (
               <div class="tl-espera" data-espera>
                 <span class="tl-espera-luz l1" aria-hidden="true" />
                 <span class="tl-espera-luz l2" aria-hidden="true" />

@@ -15,7 +15,7 @@
  * por BroadcastChannel; las órdenes del presentador llegan por el mismo canal.
  */
 import { CURVA, SplitText, amarrarSignos, gsap, reducido } from '../motion/core'
-import { API_PC, canal, consultar, direccionTecla, enviar, leerAviso, leerDatos, type Aviso, type Mensaje } from './comun'
+import { API_PC, avisoLocal, canal, consultar, cuentaAviso, direccionTecla, enviar, leerDatos, type Aviso, type AvisoRed, type Mensaje } from './comun'
 import { HOOKS, type Api } from './escenas'
 import { crearCortina } from './cortina'
 
@@ -40,7 +40,6 @@ function montar() {
   const titulos = new Map<number, SplitText>()
 
   const avisar = canal(datos.n, (m: Mensaje) => {
-    if (m.tipo === 'aviso') return ponerEspera(m.aviso)
     if (!activo) return
     if (m.tipo === 'ir') ir(m.i, m.paso, false)
     else if (m.tipo === 'hola') avisar({ tipo: 'ir', i, paso })
@@ -48,19 +47,17 @@ function montar() {
   })
 
   // ---------- Aviso de inicio ("Empezamos en 00:00") ----------
-  // Lo lanza el presentador; tapa la escena hasta que lo quite. En cero se
-  // queda en "Empezamos ya".
+  // Lo lanza el presentador y llega por el servidor (ver comun.ts); tapa la
+  // escena hasta que lo quite. En cero se queda en "Empezamos ya".
   const espera = lienzo.querySelector<HTMLElement>('[data-espera]')
   const esperaReloj = espera?.querySelector<HTMLElement>('[data-espera-reloj]')
   const esperaKicker = espera?.querySelector<HTMLElement>('[data-espera-kicker]')
   const esperaBarra = espera?.querySelector<HTMLElement>('[data-espera-barra]')
   let aviso: Aviso | null = null
   let esperaTic: ReturnType<typeof setInterval> | null = null
-  const cifras = (seg: number) => `${String(Math.floor(seg / 60)).padStart(2, '0')}:${String(seg % 60).padStart(2, '0')}`
   const pintarEspera = () => {
     if (!espera || !esperaReloj || !aviso) return
-    const resta = Math.max(0, Math.ceil((aviso.fin - Date.now()) / 1000))
-    const txt = cifras(resta)
+    const { resta, texto: txt, queda } = cuentaAviso(aviso)
     // Un span por carácter: así solo se anima la cifra que cambia.
     if (esperaReloj.children.length !== txt.length) {
       esperaReloj.replaceChildren(
@@ -84,10 +81,12 @@ function montar() {
     esperaReloj.setAttribute('aria-label', txt)
     espera.classList.toggle('cero', resta === 0)
     if (esperaKicker) esperaKicker.textContent = resta === 0 ? 'Empezamos ya' : 'Empezamos en'
-    esperaBarra?.style.setProperty('--p', String(Math.min(1, Math.max(0, (aviso.fin - Date.now()) / aviso.ms))))
+    esperaBarra?.style.setProperty('--p', String(queda))
   }
-  function ponerEspera(a: Aviso | null) {
+  function ponerEspera(r: AvisoRed | null | undefined) {
     if (!espera) return
+    const a = avisoLocal(r, aviso)
+    if (a === aviso) return
     const estaba = !!aviso
     aviso = a
     if (esperaTic) clearInterval(esperaTic)
@@ -107,7 +106,16 @@ function montar() {
     gsap.fromTo(espera, { autoAlpha: 0 }, { autoAlpha: 1, duration: 0.6, ease: CURVA })
     gsap.fromTo(espera.querySelectorAll('.tl-espera-centro > *'), { autoAlpha: 0, y: 40 }, { autoAlpha: 1, y: 0, duration: 0.9, stagger: 0.1, delay: 0.15, ease: 'expo.out', clearProps: 'transform,opacity,visibility' })
   }
-  if (datos.admin) ponerEspera(leerAviso(datos.n))
+  // El proyector de quien dicta lo consulta cada 2 s; el PC vinculado lo
+  // recibe en la consulta con la que sigue la escena (seguirPresentacion).
+  if (datos.admin && espera) {
+    const mirarAviso = () =>
+      consultar<{ aviso: AvisoRed | null }>({ que: 'aviso', n: datos.n })
+        .then((r) => ponerEspera(r.aviso))
+        .catch((e) => console.error('[taller] aviso', e))
+    void mirarAviso()
+    setInterval(mirarAviso, 2000)
+  }
 
   // ---------- Escala ----------
   const escalar = () => {
@@ -379,8 +387,9 @@ function montar() {
     const mirar = async () => {
       if (!activo || document.hidden) return
       try {
-        const r = await consultar<{ enCurso: boolean; escena?: string; paso?: number }>({}, API_PC)
+        const r = await consultar<{ enCurso: boolean; escena?: string; paso?: number; aviso?: AvisoRed | null }>({}, API_PC)
         if (!r.enCurso) return void location.reload()
+        ponerEspera(r.aviso)
         const k = ids.indexOf(r.escena ?? '')
         if (k >= 0 && (k !== i || (r.paso ?? 0) !== paso)) ir(k, r.paso ?? 0, false)
       } catch (e) {
