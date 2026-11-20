@@ -64,8 +64,12 @@ function montar(d: DatosCt) {
   })
 
   // ---------- Pintar ----------
+  let pintada = -1
   const pintar = () => {
     const e = d.escenas[i]!
+    // Escena nueva: las notas vuelven arriba.
+    if (i !== pintada) $('.ct-notas').scrollTop = 0
+    pintada = i
     $('[data-numero]').textContent = `Escena ${i + 1} de ${total}`
     $('[data-paso]').textContent = e.pasos ? `Paso ${paso} de ${e.pasos}` : 'Sin pasos'
     $('[data-kicker]').textContent = e.kicker
