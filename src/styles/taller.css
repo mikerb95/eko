@@ -233,6 +233,7 @@
 .clawd-globo[data-tipo='ok'] { background: #7fd49c; box-shadow: 0 4px 0 #2e8b57; }
 .clawd--votos .clawd-globo, .clawd--constructor .clawd-globo { left: auto; right: 0; translate: 0 0; top: -22%; }
 .clawd--piensa .clawd-globo { left: 0; translate: 0 0; }
+.clawd--inventa .clawd-piensa { left: auto; right: -40px; translate: 0 0; }
 
 /* Zzz del descanso. */
 .clawd-zzz { position: absolute; left: 66%; top: 4%; display: none; font: 600 calc(var(--globo) * 1.3)/1 var(--font-mono); color: #6fd2c9; pointer-events: none; }

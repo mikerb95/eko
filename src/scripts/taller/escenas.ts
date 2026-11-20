@@ -417,14 +417,17 @@ const inventa: Hook = {
       }
       if (previo === 0 && clawd && !reducido()) {
         // Primero escoge Clawd; la frase que sigue y el sello llegan después.
+        // El proyector ya la estaba haciendo aparecer: se detiene y se oculta.
         const sigue = $(el, '[data-inventa-sigue]')
-        gsap.set(sigue, { autoAlpha: 0 })
+        gsap.killTweensOf(sigue)
+        gsap.set(sigue, { autoAlpha: 0, y: 0 })
+        clawd.callar()
         const palabras = c.filas.slice(0, 4).map((f, j) => ({ texto: $(f, '.tk')!.textContent || '', nota: pct(c.base[j]!) }))
         clawd.pensar(palabras, w, $(el, '[data-frase-nueva]')).then(() => {
           if (clawdEn(el) !== clawd) return
           marcar()
           inventaClawd(el, 1, true)
-          gsap.to(sigue, { autoAlpha: 1, duration: 0.4, delay: 0.5, clearProps: 'opacity,visibility' })
+          gsap.fromTo(sigue, { autoAlpha: 0, y: 26 }, { autoAlpha: 1, y: 0, duration: 0.6, delay: 0.5, ease: CURVA, clearProps: 'transform,opacity,visibility' })
           gsap.delayedCall(2.4, () => sellar($$(el, '[data-inventa-sigue] .sello')))
         })
       } else {

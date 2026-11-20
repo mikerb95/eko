@@ -665,6 +665,25 @@ export const TABLAS: readonly string[] = [
     PRIMARY KEY (taller, codigo)
   )`,
 
+  // Formulario de cierre de cada capacitación (/academia/sala/opinion), uno
+  // por área. No es anónimo: lo ven solo admin y gerencia en el panel. Una
+  // fila por asistente (si lo vuelve a enviar, se actualiza). respuestas es
+  // JSON { id de campo: texto }. resolucion y resuelta_at llevan la
+  // trazabilidad de cómo se resolvió la duda.
+  `CREATE TABLE IF NOT EXISTS ac_taller_opiniones (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    taller INTEGER NOT NULL,
+    fecha TEXT NOT NULL,
+    asistente_id INTEGER NOT NULL UNIQUE,
+    area TEXT NOT NULL,
+    respuestas TEXT NOT NULL,
+    resolucion TEXT NOT NULL DEFAULT '',
+    resuelta_at TEXT NOT NULL DEFAULT '',
+    resuelta_por TEXT NOT NULL DEFAULT '',
+    created_at TEXT NOT NULL,
+    updated_at TEXT NOT NULL
+  )`,
+
   `CREATE TABLE IF NOT EXISTS ac_certificados (
     codigo TEXT PRIMARY KEY,
     usuario_id INTEGER NOT NULL,
@@ -743,6 +762,7 @@ export const TABLAS_ESPERADAS: readonly string[] = [
   'ac_taller_asistentes',
   'ac_taller_codigos_pc',
   'ac_taller_estado',
+  'ac_taller_opiniones',
   'ac_taller_practicas',
   'ac_taller_preguntas',
   'ac_taller_respuestas',
