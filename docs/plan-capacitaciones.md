@@ -58,7 +58,7 @@ Crear `src/lib/talleres/tallerN.ts` con la misma forma (bloques, escenas, intera
 - Hojas impresas por área (`/academia/taller/1/entregables`) y banco de recursos público (`/academia/recursos/<área>`, destino de su QR): ver `docs/plan-recursos.md`. Falta desplegar antes de imprimir.
 
 - Prueba real del enlace por correo en producción (RESEND_API_KEY "ekosolv-academia" configurada el 2026-11-19).
-- Enviar el material de cada capacitación al correo de los asistentes (`ac_taller_asistentes.correo`): por decidir qué, cuándo y desde dónde se manda.
+- Material por correo: construido el 2026-11-20 (enlace al banco de recursos del área, desde `/admin/academia`, pestaña Material; ver `docs/plan-recursos.md`). Falta la prueba real en producción.
 - Reemplazar el contenido marcado como provisional con material real de Ekosolv: el auto de la demo, las citas de "verdad o alucinación", los casos del semáforo y el certificado del anonimizador. Verificar las citas normativas antes de la sesión.
 - Probar la demo con IA real en producción (en local usa el modelo simulado y muestra la respuesta guardada).
 - Contenido de las capacitaciones 2, 3 y 4 cuando lleguen los documentos de cada área.

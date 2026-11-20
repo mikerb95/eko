@@ -13,6 +13,15 @@
 - PDF: `public/recursos/taller1-<área>-checklist.pdf` y `-guia.pdf`. Se regeneran con `BASE=http://localhost:<puerto> ADMIN_USER=… ADMIN_PASS=… node scripts/entregables-pdf.mjs 1` cada vez que cambie `entregables1.ts`.
 - Prueba en navegador sin sesión: `e2e/recursos.spec.ts`.
 
+## Agregado el 2026-11-20 (Mike eligió 1, 2 y 4 de las sugerencias)
+
+- **Preguntas frecuentes**: salen de los `siPreguntan` de cada escena, agrupadas por bloque (`preguntasDe` en `recursos.ts`). Quedan fuera las escenas `sala` y `diagnostico` (solo aplican en la sesión) y la respuesta "¿Se puede conectar Claude a nuestro Zoho?", que la práctica final dejó desactualizada. Si se edita un `siPreguntan`, el banco cambia solo.
+- **Glosario**: 16 términos de la capacitación 1 (`GLOSARIO_TALLER1` en `recursos.ts`).
+- **Material por correo**: `/admin/academia`, pestaña **Material** (solo admin). Una tarjeta por sesión (capacitación y fecha) con registrados, enviados y pendientes, y el botón "Enviar a N personas". Cada persona registrada en la sala recibe un correo (`enviarRecursos` en `src/lib/email.ts`, remitente de la sala) con el enlace a la ruta de su área. No se repite: columna `ac_taller_asistentes.recursos_at`, un correo por dirección aunque se haya registrado dos veces. Envío uno a uno con 600 ms de pausa (límite de Resend). Los que fallan se listan y se pueden reintentar. Lógica en `src/lib/talleres/material.ts`.
+- Sin probar: el envío real (en local no hay `RESEND_API_KEY`, así que el botón responde que el correo no está configurado y no marca nada). Probar en producción con una sesión de prueba antes de usarlo con el equipo.
+
+Las sugerencias 3 (autoevaluación), 5 (biblioteca del equipo), 6 (revisor abierto) y 7 (medir uso) quedaron sin hacer.
+
 ## Qué es
 
 Una página pública por área con todo lo que la persona necesita después de cada capacitación: las instrucciones para copiar, las guías paso a paso y el material para descargar. Crece con cada sábado: la capacitación 1 al principio y las 2 a 4 cuando existan.

@@ -21,9 +21,7 @@ const maxTarea = Math.max(1, ...(d?.tareas.map((x) => x.n) ?? [1]))
     <div class="cinta" aria-hidden="true" data-cinta>
       {[...cinta, ...cinta].map((tk, i) => <span class={`tk t${i % 4}`}>{tk}</span>)}
     </div>
-    <p class="sub">{t.subtitulo}</p>
-    <p class="firma"><b>Michael Rodriguez</b> con el equipo de Ekosolv</p>
-  </>
+    <p class="sub">{t.subtitulo}</p>  </>
 )}
 
 {e.tipo === 'sala' && (
