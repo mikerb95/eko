@@ -15,6 +15,13 @@
 | Funciones | Vista de presentador, asistencia automática, evaluación antes y después, repaso al iniciar los sábados 2 a 4, tarjeta resumen, apertura con datos del diagnóstico. |
 | Fuera | Reto cronometrado y preguntas anónimas (no los eligió). |
 
+## Práctica guiada y PC vinculado (Mike, 2026-11-19)
+
+- **Práctica final de Zoho** (bloque `conectar`, 40 min): escena `zoho` de tipo `conectar` con 9 pasos (`src/lib/talleres/conectarZoho.ts`). Cada paso tiene concepto, qué hacer, qué es y una maqueta animada (`src/components/taller/Maqueta.astro`, estilos en `src/styles/maquetas.css`). El proyector muestra la ruta de pasos y el paso actual (`Conectar.astro`, hook `conectar` en `escenas.ts`); el celular repite el paso actual con su maqueta. Solo lectura. Las maquetas son ilustraciones; la del conector copia el directorio de Claude.
+- **El paso también se guarda** (columna `paso` de `ac_taller_estado`): lo mandan el proyector y la vista de presentador en cada clic (con 250 ms de espera). Lo siguen el celular y el PC vinculado.
+- **PC vinculado**: en la sala, "Abrir en mi PC" muestra la dirección corta `/pc` y un código de dos números (10 a 99, único entre los vigentes, vence en 5 minutos, sirve una vez; tabla `ac_taller_codigos_pc`). En `/pc` se escribe y el PC recibe la cookie `eko_pc` (el mismo pase firmado de la sala, en otra cookie): con ella abre `/academia/taller/<n>` sin cuenta y la presentación sigue la escena y el paso de quien dicta (consulta `/api/academia/pc` cada 2 s; el teclado no la mueve). Con `eko_pc` no se vota ni se pregunta. Los intentos fallidos se limitan por IP (30 cada 10 min, holgado porque la oficina sale por una sola IP). Cuando el PC usa el código, el celular lo avisa. Al terminar la sesión, el PC muestra que ya no está en curso.
+- Prueba en navegador: `e2e/zoho-pc.spec.ts` (va después de `taller.spec.ts` porque esa espera la base limpia).
+
 ## Cómo se dicta
 
 1. Programar en `/admin/academia` el bloque del día con el módulo de la capacitación (para la 1: `general`). La lista de registrados se guarda siempre (el presentador la muestra); la asistencia que cuenta para el certificado solo se marca si hay bloque programado y el nombre registrado coincide con el de una cuenta inscrita en la academia. Sin bloque, el presentador lo avisa.
@@ -44,4 +51,4 @@ Crear `src/lib/talleres/tallerN.ts` con la misma forma (bloques, escenas, intera
 - Reemplazar el contenido marcado como provisional con material real de Ekosolv: el auto de la demo, las citas de "verdad o alucinación", los casos del semáforo y el certificado del anonimizador. Verificar las citas normativas antes de la sesión.
 - Probar la demo con IA real en producción (en local usa el modelo simulado y muestra la respuesta guardada).
 - Contenido de las capacitaciones 2, 3 y 4 cuando lleguen los documentos de cada área.
-- Ideas por construir (cierre de la capacitación 1 conectando Zoho con Claude, PC vinculado al celular con código): ver `docs/ideas-talleres.md`.
+- Práctica de Zoho y PC vinculado: pendientes en `docs/ideas-talleres.md` (capturas reales de autorización y permisos, tiempo total, habilitar en el plan Team).
