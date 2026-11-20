@@ -22,7 +22,7 @@
  */
 import { capitalizarNombre } from '../../lib/talleres/reglas'
 import { pintarRevision } from '../academia/revision'
-import { API_SALA, consultar as consultarTaller, enviar as enviarTaller } from './comun'
+import { API_SALA, avisoLocal, consultar as consultarTaller, cuentaAviso, enviar as enviarTaller, type Aviso, type AvisoRed } from './comun'
 
 const consultar = <T>(p: Record<string, string | number>) => consultarTaller<T>(p, API_SALA)
 const enviar = (c: Record<string, unknown>) => enviarTaller(c, 15_000, API_SALA)
@@ -200,6 +200,7 @@ function montar(raiz: HTMLElement) {
   const ejemplo = $('[data-sl-ejemplo]')
   montarDuda(raiz.querySelector<HTMLFormElement>('[data-sl-duda]')!)
   const pc = montarPC(raiz)
+  const avisoInicio = montarEspera(raiz)
 
   const pintarEjemplo = (e: Estado['ejemplo']) => {
     const clave = e ? e.titulo + e.texto : ''
@@ -393,6 +394,7 @@ function montar(raiz: HTMLElement) {
       decir(err instanceof Error ? err.message : 'Sin conexión. Reintentando…', 'error')
       return
     }
+    avisoInicio?.poner(e.enCurso ? e.aviso : null)
     if (!e.enCurso) {
       taller = 0
       abierta = null
@@ -438,6 +440,41 @@ function montar(raiz: HTMLElement) {
 
   refrescar()
   setInterval(refrescar, 2000)
+}
+
+/**
+ * Aviso "Empezamos en 00:00" arriba de la sala, con la misma cuenta que el
+ * proyector (llega en cada consulta del estado; ver comun.ts).
+ */
+function montarEspera(raiz: HTMLElement): { poner(r: AvisoRed | null | undefined): void } | null {
+  const caja = raiz.querySelector<HTMLElement>('[data-sl-espera]')
+  if (!caja) return null
+  const reloj = caja.querySelector<HTMLElement>('[data-sl-espera-reloj]')!
+  const kicker = caja.querySelector<HTMLElement>('[data-sl-espera-kicker]')!
+  const barra = caja.querySelector<HTMLElement>('[data-sl-espera-barra]')!
+  let aviso: Aviso | null = null
+  let tic: ReturnType<typeof setInterval> | null = null
+  const pintar = () => {
+    if (!aviso) return
+    const c = cuentaAviso(aviso)
+    reloj.textContent = c.texto
+    kicker.textContent = c.resta ? 'Empezamos en' : 'Empezamos ya'
+    caja.classList.toggle('cero', !c.resta)
+    barra.style.setProperty('--p', String(c.queda))
+  }
+  return {
+    poner(r) {
+      const a = avisoLocal(r, aviso)
+      if (a === aviso) return
+      aviso = a
+      if (tic) clearInterval(tic)
+      tic = null
+      caja.hidden = !a
+      if (!a) return
+      pintar()
+      tic = setInterval(pintar, 250)
+    },
+  }
 }
 
 /**

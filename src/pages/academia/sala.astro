@@ -56,6 +56,11 @@ const maquetas = [
   {asistente ? (
     <section class="sl" data-sala aria-live="polite">
       <p class="sl-quien" data-sl-kicker>Asistencia registrada · {asistente.nombre} {asistente.apellido}</p>
+      <div class="sl-espera" data-sl-espera aria-live="off" hidden>
+        <p class="sl-espera-kicker"><i aria-hidden="true"></i><span data-sl-espera-kicker>Empezamos en</span></p>
+        <p class="sl-espera-reloj" data-sl-espera-reloj>00:00</p>
+        <span class="sl-espera-barra" aria-hidden="true"><i data-sl-espera-barra></i></span>
+      </div>
       <p class="ac-kicker" data-sl-escena></p>
       <h1 data-sl-titulo>Conectando…</h1>
       <p class="sl-sub" data-sl-sub></p>
