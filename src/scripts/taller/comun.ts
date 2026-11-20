@@ -66,32 +66,37 @@ export type Mensaje =
   | { tipo: 'ir'; i: number; paso: number }
   | { tipo: 'hola' }
   | { tipo: 'accion'; nombre: 'pedir' | 'generar' }
-  | { tipo: 'aviso'; aviso: Aviso | null }
 
-/** Aviso "Empezamos en 00:00" sobre el proyector: hora de llegada a cero y duración total (ms). */
+/**
+ * Aviso "Empezamos en 00:00". Lo pone quien dicta y viaja por el servidor, así
+ * que lo ven el proyector, los PC vinculados y los celulares aunque estén en
+ * equipos distintos. El servidor manda cuánto falta (no la hora de fin)
+ * porque el reloj de cada equipo es distinto.
+ */
+export interface AvisoRed {
+  id: number
+  resta: number
+  ms: number
+}
+/** El aviso en el reloj de este equipo. */
 export interface Aviso {
+  id: number
   fin: number
   ms: number
 }
 
-/**
- * El aviso de inicio también queda en localStorage: si el proyector se abre o
- * se recarga después de lanzarlo, lo retoma donde va.
- */
-const claveAviso = (n: number) => `ekosolv-taller-${n}-aviso`
-export function leerAviso(n: number): Aviso | null {
-  try {
-    const a = JSON.parse(localStorage.getItem(claveAviso(n)) || 'null')
-    return a && a.fin > 0 && a.ms > 0 ? { fin: Number(a.fin), ms: Number(a.ms) } : null
-  } catch {
-    return null
-  }
+/** Si es el mismo aviso que ya se tenía, conserva su fin: así la latencia de cada consulta no hace saltar el reloj. */
+export function avisoLocal(r: AvisoRed | null | undefined, actual: Aviso | null): Aviso | null {
+  if (!r) return null
+  if (actual && actual.id === r.id) return actual
+  return { id: r.id, fin: Date.now() + r.resta, ms: r.ms }
 }
-export function guardarAviso(n: number, aviso: Aviso | null): void {
-  try {
-    if (aviso) localStorage.setItem(claveAviso(n), JSON.stringify(aviso))
-    else localStorage.removeItem(claveAviso(n))
-  } catch {}
+
+/** Segundos que faltan, el texto MM:SS y la fracción que queda (1 al lanzarlo, 0 en cero). */
+export function cuentaAviso(a: Aviso, ref = Date.now()): { resta: number; texto: string; queda: number } {
+  const resta = Math.max(0, Math.ceil((a.fin - ref) / 1000))
+  const texto = `${String(Math.floor(resta / 60)).padStart(2, '0')}:${String(resta % 60).padStart(2, '0')}`
+  return { resta, texto, queda: Math.min(1, Math.max(0, (a.fin - ref) / a.ms)) }
 }
 
 export function canal(n: number, alRecibir: (m: Mensaje) => void): (m: Mensaje) => void {

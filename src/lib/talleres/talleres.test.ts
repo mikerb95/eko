@@ -23,6 +23,7 @@ import {
 } from './reglas.ts'
 import { AREA_IDS } from '../academia/reglas.ts'
 import { aHtml } from './formato.ts'
+import { camposOpinion, validarOpinion, MAX_RESPUESTA_OPINION, TOTAL_CAPACITACIONES } from './opinion.ts'
 import type { Taller } from './tipos.ts'
 
 test('validarPregunta limpia espacios y rechaza vacías o muy largas', () => {
@@ -219,3 +220,23 @@ for (const t of Object.values(TALLERES)) {
     }
   })
 }
+
+test('formulario de cierre: cada área tiene sus campos con sugerencia y la pregunta de la siguiente capacitación', () => {
+  for (const area of AREA_IDS) {
+    const campos = camposOpinion(area, 1)
+    assert.deepEqual(campos.map((c) => c.id), ['duda', 'usar', 'mejorar', 'siguiente'])
+    for (const c of campos) assert.ok(c.sugerencia.endsWith('…'), `${area}/${c.id} sin sugerencia`)
+    assert.match(campos.at(-1)!.pregunta, /siguiente capacitación/)
+  }
+  assert.notEqual(camposOpinion('finanzas', 1)[3]!.sugerencia, camposOpinion('operaciones', 1)[3]!.sugerencia)
+  assert.doesNotMatch(camposOpinion('gerencia', TOTAL_CAPACITACIONES).at(-1)!.pregunta, /siguiente capacitación/)
+})
+
+test('validarOpinion guarda solo los campos del formulario y exige al menos una respuesta', () => {
+  const r = validarOpinion({ duda: '  ¿Cómo   cito la norma? ', otro: 'x', siguiente: 'Zoho' }, 'operaciones', 1)
+  assert.ok('respuestas' in r)
+  assert.deepEqual(r.respuestas, { duda: '¿Cómo cito la norma?', usar: '', mejorar: '', siguiente: 'Zoho' })
+  assert.ok('error' in validarOpinion({ duda: '   ' }, 'operaciones', 1))
+  assert.ok('error' in validarOpinion(null, 'operaciones', 1))
+  assert.ok('error' in validarOpinion({ duda: 'a'.repeat(MAX_RESPUESTA_OPINION + 1) }, 'operaciones', 1))
+})
