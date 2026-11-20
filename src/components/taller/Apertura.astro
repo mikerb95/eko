@@ -30,7 +30,7 @@ const maxTarea = Math.max(1, ...(d?.tareas.map((x) => x.n) ?? [1]))
   <>
     <div class="qr" set:html={ctx.qrSala} role="img" aria-label={`Código QR de ${ctx.urlSala}`} />
     <div style="display:flex;flex-direction:column;gap:28px">
-      <p class="url">{ctx.urlSala.replace(/^https?:\/\//, '')}</p>
+      <p class="url"><span class="url-dom">{new URL(ctx.urlSala).host}</span><b class="url-ruta">{new URL(ctx.urlSala).pathname}</b></p>
       <ol>
         <li>Escanee el código con la cámara del celular.</li>
         <li>Escriba su nombre, correo y área. Le llega un enlace al correo: ábralo y queda dentro.</li>

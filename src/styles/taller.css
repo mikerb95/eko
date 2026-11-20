@@ -275,6 +275,10 @@
 .tl-on .qr { max-width: none; width: 420px; padding: 32px; }
 .qr svg { width: 100%; height: auto; }
 .esc-sala .url { font: 500 1em/1.3 var(--font-mono); color: var(--c-deep); word-break: break-all; }
+/* Dirección de la sala: el dominio queda de apoyo (para quien no puede
+   escanear y la escribe) y la ruta corta es lo que se lee de un vistazo. */
+.url-dom { color: #8a99a4; font-weight: 400; }
+.url-ruta { color: var(--c-deep); font-weight: 600; font-size: 1.5em; }
 .esc-sala ol, .esc-practica ol { margin: 0; padding: 0; list-style: none; display: grid; gap: 14px; counter-reset: p; }
 .esc-sala li, .esc-practica li { counter-increment: p; display: flex; gap: 16px; align-items: baseline; }
 .esc-sala li::before, .esc-practica li::before { content: counter(p, decimal-leading-zero); font: 500 .7em/1 var(--font-mono); color: var(--c-forest); }
@@ -689,7 +693,7 @@
 .tl-espera-qr { width: 300px; margin-bottom: 8px; }
 .tl-espera-qr svg { display: block; width: 100%; height: auto; }
 .tl-espera-sala-txt { font: 600 28px/1.15 var(--font-display); letter-spacing: -0.01em; text-align: center; }
-.tl-espera-url { font: 500 19px/1.2 var(--font-mono); color: #4d6170; }
+.tl-espera-url { font: 500 19px/1.2 var(--font-mono); color: #4d6170; display: flex; align-items: baseline; justify-content: center; flex-wrap: wrap; }
 /* Clawd de pie sobre el borde de arriba de la tarjeta; el globo del saludo
    sale a su izquierda, hacia la cuenta regresiva. */
 .tl-espera .clawd { position: absolute; right: 34px; bottom: calc(100% - 14px); width: 170px; --globo: 26px; }

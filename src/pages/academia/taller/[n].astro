@@ -165,7 +165,7 @@ const datos = {
                     <Clawd lugar="espera" burbujas />
                     <div class="tl-espera-qr" set:html={ctx.qrSala} role="img" aria-label={`Código QR de ${ctx.urlSala}`} />
                     <p class="tl-espera-sala-txt">Escanee y entre a la sala</p>
-                    <p class="tl-espera-url">{ctx.urlSala.replace(/^https?:\/\//, '')}</p>
+                    <p class="tl-espera-url"><span class="url-dom">{new URL(ctx.urlSala).host}</span><b class="url-ruta">{new URL(ctx.urlSala).pathname}</b></p>
                   </div>
                 </div>
                 <span class="tl-espera-barra" aria-hidden="true"><i data-espera-barra /></span>
