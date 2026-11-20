@@ -17,6 +17,7 @@ const azar = (a: number, b: number) => a + Math.random() * (b - a)
 const entero = (a: number, b: number) => Math.floor(azar(a, b + 1))
 
 export type Ojos = 'normal' | 'cerrados' | 'entrecerrados' | 'blanco' | 'confundido'
+export type Opcion = string | { texto: string; nota?: string }
 
 export interface Clawd {
   /** Teclea en ráfagas hasta que se apague. `alRafaga` corre al final de cada una. */
@@ -30,8 +31,11 @@ export interface Clawd {
   mirar(x: number, y: number): void
   sudor(on: boolean): void
   dormir(on: boolean): void
-  /** Muestra las opciones sobre la cabeza, duda entre ellas y la elegida vuela a `destino`. */
-  pensar(opciones: string[], elegida: string, destino: Element | null): Promise<void>
+  /**
+   * Muestra las opciones sobre la cabeza (con su nota, p. ej. la probabilidad),
+   * duda entre ellas y la elegida vuela a `destino`.
+   */
+  pensar(opciones: Opcion[], elegida: string, destino: Element | null): Promise<void>
   /** Un token sale de detrás de la cabeza y sube hasta la franja `destino`. */
   lanzar(texto: string, clase: string, destino: Element): void
   /** Deja `n` hojas en la pila de la mesa (las nuevas caen si `animar`). */
@@ -269,15 +273,21 @@ function crear(escena: HTMLElement, raiz: HTMLElement): Clawd {
   }
 
   // ---------- Pensar y escoger ----------
-  async function pensar(opciones: string[], elegida: string, destino: Element | null): Promise<void> {
+  async function pensar(opciones: Opcion[], elegida: string, destino: Element | null): Promise<void> {
     if (!anim || !vivo) return
-    const k = Math.max(0, opciones.indexOf(elegida))
+    const ops = opciones.map((o) => (typeof o === 'string' ? { texto: o, nota: '' } : { texto: o.texto, nota: o.nota ?? '' }))
+    const k = Math.max(0, ops.findIndex((o) => o.texto === elegida))
     const caja = document.createElement('div')
     caja.className = 'clawd-piensa'
-    const chips = opciones.map((w, i) => {
+    const chips = ops.map((o, i) => {
       const s = document.createElement('span')
       s.className = `tk t${i % 4}`
-      s.textContent = w
+      s.textContent = o.texto
+      if (o.nota) {
+        const n = document.createElement('small')
+        n.textContent = o.nota
+        s.append(n)
+      }
       caja.append(s)
       return s
     })
@@ -288,10 +298,10 @@ function crear(escena: HTMLElement, raiz: HTMLElement): Clawd {
     if (!vivo) return
     // Duda: el resaltado pasa por las opciones, cada vez más lento, y para en la elegida.
     const tl = gsap.timeline()
-    const vueltas = opciones.length * 2 + k
+    const vueltas = ops.length * 2 + k
     let t = 0
     for (let j = 0; j <= vueltas; j++) {
-      tl.call(() => chips.forEach((c, i) => c.classList.toggle('on', i === j % opciones.length)), [], t)
+      tl.call(() => chips.forEach((c, i) => c.classList.toggle('on', i === j % ops.length)), [], t)
       t += 0.05 + j * 0.011
     }
     tl.call(() => {}, [], t + 0.2)
@@ -303,6 +313,7 @@ function crear(escena: HTMLElement, raiz: HTMLElement): Clawd {
       const a = enEscena(chip.getBoundingClientRect())
       const b = enEscena(destino.getBoundingClientRect())
       const vuela = chip.cloneNode(true) as HTMLElement
+      vuela.querySelector('small')?.remove()
       vuela.classList.add('clawd-vuela')
       escena.append(vuela)
       sueltos.add(vuela)

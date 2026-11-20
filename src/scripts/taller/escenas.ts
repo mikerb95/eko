@@ -329,7 +329,7 @@ const siguiente: Hook = {
       if (!orden.includes(k)) orden[orden.length - 1] = k
       pensando = true
       clawd
-        .pensar(orden.map(palabra), w, $(el, '[data-frase-nueva]'))
+        .pensar(orden.map((j) => ({ texto: palabra(j), nota: pct(probs[j]!) })), w, $(el, '[data-frase-nueva]'))
         .catch(() => {})
         .then(() => {
           pensando = false
@@ -419,7 +419,7 @@ const inventa: Hook = {
         // Primero escoge Clawd; la frase que sigue y el sello llegan después.
         const sigue = $(el, '[data-inventa-sigue]')
         gsap.set(sigue, { autoAlpha: 0 })
-        const palabras = c.filas.map((f) => $(f, '.tk')!.textContent || '').slice(0, 4)
+        const palabras = c.filas.slice(0, 4).map((f, j) => ({ texto: $(f, '.tk')!.textContent || '', nota: pct(c.base[j]!) }))
         clawd.pensar(palabras, w, $(el, '[data-frase-nueva]')).then(() => {
           if (clawdEn(el) !== clawd) return
           marcar()

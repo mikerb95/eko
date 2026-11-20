@@ -250,6 +250,7 @@
 .clawd-piensa { position: absolute; left: 50%; bottom: 72%; translate: -50% 0; display: flex; gap: 8px; pointer-events: none; font-size: 26px; }
 .clawd-piensa .tk { transition: box-shadow .05s, transform .05s; }
 .clawd-piensa .tk.on { box-shadow: 0 0 0 3px var(--c-forest); transform: translateY(-4px); }
+.clawd-piensa .tk small { margin-left: .5em; font-size: .72em; opacity: .7; }
 .clawd-vuela { position: absolute; left: 0; top: 0; z-index: 5; pointer-events: none; font-size: calc(26px * .82); }
 
 /* Token en vuelo de la portada: opaco y con tinte aqua para que no se enrede
