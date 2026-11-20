@@ -42,6 +42,12 @@ export interface Clawd {
   apilar(n: number, animar?: boolean): void
   /** Llegan más hojas de las que caben y las de arriba se caen de la mesa. */
   derrumbar(): Promise<void>
+  /**
+   * Saca la varita y sopla burbujas en bucle (tandas, a veces una gigante, a
+   * veces persigue una y la revienta de un cabezazo) hasta que se apague.
+   * Solo si el dibujo trae la varita (prop `burbujas` de Clawd.astro).
+   */
+  burbujas(on: boolean): void
   /** Vuelve a la postura neutra: ojos normales, sin globo, sin sudor, quieto. */
   reposo(): void
   destruir(): void
@@ -88,6 +94,13 @@ function crear(escena: HTMLElement, raiz: HTMLElement): Clawd {
   const teclas = [...raiz.querySelectorAll<SVGRectElement>('[data-clawd-tecla]')]
   const hojas = [...raiz.querySelectorAll<SVGRectElement>('[data-clawd-hoja]')]
   const colorTecla = teclas[0]?.getAttribute('fill') ?? '#4A6377'
+  const respira = q<SVGGElement>('.clawd-respira')!
+  const varita = q<SVGGElement>('[data-clawd-varita]')
+  const pompa = q<SVGGElement>('[data-clawd-pompa]')
+  const boca = q<SVGRectElement>('[data-clawd-boca]')
+  /** Con la varita en la mano el brazo izquierdo queda arriba. */
+  let conJuguete = false
+  const alturaI = () => (conJuguete ? -2 : 0)
 
   let vivo = true
   let tecleando = false
@@ -198,7 +211,8 @@ function crear(escena: HTMLElement, raiz: HTMLElement): Clawd {
     if (!anim || !vivo || saltando) return Promise.resolve()
     saltando = true
     bucle?.kill()
-    gsap.set([brazoI, brazoD], { y: 0 })
+    gsap.set(brazoI, { y: alturaI() })
+    gsap.set(brazoD, { y: 0 })
     raiz.classList.remove('quieto')
     const alto = o.alto ?? 5
     const snap = { snap: { y: 1 } }
@@ -206,7 +220,8 @@ function crear(escena: HTMLElement, raiz: HTMLElement): Clawd {
       onComplete: () => {
         saltando = false
         gsap.set(salto, { clearProps: 'transform' })
-        gsap.set([brazoI, brazoD], { y: 0 })
+        gsap.set(brazoI, { y: alturaI() })
+        gsap.set(brazoD, { y: 0 })
         if (tecleando) rafaga()
       },
     })
@@ -217,7 +232,7 @@ function crear(escena: HTMLElement, raiz: HTMLElement): Clawd {
       .to(salto, { scaleY: 0.9, transformOrigin: '50% 100%', duration: 0.06 })
       .to(salto, { scaleY: 1, duration: 0.12, ease: 'back.out(3)' })
     if (o.saludo) {
-      tl.set(brazoI, { y: 0 })
+      tl.set(brazoI, { y: alturaI() })
       for (let k = 0; k < 6; k++) tl.set(brazoD, { y: k % 2 ? -3 : -2 }, '+=0.13')
       tl.set(brazoD, { y: 0 }, '+=0.13')
     }
@@ -420,6 +435,210 @@ function crear(escena: HTMLElement, raiz: HTMLElement): Clawd {
     enPila = quedan
   }
 
+  // ---------- Burbujas (aviso "Empezamos en") ----------
+  /** Posición (centro y caja) de un elemento en coordenadas de `raiz`. */
+  const enRaiz = (el: Element) => {
+    const r = raiz.getBoundingClientRect()
+    const k = r.width / raiz.offsetWidth || 1
+    const p = el.getBoundingClientRect()
+    return { x: (p.left + p.width / 2 - r.left) / k, y: (p.top + p.height / 2 - r.top) / k, w: p.width / k, h: p.height / k }
+  }
+
+  /**
+   * Suelta una burbuja desde el aro. Sube ondulando y revienta en gotitas al
+   * final del viaje (o antes, al azar). Con `destino` va hasta ese punto y se
+   * queda flotando hasta que alguien la reviente.
+   */
+  function soltarBurbuja(o: { d?: number; destino?: { x: number; y: number }; dura?: number } = {}) {
+    const nada = { reventar: () => {} }
+    if (!vivo || !pompa || document.hidden || raiz.querySelectorAll('.clawd-burbuja').length > 14) return nada
+    const d = o.d ?? azar(16, 42)
+    const b = document.createElement('span')
+    b.className = 'clawd-burbuja'
+    b.style.setProperty('--d', `${d.toFixed(0)}px`)
+    b.innerHTML = '<span><i></i><b></b></span>'
+    const bola = b.firstElementChild as HTMLElement
+    raiz.append(b)
+    sueltos.add(b)
+    const p = enRaiz(pompa)
+    const dura = o.dura ?? azar(3.4, 6)
+    const x1 = o.destino ? o.destino.x : p.x - azar(70, 360)
+    const y1 = o.destino ? o.destino.y : p.y - azar(240, 560)
+    gsap.set(b, { x: p.x, y: p.y })
+    const anims: gsap.core.Animation[] = []
+    let reventada = false
+    const reventar = () => {
+      if (reventada) return
+      reventada = true
+      anims.forEach((a) => (a.kill(), vivos.delete(a)))
+      const quitar = () => (b.remove(), sueltos.delete(b))
+      if (!vivo || document.hidden) return quitar()
+      // Pop: la bola se infla y desaparece, y salen gotitas cuadradas (pixel).
+      const gotas = Array.from({ length: 7 }, () => {
+        const g = document.createElement('i')
+        g.className = 'clawd-gotita'
+        b.append(g)
+        return g
+      })
+      const fin = gsap.timeline({ onComplete: quitar })
+      fin
+        .to(bola, { scale: 1.35, autoAlpha: 0, duration: 0.12, ease: 'power1.out' }, 0)
+        .fromTo(
+          gotas,
+          { x: 0, y: 0, autoAlpha: 1, scale: 1 },
+          {
+            x: (k) => Math.cos((k / gotas.length) * Math.PI * 2 + 0.4) * d * azar(0.7, 1.1),
+            y: (k) => Math.sin((k / gotas.length) * Math.PI * 2 + 0.4) * d * azar(0.7, 1.1) + 8,
+            autoAlpha: 0,
+            scale: 0.5,
+            duration: 0.42,
+            ease: 'power2.out',
+          },
+          0,
+        )
+      seguir(fin)
+    }
+    const viaje = gsap.timeline({ onComplete: () => !o.destino && reventar() })
+    viaje
+      .fromTo(bola, { scale: 0.15 }, { scale: 1, duration: 0.4, ease: 'back.out(2.2)' }, 0)
+      .to(b, { x: x1, duration: dura, ease: 'sine.inOut' }, 0)
+      .to(b, { y: y1, duration: dura, ease: o.destino ? 'power2.out' : 'power1.out' }, 0)
+    // Bamboleo de gelatina y vaivén de lado a lado mientras sube.
+    const gelatina = gsap.to(bola, { scaleX: 1.09, scaleY: 0.92, duration: azar(0.32, 0.5), yoyo: true, repeat: -1, ease: 'sine.inOut', delay: 0.4 })
+    const vaiven = gsap.to(bola, { x: azar(10, 24) * (Math.random() < 0.5 ? -1 : 1), duration: azar(0.8, 1.3), yoyo: true, repeat: -1, ease: 'sine.inOut' })
+    anims.push(viaje, gelatina, vaiven)
+    // Algunas no aguantan todo el viaje.
+    if (!o.destino && Math.random() < 0.35) anims.push(gsap.delayedCall(azar(1.2, dura * 0.8), reventar))
+    anims.forEach((a) => vivos.add(a))
+    return { reventar }
+  }
+
+  let soplando = false
+  let turno = 0
+  let pasoB: gsap.core.Animation | null = null
+  const paso = (a: gsap.core.Animation) => ((pasoB = a), esperar(a))
+  const pausa = (s: number) => paso(gsap.delayedCall(s, () => {}))
+
+  function sacar() {
+    conJuguete = true
+    varita!.setAttribute('visibility', 'visible')
+    mirar(-1, -1)
+    return gsap
+      .timeline()
+      .set(brazoI, { y: -1 })
+      .set(brazoI, { y: -2 }, 0.06)
+      .fromTo(varita, { y: 6 }, { y: 0, duration: 0.4, ease: 'back.out(2.4)', snap: { y: 1 } }, 0)
+      .fromTo(pompa, { opacity: 0 }, { opacity: 1, duration: 0.3 }, 0.3)
+      .call(() => {}, [], 0.8)
+  }
+
+  function guardar() {
+    return gsap
+      .timeline({
+        onComplete: () => {
+          varita!.setAttribute('visibility', 'hidden')
+          conJuguete = false
+          if (!saltando) gsap.set(brazoI, { y: 0 })
+          mirar(0, 0)
+        },
+      })
+      .to(varita, { y: 6, duration: 0.3, ease: 'back.in(2)', snap: { y: 1 } })
+  }
+
+  /** Toma aire, sopla una tanda (a veces una gigante) y mira cómo suben. */
+  function ronda(gigante: boolean) {
+    const tl = gsap.timeline()
+    const o = { transformOrigin: '50% 100%' }
+    tl.call(() => mirar(-1, 0))
+      .to(respira, { scaleY: 1.08, scaleX: 0.97, ...o, duration: 0.45, ease: 'power2.out' })
+      .call(() => boca?.setAttribute('visibility', 'visible'))
+    if (gigante) {
+      // Sopla despacito y largo: sale una sola, enorme.
+      tl.to(respira, { scaleY: 0.96, scaleX: 1.03, ...o, duration: 1.1, ease: 'sine.inOut' })
+        .to(pompa, { scale: 1.4, transformOrigin: '50% 50%', duration: 1.1, ease: 'sine.in' }, '<')
+        .call(() => void soltarBurbuja({ d: azar(78, 96), dura: azar(6, 7.5) }))
+        .set(pompa, { scale: 1, opacity: 0.25 })
+    } else {
+      tl.to(respira, { scaleY: 0.94, scaleX: 1.05, ...o, duration: 0.16, ease: 'power2.out' })
+      const n = entero(4, 7)
+      let t = 0
+      for (let k = 0; k < n; k++) {
+        tl.call(() => void soltarBurbuja(), [], `<${t.toFixed(2)}`)
+        tl.fromTo(pompa, { x: -1 }, { x: 0, duration: 0.08, snap: { x: 1 } }, '<')
+        t = azar(0.09, 0.2)
+      }
+      tl.set(pompa, { opacity: 0.25 })
+    }
+    tl.to(respira, { scaleX: 1, scaleY: 1, duration: 0.35, ease: 'back.out(3)' })
+      .call(() => boca?.setAttribute('visibility', 'hidden'), [], '<')
+      .call(() => mirar(-1, -1), [], '<')
+      .to(pompa, { opacity: 1, duration: 0.5 }, '+=0.3')
+      .call(() => mirar(0, -1), [], `+=${azar(0.4, 0.9).toFixed(2)}`)
+      .call(() => {}, [], `+=${azar(0.4, 1).toFixed(2)}`)
+    return tl
+  }
+
+  /** Una burbuja lenta se le para encima y la revienta de un cabezazo. */
+  async function cazar(sigue: () => boolean) {
+    const cab = enRaiz(cuerpo)
+    const u = cab.w / 12
+    const d = 36
+    const bur = soltarBurbuja({ d, dura: 2.6, destino: { x: cab.x + azar(-u, u), y: cab.y - cab.h / 2 - 5 * u - d * 0.25 } })
+    mirar(-1, -1)
+    await pausa(1.3)
+    if (!sigue()) return bur.reventar()
+    mirar(0, -1)
+    await pausa(1.5)
+    if (!sigue()) return bur.reventar()
+    void saltar({ brazos: true })
+    await pausa(0.32)
+    bur.reventar()
+    ojos('entrecerrados')
+    await pausa(0.9)
+    ojos('normal')
+  }
+
+  async function bucleBurbujas() {
+    const yo = ++turno
+    const sigue = () => vivo && soplando && turno === yo
+    while (sigue()) {
+      await paso(sacar())
+      const rondas = entero(2, 3)
+      for (let r = 0; r < rondas && sigue(); r++) {
+        while (saltando && sigue()) await pausa(0.3)
+        await paso(ronda(r === rondas - 1 && Math.random() < 0.45))
+      }
+      if (sigue() && Math.random() < 0.6) await cazar(sigue)
+      if (!sigue()) return
+      await paso(guardar())
+      if (!sigue()) return
+      await pausa(azar(2.5, 4.5))
+    }
+  }
+
+  function apagarBurbujas() {
+    soplando = false
+    turno++
+    pasoB?.kill()
+    pasoB = null
+    gsap.killTweensOf([varita, pompa, respira].filter(Boolean))
+    gsap.set(respira, { clearProps: 'transform' })
+    if (pompa) gsap.set(pompa, { clearProps: 'all' })
+    varita?.setAttribute('visibility', 'hidden')
+    boca?.setAttribute('visibility', 'hidden')
+    conJuguete = false
+    if (!saltando) gsap.set(brazoI, { y: 0 })
+  }
+
+  function burbujas(on: boolean) {
+    if (!anim || !varita || !pompa) return
+    if (!on) return soplando ? apagarBurbujas() : undefined
+    if (soplando) return
+    teclear(false)
+    soplando = true
+    void bucleBurbujas()
+  }
+
   function reposo() {
     teclear(false)
     callar()
@@ -430,6 +649,7 @@ function crear(escena: HTMLElement, raiz: HTMLElement): Clawd {
   }
 
   function destruir() {
+    if (soplando) apagarBurbujas()
     vivo = false
     tecleando = false
     saltando = false
@@ -450,7 +670,7 @@ function crear(escena: HTMLElement, raiz: HTMLElement): Clawd {
   }
 
   ojos('normal')
-  return { teclear, saltar, decir, callar, ojos, mirar, sudor, dormir, pensar, lanzar, apilar, derrumbar, reposo, destruir }
+  return { teclear, saltar, decir, callar, ojos, mirar, sudor, dormir, pensar, lanzar, apilar, derrumbar, burbujas, reposo, destruir }
 }
 
 // ---------- Papeles que se repiten ----------
