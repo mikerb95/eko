@@ -34,21 +34,24 @@ const grupo = (() => {
 
 // Escenas donde Clawd tiene un papel (el motor está en scripts/taller/clawd.ts
 // y en los hooks de escenas.ts). En las demás no aparece.
-const PAPELES: Record<string, { accesorio: 'teclado' | 'mesa' | 'nada'; lugar: string }> = {
-  portada: { accesorio: 'teclado', lugar: 'portada' },
-  siguiente: { accesorio: 'teclado', lugar: 'piensa' },
-  inventa: { accesorio: 'teclado', lugar: 'inventa' },
-  contexto: { accesorio: 'mesa', lugar: 'mesa' },
-  constructor: { accesorio: 'teclado', lugar: 'constructor' },
-  evaluacion: { accesorio: 'nada', lugar: 'votos' },
-  voto: { accesorio: 'nada', lugar: 'votos' },
-  repaso: { accesorio: 'nada', lugar: 'votos' },
-  verdad: { accesorio: 'nada', lugar: 'votos' },
-  semaforo: { accesorio: 'nada', lugar: 'votos' },
-  descanso: { accesorio: 'nada', lugar: 'descanso' },
-  practica: { accesorio: 'teclado', lugar: 'practica' },
-}
-const papel = PAPELES[e.tipo]
+// Map y no objeto: `constructor` es un tipo de escena y en un objeto choca con
+// la propiedad heredada del mismo nombre.
+type Papel = { accesorio: 'teclado' | 'mesa' | 'nada'; lugar: string }
+const PAPELES = new Map<string, Papel>([
+  ['portada', { accesorio: 'teclado', lugar: 'portada' }],
+  ['siguiente', { accesorio: 'teclado', lugar: 'piensa' }],
+  ['inventa', { accesorio: 'teclado', lugar: 'inventa' }],
+  ['contexto', { accesorio: 'mesa', lugar: 'mesa' }],
+  ['constructor', { accesorio: 'teclado', lugar: 'constructor' }],
+  ['evaluacion', { accesorio: 'nada', lugar: 'votos' }],
+  ['voto', { accesorio: 'nada', lugar: 'votos' }],
+  ['repaso', { accesorio: 'nada', lugar: 'votos' }],
+  ['verdad', { accesorio: 'nada', lugar: 'votos' }],
+  ['semaforo', { accesorio: 'nada', lugar: 'votos' }],
+  ['descanso', { accesorio: 'nada', lugar: 'descanso' }],
+  ['practica', { accesorio: 'teclado', lugar: 'practica' }],
+])
+const papel = PAPELES.get(e.tipo)
 ---
 
 <section
