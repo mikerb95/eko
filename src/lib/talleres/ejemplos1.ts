@@ -203,6 +203,10 @@ export const CELULAR_TALLER1: Record<string, GuiaCelular> = {
       finanzas: { titulo: 'Nómina y bancos en la cuenta de Ekosolv', texto: 'Para el procedimiento de nómina bastan totales; los datos de cada empleado, solo si la tarea los pide. Claves bancarias y tokens, nunca.' },
     },
   },
+  // En esta escena el celular muestra el paso guiado (conectarZoho.ts); la idea queda de respaldo.
+  zoho: {
+    idea: 'Vamos a conectar Claude con su Zoho CRM, solo para leer. Siga los pasos en la pantalla o aquí en el celular.',
+  },
   comparacion: {
     idea: 'En pantalla está el resultado del grupo en las mismas cinco preguntas, antes y después de hoy.',
   },

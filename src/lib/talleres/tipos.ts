@@ -93,6 +93,24 @@ export type TipoEscena =
   | 'sigue'
   | 'cierre'
   | 'repaso'
+  | 'conectar'
+
+/**
+ * Un paso de una práctica guiada (escena `conectar`): lo que se hace y el
+ * concepto que aparece en ese momento. El proyector lo muestra grande y el
+ * celular lo repite con su maqueta animada (src/components/taller/Maqueta.astro).
+ */
+export interface PasoGuiado {
+  /** Concepto que se explica en este paso (MCP, conector, permisos...). */
+  concepto: string
+  titulo: string
+  /** Lo que la persona hace en su PC. */
+  hacer: string
+  /** El concepto en palabras sencillas. */
+  queEs: string
+  /** id de la maqueta animada. */
+  maqueta: string
+}
 
 /** Cómo se ve la idea de una escena en el trabajo de un área (celular). */
 export interface EjemploArea {

@@ -12,6 +12,7 @@
  */
 import type { Interaccion, Pregunta, Taller } from './tipos.ts'
 import { CELULAR_TALLER1 } from './ejemplos1.ts'
+import { ESCENA_ZOHO } from './conectarZoho.ts'
 
 // ---------- Evaluación de entrada y salida (las mismas preguntas) ----------
 
@@ -110,7 +111,7 @@ export const TALLER_1: Taller = {
   titulo: 'Inteligencia artificial, por dentro',
   subtitulo: 'Qué es, cómo funciona, en qué sirve y cómo usarla con seguridad en Ekosolv',
   modulos: ['general'],
-  minutosTotales: 240,
+  minutosTotales: 280,
   bloques: [
     { id: 'apertura', titulo: 'Apertura', minutos: 15 },
     { id: 'dentro', titulo: 'Qué es la IA por dentro', minutos: 65 },
@@ -119,6 +120,7 @@ export const TALLER_1: Taller = {
     { id: 'pedir', titulo: 'Cómo pedir', minutos: 45 },
     { id: 'practica', titulo: 'Práctica guiada', minutos: 30 },
     { id: 'seguridad', titulo: 'Seguridad y Ley 1581', minutos: 20 },
+    { id: 'conectar', titulo: 'Conectar Zoho', minutos: 40 },
     { id: 'cierre', titulo: 'Cierre', minutos: 15 },
   ],
   evaluacion: { pre: 'pre', post: 'post' },
@@ -846,6 +848,9 @@ export const TALLER_1: Taller = {
         ],
       },
     },
+
+    // ── Conectar Zoho (40): práctica final, ver conectarZoho.ts ──
+    ESCENA_ZOHO,
 
     // ── Cierre (15) ──
     {

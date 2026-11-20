@@ -24,6 +24,7 @@ export const COLOR_BLOQUE: Record<string, string> = {
   pedir: '#179C91',
   practica: '#179C91',
   seguridad: '#B4442F',
+  conectar: '#124E7D',
   cierre: '#00AA9F',
 }
 
