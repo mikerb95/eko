@@ -91,7 +91,17 @@ export function crearCortina(lienzo: HTMLElement) {
     const vuelos = (et?.pares ?? []).map(([i, j]) => {
       const v = pv.titulo[i]!
       const cs = getComputedStyle(v)
-      return { v, n: pn.titulo[j]!, desde: local(v), color: cs.color, font: cs.font, ls: cs.letterSpacing }
+      // Propiedades sueltas: Chrome devuelve vacío el atajo `font` de estos nodos.
+      const tipo = {
+        fontFamily: cs.fontFamily,
+        fontSize: cs.fontSize,
+        fontWeight: cs.fontWeight,
+        fontVariationSettings: cs.fontVariationSettings,
+        lineHeight: cs.lineHeight,
+        letterSpacing: cs.letterSpacing,
+        textTransform: cs.textTransform,
+      }
+      return { v, n: pn.titulo[j]!, desde: local(v), color: cs.color, tipo }
     })
     const numeros = [...(ek?.numeros ?? []).map(([i, j]) => [pv.kicker[i]!, pn.kicker[j]!]), ...(et?.numeros ?? []).map(([i, j]) => [pv.titulo[i]!, pn.titulo[j]!])]
       .map(([v, n]) => ({ v: v!, n: n!, xv: local(v!) }))
@@ -124,7 +134,7 @@ export function crearCortina(lienzo: HTMLElement) {
       const clon = document.createElement('span')
       clon.className = 'tl-vuela'
       clon.textContent = p.v.textContent
-      Object.assign(clon.style, { left: `${p.desde.x}px`, top: `${p.desde.y}px`, font: p.font, letterSpacing: p.ls, color: p.color })
+      Object.assign(clon.style, p.tipo, { left: `${p.desde.x}px`, top: `${p.desde.y}px`, color: p.color })
       capaVuelo.append(clon)
       const s = hasta.h / (p.desde.h || 1)
       const colorN = getComputedStyle(p.n).color

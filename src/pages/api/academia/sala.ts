@@ -8,7 +8,8 @@ import { AREA_IDS, nombreModulo } from '../../../lib/academia/reglas'
 import { MAX_INSTRUCCION, MIN_INSTRUCCION, PRACTICAS_DIA, validarInstruccion } from '../../../lib/academia/practica'
 import { practicar, PracticaNoDisponible } from '../../../lib/academia/motorPractica'
 import { interaccionDe, interaccionPublica, PREGUNTAS_DIA, registroSala, validarPregunta, votoValido, MAX_PREGUNTA } from '../../../lib/talleres/reglas'
-import { codigoPC, codigoVigente, MINUTOS_CODIGO_PC, guardarPracticaSala, guardarPregunta, marcarEnSala, misRespuestas, practicasSalaDeHoy, preguntasDeHoyDe, liberarEnlace, registrarAsistente, reservarEnlace, votar } from '../../../lib/talleres/datos'
+import { codigoPC, codigoVigente, MINUTOS_CODIGO_PC, guardarOpinion, guardarPracticaSala, guardarPregunta, marcarEnSala, misRespuestas, opinionDe, practicasSalaDeHoy, preguntasDeHoyDe, liberarEnlace, registrarAsistente, reservarEnlace, votar } from '../../../lib/talleres/datos'
+import { validarOpinion } from '../../../lib/talleres/opinion'
 import { salaActual } from '../../../lib/talleres/sala'
 import { anotar } from '../../../lib/bitacora'
 import { clientIp } from '../../../lib/rateLimit'
@@ -28,7 +29,11 @@ import type { PasoGuiado } from '../../../lib/talleres/tipos'
 // puede enviarle una pregunta a quien dicta, que la ve en el presentador.
 //
 // GET           → capacitación en curso, si la persona ya está registrada, pregunta abierta, sus respuestas y si hay práctica
-// POST {accion} → registrar (envía el enlace al correo) | entrar | votar | practicar | preguntar | codigo_pc
+// POST {accion} → registrar (envía el enlace al correo) | entrar | votar | practicar | preguntar | codigo_pc | opinion
+//
+// Al llegar la presentación a su última escena, GET trae `opinion`
+// ('pendiente' o 'enviada') y el celular pasa al formulario de cierre de su
+// área (/academia/sala/opinion, src/lib/talleres/opinion.ts).
 //
 // codigo_pc: el celular muestra un código de dos números para abrir la
 // presentación en el PC de la persona (/pc). Ver /api/academia/pc.
@@ -68,6 +73,8 @@ export const GET: APIRoute = async ({ cookies }) => {
       mias: i ? await misRespuestas(t.n, i.id, asistente.id) : {},
       // Código para el PC que sigue vigente (si ya se usó, el celular lo quita).
       codigoPC: await codigoVigente(t.n, asistente.id),
+      // Última escena: el celular pasa al formulario de cierre (si no lo ha enviado).
+      opinion: estado.escena === t.escenas.at(-1)?.id ? ((await opinionDe(asistente.id)) ? 'enviada' : 'pendiente') : null,
     })
   } catch (e) {
     return fail('academia/sala', e)
@@ -139,6 +146,14 @@ export const POST: APIRoute = async ({ request, cookies, url, clientAddress }) =
       const hoy = hoyEnBogota()
       if ((await preguntasDeHoyDe(asistente.id, hoy)) >= PREGUNTAS_DIA) return json({ error: `Ya envió ${PREGUNTAS_DIA} preguntas hoy. Hágala en voz alta.` }, 429)
       await guardarPregunta(t.n, hoy, asistente.id, estado.escena, texto)
+      return json({ ok: true })
+    }
+
+    if (b?.accion === 'opinion') {
+      const r = validarOpinion(b.respuestas, asistente.area, t.n)
+      if ('error' in r) return json(r, 400)
+      await guardarOpinion(asistente, r.respuestas)
+      await anotar('opinion', { quien: `asistente:${asistente.id}`, taller: t.n, detalle: { area: asistente.area } })
       return json({ ok: true })
     }
 

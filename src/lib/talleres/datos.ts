@@ -358,3 +358,82 @@ export async function canjearCodigoPC(taller: number, codigo: string): Promise<n
   const x: any = r.rows[0]
   return x ? num(x.asistente_id) : null
 }
+
+// ---------- Formulario de cierre (/academia/sala/opinion) ----------
+
+export interface OpinionTaller {
+  id: number
+  taller: number
+  fecha: string
+  asistente_id: number
+  nombre: string
+  correo: string
+  area: string
+  respuestas: Record<string, string>
+  /** Cómo se resolvió la duda ('' = pendiente). */
+  resolucion: string
+  resuelta_at: string
+  resuelta_por: string
+  created_at: string
+  updated_at: string
+}
+
+/** Guarda o actualiza el formulario de cierre de una persona. */
+export async function guardarOpinion(a: Asistente, respuestas: Record<string, string>): Promise<void> {
+  const c = await db()
+  const ts = ahora()
+  await c.execute({
+    sql: `INSERT INTO ac_taller_opiniones (taller, fecha, asistente_id, area, respuestas, created_at, updated_at) VALUES (?, ?, ?, ?, ?, ?, ?)
+          ON CONFLICT (asistente_id) DO UPDATE SET area = excluded.area, respuestas = excluded.respuestas, updated_at = excluded.updated_at`,
+    args: [a.taller, a.fecha, a.id, a.area, JSON.stringify(respuestas), ts, ts],
+  })
+}
+
+/** Lo que la persona ya envió, para volver a mostrárselo (null si no ha enviado). */
+export async function opinionDe(asistente_id: number): Promise<Record<string, string> | null> {
+  const c = await db()
+  const r = await c.execute({ sql: 'SELECT respuestas FROM ac_taller_opiniones WHERE asistente_id = ?', args: [asistente_id] })
+  const x: any = r.rows[0]
+  return x ? leerRespuestas(x.respuestas) : null
+}
+
+/** Todos los formularios, del más reciente al más antiguo (panel, solo admin). */
+export async function opiniones(): Promise<OpinionTaller[]> {
+  const c = await db()
+  const r = await c.execute(`SELECT o.*, a.nombre, a.apellido, a.correo FROM ac_taller_opiniones o
+    JOIN ac_taller_asistentes a ON a.id = o.asistente_id ORDER BY o.fecha DESC, o.id DESC`)
+  return r.rows.map((x: any) => ({
+    id: num(x.id),
+    taller: num(x.taller),
+    fecha: str(x.fecha),
+    asistente_id: num(x.asistente_id),
+    nombre: `${str(x.nombre)} ${str(x.apellido)}`.trim(),
+    correo: str(x.correo),
+    area: str(x.area),
+    respuestas: leerRespuestas(x.respuestas),
+    resolucion: str(x.resolucion),
+    resuelta_at: str(x.resuelta_at),
+    resuelta_por: str(x.resuelta_por),
+    created_at: str(x.created_at),
+    updated_at: str(x.updated_at),
+  }))
+}
+
+/** Anota cómo se resolvió la duda; con texto vacío vuelve a quedar pendiente. */
+export async function resolverOpinion(id: number, resolucion: string, quien: string): Promise<void> {
+  const c = await db()
+  const r = resolucion.trim().slice(0, 1000)
+  await c.execute({
+    sql: 'UPDATE ac_taller_opiniones SET resolucion = ?, resuelta_at = ?, resuelta_por = ? WHERE id = ?',
+    args: [r, r ? ahora() : '', r ? quien : '', id],
+  })
+}
+
+function leerRespuestas(v: unknown): Record<string, string> {
+  try {
+    const o = JSON.parse(str(v))
+    return o && typeof o === 'object' ? Object.fromEntries(Object.entries(o).map(([k, s]) => [k, str(s)])) : {}
+  } catch {
+    return {}
+  }
+}
