@@ -15,8 +15,10 @@ interface Props {
   accesorio?: 'teclado' | 'mesa' | 'nada'
   lugar: string
   frases?: string[]
+  /** Dibuja la varita de burbujas (la saca y sopla con `burbujas(true)` en clawd.ts). */
+  burbujas?: boolean
 }
-const { accesorio = 'nada', lugar, frases } = Astro.props
+const { accesorio = 'nada', lugar, frases, burbujas = false } = Astro.props
 
 const C = {
   cuerpo: '#D97757',
@@ -33,6 +35,10 @@ const C = {
   hoja: '#FFFFFF',
   hojaB: '#CDBFAE',
   sudor: '#8FD3F2',
+  palito: '#F2C94C',
+  aro: '#F07FA8',
+  aroLuz: '#F7AFC9',
+  jabon: '#BFE9FF',
 }
 
 // Teclado: 26 de ancho, de x = -4 a 21, de y = 7 a 10, delante de las patitas.
@@ -59,7 +65,31 @@ const HOJAS = 14
           <rect x="11" y="8" width="1" height="2" />
           <rect x="13" y="8" width="1" height="2" />
         </g>
-        <g data-clawd-brazo="i"><rect x="1" y="4" width="2" height="2" fill={C.cuerpo} /></g>
+        <g data-clawd-brazo="i">
+          {burbujas && (
+            // Varita de burbujas en la mano izquierda: palito que sube en
+            // diagonal hasta un aro de 5 x 5 con la película de jabón adentro.
+            <g class="clawd-varita" data-clawd-varita visibility="hidden">
+              <g fill={C.palito}>
+                <rect x="0" y="3" width="1" height="1" />
+                <rect x="-1" y="2" width="1" height="1" />
+                <rect x="-2" y="1" width="1" height="1" />
+                <rect x="-3" y="0" width="1" height="1" />
+              </g>
+              <g fill={C.aro}>
+                <rect x="-6" y="0" width="3" height="1" />
+                <rect x="-7" y="-3" width="1" height="3" />
+                <rect x="-3" y="-3" width="1" height="3" />
+              </g>
+              <rect x="-6" y="-4" width="3" height="1" fill={C.aroLuz} />
+              <g data-clawd-pompa>
+                <rect x="-6" y="-3" width="3" height="3" fill={C.jabon} opacity=".45" />
+                <rect x="-6" y="-3" width="1" height="1" fill="#fff" opacity=".85" />
+              </g>
+            </g>
+          )}
+          <rect x="1" y="4" width="2" height="2" fill={C.cuerpo} />
+        </g>
         <g data-clawd-brazo="d"><rect x="15" y="4" width="2" height="2" fill={C.cuerpo} /></g>
         <rect data-clawd-cuerpo x="3" y="0" width="12" height="8" fill={C.cuerpo} />
         <rect x="4" y="0" width="10" height="1" fill={C.luz} />
@@ -76,6 +106,7 @@ const HOJAS = 14
             </g>
           </g>
         </g>
+        {burbujas && <rect class="clawd-boca" data-clawd-boca x="8" y="4" width="2" height="2" fill={C.ojo} visibility="hidden" />}
         <g class="clawd-sudor" data-clawd-sudor>
           <rect x="16" y="-1" width="1" height="1" fill={C.sudor} />
           <rect x="16" y="0" width="1" height="1" fill={C.sudor} />

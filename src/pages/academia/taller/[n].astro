@@ -162,7 +162,7 @@ const datos = {
                       sobre la tarjeta, saluda por su nombre a cada persona que
                       se registra (proyector.ts). */}
                   <div class="tl-espera-sala">
-                    <Clawd lugar="espera" />
+                    <Clawd lugar="espera" burbujas />
                     <div class="tl-espera-qr" set:html={ctx.qrSala} role="img" aria-label={`Código QR de ${ctx.urlSala}`} />
                     <p class="tl-espera-sala-txt">Escanee y entre a la sala</p>
                     <p class="tl-espera-url">{ctx.urlSala.replace(/^https?:\/\//, '')}</p>

@@ -7,7 +7,8 @@
 ## Dónde quedó cada cosa
 
 - Contenido (puro): `src/lib/talleres/recursos.ts` (junta `entregables1.ts`, `taller1.ts` y `conectarZoho.ts`; fuentes oficiales por área). Para la capacitación 2: sumar su función en `POR_TALLER`.
-- Página: `src/pages/academia/recursos/[...area].astro` (índice y banco por área, selector de áreas, botón Copiar, guía de Zoho con las maquetas en pasos plegables).
+- Inicio (landing tipo academia, Mike 2026-11-20): `src/pages/academia/recursos/index.astro`. Mismo armazón que `/academia` (`AcademiaLayout` con `inicio`, `etiqueta` y `nav` propios): hero, cifras, el programa de 4 capacitaciones con su temario (las no dictadas salen como "Próximamente", sin temas), rutas por área con su enfoque y cómo usar el banco.
+- Ruta del área: `src/pages/academia/recursos/[area].astro` (temario lateral con anclas, plegado en el celular; selector de áreas con el color de cada una; botón Copiar; guía de Zoho con las maquetas en pasos plegables). Un área inválida redirige al inicio.
 - Excepción pública: `esRecursos` en `src/middleware.ts`.
 - PDF: `public/recursos/taller1-<área>-checklist.pdf` y `-guia.pdf`. Se regeneran con `BASE=http://localhost:<puerto> ADMIN_USER=… ADMIN_PASS=… node scripts/entregables-pdf.mjs 1` cada vez que cambie `entregables1.ts`.
 - Prueba en navegador sin sesión: `e2e/recursos.spec.ts`.
@@ -27,7 +28,7 @@ Una página pública por área con todo lo que la persona necesita después de c
 
 | Ruta | Qué muestra |
 |---|---|
-| `/academia/recursos` | Índice: las seis áreas para elegir. |
+| `/academia/recursos` | Inicio con estilo de academia: programa, temario y rutas por área. |
 | `/academia/recursos/<área>` | El banco del área: `gerencia`, `finanzas`, `operaciones`, `logistica`, `ventas`, `mercadeo`. Arriba, un selector para ver las otras áreas. |
 
 ## Contenido de cada página (orden)
