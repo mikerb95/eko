@@ -40,7 +40,7 @@ const FINA: { w: number; t: number; curva: Curva } = { w: 0.014, t: 0.95, curva:
 // El panel de bloque entra rápido, frena en el centro para que se lea el
 // nombre y sale rápido.
 const PANEL: { w: number; t: number; curva: Curva } = { w: 1.3, t: 1.6, curva: [0.2, 0.85, 0.8, 0.15] }
-const LIBRE = 400 // px de holgura en los lados que no recorta el borde (sombras, descendentes)
+const LIBRE = 400 // px de holgura arriba, abajo y en el lado que no barre (sombras, descendentes)
 
 export function crearCortina(lienzo: HTMLElement, pie: HTMLElement | null) {
   const cortina = document.createElement('div')
@@ -98,19 +98,21 @@ export function crearCortina(lienzo: HTMLElement, pie: HTMLElement | null) {
     // El borde delantero P recorre de 0 a (1+W)·ancho con la curva; el trasero
     // va W·ancho detrás. Lo viejo se recorta donde pasa P y lo nuevo aparece
     // donde pasa el trasero. El inset varía lineal con P, así que con la misma
-    // curva y duración queda pegado al panel.
+    // curva y duración queda pegado al panel (por eso los extremos son exactos:
+    // cualquier ajuste rompe la proporción). En el lado que barre, el recorte
+    // empieza y termina en el borde del lienzo, así que no corta sombras.
     const borrar = (n: string, el: HTMLElement) => {
       const { x, w } = local(el)
       const [c0, c1] = c.adelante
-        ? [ins(-LIBRE, -LIBRE, -LIBRE, Math.min(-x, -LIBRE)), ins(-LIBRE, -LIBRE, -LIBRE, recorrido - x)]
-        : [ins(-LIBRE, Math.min(w + x - ancho, -LIBRE), -LIBRE, -LIBRE), ins(-LIBRE, w + x - ancho + recorrido, -LIBRE, -LIBRE)]
+        ? [ins(-LIBRE, -LIBRE, -LIBRE, -x), ins(-LIBRE, -LIBRE, -LIBRE, recorrido - x)]
+        : [ins(-LIBRE, w + x - ancho, -LIBRE, -LIBRE), ins(-LIBRE, w + x - ancho + recorrido, -LIBRE, -LIBRE)]
       reglas.push(`::view-transition-old(${n}){--c0:${c0};--c1:${c1};animation:tl-vt-clip ${anim}}`)
     }
     const revelar = (n: string, el: HTMLElement) => {
       const { x, w } = local(el)
       const [c0, c1] = c.adelante
-        ? [ins(-LIBRE, w + x + W * ancho, -LIBRE, -LIBRE), ins(-LIBRE, Math.min(w + x - ancho, -LIBRE), -LIBRE, -LIBRE)]
-        : [ins(-LIBRE, -LIBRE, -LIBRE, ancho + W * ancho - x), ins(-LIBRE, -LIBRE, -LIBRE, Math.min(-x, -LIBRE))]
+        ? [ins(-LIBRE, w + x + W * ancho, -LIBRE, -LIBRE), ins(-LIBRE, w + x - ancho, -LIBRE, -LIBRE)]
+        : [ins(-LIBRE, -LIBRE, -LIBRE, ancho + W * ancho - x), ins(-LIBRE, -LIBRE, -LIBRE, -x)]
       reglas.push(`::view-transition-new(${n}){--c0:${c0};--c1:${c1};animation:tl-vt-clip ${anim}}`)
     }
     // Momento (s) en que el borde delantero (o el trasero) pasa por el centro de el.
