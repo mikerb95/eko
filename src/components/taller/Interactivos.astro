@@ -130,7 +130,9 @@ const nDatos = segmentos.filter((s) => s.dato).length
       )}
     </p>
     <p class="marcador">Datos personales en el documento: {nDatos}. Tapados: <b data-tapados>0</b></p>
-    <p class="llamado"><span class="pt" />En la cuenta de Ekosolv se pega completo: la IA no entrena con él y el proveedor lo trata bajo contrato.</p>
-    <p class="llamado" data-paso="1"><span class="pt" />En una cuenta personal no se pega. Si no hay otra salida, se tapa todo esto primero.</p>
+    <div class="llamados-par">
+      <p class="llamado"><span class="pt" />Cuenta de Ekosolv: se pega completo. La IA no entrena con él y el proveedor lo trata bajo contrato.</p>
+      <p class="llamado" data-paso="1"><span class="pt" />Cuenta personal: no se pega. Habría que tapar todo esto y el documento ya no serviría igual.</p>
+    </div>
   </>
 )}

@@ -492,6 +492,9 @@
 .dato.tapado.rolado .rol { display: inline; }
 .marcador { font: 500 .7em/1 var(--font-mono); color: var(--mute); }
 .marcador b { color: var(--c-deep); font-variant-numeric: tabular-nums; }
+.llamados-par { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; align-items: stretch; max-width: 1180px; }
+.llamados-par .llamado { margin: 0; }
+@media (max-width: 760px) { .llamados-par { grid-template-columns: 1fr; } }
 
 /* ---------- Comparación ---------- */
 .antes-despues { display: flex; align-items: center; gap: 28px; flex-wrap: wrap; }
