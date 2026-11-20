@@ -10,6 +10,8 @@ test('las seis áreas abren sin sesión, con su contenido y sus PDF', async ({ p
     expect(r?.status(), area).toBe(200)
     expect(page.url()).not.toContain('/admin/login')
     await expect(page.locator('.instr article').first()).toBeVisible()
+    expect(await page.locator('.faq details').count(), area).toBeGreaterThan(10)
+    expect(await page.locator('.glosario div').count(), area).toBeGreaterThan(10)
     for (const href of await page.locator('a[download]').evaluateAll((as) => as.map((a) => a.getAttribute('href')!))) {
       expect((await request.get(href)).status(), href).toBe(200)
     }
