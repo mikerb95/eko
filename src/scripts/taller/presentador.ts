@@ -112,13 +112,21 @@ function montar(d: DatosPr) {
     )
   }
 
+  // Escena y paso se guardan en el servidor (los siguen los celulares y los PC
+  // vinculados). Con clics seguidos solo sale el último.
+  let guardarPend: ReturnType<typeof setTimeout> | null = null
+  const guardar = (k: number, p: number) => {
+    if (guardarPend) clearTimeout(guardarPend)
+    guardarPend = setTimeout(() => {
+      enviar({ accion: 'estado', taller: d.n, escena: d.escenas[k]!.id, paso: p }).catch((e) => console.error('[presentador] estado', e))
+    }, 250)
+  }
+
   const ir = (k: number, p: number) => {
     k = Math.max(0, Math.min(d.escenas.length - 1, k))
     p = Math.max(0, Math.min(d.escenas[k]!.pasos, p))
-    if (k !== i) {
-      llegada = Date.now()
-      enviar({ accion: 'estado', taller: d.n, escena: d.escenas[k]!.id }).catch((e) => console.error('[presentador] estado', e))
-    }
+    if (k !== i) llegada = Date.now()
+    if (k !== i || p !== paso) guardar(k, p)
     i = k
     paso = p
     pintar()

@@ -134,8 +134,9 @@ function montar() {
     if (!datos.admin) return
     if (estadoPend) clearTimeout(estadoPend)
     const escena = datos.escenas[i]!.id
+    const p = paso
     estadoPend = setTimeout(() => {
-      enviar({ accion: 'estado', taller: datos.n, escena }).catch((e) => console.error('[taller] estado', e))
+      enviar({ accion: 'estado', taller: datos.n, escena, paso: p }).catch((e) => console.error('[taller] estado', e))
     }, 250)
   }
 
@@ -200,6 +201,8 @@ function montar() {
       aplicarPasos(el, p, previo, true)
       pasoHook(el, k, p, previo)
       actualizarPie()
+      // El paso también se guarda: lo siguen el celular (pasos guiados) y el PC vinculado.
+      if (local) guardarEstado()
     }
     history.replaceState(null, '', `#${i + 1}.${paso}`)
     if (local) avisar({ tipo: 'ir', i, paso })

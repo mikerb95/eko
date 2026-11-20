@@ -83,7 +83,8 @@ export const POST: APIRoute = async ({ request, locals }) => {
         if (!esAdmin(locals)) return json({ error: 'Solo quien dicta mueve la presentación' }, 403)
         const escena = t.escenas.find((x) => x.id === b.escena)
         if (!escena) return json({ error: 'Esa escena no existe' }, 400)
-        await fijarEstado(t.n, escena.id, escena.interaccion ?? '')
+        const paso = Number.isInteger(b.paso) ? Math.max(0, Math.min(escena.pasos, b.paso)) : 0
+        await fijarEstado(t.n, escena.id, escena.interaccion ?? '', paso)
         return json({ ok: true })
       }
 
