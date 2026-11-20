@@ -19,6 +19,7 @@ export type TipoBitacora =
   | 'voto' // cada respuesta, también las que luego cambió
   | 'opinion' // envió (o corrigió) el formulario de cierre de su área
   | 'escena' // quien dicta movió la presentación
+  | 'aviso_inicio' // quien dicta puso o quitó el aviso "Empezamos en"
 
 export async function anotar(
   tipo: TipoBitacora,
