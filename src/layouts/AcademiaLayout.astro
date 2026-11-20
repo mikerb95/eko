@@ -14,8 +14,13 @@ interface Props {
   ancho?: boolean
   /** Sin la navegación de la academia (la sala pública del QR, sin cuenta). */
   sinNav?: boolean
+  /** Adónde lleva el logo y qué dice la etiqueta (el banco de recursos público usa los suyos). */
+  inicio?: string
+  etiqueta?: string
+  /** Navegación propia en lugar de la de la academia privada. */
+  nav?: { href: string; texto: string; activo?: boolean }[]
 }
-const { titulo, activo = '', nombre = '', rol = '', ancho = false, sinNav = false } = Astro.props
+const { titulo, activo = '', nombre = '', rol = '', ancho = false, sinNav = false, inicio = '/academia', etiqueta = 'Academia de IA', nav } = Astro.props
 const iniciales = nombre.split(/\s+/).filter(Boolean).slice(0, 2).map((p) => p[0]!.toUpperCase()).join('') || '·'
 const verPanel = rol && rol !== 'participante'
 ---
@@ -39,11 +44,14 @@ const verPanel = rol && rol !== 'participante'
   <body class="ac">
     <header class="ac-top">
       <div class="ac-top-in">
-        <a class="ac-marca" href="/academia" aria-label="Inicio de la academia">
+        <a class="ac-marca" href={inicio} aria-label="Inicio de la academia">
           <img src="/brand/ekosolv-horizontal.png" alt="EKOSOLV" width="249" height="72" />
-          <span class="ac-tag">Academia de IA</span>
+          <span class="ac-tag">{etiqueta}</span>
         </a>
-        {!sinNav && <nav class="ac-nav" aria-label="Academia">
+        {nav && <nav class="ac-nav" aria-label="Academia">
+          {nav.map((x) => <a href={x.href} aria-current={x.activo ? 'page' : undefined}>{x.texto}</a>)}
+        </nav>}
+        {!sinNav && !nav && <nav class="ac-nav" aria-label="Academia">
           <a href="/academia" aria-current={activo === 'inicio' ? 'page' : undefined}>Mi ruta</a>
           <a href="/academia/certificado" aria-current={activo === 'certificado' ? 'page' : undefined}>Certificado</a>
           {verPanel && <a href="/admin">Panel</a>}
