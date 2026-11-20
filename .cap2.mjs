@@ -1,0 +1,15 @@
+import { chromium } from '@playwright/test'
+const B='http://localhost:4377', S=process.argv[2]
+const br=await chromium.launch()
+const m=await br.newPage({viewport:{width:390,height:844},deviceScaleFactor:2})
+const errs=[]; m.on('pageerror',e=>errs.push(e.message)); m.on('console',c=>c.type()==='error'&&errs.push(c.text()))
+await m.goto(B+'/academia/recursos/operaciones',{waitUntil:'networkidle'})
+await m.screenshot({path:S+'/m1.png'})
+await m.locator('details').nth(5).locator('summary').click(); await m.waitForTimeout(2500)
+await m.locator('details').nth(5).scrollIntoViewIfNeeded(); await m.screenshot({path:S+'/m2.png'})
+const ov=await m.evaluate(()=>document.documentElement.scrollWidth); console.log('scrollWidth',ov)
+await m.goto(B+'/academia/recursos',{waitUntil:'networkidle'}); await m.screenshot({path:S+'/m0.png'})
+const d=await br.newPage({viewport:{width:1280,height:900}})
+await d.goto(B+'/academia/recursos/finanzas',{waitUntil:'networkidle'}); await d.screenshot({path:S+'/d1.png',fullPage:true})
+console.log('errores',errs)
+await br.close()
