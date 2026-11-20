@@ -8,7 +8,7 @@ import { AREA_IDS, nombreModulo } from '../../../lib/academia/reglas'
 import { MAX_INSTRUCCION, MIN_INSTRUCCION, PRACTICAS_DIA, validarInstruccion } from '../../../lib/academia/practica'
 import { practicar, PracticaNoDisponible } from '../../../lib/academia/motorPractica'
 import { interaccionDe, interaccionPublica, PREGUNTAS_DIA, registroSala, validarPregunta, votoValido, MAX_PREGUNTA } from '../../../lib/talleres/reglas'
-import { codigoPC, MINUTOS_CODIGO_PC, guardarPracticaSala, guardarPregunta, marcarEnSala, misRespuestas, practicasSalaDeHoy, preguntasDeHoyDe, liberarEnlace, registrarAsistente, reservarEnlace, votar } from '../../../lib/talleres/datos'
+import { codigoPC, codigoVigente, MINUTOS_CODIGO_PC, guardarPracticaSala, guardarPregunta, marcarEnSala, misRespuestas, practicasSalaDeHoy, preguntasDeHoyDe, liberarEnlace, registrarAsistente, reservarEnlace, votar } from '../../../lib/talleres/datos'
 import { salaActual } from '../../../lib/talleres/sala'
 import type { PasoGuiado } from '../../../lib/talleres/tipos'
 
@@ -64,6 +64,8 @@ export const GET: APIRoute = async ({ cookies }) => {
         return ej ? { area: nombreModulo(asistente.area), ...ej } : null
       })(),
       mias: i ? await misRespuestas(t.n, i.id, asistente.id) : {},
+      // Código para el PC que sigue vigente (si ya se usó, el celular lo quita).
+      codigoPC: await codigoVigente(t.n, asistente.id),
     })
   } catch (e) {
     return fail('academia/sala', e)

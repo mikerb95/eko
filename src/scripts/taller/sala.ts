@@ -38,6 +38,7 @@ interface Estado {
   ejemplo?: { area: string; titulo: string; texto: string } | null
   practica?: { consigna: string; maximo: number } | null
   guia?: Guia | null
+  codigoPC?: string | null
 }
 
 /** Paso de una práctica guiada (escena conectar), con su maqueta animada. */
@@ -192,7 +193,7 @@ function montar(raiz: HTMLElement) {
   let ejemploVisto = ''
   const ejemplo = $('[data-sl-ejemplo]')
   montarDuda(raiz.querySelector<HTMLFormElement>('[data-sl-duda]')!)
-  montarPC(raiz)
+  const pc = montarPC(raiz)
 
   const pintarEjemplo = (e: Estado['ejemplo']) => {
     const clave = e ? e.titulo + e.texto : ''
@@ -404,6 +405,7 @@ function montar(raiz: HTMLElement) {
     }
     taller = e.taller!
     entrar()
+    pc?.vigente(e.codigoPC ?? null)
     pintarEjemplo(e.ejemplo ?? null)
     const id = e.interaccion?.id ?? (e.practica ? 'practica' : e.guia ? `guia:${e.escena}:${e.guia.paso}` : `escena:${e.escena}`)
     if (id === abierta) return
@@ -431,10 +433,10 @@ function montar(raiz: HTMLElement) {
  * "Abrir en mi PC": pide el código de dos números y lo muestra grande, con
  * la dirección corta que se escribe en el PC (/pc) y cuánto le queda.
  */
-function montarPC(raiz: HTMLElement) {
+function montarPC(raiz: HTMLElement): { vigente(actual: string | null): void } | null {
   const abrir = raiz.querySelector<HTMLButtonElement>('[data-sl-pc-abrir]')
   const caja = raiz.querySelector<HTMLElement>('[data-sl-pc]')
-  if (!abrir || !caja) return
+  if (!abrir || !caja) return null
   const codigo = caja.querySelector<HTMLElement>('[data-sl-pc-codigo]')!
   const vence = caja.querySelector<HTMLElement>('[data-sl-pc-vence]')!
   let reloj: ReturnType<typeof setInterval> | null = null
@@ -481,4 +483,15 @@ function montarPC(raiz: HTMLElement) {
   }
   abrir.addEventListener('click', () => void pedir())
   caja.querySelector<HTMLButtonElement>('[data-sl-pc-cerrar]')!.addEventListener('click', cerrar)
+  return {
+    /** La sala avisa cada 2 s qué código sigue vigente: si el mostrado ya no, es que el PC lo usó. */
+    vigente(actual: string | null) {
+      if (caja.hidden || !reloj || actual === codigo.textContent) return
+      parar()
+      codigo.style.opacity = '.3'
+      vence.textContent = 'Listo: su PC ya quedó abierto con este código.'
+      abrir.textContent = 'Abrir en otro PC'
+      abrir.hidden = false
+    },
+  }
 }

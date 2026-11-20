@@ -340,6 +340,14 @@ export async function codigoPC(taller: number, asistente_id: number): Promise<{ 
   return null
 }
 
+/** El código vigente de esta persona, si tiene (la sala sabe cuándo ya se usó). */
+export async function codigoVigente(taller: number, asistente_id: number): Promise<string | null> {
+  const c = await db()
+  const r = await c.execute({ sql: 'SELECT codigo FROM ac_taller_codigos_pc WHERE taller = ? AND asistente_id = ? AND vence_at > ?', args: [taller, asistente_id, ahora()] })
+  const x: any = r.rows[0]
+  return x ? str(x.codigo) : null
+}
+
 /** Usa el código: si está vigente lo borra y devuelve de quién era. */
 export async function canjearCodigoPC(taller: number, codigo: string): Promise<number | null> {
   const c = await db()

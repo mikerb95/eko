@@ -359,3 +359,6 @@
 .sl-guia-barra i.hecho { background: var(--forest); }
 .sl-guia-barra i.actual { background: var(--deep); }
 .sl-nota-mq { font-size: 12px; color: var(--mute); margin: -6px 0 0; }
+.sl-pc-zona { display: flex; flex-direction: column; gap: 10px; align-items: flex-start; }
+.sl-pc-zona > .ac-btn[hidden] { display: none; }
+.sl-pc-zona > .sl-pc { align-self: stretch; }

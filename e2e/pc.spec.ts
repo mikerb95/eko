@@ -56,6 +56,9 @@ test('PC vinculado con el código del celular sigue la práctica guiada', async 
   await pc.getByLabel('Código').fill(numero)
   await expect(pc).toHaveURL(/\/academia\/taller\/1/)
   await expect(pc.locator('.tl-escena.activa')).toHaveAttribute('data-escena', 'zoho', { timeout: 8000 })
+  // El celular se entera de que el código ya se usó.
+  await expect(cel.locator('[data-sl-pc-vence]')).toContainText('su PC ya quedó abierto', { timeout: 8000 })
+  await expect(cel.getByRole('button', { name: 'Abrir en otro PC' })).toBeVisible()
   // El código ya se usó.
   const ctxPC2 = await browser.newContext()
   expect((await ctxPC2.request.post('/api/academia/pc', { data: { codigo: numero } })).status()).toBe(400)
