@@ -103,7 +103,7 @@
 .mq-tarjeta { align-self: flex-start; display: flex; align-items: center; gap: .6em; padding: .5em .6em; border-radius: .7em; background: #fff; border: 1px solid var(--mq-linea); }
 .mq-tarjeta .mq-logo { width: 1.6em; height: 1.6em; }
 .mq-herramienta { align-self: flex-start; display: inline-flex; align-items: center; gap: .5em; padding: .4em .7em; border-radius: 99px; background: color-mix(in oklab, var(--mq-azul) 9%, #fff); color: var(--mq-azul); font: 500 .75em/1.2 var(--font-mono, monospace); }
-.mq-giro { width: .8em; height: .8em; border-radius: 50%; border: .15em solid currentColor; border-right-color: transparent; animation: mq-giro .8s linear infinite, mq-listo 0s linear 2.1s forwards; }
+.mq-giro { width: .8em; height: .8em; border-radius: 50%; border: .15em solid currentColor; border-right-color: transparent; animation: mq-giro .8s linear infinite, mq-listo 0s linear 3.4s forwards; }
 @keyframes mq-giro { to { transform: rotate(1turn); } }
 @keyframes mq-listo { to { border-color: var(--mq-verde); background: var(--mq-verde); animation-play-state: paused; } }
 .mq-pensar { align-self: flex-start; font-size: .85em; overflow: hidden; max-height: 2.2em; animation: mq-ap .3s ease var(--d, 0s) both, mq-pensar-fin .25s ease var(--fin, 9s) forwards; }
