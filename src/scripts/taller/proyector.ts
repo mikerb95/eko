@@ -65,6 +65,9 @@ function montar() {
   const esperaKicker = espera?.querySelector<HTMLElement>('[data-espera-kicker]')
   const esperaBarra = espera?.querySelector<HTMLElement>('[data-espera-barra]')
   let aviso: Aviso | null = null
+  // Clawd, de pie sobre la tarjeta del QR: sopla burbujas mientras el aviso
+  // está puesto y, en el proyector de quien dicta, saluda a quien llega.
+  const clawd = espera ? clawdSuelto(espera) : null
   let esperaTic: ReturnType<typeof setInterval> | null = null
   const pintarEspera = () => {
     if (!espera || !esperaReloj || !aviso) return
@@ -103,6 +106,7 @@ function montar() {
     if (esperaTic) clearInterval(esperaTic)
     esperaTic = null
     if (!a) {
+      clawd?.burbujas(false)
       if (estaba && !reducido()) gsap.to(espera, { autoAlpha: 0, duration: 0.5, ease: CURVA, onComplete: () => espera.classList.remove('on') })
       else espera.classList.remove('on')
       return
@@ -112,6 +116,7 @@ function montar() {
     esperaTic = setInterval(pintarEspera, 250)
     espera.classList.add('on')
     if (estaba) return
+    clawd?.burbujas(true)
     gsap.killTweensOf(espera)
     if (reducido()) return void gsap.set(espera, { autoAlpha: 1 })
     gsap.fromTo(espera, { autoAlpha: 0 }, { autoAlpha: 1, duration: 0.6, ease: CURVA })
@@ -125,7 +130,6 @@ function montar() {
     // Mientras el aviso está puesto, Clawd saluda por su nombre a quien se
     // registra en la sala con el QR. Los que ya estaban registrados cuando
     // aparece el aviso no se saludan (la primera consulta solo toma la base).
-    const clawd = clawdSuelto(espera)
     let vistos: number | null = null
     const saludar = (nombres: string[]) => {
       if (!clawd || !nombres.length) return
