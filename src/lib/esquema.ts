@@ -749,6 +749,11 @@ export const COLUMNAS: readonly (readonly [tabla: string, columna: string])[] = 
   ['ac_taller_estado', 'paso'],
   // Aviso "Empezamos en 00:00" que lanza el presentador (JSON {fin, ms}, vacío si no hay).
   ['ac_taller_estado', 'aviso'],
+  // Movimientos entre presentador y proyector en equipos distintos: `mov` es
+  // la marca (ms) del último cambio de escena o paso, para no pisar uno más
+  // nuevo con uno viejo; `orden` es el último botón del presentador (JSON {id, nombre}).
+  ['ac_taller_estado', 'mov'],
+  ['ac_taller_estado', 'orden'],
 ]
 
 /** Tablas que deben existir al terminar. Sirve para verificar tras migrar. */

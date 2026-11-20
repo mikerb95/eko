@@ -28,7 +28,20 @@ export interface EstadoTaller {
   paso: number
   /** Aviso "Empezamos en 00:00": hora de llegada a cero (ms epoch del servidor) y duración total. */
   aviso: { fin: number; ms: number } | null
+  /** Marca (ms del servidor) del último cambio de escena o paso; 0 si nunca se movió con esta columna. */
+  mov: number
+  /** Último botón del presentador para el proyector ("pedir", "generar"). */
+  orden: { id: string; nombre: string } | null
   updated_at: string
+}
+
+const leerOrdenFila = (v: unknown): EstadoTaller['orden'] => {
+  try {
+    const o = JSON.parse(str(v) || 'null')
+    return o && typeof o.id === 'string' && typeof o.nombre === 'string' ? { id: o.id, nombre: o.nombre } : null
+  } catch {
+    return null
+  }
 }
 
 const leerAvisoFila = (v: unknown): EstadoTaller['aviso'] => {
@@ -40,7 +53,7 @@ const leerAvisoFila = (v: unknown): EstadoTaller['aviso'] => {
   }
 }
 
-const filaEstado = (x: any): EstadoTaller => ({ taller: num(x.taller), escena: str(x.escena), interaccion: str(x.interaccion), paso: num(x.paso), aviso: leerAvisoFila(x.aviso), updated_at: str(x.updated_at) })
+const filaEstado = (x: any): EstadoTaller => ({ taller: num(x.taller), escena: str(x.escena), interaccion: str(x.interaccion), paso: num(x.paso), aviso: leerAvisoFila(x.aviso), mov: num(x.mov), orden: leerOrdenFila(x.orden), updated_at: str(x.updated_at) })
 
 /** Una hora después de llegar a cero, un aviso olvidado deja de mostrarse (no tapa la siguiente sesión). */
 export const MINUTOS_AVISO_VENCIDO = 60
@@ -80,13 +93,22 @@ export function enCurso(e: EstadoTaller | null, ref = Date.now()): boolean {
   return !!e && ref - Date.parse(e.updated_at) < HORAS_EN_CURSO * 3600_000
 }
 
-export async function fijarEstado(taller: number, escena: string, interaccion: string, paso = 0): Promise<void> {
+/** Guarda escena y paso. Devuelve la marca del movimiento (ver `mov`). */
+export async function fijarEstado(taller: number, escena: string, interaccion: string, paso = 0): Promise<number> {
   const c = await db()
+  const mov = Date.now()
   await c.execute({
-    sql: `INSERT INTO ac_taller_estado (taller, escena, interaccion, paso, updated_at) VALUES (?, ?, ?, ?, ?)
-          ON CONFLICT (taller) DO UPDATE SET escena = excluded.escena, interaccion = excluded.interaccion, paso = excluded.paso, updated_at = excluded.updated_at`,
-    args: [taller, escena, interaccion, String(paso), ahora()],
+    sql: `INSERT INTO ac_taller_estado (taller, escena, interaccion, paso, mov, updated_at) VALUES (?, ?, ?, ?, ?, ?)
+          ON CONFLICT (taller) DO UPDATE SET escena = excluded.escena, interaccion = excluded.interaccion, paso = excluded.paso, mov = excluded.mov, updated_at = excluded.updated_at`,
+    args: [taller, escena, interaccion, String(paso), String(mov), ahora()],
   })
+  return mov
+}
+
+/** Botón del presentador para el proyector. El `id` lo pone quien lo envía: así el proyector no lo repite si también le llegó por el canal local. */
+export async function fijarOrden(taller: number, orden: { id: string; nombre: string }): Promise<void> {
+  const c = await db()
+  await c.execute({ sql: 'UPDATE ac_taller_estado SET orden = ? WHERE taller = ?', args: [JSON.stringify(orden), taller] })
 }
 
 /** La capacitación que se está dictando ahora (la última que se movió), si hay. */

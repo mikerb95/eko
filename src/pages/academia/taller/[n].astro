@@ -11,6 +11,7 @@ import '../../../styles/global.css'
 import '../../../styles/taller.css'
 import '../../../styles/maquetas.css'
 import Escena from '../../../components/taller/Escena.astro'
+import Clawd from '../../../components/taller/Clawd.astro'
 import { TIPOS_OSCUROS, type Contexto, type Diagnostico } from '../../../components/taller/tipos'
 import { tallerDe } from '../../../lib/talleres'
 import { enCurso, leerEstado } from '../../../lib/talleres/datos'
@@ -145,10 +146,21 @@ const datos = {
                   <img src="/brand/ekosolv-horizontal-white.png" alt="EKOSOLV" width="249" height="72" />
                   <span>Capacitación {t.n}</span>
                 </header>
-                <div class="tl-espera-centro">
-                  <p class="tl-espera-kicker"><i aria-hidden="true" /><span data-espera-kicker>Empezamos en</span></p>
-                  <p class="tl-espera-reloj" data-espera-reloj>00:00</p>
-                  <p class="tl-espera-titulo">{t.titulo}</p>
+                <div class="tl-espera-cuerpo">
+                  <div class="tl-espera-centro">
+                    <p class="tl-espera-kicker"><i aria-hidden="true" /><span data-espera-kicker>Empezamos en</span></p>
+                    <p class="tl-espera-reloj" data-espera-reloj>00:00</p>
+                    <p class="tl-espera-titulo">{t.titulo}</p>
+                  </div>
+                  {/* Mientras esperan, ya pueden entrar a la sala. Clawd, parado
+                      sobre la tarjeta, saluda por su nombre a cada persona que
+                      se registra (proyector.ts). */}
+                  <div class="tl-espera-sala">
+                    <Clawd lugar="espera" />
+                    <div class="tl-espera-qr" set:html={ctx.qrSala} role="img" aria-label={`Código QR de ${ctx.urlSala}`} />
+                    <p class="tl-espera-sala-txt">Escanee y entre a la sala</p>
+                    <p class="tl-espera-url">{ctx.urlSala.replace(/^https?:\/\//, '')}</p>
+                  </div>
                 </div>
                 <span class="tl-espera-barra" aria-hidden="true"><i data-espera-barra /></span>
               </div>

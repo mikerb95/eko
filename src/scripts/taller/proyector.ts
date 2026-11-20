@@ -18,6 +18,7 @@ import { CURVA, SplitText, amarrarSignos, gsap, reducido } from '../motion/core'
 import { API_PC, avisoLocal, canal, consultar, cuentaAviso, direccionTecla, enviar, leerDatos, type Aviso, type AvisoRed, type Mensaje } from './comun'
 import { HOOKS, type Api } from './escenas'
 import { crearCortina } from './cortina'
+import { clawdSuelto } from './clawd'
 
 const ANCHO_MIN = 760
 
@@ -115,6 +116,37 @@ function montar() {
         .catch((e) => console.error('[taller] aviso', e))
     void mirarAviso()
     setInterval(mirarAviso, 2000)
+
+    // Mientras el aviso está puesto, Clawd saluda por su nombre a quien se
+    // registra en la sala con el QR. Los que ya estaban registrados cuando
+    // aparece el aviso no se saludan (la primera consulta solo toma la base).
+    const clawd = clawdSuelto(espera)
+    let vistos: number | null = null
+    const saludar = (nombres: string[]) => {
+      if (!clawd || !nombres.length) return
+      const [a, b] = nombres
+      const texto =
+        nombres.length === 1 ? `¡Hola, ${a}!` : nombres.length === 2 ? `¡Hola, ${a} y ${b}!` : `¡Hola, ${a}, ${b} y ${nombres.length - 2} más!`
+      clawd.decir(texto, { ms: 3200, tipo: 'ok' })
+      void clawd.saltar({ brazos: true, saludo: true })
+    }
+    const mirarSala = () => {
+      if (!aviso) {
+        if (vistos !== null) clawd?.reposo()
+        vistos = null
+        return
+      }
+      consultar<{ lista?: { nombre: string }[] }>({ que: 'panel', n: datos.n })
+        .then((r) => {
+          const lista = r.lista ?? []
+          if (vistos !== null && lista.length > vistos) {
+            saludar(lista.slice(vistos).map((p) => p.nombre.trim().split(/\s+/)[0] || 'bienvenido'))
+          }
+          vistos = lista.length
+        })
+        .catch((e) => console.error('[taller] sala en el aviso', e))
+    }
+    setInterval(mirarSala, 2500)
   }
 
   // ---------- Escala ----------

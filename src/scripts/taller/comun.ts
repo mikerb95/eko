@@ -65,7 +65,7 @@ export async function enviar<T = any>(cuerpo: Record<string, unknown>, ms = 15_0
 export type Mensaje =
   | { tipo: 'ir'; i: number; paso: number }
   | { tipo: 'hola' }
-  | { tipo: 'accion'; nombre: 'pedir' | 'generar' }
+  | { tipo: 'accion'; nombre: 'pedir' | 'generar'; id?: string }
 
 /**
  * Aviso "Empezamos en 00:00". Lo pone quien dicta y viaja por el servidor, así
@@ -105,6 +105,76 @@ export function canal(n: number, alRecibir: (m: Mensaje) => void): (m: Mensaje) 
   bc.onmessage = (ev) => alRecibir(ev.data as Mensaje)
   return (m) => bc.postMessage(m)
 }
+
+/** Lo que devuelve GET ?que=estado: dónde va la presentación según el servidor. */
+export interface EstadoRed {
+  escena: string
+  paso: number
+  mov: number
+  orden: { id: string; nombre: string } | null
+  aviso: AvisoRed | null
+}
+
+/** Tras un movimiento propio, el servidor puede traer todavía uno anterior: durante este tiempo no se le hace caso. */
+const QUIETO_MS = 2000
+
+/**
+ * Proyector y presentador en equipos distintos: el canal local no llega, así
+ * que cada ventana pregunta al servidor cada segundo dónde va la presentación
+ * y se mueve ahí si lo cambió la otra. En el mismo equipo sigue mandando el
+ * canal (es instantáneo) y esto solo confirma lo mismo.
+ *
+ * - `local()`: avisar de cada movimiento hecho aquí o recibido por el canal.
+ * - `guardado(mov)`: la marca que devolvió el servidor al guardar el propio.
+ * - `orden(id)`: un botón del presentador que ya se atendió por el canal.
+ * El primer botón que se lee al abrir solo sirve de punto de partida: no se repite.
+ */
+export function seguirRed(
+  n: number,
+  op: { ids: string[]; alMover: (k: number, paso: number) => void; alOrden?: (nombre: string) => void; alAviso?: (a: AvisoRed | null) => void },
+) {
+  let visto = 0
+  let ultimoLocal = 0
+  let conBase = false
+  const atendidas = new Set<string>()
+  let ocupado = false
+
+  const mirar = async () => {
+    if (ocupado) return
+    ocupado = true
+    const pedido = Date.now()
+    try {
+      const r = await consultar<EstadoRed>({ que: 'estado', n })
+      op.alAviso?.(r.aviso)
+      if (r.orden && !atendidas.has(r.orden.id)) {
+        atendidas.add(r.orden.id)
+        if (conBase) op.alOrden?.(r.orden.nombre)
+      }
+      conBase = true
+      if (r.mov <= visto || pedido < ultimoLocal + QUIETO_MS) return
+      visto = r.mov
+      const k = op.ids.indexOf(r.escena)
+      if (k >= 0) op.alMover(k, r.paso)
+    } catch (e) {
+      console.error('[taller] seguir red', e)
+    } finally {
+      ocupado = false
+    }
+  }
+
+  void mirar()
+  setInterval(mirar, 1000)
+  document.addEventListener('visibilitychange', () => void mirar())
+
+  return {
+    local: () => void (ultimoLocal = Date.now()),
+    guardado: (mov: unknown) => void (visto = Math.max(visto, Number(mov) || 0)),
+    orden: (id: string) => void atendidas.add(id),
+  }
+}
+
+/** Identificador de un botón del presentador (para no atenderlo dos veces). */
+export const idOrden = () => (typeof crypto !== 'undefined' && 'randomUUID' in crypto ? crypto.randomUUID() : `${Date.now()}-${Math.random().toString(36).slice(2)}`)
 
 /** Teclas de avance y retroceso (flechas, clicker, barra espaciadora). */
 export function direccionTecla(ev: KeyboardEvent): 1 | -1 | 0 {

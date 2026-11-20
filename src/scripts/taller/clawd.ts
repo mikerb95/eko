@@ -64,6 +64,15 @@ export function clawdDe(escena: HTMLElement, api: Api): Clawd | null {
   return c
 }
 
+/**
+ * Clawd fuera de las escenas (p. ej. en el aviso "Empezamos en"): vive lo que
+ * dure la página, así que no se apaga al cambiar de escena.
+ */
+export function clawdSuelto(contenedor: HTMLElement): Clawd | null {
+  const raiz = contenedor.querySelector<HTMLElement>('[data-clawd]')
+  return raiz ? crear(contenedor, raiz) : null
+}
+
 /** El de la escena, si ya se creó (para los hooks de paso). */
 export const clawdEn = (escena: HTMLElement): Clawd | null => ((escena as any)[CLAVE] as Clawd | undefined) ?? null
 

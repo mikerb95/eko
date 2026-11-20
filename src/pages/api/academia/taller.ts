@@ -4,7 +4,7 @@ import { hoyEnBogota } from '../../../lib/agente/diasHabiles'
 import { nombreModulo } from '../../../lib/academia/reglas'
 import { tallerDe } from '../../../lib/talleres'
 import { compararEvaluacion, contarVotos, interaccionDe } from '../../../lib/talleres/reglas'
-import { asistentesDeHoy, avisoPublico, enSala, fijarAviso, fijarEstado, leerEstado, guardarRespuestaIA, marcarRespondida, preguntaSala, preguntasPendientes, respuestas, sesionesDeHoy } from '../../../lib/talleres/datos'
+import { asistentesDeHoy, avisoPublico, enSala, fijarAviso, fijarEstado, fijarOrden, leerEstado, guardarRespuestaIA, marcarRespondida, preguntaSala, preguntasPendientes, respuestas, sesionesDeHoy } from '../../../lib/talleres/datos'
 import { preguntarDemo, responderPregunta } from '../../../lib/talleres/motorIA'
 import { anotar } from '../../../lib/bitacora'
 
@@ -17,7 +17,9 @@ import { anotar } from '../../../lib/bitacora'
 // GET ?que=comparacion&n   → evaluación de entrada contra salida
 // GET ?que=panel&n         → sala, asistencia, preguntas de la sala, aviso de bloque del día y aviso de inicio (presentador)
 // GET ?que=aviso&n         → aviso "Empezamos en 00:00" (proyector de quien dicta)
-// POST {accion}            → estado | aviso | ia | respuesta_ia | respondida
+// GET ?que=estado&n        → escena, paso, último botón y aviso: así se siguen
+//                            proyector y presentador aunque estén en equipos distintos
+// POST {accion}            → estado | orden | aviso | ia | respuesta_ia | respondida
 
 export const prerender = false
 
@@ -46,6 +48,12 @@ export const GET: APIRoute = async ({ url, locals }) => {
     if (que === 'aviso') {
       if (!esAdmin(locals)) return json({ error: 'Solo administradores' }, 403)
       return json({ aviso: avisoPublico(await leerEstado(t.n)) })
+    }
+
+    if (que === 'estado') {
+      if (!esAdmin(locals)) return json({ error: 'Solo administradores' }, 403)
+      const e = await leerEstado(t.n)
+      return json({ escena: e?.escena ?? '', paso: e?.paso ?? 0, mov: e?.mov ?? 0, orden: e?.orden ?? null, aviso: avisoPublico(e) })
     }
 
     if (que === 'panel') {
@@ -92,8 +100,18 @@ export const POST: APIRoute = async ({ request, locals }) => {
         const escena = t.escenas.find((x) => x.id === b.escena)
         if (!escena) return json({ error: 'Esa escena no existe' }, 400)
         const paso = Number.isInteger(b.paso) ? Math.max(0, Math.min(escena.pasos, b.paso)) : 0
-        await fijarEstado(t.n, escena.id, escena.interaccion ?? '', paso)
+        const mov = await fijarEstado(t.n, escena.id, escena.interaccion ?? '', paso)
         await anotar('escena', { quien: String(locals.username ?? ''), taller: t.n, detalle: { escena: escena.id, paso } })
+        return json({ ok: true, mov })
+      }
+
+      // Botón del presentador ("pedir" en el constructor, "generar" en siguiente token).
+      case 'orden': {
+        if (!esAdmin(locals)) return json({ error: 'Solo quien dicta mueve la presentación' }, 403)
+        const nombre = String(b.nombre ?? '')
+        const id = String(b.id ?? '').slice(0, 40)
+        if (!['pedir', 'generar'].includes(nombre) || !id) return json({ error: 'Orden inválida' }, 400)
+        await fijarOrden(t.n, { id, nombre })
         return json({ ok: true })
       }
 
