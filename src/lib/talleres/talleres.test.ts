@@ -5,6 +5,7 @@ import { TALLER_1 } from './taller1.ts'
 import {
   aplicarTemperatura,
   capitalizarNombre,
+  soloLetrasNombre,
   claveNombre,
   registroSala,
   compararEvaluacion,
@@ -194,6 +195,8 @@ test('registro de la sala: nombres con mayúscula inicial y datos obligatorios',
   assert.equal(capitalizarNombre('maría JOSÉ de la torre'), 'María José De La Torre')
   assert.equal(capitalizarNombre('ana-lucía o\'neil'), 'Ana-Lucía O\'Neil')
   assert.equal(capitalizarNombre('luis '), 'Luis ')
+  assert.equal(soloLetrasNombre('Lu1s 2024 Peña!@ O\'Neil-Ruiz 😀'), 'Lus  Peña O\'Neil-Ruiz ')
+  assert.equal(registroSala({ nombre: '123', apellido: 'Gómez', correo: 'a@b.co', area: 'ventas' }, ['ventas']).error, 'Escriba su nombre.')
   assert.equal(claveNombre('  María   José Peña '), 'maria jose pena')
   const areas = ['operaciones', 'ventas']
   assert.deepEqual(registroSala({ nombre: ' laura  ', apellido: 'GÓMEZ ruiz', correo: ' Laura.Gomez@Ekosolv.com ', area: 'ventas' }, areas), {
