@@ -26,10 +26,48 @@ export interface EstadoTaller {
   interaccion: string
   /** Clic dentro de la escena (0 = recién llegada). */
   paso: number
+  /** Aviso "Empezamos en 00:00": hora de llegada a cero (ms epoch del servidor) y duración total. */
+  aviso: { fin: number; ms: number } | null
   updated_at: string
 }
 
-const filaEstado = (x: any): EstadoTaller => ({ taller: num(x.taller), escena: str(x.escena), interaccion: str(x.interaccion), paso: num(x.paso), updated_at: str(x.updated_at) })
+const leerAvisoFila = (v: unknown): EstadoTaller['aviso'] => {
+  try {
+    const a = JSON.parse(str(v) || 'null')
+    return a && Number(a.fin) > 0 && Number(a.ms) > 0 ? { fin: Number(a.fin), ms: Number(a.ms) } : null
+  } catch {
+    return null
+  }
+}
+
+const filaEstado = (x: any): EstadoTaller => ({ taller: num(x.taller), escena: str(x.escena), interaccion: str(x.interaccion), paso: num(x.paso), aviso: leerAvisoFila(x.aviso), updated_at: str(x.updated_at) })
+
+/** Una hora después de llegar a cero, un aviso olvidado deja de mostrarse (no tapa la siguiente sesión). */
+export const MINUTOS_AVISO_VENCIDO = 60
+
+/**
+ * Lo que reciben los dispositivos: cuánto falta (ms, negativo si ya pasó) en
+ * vez de la hora de fin, porque el reloj de cada equipo es distinto. `id`
+ * distingue un aviso de otro (si se relanza, cambia).
+ */
+export function avisoPublico(e: EstadoTaller | null, ref = Date.now()): { id: number; resta: number; ms: number } | null {
+  const a = e?.aviso
+  if (!a || ref - a.fin > MINUTOS_AVISO_VENCIDO * 60_000) return null
+  return { id: a.fin, resta: a.fin - ref, ms: a.ms }
+}
+
+/**
+ * Pone o quita el aviso. Cuenta como movimiento de la presentación (la deja
+ * "en curso"); si todavía no había estado, arranca en la escena dada.
+ */
+export async function fijarAviso(taller: number, aviso: { fin: number; ms: number } | null, escena: string, interaccion: string): Promise<void> {
+  const c = await db()
+  await c.execute({
+    sql: `INSERT INTO ac_taller_estado (taller, escena, interaccion, paso, aviso, updated_at) VALUES (?, ?, ?, '0', ?, ?)
+          ON CONFLICT (taller) DO UPDATE SET aviso = excluded.aviso, updated_at = excluded.updated_at`,
+    args: [taller, escena, interaccion, aviso ? JSON.stringify(aviso) : '', ahora()],
+  })
+}
 
 export async function leerEstado(taller: number): Promise<EstadoTaller | null> {
   const c = await db()

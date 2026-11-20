@@ -747,6 +747,8 @@ export const COLUMNAS: readonly (readonly [tabla: string, columna: string])[] = 
   ['ac_taller_preguntas', 'respuesta_ia'],
   // Paso de la escena en curso: lo siguen el celular (pasos guiados) y el PC vinculado.
   ['ac_taller_estado', 'paso'],
+  // Aviso "Empezamos en 00:00" que lanza el presentador (JSON {fin, ms}, vacío si no hay).
+  ['ac_taller_estado', 'aviso'],
 ]
 
 /** Tablas que deben existir al terminar. Sirve para verificar tras migrar. */

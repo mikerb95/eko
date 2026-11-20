@@ -14,6 +14,10 @@
  *    la persona y una caja para enviarle preguntas a quien dicta (las ve en
  *    la vista de presentador).
  *
+ * 4. Al llegar la presentación a su última escena, el celular pasa solo al
+ *    formulario de cierre de su área (/academia/sala/opinion), si todavía no
+ *    lo ha enviado.
+ *
  * Mientras la página esté abierta, la pantalla del celular no se apaga.
  */
 import { capitalizarNombre } from '../../lib/talleres/reglas'
@@ -39,6 +43,8 @@ interface Estado {
   practica?: { consigna: string; maximo: number } | null
   guia?: Guia | null
   codigoPC?: string | null
+  /** Última escena: 'pendiente' lleva al formulario de cierre del área. */
+  opinion?: 'pendiente' | 'enviada' | null
 }
 
 /** Paso de una práctica guiada (escena conectar), con su maqueta animada. */
@@ -401,6 +407,11 @@ function montar(raiz: HTMLElement) {
     // El pase es de una capacitación y un día: si ya no sirve, se vuelve al registro.
     if (!e.registrado) {
       location.reload()
+      return
+    }
+    // Final de la presentación: al formulario de cierre de su área.
+    if (e.opinion === 'pendiente') {
+      location.assign('/academia/sala/opinion')
       return
     }
     taller = e.taller!
