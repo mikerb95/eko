@@ -263,6 +263,9 @@
 
 /* Token en vuelo de la portada: opaco y con tinte aqua para que no se enrede
    con las fichas de la cinta cuando llega; sale por detrás de Clawd. */
+/* Palabra que Clawd lleva al párrafo de la portada: va encerrada en una ficha
+   y, al caer en su sitio, el marco se desvanece (--marco de 1 a 0). */
+.clawd-palabra { --marco: 1; position: absolute; left: 0; top: 0; z-index: 3; pointer-events: none; white-space: pre; padding: .08em .32em; border-radius: .3em; background: rgba(23, 58, 64, calc(.95 * var(--marco))); box-shadow: 0 0 0 1px rgba(111, 210, 201, calc(.45 * var(--marco))), 0 6px 18px rgba(0, 0, 0, calc(.35 * var(--marco))); will-change: transform, opacity; }
 .oscura .tk.clawd-tk { position: absolute; left: 0; top: 0; z-index: 3; pointer-events: none; font-size: calc(30px * .82); background: #173a40; color: #c4f1ec; box-shadow: 0 0 0 1px rgba(111, 210, 201, .35); will-change: transform, opacity; }
 @media (prefers-reduced-motion: reduce) {
   .clawd-parpado, .clawd .clawd-respira, .clawd.suda .clawd-sudor, .clawd-zzz i { animation: none !important; }

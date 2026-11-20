@@ -41,6 +41,12 @@ export interface Clawd {
   pensar(opciones: Opcion[], elegida: string, destino: Element | null): Promise<void>
   /** Un token sale de detrás de la cabeza y sube hasta la franja `destino`. */
   lanzar(texto: string, clase: string, destino: Element): void
+  /**
+   * Encierra la palabra `destino` en una ficha que sale de su cabeza y vuela
+   * hasta su lugar en el párrafo; al llegar la ficha se suelta y queda la
+   * palabra. `alLlegar` corre siempre (también sin animación).
+   */
+  entregar(destino: HTMLElement, alLlegar: () => void): void
   /** Deja `n` hojas en la pila de la mesa (las nuevas caen si `animar`). */
   apilar(n: number, animar?: boolean): void
   /** Llegan más hojas de las que caben y las de arriba se caen de la mesa. */
@@ -404,6 +410,49 @@ function crear(escena: HTMLElement, raiz: HTMLElement): Clawd {
     )
     mirar(0, -1)
     seguir(gsap.delayedCall(0.8, () => !saltando && mirar(0, 0)))
+  }
+
+  function entregar(destino: HTMLElement, alLlegar: () => void) {
+    if (!anim || !vivo || document.hidden) return alLlegar()
+    const cab = enEscena(cuerpo.getBoundingClientRect())
+    const b = enEscena(destino.getBoundingClientRect())
+    const estilo = getComputedStyle(destino)
+    const el = document.createElement('span')
+    el.className = 'clawd-palabra'
+    el.textContent = destino.textContent ?? ''
+    for (const k of ['fontFamily', 'fontSize', 'fontWeight', 'lineHeight', 'letterSpacing'] as const) el.style[k] = estilo[k]
+    el.style.color = estilo.color
+    escena.append(el)
+    sueltos.add(el)
+    const w = el.offsetWidth
+    const h = el.offsetHeight
+    // El texto de la ficha queda justo encima de la palabra (la ficha tiene relleno).
+    const pad = (w - b.w) / 2
+    const x1 = b.x - pad
+    const y1 = b.y - (h - b.h) / 2
+    const x0 = cab.x + cab.w / 2 - w / 2
+    const y0 = cab.y + h * 0.3
+    let listo = false
+    const llegar = () => {
+      if (listo) return
+      listo = true
+      alLlegar()
+    }
+    gsap.set(el, { x: x0, y: y0, scale: 0.4, autoAlpha: 0 })
+    seguir(
+      gsap
+        .timeline({ onComplete: () => (el.remove(), sueltos.delete(el)), onInterrupt: llegar })
+        .to(el, { autoAlpha: 1, scale: 1, duration: 0.18, ease: 'back.out(2)' }, 0)
+        // Sube primero y luego cae en su sitio: arco con dos curvas.
+        .to(el, { y: Math.min(y0, y1) - azar(40, 90), duration: 0.38, ease: 'power2.out' }, 0)
+        .to(el, { y: y1, duration: 0.42, ease: 'power2.in' }, 0.38)
+        .to(el, { x: x1, duration: 0.8, ease: 'power1.inOut' }, 0)
+        .call(llegar, [], 0.8)
+        .to(el, { '--marco': 0, duration: 0.3, ease: 'power1.out' }, 0.8)
+        .to(el, { autoAlpha: 0, duration: 0.12 }, 1.0),
+    )
+    mirar(b.x < cab.x ? -1 : 1, -1)
+    seguir(gsap.delayedCall(0.7, () => !saltando && mirar(0, 0)))
   }
 
   // ---------- Mesa ----------
@@ -930,7 +979,7 @@ function crear(escena: HTMLElement, raiz: HTMLElement): Clawd {
   }
 
   ojos('normal')
-  return { teclear, saltar, decir, callar, ojos, mirar, sudor, dormir, pensar, lanzar, apilar, derrumbar, burbujas, reposo, destruir }
+  return { teclear, saltar, decir, callar, ojos, mirar, sudor, dormir, pensar, lanzar, apilar, derrumbar, burbujas, reposo, destruir, entregar }
 }
 
 // ---------- Papeles que se repiten ----------
@@ -971,10 +1020,7 @@ export function papelPortada(escena: HTMLElement, api: Api): void {
     c.teclear(true, {
       alRafaga: () => {
         const p = palabras[escritas++]
-        if (p) {
-          p.classList.remove('oculta')
-          gsap.fromTo(p, { opacity: 0, y: 6, filter: 'blur(4px)' }, { opacity: 1, y: 0, filter: 'blur(0px)', duration: 0.3, ease: 'power2.out', clearProps: 'all' })
-        }
+        if (p) c.entregar(p, () => p.classList.remove('oculta'))
         if (escritas >= palabras.length) aLaCinta()
       },
     })
