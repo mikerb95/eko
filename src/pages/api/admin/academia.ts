@@ -17,6 +17,7 @@ import {
   revocarCertificado,
 } from '../../../lib/academia/datos'
 import { resolverOpinion } from '../../../lib/talleres/datos'
+import { enviarMaterial } from '../../../lib/talleres/material'
 
 export const prerender = false
 
@@ -51,6 +52,8 @@ const ACCIONES: Record<string, Accion> = {
   revocar_certificado: (b) => revocarCertificado(b.codigo),
   // Formulario de cierre de las capacitaciones: cómo se resolvió la duda.
   resolver_opinion: (b, quien) => resolverOpinion(Number(b.id), String(b.resolucion ?? ''), quien),
+  // Correo con el enlace al banco de recursos a quienes se registraron en la sala ese día.
+  enviar_material: (b) => enviarMaterial(Number(b.taller), String(b.fecha ?? '')),
 }
 
 /** Todas las escrituras van con `{ accion, ...datos }` y devuelven el estado completo. */

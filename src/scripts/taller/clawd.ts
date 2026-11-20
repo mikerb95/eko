@@ -452,7 +452,7 @@ function crear(escena: HTMLElement, raiz: HTMLElement): Clawd {
   function soltarBurbuja(o: { d?: number; destino?: { x: number; y: number }; dura?: number } = {}) {
     const nada = { reventar: () => {} }
     if (!vivo || !pompa || document.hidden || raiz.querySelectorAll('.clawd-burbuja').length > 18) return nada
-    const d = o.d ?? azar(22, 58)
+    const d = o.d ?? azar(14, 36)
     const b = document.createElement('span')
     b.className = 'clawd-burbuja'
     b.style.setProperty('--d', `${d.toFixed(0)}px`)
@@ -558,11 +558,11 @@ function crear(escena: HTMLElement, raiz: HTMLElement): Clawd {
       // Sopla despacito y largo: sale una sola, enorme.
       tl.to(respira, { scaleY: 0.96, scaleX: 1.03, ...o, duration: 1.1, ease: 'sine.inOut' })
         .to(pompa, { scale: 1.4, transformOrigin: '50% 50%', duration: 1.1, ease: 'sine.in' }, '<')
-        .call(() => void soltarBurbuja({ d: azar(100, 128), dura: azar(6.5, 8) }))
+        .call(() => void soltarBurbuja({ d: azar(64, 82), dura: azar(6.5, 8) }))
         .set(pompa, { scale: 1, opacity: 0.25 })
     } else {
       tl.to(respira, { scaleY: 0.94, scaleX: 1.05, ...o, duration: 0.16, ease: 'power2.out' })
-      const n = entero(5, 9)
+      const n = entero(3, 6)
       let t = 0
       for (let k = 0; k < n; k++) {
         tl.call(() => void soltarBurbuja(), [], `<${t.toFixed(2)}`)

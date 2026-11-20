@@ -13,7 +13,8 @@ import { estadoAdmin, type EstadoAdmin } from '../../lib/academia/datos'
 import { MODULOS_ACADEMIA } from '../../lib/academia/reglas'
 import { COLOR } from '../../lib/academia/ui'
 import { SITE_URL } from '../../lib/site'
-import { opiniones as leerOpiniones, type OpinionTaller } from '../../lib/talleres/datos'
+import { gruposMaterial, opiniones as leerOpiniones, type GrupoMaterial, type OpinionTaller } from '../../lib/talleres/datos'
+import { tallerDe } from '../../lib/talleres'
 import { camposOpinion } from '../../lib/talleres/opinion'
 import { fechaLarga } from '../../lib/academia/ui'
 
@@ -24,14 +25,16 @@ const hoy = hoyEnBogota()
 let estado: EstadoAdmin | null = null
 let errorCarga = ''
 let opiniones: OpinionTaller[] = []
+let material: GrupoMaterial[] = []
 try {
-  ;[estado, opiniones] = await Promise.all([estadoAdmin(hoy), leerOpiniones()])
+  ;[estado, opiniones, material] = await Promise.all([estadoAdmin(hoy), leerOpiniones(), gruposMaterial()])
 } catch (e: any) {
   console.error('[admin/academia] carga', e?.stack || e)
   errorCarga = 'No se pudo cargar la academia.'
 }
 // resuelta_at es ISO en UTC: la fecha que se muestra es la de Bogotá.
 const diaBogota = (iso: string) => new Intl.DateTimeFormat('en-CA', { timeZone: 'America/Bogota' }).format(new Date(iso))
+const materialPendiente = material.reduce((s, g) => s + g.pendientes, 0)
 const dudasPendientes = opiniones.filter((o) => o.respuestas.duda && !o.resolucion).length
 const porRevisar = estado ? estado.entregas.filter((e) => e.estado === 'enviada').length : 0
 const cuentas = { academia: estado?.personas.length ?? 0, academiaRevisar: porRevisar }
@@ -61,6 +64,7 @@ const catalogos = { modulos: MODULOS_ACADEMIA, colores: COLOR, sitio: SITE_URL }
     <button class="subtab" data-tab="sesiones">Sábados</button>
     <button class="subtab" data-tab="certificados">Certificados</button>
     <button class="subtab" data-tab="opiniones">Opiniones <span class="count">{dudasPendientes}</span></button>
+    <button class="subtab" data-tab="material">Material <span class="count">{materialPendiente}</span></button>
   </nav>
 
   <!-- PARTICIPANTES -->
@@ -137,6 +141,26 @@ const catalogos = { modulos: MODULOS_ACADEMIA, colores: COLOR, sitio: SITE_URL }
               </div>
             </form>
           )}
+        </article>
+      ))}
+    </div>
+  </section>
+
+  <!-- MATERIAL POR CORREO -->
+  <section id="panel-material" class="panel">
+    <p class="muted th-intro">Envía a cada persona que se registró en la sala un correo con el enlace al <a href="/academia/recursos" target="_blank">banco de recursos</a> de su área. A quien ya le llegó no se le repite, así que puede volver a enviar después si alguien se registró tarde.</p>
+    {material.length === 0 && <p class="vacio">Todavía nadie se ha registrado en la sala de una capacitación.</p>}
+    <div class="ac-material">
+      {material.map((g) => (
+        <article class="dash-card ac-mat">
+          <div>
+            <h3>Capacitación {g.taller}{tallerDe(g.taller) && `: ${tallerDe(g.taller)!.titulo}`}</h3>
+            <p class="muted">{fechaLarga(g.fecha)} · {g.registrados} registrados · {g.enviados} correos enviados · {g.pendientes} pendientes</p>
+            <p class="muted" data-mat-meta></p>
+          </div>
+          <button type="button" class="btn-primary" data-material={`${g.taller}|${g.fecha}`} disabled={g.pendientes === 0}>
+            {g.pendientes === 0 ? 'Todo enviado' : `Enviar a ${g.pendientes} ${g.pendientes === 1 ? 'persona' : 'personas'}`}
+          </button>
         </article>
       ))}
     </div>
@@ -304,6 +328,28 @@ const catalogos = { modulos: MODULOS_ACADEMIA, colores: COLOR, sitio: SITE_URL }
     </script>
     <script src="/admin/academia.js" type="module"></script>
     <script>
+      // Material: correo con el enlace al banco de recursos de su área.
+      for (const b of document.querySelectorAll<HTMLButtonElement>('button[data-material]')) {
+        b.addEventListener('click', async () => {
+          const [taller, fecha] = b.dataset.material!.split('|')
+          const meta = b.closest('article')!.querySelector<HTMLElement>('[data-mat-meta]')!
+          b.disabled = true
+          b.textContent = 'Enviando…'
+          try {
+            const r = await fetch('/api/admin/academia', { method: 'POST', headers: { 'content-type': 'application/json' }, body: JSON.stringify({ accion: 'enviar_material', taller: Number(taller), fecha }) })
+            const d = await r.json().catch(() => ({}))
+            if (!r.ok) throw new Error(d.error || 'No se pudo enviar.')
+            const { enviados, fallidos } = d.resultado as { enviados: number; fallidos: { nombre: string; correo: string }[] }
+            meta.textContent = `Enviados: ${enviados}.` + (fallidos.length ? ` No salieron (puede reintentar): ${fallidos.map((f) => `${f.nombre} <${f.correo}>`).join(', ')}.` : '')
+            b.textContent = fallidos.length ? `Reintentar ${fallidos.length}` : 'Todo enviado'
+            b.disabled = !fallidos.length
+          } catch (e: any) {
+            meta.textContent = e?.message || 'No se pudo enviar. Intente de nuevo.'
+            b.textContent = 'Reintentar'
+            b.disabled = false
+          }
+        })
+      }
       // Opiniones: guardar cómo se resolvió cada duda (vacío = vuelve a pendiente).
       for (const f of document.querySelectorAll<HTMLFormElement>('form[data-opinion]')) {
         f.addEventListener('submit', async (ev) => {

@@ -87,3 +87,11 @@
 .ac-op-resolver label { display: flex; flex-direction: column; gap: 6px; font-size: 12.5px; font-weight: 600; color: var(--ink-2); }
 .ac-op-resolver textarea { font: inherit; font-size: 13.5px; line-height: 1.5; font-weight: 400; border: 1px solid var(--line); border-radius: 10px; padding: 8px 10px; background: var(--paper); color: var(--ink); resize: vertical; }
 .ac-op-pie { display: flex; justify-content: space-between; align-items: center; gap: 10px; }
+
+/* Material por correo (banco de recursos) */
+.ac-material { display: flex; flex-direction: column; gap: 12px; }
+.ac-mat { margin: 0; display: flex; justify-content: space-between; align-items: center; gap: 16px; flex-wrap: wrap; }
+.ac-mat h3 { margin: 0 0 4px; font-size: 16px; }
+.ac-mat p { margin: 0; }
+.ac-mat [data-mat-meta]:empty { display: none; }
+.ac-mat [data-mat-meta] { margin-top: 6px; }

@@ -68,23 +68,26 @@ const HOJAS = 14
         <g data-clawd-brazo="i">
           {burbujas && (
             // Varita de burbujas en la mano izquierda: palito que sube en
-            // diagonal hasta un aro de 5 x 5 con la película de jabón adentro.
+            // diagonal hasta un aro de 5 x 5 con la película de jabón adentro. Va al 80 % desde la mano (el <g> de
+            // afuera es el que mueve el motor).
             <g class="clawd-varita" data-clawd-varita visibility="hidden">
-              <g fill={C.palito}>
-                <rect x="0" y="3" width="1" height="1" />
-                <rect x="-1" y="2" width="1" height="1" />
-                <rect x="-2" y="1" width="1" height="1" />
-                <rect x="-3" y="0" width="1" height="1" />
-              </g>
-              <g fill={C.aro}>
-                <rect x="-6" y="0" width="3" height="1" />
-                <rect x="-7" y="-3" width="1" height="3" />
-                <rect x="-3" y="-3" width="1" height="3" />
-              </g>
-              <rect x="-6" y="-4" width="3" height="1" fill={C.aroLuz} />
-              <g data-clawd-pompa>
-                <rect x="-6" y="-3" width="3" height="3" fill={C.jabon} opacity=".7" />
-                <rect x="-6" y="-3" width="1" height="1" fill="#fff" opacity=".85" />
+              <g transform="translate(1 4) scale(.8) translate(-1 -4)">
+                <g fill={C.palito}>
+                  <rect x="0" y="3" width="1" height="1" />
+                  <rect x="-1" y="2" width="1" height="1" />
+                  <rect x="-2" y="1" width="1" height="1" />
+                  <rect x="-3" y="0" width="1" height="1" />
+                </g>
+                <g fill={C.aro}>
+                  <rect x="-6" y="0" width="3" height="1" />
+                  <rect x="-7" y="-3" width="1" height="3" />
+                  <rect x="-3" y="-3" width="1" height="3" />
+                </g>
+                <rect x="-6" y="-4" width="3" height="1" fill={C.aroLuz} />
+                <g data-clawd-pompa>
+                  <rect x="-6" y="-3" width="3" height="3" fill={C.jabon} opacity=".7" />
+                  <rect x="-6" y="-3" width="1" height="1" fill="#fff" opacity=".85" />
+                </g>
               </g>
             </g>
           )}
