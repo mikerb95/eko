@@ -1,0 +1,139 @@
+---
+// Inicio del banco de recursos (docs/plan-recursos.md): la cara pública de la
+// academia de IA. Mismo armazón y estilo que /academia, sin cuenta: el
+// programa de capacitaciones con su temario, las rutas por área y cómo usar el
+// banco. Pública (excepción en src/middleware.ts): ningún QR lleva a un login.
+export const prerender = false
+import AcademiaLayout from '../../../layouts/AcademiaLayout.astro'
+import { colorDe } from '../../../lib/academia/ui'
+import { AREAS_RECURSOS, TOTAL_PROGRAMA, bancoDe, rutaRecursos, temarioDe } from '../../../lib/talleres/recursos'
+
+// Las capacitaciones publicadas son las mismas para todas las áreas: el
+// temario se toma de la primera y los conteos son por área.
+const publicadas = bancoDe(AREAS_RECURSOS[0]!.id)
+const porN = new Map(publicadas.map((b) => [b.n, b]))
+const programa = Array.from({ length: TOTAL_PROGRAMA }, (_, i) => i + 1).map((n) => porN.get(n) ?? { n })
+const ultima = publicadas[0]
+const pasosGuia = publicadas.reduce((s, b) => s + b.guias.reduce((t, g) => t + g.pasos.length, 0), 0)
+const nav = [
+  { href: '/academia/recursos', texto: 'Inicio', activo: true },
+  { href: '#rutas', texto: 'Rutas por área' },
+]
+const dos = (n: number) => String(n).padStart(2, '0')
+---
+
+<AcademiaLayout titulo="Banco de recursos · Academia de IA · Ekosolv" inicio="/academia/recursos" etiqueta="Academia de IA" nav={nav}>
+  <section class="ac-hero rc-hero">
+    <div class="ac-hero-txt">
+      <p class="ac-kicker">Banco de recursos</p>
+      <h1>Lo que vio en la capacitación, listo para <span>usarlo en su trabajo</span></h1>
+      <p class="ac-lede">Instrucciones para copiar, guías paso a paso y las hojas de cada sábado, con ejemplos de su área. Sin usuario ni contraseña: entre cuando lo necesite.</p>
+      <div class="rc-acciones">
+        <a class="ac-btn" href="#rutas">Elegir mi área</a>
+        <a class="ac-btn ac-btn-sec" href="#programa">Ver el programa</a>
+      </div>
+    </div>
+    <div class="rc-ficha" aria-hidden="true">
+      <span class="rc-ficha-et">Instrucción de ejemplo</span>
+      <div class="rc-partes">
+        <span style="--c: #124E7D"><b>Contexto</b>Quién es usted y qué hay que saber</span>
+        <span style="--c: #179C91"><b>Tarea</b>Qué quiere, con un verbo claro</span>
+        <span style="--c: #B8926F"><b>Formato</b>Cómo lo quiere recibir</span>
+        <span style="--c: #6B7580"><b>Ejemplo</b>Cómo debe quedar</span>
+      </div>
+      <span class="rc-ficha-copiar">Copiar</span>
+    </div>
+  </section>
+
+  <section class="ac-cifras" aria-label="Qué hay en el banco">
+    <div class="ac-cifra"><span>Capacitaciones publicadas</span><b>{publicadas.length}<small>/{TOTAL_PROGRAMA}</small></b><em>se suma una cada sábado</em></div>
+    <div class="ac-cifra"><span>Rutas por área</span><b>{AREAS_RECURSOS.length}</b><em>ejemplos de su trabajo</em></div>
+    <div class="ac-cifra"><span>Instrucciones por área</span><b>{ultima?.instrucciones.length ?? 0}</b><em>listas para copiar</em></div>
+    <div class="ac-cifra"><span>Pasos de guía</span><b>{pasosGuia}</b><em>con ilustraciones</em></div>
+  </section>
+
+  <div class="ac-grid">
+    <section class="ac-modulos" id="programa" aria-label="Programa">
+      {programa.map((b) => (
+        <article class:list={['ac-modulo', { 'rc-proxima': !('titulo' in b) }]} style={`--c:${'titulo' in b ? '#124E7D' : '#9AA3AB'}`}>
+          <header>
+            <span class="ac-punto" aria-hidden="true"></span>
+            <h2>{'titulo' in b ? b.titulo : `Capacitación ${b.n}`}</h2>
+            <span class="ac-cuenta-mod">{'titulo' in b ? `Capacitación ${b.n}` : 'Próximamente'}</span>
+          </header>
+          {'titulo' in b ? (
+            <ol class="ac-lecciones rc-temario">
+              {temarioDe(b).map((t, i) => (
+                <li>
+                  <div>
+                    <span class="ac-num">{dos(i + 1)}</span>
+                    <span class="ac-lec-txt"><b>{t.titulo}</b><span class="ac-etiquetas"><span>{t.etiqueta}</span></span></span>
+                  </div>
+                </li>
+              ))}
+            </ol>
+          ) : (
+            <p class="ac-nada">Su material se publica aquí después de la sesión.</p>
+          )}
+        </article>
+      ))}
+    </section>
+
+    <aside class="ac-lado">
+      <section class="ac-caja" id="rutas">
+        <h2>Rutas por área</h2>
+        <p>Cada ruta trae el mismo temario con ejemplos e instrucciones del trabajo de esa área.</p>
+        <ul class="rc-rutas">
+          {AREAS_RECURSOS.map((a) => (
+            <li>
+              <a href={rutaRecursos(a.id)} style={`--c:${colorDe(a.id)}`}>
+                <span class="ac-punto" aria-hidden="true"></span>
+                <span><b>{a.nombre}</b><small>{a.enfoque}</small></span>
+              </a>
+            </li>
+          ))}
+        </ul>
+      </section>
+
+      <section class="ac-caja">
+        <h2>Cómo usar el banco</h2>
+        <ol class="rc-pasos">
+          <li><b>Elija su área.</b> Las instrucciones vienen con casos de su trabajo.</li>
+          <li><b>Copie y ajuste.</b> Cambie lo que va entre corchetes por los datos reales y péguela en la cuenta de Ekosolv.</li>
+          <li><b>Verifique antes de usar.</b> Normas, cifras y fechas se confirman contra la fuente.</li>
+        </ol>
+      </section>
+    </aside>
+  </div>
+</AcademiaLayout>
+
+<style>
+  .rc-hero { align-items: center; }
+  .rc-acciones { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 24px; }
+  .rc-acciones .ac-btn { margin-top: 0; }
+
+  .rc-ficha { width: 300px; background: #fff; border-radius: 20px; padding: 18px; box-shadow: 0 1px 2px rgba(14, 28, 38, .05), 0 18px 40px rgba(14, 28, 38, .09); display: grid; gap: 12px; transform: rotate(1.5deg); }
+  .rc-ficha-et { font: 500 11px/1 var(--font-mono); letter-spacing: .1em; text-transform: uppercase; color: var(--mute); }
+  .rc-partes { display: grid; gap: 8px; }
+  .rc-partes span { display: grid; gap: 2px; background: color-mix(in oklab, var(--c) 7%, #fff); border-radius: 12px; padding: 10px 12px; font-size: 12.5px; color: var(--ink-2); }
+  .rc-partes b { font: 600 14px/1.1 var(--font-display); color: var(--c); }
+  .rc-ficha-copiar { justify-self: end; font: 600 13px/1 var(--font-sans); padding: 8px 14px; border-radius: 999px; background: var(--forest); color: #fff; }
+
+  .rc-proxima { box-shadow: none; background: color-mix(in oklab, #fff 55%, transparent); }
+  .rc-proxima h2 { color: var(--mute); }
+  .rc-temario li > div { display: flex; align-items: center; gap: 14px; padding: 12px 0; }
+
+  .rc-rutas { list-style: none; margin: 0; padding: 0; display: grid; gap: 4px; }
+  .rc-rutas a { display: flex; gap: 12px; align-items: flex-start; padding: 10px; margin: 0 -10px; border-radius: 12px; text-decoration: none; color: var(--ink); transition: background .15s; }
+  .rc-rutas a:hover { background: color-mix(in oklab, var(--c) 8%, #fff); }
+  .rc-rutas .ac-punto { margin-top: 6px; }
+  .rc-rutas b { display: block; font-weight: 600; font-size: 15.5px; }
+  .rc-rutas small { display: block; font-size: 13px; line-height: 1.4; color: var(--mute); margin-top: 2px; }
+
+  .rc-pasos { margin: 0; padding-left: 20px; display: grid; gap: 10px; font-size: 14.5px; line-height: 1.5; color: var(--ink-2); }
+  .rc-pasos b { color: var(--ink); font-weight: 600; }
+
+  @media (max-width: 640px) {
+    .rc-ficha { width: auto; transform: none; }
+  }
+</style>
