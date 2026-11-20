@@ -42,3 +42,4 @@ Crear `src/lib/talleres/tallerN.ts` con la misma forma (bloques, escenas, intera
 - Reemplazar el contenido marcado como provisional con material real de Ekosolv: el auto de la demo, las citas de "verdad o alucinación", los casos del semáforo y el certificado del anonimizador. Verificar las citas normativas antes de la sesión.
 - Probar la demo con IA real en producción (en local usa el modelo simulado y muestra la respuesta guardada).
 - Contenido de las capacitaciones 2, 3 y 4 cuando lleguen los documentos de cada área.
+- Ideas por construir (cierre de la capacitación 1 conectando Zoho con Claude, PC vinculado al celular con código): ver `docs/ideas-talleres.md`.
