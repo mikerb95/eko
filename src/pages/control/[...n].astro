@@ -3,5 +3,6 @@
 export const prerender = false
 import { numeroAtajo } from '../../lib/talleres/atajo'
 
-return Astro.redirect(`/academia/taller/${await numeroAtajo(Astro.params.n)}/control`, 302)
+const n = await numeroAtajo(Astro.params.n)
+return Astro.redirect(`/academia/taller/${n}/control`, 302)
 ---
