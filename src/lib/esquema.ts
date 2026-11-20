@@ -692,6 +692,10 @@ export const COLUMNAS: readonly (readonly [tabla: string, columna: string])[] = 
   // columna). Los borradores los crea el asistente del panel (docs/plan-asistente.md).
   ['posts', 'estado'],
   ['normativas', 'estado'],
+  // Sala de la capacitación: el enlace de entrada llega a este correo, y
+  // después el material. enlace_at frena reenvíos seguidos.
+  ['ac_taller_asistentes', 'correo'],
+  ['ac_taller_asistentes', 'enlace_at'],
 ]
 
 /** Tablas que deben existir al terminar. Sirve para verificar tras migrar. */

@@ -84,7 +84,7 @@ const filaAsistente = (x: any): Asistente => ({
   fecha: str(x.fecha),
   nombre: str(x.nombre),
   apellido: str(x.apellido),
-  cargo: str(x.cargo),
+  correo: str(x.correo),
   area: str(x.area),
   usuario_id: num(x.usuario_id),
 })
@@ -92,7 +92,7 @@ const filaAsistente = (x: any): Asistente => ({
 /**
  * Registro desde el QR. Si la misma persona (mismo nombre completo, sin
  * importar tildes ni mayúsculas) ya se registró hoy en esta capacitación, se
- * actualizan su cargo y área y se devuelve el mismo registro: así no se
+ * actualizan su correo y área y se devuelve el mismo registro: así no se
  * duplica si cambia de celular o borra las cookies.
  *
  * Si hay una cuenta activa de la academia con ese mismo nombre, queda
@@ -106,16 +106,40 @@ export async function registrarAsistente(t: Taller, hoy: string, r: RegistroSala
   const cuenta = cuentas.rows.find((x: any) => claveNombre(str(x.name)) === clave) as any
   const usuario_id = cuenta ? num(cuenta.id) : 0
   const res = await c.execute({
-    sql: `INSERT INTO ac_taller_asistentes (taller, fecha, nombre, apellido, cargo, area, clave, usuario_id, created_at)
-          VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
+    // cargo ya no se pide (Mike, 2026-11-19): la columna queda vacía.
+    sql: `INSERT INTO ac_taller_asistentes (taller, fecha, nombre, apellido, cargo, correo, area, clave, usuario_id, created_at)
+          VALUES (?, ?, ?, ?, '', ?, ?, ?, ?, ?)
           ON CONFLICT (taller, fecha, clave) DO UPDATE SET nombre = excluded.nombre, apellido = excluded.apellido,
-            cargo = excluded.cargo, area = excluded.area, usuario_id = excluded.usuario_id
+            correo = excluded.correo, area = excluded.area, usuario_id = excluded.usuario_id
           RETURNING *`,
-    args: [t.n, hoy, r.nombre, r.apellido, r.cargo, r.area, clave, usuario_id, ahora()],
+    args: [t.n, hoy, r.nombre, r.apellido, r.correo, r.area, clave, usuario_id, ahora()],
   })
   const asistente = filaAsistente(res.rows[0])
   const marcados = cuenta ? await marcarAsistenciaAcademia(t, usuario_id, hoy) : 0
   return { asistente, marcados }
+}
+
+/**
+ * Reserva el envío del enlace de entrada: no más de uno por persona cada
+ * SEGUNDOS_ENTRE_ENLACES (quien toca dos veces el botón no recibe dos correos
+ * y el formulario público no sirve para llenar buzones ajenos). Devuelve
+ * false si hay que esperar.
+ */
+export const SEGUNDOS_ENTRE_ENLACES = 60
+export async function reservarEnlace(asistente_id: number): Promise<boolean> {
+  const c = await db()
+  const limite = new Date(Date.now() - SEGUNDOS_ENTRE_ENLACES * 1000).toISOString()
+  const r = await c.execute({
+    sql: `UPDATE ac_taller_asistentes SET enlace_at = ? WHERE id = ? AND (enlace_at = '' OR enlace_at < ?)`,
+    args: [ahora(), asistente_id, limite],
+  })
+  return r.rowsAffected > 0
+}
+
+/** Si el correo no salió, la persona puede volver a intentarlo de inmediato. */
+export async function liberarEnlace(asistente_id: number): Promise<void> {
+  const c = await db()
+  await c.execute({ sql: `UPDATE ac_taller_asistentes SET enlace_at = '' WHERE id = ?`, args: [asistente_id] })
 }
 
 export async function asistenteDe(id: number): Promise<Asistente | null> {

@@ -222,19 +222,25 @@ export function claveNombre(nombreCompleto: string): string {
 export interface RegistroSala {
   nombre: string
   apellido: string
-  cargo: string
+  correo: string
   area: string
+}
+
+/** Correo en minúsculas si tiene forma válida; si no, cadena vacía. */
+export function correoValido(v: unknown): string {
+  const c = String(v ?? '').trim().toLowerCase()
+  return c.length <= 120 && /^[^\s@]+@[^\s@]+\.[a-z]{2,}$/.test(c) ? c : ''
 }
 
 /** Valida lo que llega del formulario del celular. Devuelve los datos limpios o el error. */
 export function registroSala(b: any, areas: readonly string[]): RegistroSala | { error: string } {
   const nombre = capitalizarNombre(limpio(b?.nombre, 60))
   const apellido = capitalizarNombre(limpio(b?.apellido, 60))
-  const cargo = limpio(b?.cargo, 80)
+  const correo = correoValido(b?.correo)
   const area = String(b?.area ?? '')
   if (!nombre) return { error: 'Escriba su nombre.' }
   if (!apellido) return { error: 'Escriba su apellido.' }
-  if (!cargo) return { error: 'Escriba su cargo.' }
+  if (!correo) return { error: 'Escriba un correo válido.' }
   if (!areas.includes(area)) return { error: 'Elija su área.' }
-  return { nombre, apellido, cargo, area }
+  return { nombre, apellido, correo, area }
 }

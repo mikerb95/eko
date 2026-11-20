@@ -66,10 +66,12 @@ interface SendInput {
   replyTo?: string
   /** Destinatarios; por defecto, los de NOTIFY_EMAIL. */
   to?: string[]
+  /** Remitente; por defecto, NOTIFY_FROM. */
+  from?: string
 }
 
-async function send({ subject, html, text, replyTo, to = recipients() }: SendInput): Promise<SendResult> {
-  if (!env('RESEND_API_KEY') || !env('NOTIFY_FROM') || !to.length) {
+async function send({ subject, html, text, replyTo, to = recipients(), from = env('NOTIFY_FROM') }: SendInput): Promise<SendResult> {
+  if (!env('RESEND_API_KEY') || !from || !to.length) {
     console.warn('[email] sin configurar (RESEND_API_KEY / NOTIFY_FROM / NOTIFY_EMAIL); no se envía:', subject)
     return { sent: false, reason: 'not_configured' }
   }
@@ -82,7 +84,7 @@ async function send({ subject, html, text, replyTo, to = recipients() }: SendInp
         'content-type': 'application/json',
       },
       body: JSON.stringify({
-        from: env('NOTIFY_FROM'),
+        from,
         to,
         subject,
         html,
@@ -289,5 +291,54 @@ export async function notifyPropuestaEleccion(e: { resumen: string; nombre: stri
     html: layout(title, rows, 'Ver en el panel', cta, 'No es un contrato firmado: es el aviso para formalizar.'),
     text: plain(title, rows, cta),
     to: recipients('PROPUESTA_EMAIL'),
+  })
+}
+
+// ------------------------------------------------- sala de la capacitación
+
+/**
+ * Remitente de los correos de la capacitación. Sale del dominio codebymike.net,
+ * el mismo que ya está verificado en Resend para el portafolio (misma
+ * RESEND_API_KEY). SALA_FROM lo cambia sin tocar el código.
+ */
+const SALA_FROM_DEFECTO = 'Ekosolv Academia de IA <academia@codebymike.net>'
+
+/** ¿Hay con qué enviar el enlace de entrada a la sala? */
+export function salaEmailConfigured(): boolean {
+  return Boolean(env('RESEND_API_KEY'))
+}
+
+/**
+ * Enlace de entrada a la sala: la persona llenó nombre, apellido, correo y
+ * área en el celular y con este enlace queda dentro. Sirve solo para la
+ * capacitación en curso y ese día. Al mismo correo llegará después el
+ * material de la capacitación.
+ */
+export async function enviarEnlaceSala(p: { to: string; nombre: string; capacitacion: string; url: string }): Promise<SendResult> {
+  const titulo = `${p.nombre}, este es su enlace para entrar a la capacitación`
+  // bgcolor además de background-color: Gmail a veces descarta `background`.
+  const html = `<div style="margin:0;padding:24px;background-color:#f4f6f4;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Helvetica,Arial,sans-serif">
+  <table role="presentation" width="100%" cellpadding="0" cellspacing="0" bgcolor="#ffffff" style="max-width:560px;margin:0 auto;background-color:#ffffff;border-radius:12px;overflow:hidden">
+    <tr><td bgcolor="#16261e" style="padding:20px 24px;background-color:#16261e">
+      <span style="color:#ffffff;font-size:15px;font-weight:600;letter-spacing:.02em">Ekosolv · Academia de IA</span>
+    </td></tr>
+    <tr><td style="padding:24px">
+      <h1 style="margin:0 0 12px;font-size:18px;line-height:1.35;color:#16261e">${escapeHtml(titulo)}</h1>
+      <p style="margin:0 0 8px;color:#3d4b44;font-size:14px;line-height:1.55">Capacitación: <strong style="color:#16261e">${escapeHtml(p.capacitacion)}</strong></p>
+      <p style="margin:0;color:#3d4b44;font-size:14px;line-height:1.55">Toque el botón desde el celular con el que va a participar. Ahí verá las preguntas de la sesión y podrá enviarle las suyas a quien dicta.</p>
+      <table role="presentation" cellpadding="0" cellspacing="0" style="margin:22px 0 0"><tr><td bgcolor="#2f7d4f" style="border-radius:8px;background-color:#2f7d4f">
+        <a href="${escapeHtml(p.url)}" style="display:inline-block;padding:12px 22px;color:#ffffff;border-radius:8px;text-decoration:none;font-size:15px;font-weight:600">Entrar a la capacitación</a>
+      </td></tr></table>
+      <p style="margin:20px 0 0;color:#5b6b62;font-size:12px;line-height:1.5">El enlace sirve solo hoy. A este mismo correo le llegará después el material de la capacitación: guías, plantillas y recursos visuales.</p>
+    </td></tr>
+  </table>
+</div>`
+  const text = `${titulo}\n\nCapacitación: ${p.capacitacion}\n\nEntrar a la capacitación: ${p.url}\n\nEl enlace sirve solo hoy. A este mismo correo le llegará después el material de la capacitación.\n`
+  return send({
+    subject: 'Su enlace para entrar a la capacitación de IA',
+    html,
+    text,
+    to: [p.to],
+    from: env('SALA_FROM') || SALA_FROM_DEFECTO,
   })
 }

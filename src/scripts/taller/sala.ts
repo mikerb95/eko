@@ -2,8 +2,9 @@
  * La sala en el celular, en dos momentos:
  *
  * 1. Registro (sin cuenta): nombres y apellidos con la primera letra de cada
- *    palabra en mayúscula mientras se escribe, cargo y área. Al enviarlo
- *    queda la asistencia y la página se recarga ya dentro de la sala.
+ *    palabra en mayúscula mientras se escribe, correo y área. Al enviarlo le
+ *    llega al correo el enlace de entrada; al abrirlo queda la asistencia y
+ *    entra a la sala.
  * 2. Sala: consulta cada 2 segundos qué pregunta está abierta y pinta sus
  *    opciones; al tocar una, la guarda (se puede cambiar mientras siga
  *    abierta). Avisa que sigue en la sala cada 30 segundos, que es lo que
@@ -106,11 +107,30 @@ function montarRegistro(form: HTMLFormElement) {
       decir(vacio.tagName === 'SELECT' ? 'Elija su área.' : `Escriba su ${nombre === 'nombres' ? 'nombre' : nombre === 'apellidos' ? 'apellido' : nombre}.`, 'error')
       return
     }
+    const correo = form.querySelector<HTMLInputElement>('input[name="correo"]')!
+    if (!correo.checkValidity()) {
+      correo.setAttribute('aria-invalid', 'true')
+      correo.focus()
+      decir('Revise el correo: parece que le falta algo.', 'error')
+      return
+    }
     boton.disabled = true
-    decir('Registrando…')
+    decir('Enviando el enlace…')
     try {
-      await enviar({ accion: 'registrar', ...Object.fromEntries(campos.map((c) => [c.name, c.value])) })
-      location.reload()
+      const r = (await enviar({ accion: 'registrar', ...Object.fromEntries(campos.map((c) => [c.name, c.value])) })) as { correo?: string; enlace?: string }
+      // En desarrollo sin Resend el enlace vuelve en la respuesta: se abre directo.
+      if (r.enlace) return void location.assign(r.enlace)
+      const enviado = document.querySelector<HTMLElement>('[data-sl-enviado]')!
+      enviado.querySelector('[data-sl-correo]')!.textContent = r.correo ?? correo.value
+      form.hidden = true
+      enviado.hidden = false
+      enviado.querySelector<HTMLButtonElement>('[data-sl-otra]')!.onclick = () => {
+        enviado.hidden = true
+        form.hidden = false
+        boton.disabled = false
+        decir('')
+        correo.focus()
+      }
     } catch (err) {
       decir(err instanceof Error ? err.message : 'No se pudo registrar. Intente de nuevo.', 'error')
       boton.disabled = false

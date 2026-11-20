@@ -1,19 +1,23 @@
 import type { APIRoute } from 'astro'
 import { fail, json } from '../../../lib/apiError'
-import { SALA_COOKIE, SALA_TTL_SECONDS, crearPaseSala } from '../../../lib/auth'
+import { SALA_COOKIE, crearPaseSala } from '../../../lib/auth'
+import { enviarEnlaceSala, salaEmailConfigured } from '../../../lib/email'
+import { SITE_URL } from '../../../lib/site'
 import { hoyEnBogota } from '../../../lib/agente/diasHabiles'
 import { AREA_IDS, nombreModulo } from '../../../lib/academia/reglas'
 import { MAX_INSTRUCCION, MIN_INSTRUCCION, PRACTICAS_DIA, validarInstruccion } from '../../../lib/academia/practica'
 import { practicar, PracticaNoDisponible } from '../../../lib/academia/motorPractica'
 import { interaccionDe, interaccionPublica, PREGUNTAS_DIA, registroSala, validarPregunta, votoValido, MAX_PREGUNTA } from '../../../lib/talleres/reglas'
-import { guardarPracticaSala, guardarPregunta, marcarEnSala, misRespuestas, practicasSalaDeHoy, preguntasDeHoyDe, registrarAsistente, votar } from '../../../lib/talleres/datos'
+import { guardarPracticaSala, guardarPregunta, marcarEnSala, misRespuestas, practicasSalaDeHoy, preguntasDeHoyDe, liberarEnlace, registrarAsistente, reservarEnlace, votar } from '../../../lib/talleres/datos'
 import { salaActual } from '../../../lib/talleres/sala'
 
 // La sala del celular (/academia/sala). Pública: se llega por el QR del
 // proyector y no pide usuario ni contraseña (excepción en src/middleware.ts).
-// La persona escribe nombre, apellido, cargo y área y recibe un pase firmado
-// (cookie eko_sala) que solo sirve para votar en la capacitación en curso,
-// ese día. Fuera de una sesión en curso no se puede registrar ni votar.
+// La persona escribe nombre, apellido, correo y área y le llega al correo un
+// enlace de entrada (Resend, dominio codebymike.net). El enlace lleva un pase
+// firmado que /academia/sala guarda como cookie (eko_sala) y que solo sirve
+// para votar en la capacitación en curso, ese día. Al mismo correo llegará
+// después el material. Fuera de una sesión en curso no se puede registrar ni votar.
 // Mientras el proyector está en la práctica guiada, la sala es el revisor de
 // instrucciones (mismo motor y tope de gasto que el de la academia).
 // En cada escena la persona ve la idea en palabras sencillas y un ejemplo de
@@ -21,7 +25,7 @@ import { salaActual } from '../../../lib/talleres/sala'
 // puede enviarle una pregunta a quien dicta, que la ve en el presentador.
 //
 // GET           → capacitación en curso, si la persona ya está registrada, pregunta abierta, sus respuestas y si hay práctica
-// POST {accion} → registrar | entrar | votar | practicar | preguntar
+// POST {accion} → registrar (envía el enlace al correo) | entrar | votar | practicar | preguntar
 
 export const prerender = false
 
@@ -53,7 +57,7 @@ export const GET: APIRoute = async ({ cookies }) => {
   }
 }
 
-export const POST: APIRoute = async ({ request, cookies }) => {
+export const POST: APIRoute = async ({ request, cookies, url }) => {
   let b: any
   try {
     b = await request.json()
@@ -69,15 +73,20 @@ export const POST: APIRoute = async ({ request, cookies }) => {
       if ('error' in r) return json(r, 400)
       const hoy = hoyEnBogota()
       const { asistente: a } = await registrarAsistente(t, hoy, r)
-      await marcarEnSala(t.n, a.id)
-      cookies.set(SALA_COOKIE, await crearPaseSala({ a: a.id, t: t.n, f: hoy }), {
-        path: '/',
-        httpOnly: true,
-        sameSite: 'lax',
-        secure: import.meta.env.PROD,
-        maxAge: SALA_TTL_SECONDS,
-      })
-      return json({ ok: true, nombre: a.nombre })
+      // En desarrollo el enlace apunta al servidor local; en producción,
+      // siempre al dominio público (una URL de Vercel pediría su login).
+      const origen = import.meta.env.DEV ? url.origin : SITE_URL
+      const enlace = `${origen}/academia/sala?e=${encodeURIComponent(await crearPaseSala({ a: a.id, t: t.n, f: hoy }))}`
+      // Sin Resend en desarrollo, el enlace vuelve en la respuesta para probar sin buzón.
+      if (import.meta.env.DEV && !salaEmailConfigured()) return json({ ok: true, correo: r.correo, enlace })
+      if (!(await reservarEnlace(a.id))) return json({ error: 'Ya le enviamos el enlace. Revise su correo (también la carpeta de spam) y espere un minuto para pedirlo otra vez.' }, 429)
+      const envio = await enviarEnlaceSala({ to: r.correo, nombre: a.nombre, capacitacion: `Capacitación ${t.n} · ${t.titulo}`, url: enlace })
+      if (!envio.sent) {
+        console.error('[academia/sala] enlace sin enviar', envio.reason)
+        await liberarEnlace(a.id)
+        return json({ error: 'No pudimos enviar el correo. Revise que esté bien escrito o avísele a quien dicta.' }, 502)
+      }
+      return json({ ok: true, correo: r.correo })
     }
 
     if (!asistente) return json({ error: 'Registre su nombre para participar.', registrar: true }, 401)

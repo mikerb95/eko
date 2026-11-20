@@ -1,20 +1,37 @@
 ---
 // La sala: lo que cada participante abre en el celular durante una
 // capacitación presencial (se llega por el código QR del proyector). Es
-// pública: la primera vez pide nombres, apellidos, cargo y área (sin usuario
-// ni contraseña) y eso queda como su asistencia. Después muestra la pregunta
+// pública: la primera vez pide nombres, apellidos, correo y área (sin usuario
+// ni contraseña) y le envía al correo el enlace de entrada. Al abrirlo
+// (?e=<pase>) queda registrada su asistencia y entra. Después muestra la pregunta
 // abierta en cada momento y guarda sus respuestas. Cuando no hay nada que
 // votar, muestra la idea de la escena en palabras sencillas y un ejemplo de su
 // área. Abajo, una caja para enviarle preguntas a quien dicta.
 // Motor: src/scripts/taller/sala.ts. API: /api/academia/sala.
 export const prerender = false
 import AcademiaLayout from '../../layouts/AcademiaLayout.astro'
-import { SALA_COOKIE } from '../../lib/auth'
+import { SALA_COOKIE, SALA_TTL_SECONDS, verificarPaseSala } from '../../lib/auth'
 import { AREAS_ACADEMIA } from '../../lib/academia/reglas'
 import { salaActual } from '../../lib/talleres/sala'
 
-const { estado, t, asistente } = await salaActual(Astro.cookies.get(SALA_COOKIE)?.value)
 Astro.response.headers.set('cache-control', 'no-store')
+
+// Enlace del correo: guarda el pase como cookie y recarga sin él en la URL,
+// para que no quede en el historial ni se comparta por error al copiar la
+// dirección. salaActual decide si el pase sirve (capacitación en curso, hoy).
+const enlace = Astro.url.searchParams.get('e')
+let enlaceVencido = false
+if (enlace) {
+  if (await verificarPaseSala(enlace)) {
+    Astro.cookies.set(SALA_COOKIE, enlace, { path: '/', httpOnly: true, sameSite: 'lax', secure: import.meta.env.PROD, maxAge: SALA_TTL_SECONDS })
+    return Astro.redirect('/academia/sala')
+  }
+  enlaceVencido = true
+}
+
+const { estado, t, asistente } = await salaActual(Astro.cookies.get(SALA_COOKIE)?.value)
+// Un pase válido pero de otro día u otra capacitación no deja entrar.
+if (!asistente && Astro.cookies.get(SALA_COOKIE)?.value) enlaceVencido = true
 ---
 
 <AcademiaLayout titulo="Sala · Academia de IA · Ekosolv" sinNav>
@@ -47,9 +64,10 @@ Astro.response.headers.set('cache-control', 'no-store')
       <h1>Antes de empezar, ¿quién es usted?</h1>
       <p class="sl-sub">
         {estado
-          ? 'Con estos datos queda registrada su asistencia. No necesita usuario ni contraseña.'
+          ? 'Le enviamos a su correo el enlace para entrar. No necesita usuario ni contraseña.'
           : 'La sesión todavía no ha empezado. Puede llenar sus datos cuando quien dicta abra la presentación.'}
       </p>
+      {enlaceVencido && <p class="sl-estado error" role="alert">Ese enlace ya no sirve: es de otro día o de otra capacitación. Llene sus datos y le enviamos uno nuevo.</p>}
       <form class="sl-form" data-sl-registro novalidate>
         <div class="sl-par">
           <label>
@@ -62,8 +80,8 @@ Astro.response.headers.set('cache-control', 'no-store')
           </label>
         </div>
         <label>
-          <span>Cargo</span>
-          <input name="cargo" required maxlength="80" autocomplete="organization-title" autocapitalize="sentences" />
+          <span>Correo</span>
+          <input name="correo" type="email" required maxlength="120" autocomplete="email" inputmode="email" autocapitalize="off" spellcheck="false" />
         </label>
         <label>
           <span>Área</span>
@@ -72,9 +90,15 @@ Astro.response.headers.set('cache-control', 'no-store')
             {AREAS_ACADEMIA.map((a) => <option value={a.id}>{a.etiqueta}</option>)}
           </select>
         </label>
-        <button type="submit" class="ac-btn">Entrar a la sala</button>
+        <button type="submit" class="ac-btn">Enviarme el enlace</button>
         <p class="sl-estado" data-sl-estado role="status"></p>
+        <p class="sl-nota">A este correo le llegará también el material de la capacitación: guías, plantillas y recursos visuales.</p>
       </form>
+      <div class="sl-enviado" data-sl-enviado hidden>
+        <h2>Revise su correo</h2>
+        <p>Le enviamos el enlace a <b data-sl-correo></b>. Ábralo desde este celular para entrar. Si no aparece en un minuto, mire en la carpeta de spam.</p>
+        <button type="button" class="ac-btn ac-btn-sec" data-sl-otra>Corregir el correo</button>
+      </div>
     </section>
   )}
   <script>
