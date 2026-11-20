@@ -12,6 +12,7 @@ import Votaciones from './Votaciones.astro'
 import Pedir from './Pedir.astro'
 import Cierre from './Cierre.astro'
 import Conectar from './Conectar.astro'
+import Clawd from './Clawd.astro'
 
 interface Props {
   e: Escena
@@ -30,6 +31,24 @@ const grupo = (() => {
   if (e.tipo === 'conectar') return 'conectar'
   return 'cierre'
 })()
+
+// Escenas donde Clawd tiene un papel (el motor está en scripts/taller/clawd.ts
+// y en los hooks de escenas.ts). En las demás no aparece.
+const PAPELES: Record<string, { accesorio: 'teclado' | 'mesa' | 'nada'; lugar: string }> = {
+  portada: { accesorio: 'teclado', lugar: 'portada' },
+  siguiente: { accesorio: 'teclado', lugar: 'piensa' },
+  inventa: { accesorio: 'teclado', lugar: 'inventa' },
+  contexto: { accesorio: 'mesa', lugar: 'mesa' },
+  constructor: { accesorio: 'teclado', lugar: 'constructor' },
+  evaluacion: { accesorio: 'nada', lugar: 'votos' },
+  voto: { accesorio: 'nada', lugar: 'votos' },
+  repaso: { accesorio: 'nada', lugar: 'votos' },
+  verdad: { accesorio: 'nada', lugar: 'votos' },
+  semaforo: { accesorio: 'nada', lugar: 'votos' },
+  descanso: { accesorio: 'nada', lugar: 'descanso' },
+  practica: { accesorio: 'teclado', lugar: 'practica' },
+}
+const papel = PAPELES[e.tipo]
 ---
 
 <section
@@ -57,4 +76,5 @@ const grupo = (() => {
     {grupo === 'cierre' && <Cierre e={e} t={t} ctx={ctx} />}
     {grupo === 'conectar' && <Conectar e={e} />}
   </div>
+  {papel && <Clawd accesorio={papel.accesorio} lugar={papel.lugar} frases={e.datos?.clawd} />}
 </section>

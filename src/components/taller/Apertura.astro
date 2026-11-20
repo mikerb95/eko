@@ -3,7 +3,6 @@
 import type { Escena, Taller } from '../../lib/talleres/tipos'
 import { tokenizarAprox } from '../../lib/talleres/reglas'
 import type { Contexto } from './tipos'
-import Clawd from './Clawd.astro'
 
 interface Props {
   e: Escena
@@ -24,7 +23,6 @@ const maxTarea = Math.max(1, ...(d?.tareas.map((x) => x.n) ?? [1]))
     </div>
     <p class="sub">{t.subtitulo}</p>
     <p class="firma">Ekosolv · Capacitación en IA · Dictada por Michael Rodriguez</p>
-    <Clawd />
   </>
 )}
 

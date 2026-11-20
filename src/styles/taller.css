@@ -117,7 +117,6 @@
   bottom: 0;
   left: 0;
   background: var(--c);
-  box-shadow: 0 0 48px rgba(14, 28, 38, .18);
   display: grid;
   place-items: center;
   will-change: transform;
@@ -187,27 +186,80 @@
 .tl-on .esc-portada .cinta { position: absolute; top: 470px; left: 0; flex-wrap: nowrap; width: max-content; font-size: 30px; }
 .tl-on .esc-portada .tl-titulo { margin-top: 30px; }
 
-/* Clawd, la mascota (Clawd.astro + scripts/taller/clawd.ts). En documento va
-   en el flujo, pequeño y a la derecha; en presentación se para abajo a la
-   derecha, debajo de la cinta, y los tokens que teclea suben hasta ella. */
-.clawd { position: relative; align-self: flex-end; width: 200px; }
+/* Clawd, la mascota (Clawd.astro + scripts/taller/clawd.ts). Solo aparece en
+   las escenas donde actúa (PAPELES en Escena.astro). En presentación se ubica
+   según la escena con clawd--<lugar>; en modo documento solo se ve en la
+   portada, pequeño y a la derecha. */
+.clawd { position: relative; align-self: flex-end; width: 200px; --globo: 26px; }
+.tl-escena:not(.esc-portada) > .clawd { display: none; }
+.tl-on .tl-escena > .clawd { display: block; position: absolute; z-index: 4; }
 .clawd svg { display: block; width: 100%; height: auto; overflow: visible; }
-.tl-on .clawd { position: absolute; right: 120px; bottom: 34px; width: 392px; }
-.clawd-piso { fill: #000; opacity: .28; }
-.clawd-parpado { transform-box: fill-box; transform-origin: 50% 50%; animation: clawd-parpadeo 4.6s steps(1) infinite; }
-.clawd.quieto .clawd-respira { animation: clawd-respira 1.4s steps(1) infinite; }
+.clawd-piso { fill: #000; opacity: .12; }
+.oscura .clawd-piso { opacity: .28; }
+.tl-on .clawd--portada { right: 120px; bottom: 34px; width: 392px; }
+.tl-on .clawd--piensa { left: 120px; bottom: 26px; width: 300px; --globo: 22px; }
+.tl-on .clawd--inventa { right: 110px; bottom: 26px; width: 300px; --globo: 22px; }
+.tl-on .clawd--mesa { right: 96px; bottom: 6px; width: 250px; --globo: 20px; }
+.tl-on .clawd--constructor { right: 96px; bottom: 4px; width: 170px; --globo: 18px; }
+.tl-on .clawd--votos { right: 96px; bottom: 10px; width: 180px; --globo: 18px; }
+.tl-on .clawd--descanso { right: 180px; bottom: 140px; width: 380px; --globo: 26px; }
+.tl-on .clawd--practica { left: 500px; bottom: 26px; width: 250px; --globo: 20px; }
+
+/* Ojos: normales (parpadean), cerrados o en blanco (rayitas), entrecerrados
+   (esfuerzo) y confundido (uno abierto, otro en rayita). */
+.clawd-parpado { transform-box: fill-box; transform-origin: 50% 100%; animation: clawd-parpadeo 4.6s steps(1) infinite; }
+.clawd-planos { display: none; }
+.clawd[data-ojos='cerrados'] .clawd-parpado, .clawd[data-ojos='blanco'] .clawd-parpado { display: none; }
+.clawd[data-ojos='cerrados'] .clawd-planos, .clawd[data-ojos='blanco'] .clawd-planos { display: inline; }
+.clawd[data-ojos='entrecerrados'] .clawd-parpado { animation: none; transform: scaleY(.5); }
+.clawd[data-ojos='confundido'] .clawd-parpado .clawd-ojo-d { visibility: hidden; }
+.clawd[data-ojos='confundido'] .clawd-planos { display: inline; }
+.clawd[data-ojos='confundido'] .clawd-planos .clawd-ojo-i { visibility: hidden; }
+.clawd.quieto .clawd-respira, .clawd.duerme .clawd-respira { animation: clawd-respira 1.4s steps(1) infinite; }
+.clawd.duerme .clawd-respira { animation-duration: 2.4s; }
+.clawd-sudor { visibility: hidden; }
+.clawd.suda .clawd-sudor { visibility: visible; animation: clawd-gota 1.2s steps(1) infinite; }
 @keyframes clawd-parpadeo {
   0%, 93%, 96%, 98.5%, 100% { transform: scaleY(1); }
   94.5%, 97.5% { transform: scaleY(.5); }
 }
 @keyframes clawd-respira { 50% { transform: translateY(1px); } }
-.clawd-globo { position: absolute; left: 50%; top: -6%; translate: -50% 0; font: 600 26px/1 var(--font-mono); color: var(--tinta); background: #6fd2c9; padding: 8px 14px; border-radius: 4px; opacity: 0; pointer-events: none; white-space: nowrap; box-shadow: 0 4px 0 #2f8f87; }
-.tl-on .clawd { z-index: 4; }
-/* Token en vuelo: opaco y con tinte aqua para que no se enrede con las fichas
-   de la cinta cuando llega; sale por detrás de Clawd. */
+@keyframes clawd-gota { 50% { transform: translateY(1px); } }
+
+/* Globo: lo que dice Clawd (aqua), la pregunta de la sala (rojo) o una buena
+   noticia (verde). */
+.clawd-globo { position: absolute; left: 50%; top: -6%; translate: -50% 0; font: 600 var(--globo)/1.15 var(--font-mono); color: var(--tinta); background: #6fd2c9; padding: .3em .55em; border-radius: 4px; opacity: 0; visibility: hidden; pointer-events: none; white-space: nowrap; box-shadow: 0 4px 0 #2f8f87; }
+.clawd-globo[data-tipo='pregunta'] { background: var(--c-rojo); color: #fff; box-shadow: 0 4px 0 #7d2c1d; }
+.clawd-globo[data-tipo='ok'] { background: #7fd49c; box-shadow: 0 4px 0 #2e8b57; }
+.clawd--votos .clawd-globo, .clawd--constructor .clawd-globo { left: auto; right: 0; translate: 0 0; top: -22%; }
+.clawd--piensa .clawd-globo { left: 0; translate: 0 0; }
+
+/* Zzz del descanso. */
+.clawd-zzz { position: absolute; left: 66%; top: 4%; display: none; font: 600 calc(var(--globo) * 1.3)/1 var(--font-mono); color: #6fd2c9; pointer-events: none; }
+.clawd.duerme .clawd-zzz { display: block; }
+.clawd-zzz i { position: absolute; opacity: 0; animation: clawd-zzz 3s linear infinite; }
+.clawd-zzz i:nth-child(2) { animation-delay: 1s; }
+.clawd-zzz i:nth-child(3) { animation-delay: 2s; }
+@keyframes clawd-zzz {
+  0% { transform: translate(0, 0) scale(.6); opacity: 0; }
+  20% { opacity: 1; }
+  100% { transform: translate(1.4em, -2.2em) scale(1.2); opacity: 0; }
+}
+
+/* Pensar: las opciones sobre la cabeza; la que está en duda se resalta. */
+.clawd-piensa { position: absolute; left: 50%; bottom: 72%; translate: -50% 0; display: flex; gap: 8px; pointer-events: none; font-size: 26px; }
+.clawd-piensa .tk { transition: box-shadow .05s, transform .05s; }
+.clawd-piensa .tk.on { box-shadow: 0 0 0 3px var(--c-forest); transform: translateY(-4px); }
+.clawd-vuela { position: absolute; left: 0; top: 0; z-index: 5; pointer-events: none; font-size: calc(26px * .82); }
+
+/* Token en vuelo de la portada: opaco y con tinte aqua para que no se enrede
+   con las fichas de la cinta cuando llega; sale por detrás de Clawd. */
 .oscura .tk.clawd-tk { position: absolute; left: 0; top: 0; z-index: 3; pointer-events: none; font-size: calc(30px * .82); background: #173a40; color: #c4f1ec; box-shadow: 0 0 0 1px rgba(111, 210, 201, .35); will-change: transform, opacity; }
 @media (prefers-reduced-motion: reduce) {
-  .clawd-parpado, .clawd.quieto .clawd-respira { animation: none; }
+  .clawd-parpado, .clawd .clawd-respira, .clawd.suda .clawd-sudor, .clawd-zzz i { animation: none !important; }
+  .clawd-zzz i { opacity: 1; }
+  .clawd-zzz i:nth-child(2) { transform: translate(.7em, -1em); }
+  .clawd-zzz i:nth-child(3) { transform: translate(1.4em, -2em); }
 }
 
 /* ---------- Sala (QR) ---------- */
