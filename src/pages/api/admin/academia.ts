@@ -16,6 +16,7 @@ import {
   revisarEntrega,
   revocarCertificado,
 } from '../../../lib/academia/datos'
+import { resolverOpinion } from '../../../lib/talleres/datos'
 
 export const prerender = false
 
@@ -48,6 +49,8 @@ const ACCIONES: Record<string, Accion> = {
   revisar_entrega: (b, quien) => revisarEntrega(b, quien),
   emitir_certificado: (b, quien, hoy) => emitirCertificado(Number(b.usuario_id), quien, hoy),
   revocar_certificado: (b) => revocarCertificado(b.codigo),
+  // Formulario de cierre de las capacitaciones: cómo se resolvió la duda.
+  resolver_opinion: (b, quien) => resolverOpinion(Number(b.id), String(b.resolucion ?? ''), quien),
 }
 
 /** Todas las escrituras van con `{ accion, ...datos }` y devuelven el estado completo. */

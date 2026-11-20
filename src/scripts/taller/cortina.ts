@@ -192,7 +192,21 @@ export function crearCortina(lienzo: HTMLElement) {
       c.alFinal?.()
     }
     terminar = fin
-    Promise.all(anims.map((a) => a.finished)).then(fin, () => {})
+    // Todas arrancan juntas dos cuadros después: el primer cuadro tras el
+    // cambio es pesado y la franja (que corre en la GPU) se adelantaría al
+    // recorte (que corre en el hilo principal). En pausa, la escena nueva ya
+    // está recortada del todo y el panel fuera de la pantalla.
+    for (const a of anims) a.pause()
+    requestAnimationFrame(() =>
+      requestAnimationFrame(() => {
+        if (hecho) return
+        const t0 = document.timeline.currentTime
+        for (const a of anims) {
+          a.startTime = t0
+        }
+        Promise.all(anims.map((a) => a.finished)).then(fin, () => {})
+      }),
+    )
   }
 
   return { correr }

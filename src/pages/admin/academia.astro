@@ -1,6 +1,8 @@
 ---
 // Academia de IA desde el panel: participantes, entregas por revisar,
-// lecciones, sábados (con asistencia) y certificados. Solo admin.
+// lecciones, sábados (con asistencia), certificados y las opiniones del
+// formulario de cierre de cada capacitación (no anónimas: solo admin y
+// gerencia, para la trazabilidad de las dudas). Solo admin.
 // docs/plan-academia.md. Todo se carga en el servidor; academia.js pinta y
 // envía los cambios a /api/admin/academia, que devuelve el estado completo.
 export const prerender = false
@@ -11,6 +13,9 @@ import { estadoAdmin, type EstadoAdmin } from '../../lib/academia/datos'
 import { MODULOS_ACADEMIA } from '../../lib/academia/reglas'
 import { COLOR } from '../../lib/academia/ui'
 import { SITE_URL } from '../../lib/site'
+import { opiniones as leerOpiniones, type OpinionTaller } from '../../lib/talleres/datos'
+import { camposOpinion } from '../../lib/talleres/opinion'
+import { fechaLarga } from '../../lib/academia/ui'
 
 const role = Astro.locals.role || ''
 if (role !== 'admin') return Astro.redirect('/admin')
@@ -18,12 +23,14 @@ if (role !== 'admin') return Astro.redirect('/admin')
 const hoy = hoyEnBogota()
 let estado: EstadoAdmin | null = null
 let errorCarga = ''
+let opiniones: OpinionTaller[] = []
 try {
-  estado = await estadoAdmin(hoy)
+  ;[estado, opiniones] = await Promise.all([estadoAdmin(hoy), leerOpiniones()])
 } catch (e: any) {
   console.error('[admin/academia] carga', e?.stack || e)
   errorCarga = 'No se pudo cargar la academia.'
 }
+const dudasPendientes = opiniones.filter((o) => o.respuestas.duda && !o.resolucion).length
 const porRevisar = estado ? estado.entregas.filter((e) => e.estado === 'enviada').length : 0
 const cuentas = { academia: estado?.personas.length ?? 0, academiaRevisar: porRevisar }
 const catalogos = { modulos: MODULOS_ACADEMIA, colores: COLOR, sitio: SITE_URL }
@@ -51,6 +58,7 @@ const catalogos = { modulos: MODULOS_ACADEMIA, colores: COLOR, sitio: SITE_URL }
     <button class="subtab" data-tab="lecciones">Lecciones</button>
     <button class="subtab" data-tab="sesiones">Sábados</button>
     <button class="subtab" data-tab="certificados">Certificados</button>
+    <button class="subtab" data-tab="opiniones">Opiniones <span class="count">{dudasPendientes}</span></button>
   </nav>
 
   <!-- PARTICIPANTES -->
@@ -97,6 +105,39 @@ const catalogos = { modulos: MODULOS_ACADEMIA, colores: COLOR, sitio: SITE_URL }
   <section id="panel-certificados" class="panel">
     <div id="cert-list"></div>
     <p class="muted th-nota">Cualquiera puede comprobar un certificado con su código en <code>/verificar/&lt;código&gt;</code>. Revocar lo marca como no válido allí.</p>
+  </section>
+
+  <!-- OPINIONES (formulario de cierre de cada capacitación) -->
+  <section id="panel-opiniones" class="panel">
+    <p class="muted th-intro">Lo que cada persona respondió al terminar la capacitación, con el formulario de su área. No es anónimo y solo lo ven los administradores. Cuando resuelva una duda, anote cómo: queda la fecha y quién la resolvió.</p>
+    {opiniones.length === 0 && <p class="vacio">Todavía nadie ha enviado el formulario de cierre.</p>}
+    <div class="ac-opiniones">
+      {opiniones.map((o) => (
+        <article class="dash-card ac-opinion" style={`--c:${COLOR[o.area] ?? COLOR.general}`}>
+          <header class="dash-head">
+            <div>
+              <h3><span class="ac-dot"></span>{o.nombre}</h3>
+              <p>{MODULOS_ACADEMIA.find((m) => m.id === o.area)?.etiqueta ?? o.area} · Capacitación {o.taller} · {fechaLarga(o.fecha)}{o.correo && <> · <a href={`mailto:${o.correo}`}>{o.correo}</a></>}</p>
+            </div>
+            {o.respuestas.duda && <span class={`pill ${o.resolucion ? 'forest' : 'warn'}`}>{o.resolucion ? 'Duda resuelta' : 'Duda pendiente'}</span>}
+          </header>
+          <dl class="ac-op-resp">
+            {camposOpinion(o.area, o.taller).filter((c) => o.respuestas[c.id]).map((c) => (
+              <div><dt>{c.pregunta}</dt><dd>{o.respuestas[c.id]}</dd></div>
+            ))}
+          </dl>
+          {o.respuestas.duda && (
+            <form class="ac-op-resolver" data-opinion={o.id}>
+              <label>Cómo se resolvió la duda<textarea name="resolucion" rows="2" maxlength="1000" placeholder="Le expliqué en la sesión siguiente que…">{o.resolucion}</textarea></label>
+              <div class="ac-op-pie">
+                <small class="muted" data-op-meta>{o.resuelta_at && `Resuelta el ${fechaLarga(o.resuelta_at.slice(0, 10))} por ${o.resuelta_por}`}</small>
+                <button type="submit" class="btn-ghost">Guardar</button>
+              </div>
+            </form>
+          )}
+        </article>
+      ))}
+    </div>
   </section>
 
   <Fragment slot="fuera">
@@ -260,5 +301,31 @@ const catalogos = { modulos: MODULOS_ACADEMIA, colores: COLOR, sitio: SITE_URL }
       window.__ACADEMIA__ = { estado, catalogos }
     </script>
     <script src="/admin/academia.js" type="module"></script>
+    <script>
+      // Opiniones: guardar cómo se resolvió cada duda (vacío = vuelve a pendiente).
+      for (const f of document.querySelectorAll<HTMLFormElement>('form[data-opinion]')) {
+        f.addEventListener('submit', async (ev) => {
+          ev.preventDefault()
+          const boton = f.querySelector('button')!
+          const meta = f.querySelector<HTMLElement>('[data-op-meta]')!
+          const resolucion = f.querySelector('textarea')!.value
+          boton.disabled = true
+          try {
+            const r = await fetch('/api/admin/academia', { method: 'POST', headers: { 'content-type': 'application/json' }, body: JSON.stringify({ accion: 'resolver_opinion', id: Number(f.dataset.opinion), resolucion }) })
+            if (!r.ok) throw new Error()
+            const pill = f.closest('article')?.querySelector('.pill')
+            if (pill) {
+              pill.className = `pill ${resolucion.trim() ? 'forest' : 'warn'}`
+              pill.textContent = resolucion.trim() ? 'Duda resuelta' : 'Duda pendiente'
+            }
+            meta.textContent = resolucion.trim() ? 'Guardado.' : 'Quedó pendiente otra vez.'
+          } catch {
+            meta.textContent = 'No se pudo guardar. Intente de nuevo.'
+          } finally {
+            boton.disabled = false
+          }
+        })
+      }
+    </script>
   </Fragment>
 </AdminLayout>
