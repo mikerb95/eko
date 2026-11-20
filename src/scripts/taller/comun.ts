@@ -94,6 +94,13 @@ export function guardarAviso(n: number, aviso: Aviso | null): void {
   } catch {}
 }
 
+export function canal(n: number, alRecibir: (m: Mensaje) => void): (m: Mensaje) => void {
+  if (typeof BroadcastChannel === 'undefined') return () => {}
+  const bc = new BroadcastChannel(`ekosolv-taller-${n}`)
+  bc.onmessage = (ev) => alRecibir(ev.data as Mensaje)
+  return (m) => bc.postMessage(m)
+}
+
 /** Teclas de avance y retroceso (flechas, clicker, barra espaciadora). */
 export function direccionTecla(ev: KeyboardEvent): 1 | -1 | 0 {
   const t = ev.target as HTMLElement | null

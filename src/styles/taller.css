@@ -605,3 +605,58 @@
 @keyframes cx-entra { from { opacity: 0; transform: translateY(18px); } }
 @media (prefers-reduced-motion: reduce) { .tl-on .cx-paso.actual { animation: none; } }
 .tl-barra-nota { margin-left: auto; font-size: 14px; color: var(--mute); }
+
+/* ---------- Aviso de inicio ("Empezamos en 00:00") ----------
+   Lo lanza el presentador y tapa el lienzo completo, encima de la cortina y
+   del pie. Fondo tinta con la trama de puntos de las escenas oscuras y dos
+   luces de marca que derivan despacio; la cuenta regresiva es la protagonista. */
+.tl-espera { display: none; }
+.tl-on .tl-espera.on {
+  position: absolute;
+  inset: 0;
+  z-index: 60;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  background-color: var(--tinta);
+  background-image: radial-gradient(circle at 1px 1px, rgba(255, 255, 255, .07) 1.2px, transparent 1.6px);
+  background-size: 28px 28px;
+  color: #EDEBEB;
+  isolation: isolate;
+}
+.tl-espera-luz { position: absolute; z-index: -1; border-radius: 50%; filter: blur(90px); opacity: .55; pointer-events: none; }
+.tl-espera-luz.l1 { width: 760px; height: 760px; left: -180px; top: -260px; background: radial-gradient(circle, #179C91 0%, transparent 68%); animation: tl-espera-deriva 18s ease-in-out infinite alternate; }
+.tl-espera-luz.l2 { width: 880px; height: 880px; right: -260px; bottom: -380px; background: radial-gradient(circle, #124E7D 0%, transparent 68%); animation: tl-espera-deriva 22s ease-in-out -6s infinite alternate-reverse; }
+@keyframes tl-espera-deriva {
+  from { transform: translate(0, 0) scale(1); }
+  to { transform: translate(120px, 70px) scale(1.12); }
+}
+.tl-espera-top { display: flex; justify-content: space-between; align-items: center; padding: 56px 96px 0; font: 500 18px/1 var(--font-mono); letter-spacing: .12em; text-transform: uppercase; color: #8fa2ae; }
+.tl-espera-top img { height: 34px; width: auto; }
+.tl-espera-centro { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 18px; padding: 0 96px 40px; text-align: center; }
+.tl-espera-kicker { display: inline-flex; align-items: center; gap: 16px; padding: 14px 28px 14px 22px; border-radius: 999px; background: rgba(111, 210, 201, .1); box-shadow: inset 0 0 0 1px rgba(111, 210, 201, .28); font: 600 30px/1 var(--font-sans); letter-spacing: .14em; text-transform: uppercase; color: #6fd2c9; }
+.tl-espera-kicker i { position: relative; width: 14px; height: 14px; border-radius: 50%; background: #6fd2c9; flex: none; }
+.tl-espera-kicker i::after { content: ''; position: absolute; inset: 0; border-radius: 50%; background: #6fd2c9; animation: tl-espera-pulso 1.6s ease-out infinite; }
+@keyframes tl-espera-pulso {
+  from { transform: scale(1); opacity: .7; }
+  to { transform: scale(3.2); opacity: 0; }
+}
+.tl-espera-reloj { display: flex; justify-content: center; font: 700 300px/.9 var(--font-display); letter-spacing: -0.03em; color: #fff; text-shadow: 0 0 80px rgba(23, 156, 145, .35); }
+.tl-espera-reloj .dig { display: inline-block; width: .6em; text-align: center; }
+.tl-espera-reloj .sep { display: inline-block; width: .3em; text-align: center; color: #6fd2c9; transform: translateY(-.06em); animation: tl-espera-sep 1s steps(1) infinite; }
+@keyframes tl-espera-sep { 50% { opacity: .35; } }
+.tl-espera-reloj .cambia { animation: tl-espera-cifra .45s cubic-bezier(.2, .8, .2, 1); }
+@keyframes tl-espera-cifra {
+  from { transform: translateY(-.18em); opacity: 0; filter: blur(6px); }
+  to { transform: none; opacity: 1; filter: none; }
+}
+.tl-espera-titulo { max-width: 26ch; font: 600 44px/1.15 var(--font-display); letter-spacing: -0.02em; color: #cfdbe2; text-wrap: balance; }
+.tl-espera-barra { position: absolute; left: 0; right: 0; bottom: 0; height: 10px; background: rgba(255, 255, 255, .08); }
+.tl-espera-barra i { display: block; height: 100%; width: 100%; transform-origin: left; transform: scaleX(var(--p, 1)); background: linear-gradient(90deg, #179C91, #6fd2c9); transition: transform .25s linear; }
+/* En cero: el reloj se tiñe de marca y late. */
+.tl-espera.cero .tl-espera-reloj { color: #6fd2c9; animation: tl-espera-late 1.4s ease-in-out infinite; }
+.tl-espera.cero .tl-espera-reloj .sep { animation: none; }
+@keyframes tl-espera-late { 50% { transform: scale(1.04); } }
+@media (prefers-reduced-motion: reduce) {
+  .tl-espera-luz, .tl-espera-kicker i::after, .tl-espera-reloj .sep, .tl-espera.cero .tl-espera-reloj { animation: none; }
+}
