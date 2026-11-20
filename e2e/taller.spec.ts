@@ -73,7 +73,7 @@ test('presentación, sala, votos y asistencia', async ({ browser }) => {
   await cel.getByLabel('Correo').fill('luis.mora@ekosolv')
   await cel.getByLabel('Área').selectOption('operaciones')
   await cel.getByRole('button', { name: 'Enviarme el enlace' }).click()
-  await expect(cel.locator('[data-sl-estado]')).toHaveText('Revise el correo: parece que le falta algo.')
+  await expect(cel.locator('[data-sl-estado]')).toHaveText('Escriba un correo válido.')
   await cel.getByLabel('Correo').fill('Luis.Mora@ekosolv.com')
   await cel.screenshot({ path: 'test-results/taller-registro-celular.png', fullPage: true })
   expect(await cel.evaluate(() => document.documentElement.scrollWidth)).toBeLessThanOrEqual(390)

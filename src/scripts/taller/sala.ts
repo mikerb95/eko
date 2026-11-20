@@ -111,7 +111,7 @@ function montarRegistro(form: HTMLFormElement) {
     if (!correo.checkValidity()) {
       correo.setAttribute('aria-invalid', 'true')
       correo.focus()
-      decir('Revise el correo: parece que le falta algo.', 'error')
+      decir('Escriba un correo válido.', 'error')
       return
     }
     boton.disabled = true
