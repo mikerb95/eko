@@ -211,12 +211,12 @@ function montar(d: DatosPr) {
         $('[data-sala]').textContent = String(r.sala)
         $('[data-asistentes]').textContent = String(r.asistentes)
         $('[data-lista]').replaceChildren(
-          ...(r.lista as { nombre: string; cargo: string; area: string; cuenta: boolean }[]).map((a) => {
+          ...(r.lista as { nombre: string; correo: string; area: string; cuenta: boolean }[]).map((a) => {
             const li = document.createElement('li')
             const b = document.createElement('b')
             b.textContent = a.nombre
             const sp = document.createElement('span')
-            sp.textContent = `${a.cargo} · ${a.area}${a.cuenta ? ' · con cuenta en la academia' : ''}`
+            sp.textContent = `${a.area} · ${a.correo}${a.cuenta ? ' · con cuenta en la academia' : ''}`
             li.append(b, sp)
             return li
           }),

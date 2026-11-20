@@ -300,7 +300,7 @@
 @keyframes sl-latido { 50% { transform: scale(1.6); opacity: .5; } }
 @media (prefers-reduced-motion: reduce) { .sl-espera::before { animation: none; } }
 
-/* Registro de la sala (QR): nombres y apellidos lado a lado, cargo y área debajo. */
+/* Registro de la sala (QR): nombres y apellidos lado a lado, correo y área debajo. */
 .sl-form { display: flex; flex-direction: column; gap: 14px; margin-top: 6px; }
 .sl-par { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
 .sl-form label { display: flex; flex-direction: column; gap: 6px; min-width: 0; }
@@ -317,6 +317,12 @@
 .sl-practica textarea { width: 100%; min-width: 0; font: 16px/1.5 var(--font-sans); color: var(--ink); background: #fff; border: 1px solid var(--line); border-radius: 14px; padding: 13px 14px; resize: vertical; }
 .sl-practica textarea:focus { outline: 2px solid color-mix(in oklab, var(--deep) 35%, transparent); outline-offset: 1px; }
 .sl-nota { font-size: 13.5px; color: var(--mute); margin: 0; }
+/* Después de pedir el enlace: aviso de revisar el correo. */
+.sl-enviado { display: flex; flex-direction: column; align-items: flex-start; gap: 12px; margin-top: 6px; padding: 20px; border-radius: var(--r-lg); background: color-mix(in oklab, var(--forest) 9%, #fff); }
+.sl-enviado[hidden] { display: none; }
+.sl-enviado h2 { margin: 0; font-size: 20px; }
+.sl-enviado p { margin: 0; font-size: 15.5px; line-height: 1.5; color: var(--ink-2); }
+.sl-enviado b { color: var(--ink); word-break: break-all; }
 
 /* Ejemplo del área de la persona para la escena en curso. */
 .sl-ejemplo { display: flex; flex-direction: column; gap: 8px; padding: 20px 18px; border-radius: var(--r-lg); background: color-mix(in oklab, var(--deep) 6%, #fff); }

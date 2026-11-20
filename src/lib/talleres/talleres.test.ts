@@ -195,12 +195,13 @@ test('registro de la sala: nombres con mayúscula inicial y datos obligatorios',
   assert.equal(capitalizarNombre('luis '), 'Luis ')
   assert.equal(claveNombre('  María   José Peña '), 'maria jose pena')
   const areas = ['operaciones', 'ventas']
-  assert.deepEqual(registroSala({ nombre: ' laura  ', apellido: 'GÓMEZ ruiz', cargo: ' Analista  ambiental ', area: 'ventas' }, areas), {
+  assert.deepEqual(registroSala({ nombre: ' laura  ', apellido: 'GÓMEZ ruiz', correo: ' Laura.Gomez@Ekosolv.com ', area: 'ventas' }, areas), {
     nombre: 'Laura',
     apellido: 'Gómez Ruiz',
-    cargo: 'Analista ambiental',
+    correo: 'laura.gomez@ekosolv.com',
     area: 'ventas',
   })
-  assert.deepEqual(registroSala({ nombre: 'Laura', apellido: '', cargo: 'x', area: 'ventas' }, areas), { error: 'Escriba su apellido.' })
-  assert.deepEqual(registroSala({ nombre: 'Laura', apellido: 'Gómez', cargo: 'x', area: 'otra' }, areas), { error: 'Elija su área.' })
+  assert.deepEqual(registroSala({ nombre: 'Laura', apellido: '', correo: 'l@e.co', area: 'ventas' }, areas), { error: 'Escriba su apellido.' })
+  assert.deepEqual(registroSala({ nombre: 'Laura', apellido: 'Gómez', correo: 'laura@ekosolv', area: 'ventas' }, areas), { error: 'Escriba un correo válido.' })
+  assert.deepEqual(registroSala({ nombre: 'Laura', apellido: 'Gómez', correo: 'l@e.co', area: 'otra' }, areas), { error: 'Elija su área.' })
 })

@@ -102,8 +102,8 @@ export function clearCookie(secure: boolean): string {
 
 // ---- Pase de la sala de capacitación ----
 // Quien entra por el QR del proyector no tiene cuenta: escribe su nombre,
-// cargo y área y recibe este pase firmado, válido solo para esa capacitación
-// y ese día. No abre nada más del sitio (verifySession lo rechaza porque no
+// correo y área y le llega este pase firmado dentro del enlace del correo,
+// válido solo para esa capacitación y ese día. No abre nada más del sitio (verifySession lo rechaza porque no
 // trae usuario ni rol).
 
 export const SALA_COOKIE = 'eko_sala'

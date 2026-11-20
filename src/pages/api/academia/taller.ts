@@ -48,7 +48,7 @@ export const GET: APIRoute = async ({ url, locals }) => {
       return json({
         sala,
         asistentes: asistentes.length,
-        lista: asistentes.map((a) => ({ nombre: `${a.nombre} ${a.apellido}`, cargo: a.cargo, area: nombreModulo(a.area), cuenta: a.usuario_id > 0 })),
+        lista: asistentes.map((a) => ({ nombre: `${a.nombre} ${a.apellido}`, correo: a.correo, area: nombreModulo(a.area), cuenta: a.usuario_id > 0 })),
         sesiones: sesiones.map((s) => s.titulo),
         preguntas: preguntas.map((p) => ({
           id: p.id,

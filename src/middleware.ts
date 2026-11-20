@@ -7,8 +7,8 @@ const PUBLIC_ADMIN_PATHS = new Set(['/admin/login'])
 // "solo admin" y a los demás roles les respondía 403 sin borrar la cookie.
 // Cerrar una sesión que no existe no hace daño.
 const PUBLIC_API_PATHS = new Set(['/api/admin/login', '/api/admin/logout'])
-// La sala de la capacitación (QR del proyector): se entra con nombre, cargo y
-// área, sin cuenta. Su API valida un pase firmado propio (src/lib/talleres/sala.ts)
+// La sala de la capacitación (QR del proyector): se entra con nombre, correo y
+// área, sin cuenta (el enlace de entrada llega al correo). Su API valida un pase firmado propio (src/lib/talleres/sala.ts)
 // que solo sirve para votar en la capacitación en curso.
 // Regla: ningún QR de las capacitaciones lleva a un login. La tarjeta resumen
 // (QR del cierre) también es pública; solo tiene el contenido de la capacitación.

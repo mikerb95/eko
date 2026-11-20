@@ -288,7 +288,7 @@ export const TALLER_1: Taller = {
         'Arranque cuando haya entrado la mayoría; quien llegue tarde escanea sin interrumpir. Con el registro queda la asistencia de hoy.',
       ],
       siPreguntan: [
-        { p: '¿Qué hacen con mis datos?', r: 'Solo se piden nombre, cargo y área: sirven para la asistencia y para mostrarle ejemplos de su área. En la pantalla las votaciones se ven en grupo, nunca por persona.' },
+        { p: '¿Qué hacen con mis datos?', r: 'Solo se piden nombre, correo y área: sirven para la asistencia, para mostrarle ejemplos de su área y para enviarle el enlace de entrada y después el material de la capacitación. En la pantalla las votaciones se ven en grupo, nunca por persona.' },
       ],
     },
     {

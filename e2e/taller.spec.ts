@@ -3,7 +3,8 @@ import { CELULAR_TALLER1 } from '../src/lib/talleres/ejemplos1'
 
 // Capacitación en vivo de punta a punta: quien dicta mueve la presentación
 // (proyector y vista de presentador sincronizados), una persona entra a la
-// sala desde el celular con nombre, cargo y área (sin contraseña), queda en la
+// sala desde el celular con nombre, correo y área (sin contraseña), abre el
+// enlace de entrada (en desarrollo vuelve en la respuesta, sin Resend), queda en la
 // lista de registrados, responde la evaluación y su voto llega al proyector. La demo con IA cae en la respuesta guardada
 // (modelo simulado), y fuera del ancho de proyector la página es un documento.
 
@@ -63,17 +64,22 @@ test('presentación, sala, votos y asistencia', async ({ browser }) => {
   await cel.goto('/academia/sala')
   await expect(cel).toHaveURL(/\/academia\/sala$/)
   await expect(cel.getByRole('heading', { name: 'Antes de empezar, ¿quién es usted?' })).toBeVisible()
-  await cel.getByRole('button', { name: 'Entrar a la sala' }).click()
+  await cel.getByRole('button', { name: 'Enviarme el enlace' }).click()
   await expect(cel.locator('[data-sl-estado]')).toHaveText('Escriba su nombre.')
   await cel.getByLabel('Nombres').pressSequentially('luis')
   await expect(cel.getByLabel('Nombres')).toHaveValue('Luis')
   await cel.getByLabel('Apellidos').pressSequentially('MORA')
   await expect(cel.getByLabel('Apellidos')).toHaveValue('Mora')
-  await cel.getByLabel('Cargo').fill('Coordinador de operaciones')
+  await cel.getByLabel('Correo').fill('luis.mora@ekosolv')
   await cel.getByLabel('Área').selectOption('operaciones')
+  await cel.getByRole('button', { name: 'Enviarme el enlace' }).click()
+  await expect(cel.locator('[data-sl-estado]')).toHaveText('Revise el correo: parece que le falta algo.')
+  await cel.getByLabel('Correo').fill('Luis.Mora@ekosolv.com')
   await cel.screenshot({ path: 'test-results/taller-registro-celular.png', fullPage: true })
   expect(await cel.evaluate(() => document.documentElement.scrollWidth)).toBeLessThanOrEqual(390)
-  await cel.getByRole('button', { name: 'Entrar a la sala' }).click()
+  await cel.getByRole('button', { name: 'Enviarme el enlace' }).click()
+  // El enlace del correo deja el pase en la cookie y se quita de la URL.
+  await expect(cel).toHaveURL(/\/academia\/sala$/)
 
   await expect(cel.locator('[data-sl-kicker]')).toHaveText('Asistencia registrada · Luis Mora')
   await expect(cel.getByRole('heading', { name: 'Antes de empezar: cinco preguntas' })).toBeVisible()
@@ -87,12 +93,16 @@ test('presentación, sala, votos y asistencia', async ({ browser }) => {
   await proyector.bringToFront()
   await expect(proyector.locator('.activa [data-respondieron]')).toHaveText('1', { timeout: 8000 })
   const panel = await (await proyector.request.get('/api/academia/taller?que=panel&n=1')).json()
-  expect(panel).toMatchObject({ sala: 1, asistentes: 1, lista: [{ nombre: 'Luis Mora', cargo: 'Coordinador de operaciones', area: 'Operaciones', cuenta: true }] })
+  expect(panel).toMatchObject({ sala: 1, asistentes: 1, lista: [{ nombre: 'Luis Mora', correo: 'luis.mora@ekosolv.com', area: 'Operaciones', cuenta: true }] })
 
   // Registrarse otra vez con el mismo nombre (otro celular) no duplica.
   const otro = await browser.newContext()
-  const r2 = await otro.request.post('/api/academia/sala', { data: { accion: 'registrar', nombre: 'LUIS', apellido: 'mora', cargo: 'Coordinador', area: 'operaciones' } })
+  const r2 = await otro.request.post('/api/academia/sala', { data: { accion: 'registrar', nombre: 'LUIS', apellido: 'mora', correo: 'luis.mora@ekosolv.com', area: 'operaciones' } })
   expect(r2.ok()).toBeTruthy()
+  // Pedir el enlace no deja entrar: hay que abrirlo.
+  expect((await otro.request.post('/api/academia/sala', { data: { accion: 'votar', interaccion: 'pre', pregunta: 'e1', valor: 'b' } })).status()).toBe(401)
+  const enlace = new URL((await r2.json()).enlace)
+  await otro.request.get(enlace.pathname + enlace.search)
   expect((await (await proyector.request.get('/api/academia/taller?que=panel&n=1')).json()).asistentes).toBe(1)
   // Ese segundo celular queda con el mismo registro: su voto reemplaza, no suma.
   expect((await otro.request.post('/api/academia/sala', { data: { accion: 'votar', interaccion: 'pre', pregunta: 'e1', valor: 'b' } })).status()).toBe(200)
@@ -101,6 +111,10 @@ test('presentación, sala, votos y asistencia', async ({ browser }) => {
   // Sin registro no se vota, y el pase de la sala no abre nada más.
   const anonimo = await browser.newContext()
   expect((await anonimo.request.post('/api/academia/sala', { data: { accion: 'votar', interaccion: 'pre', pregunta: 'e1', valor: 'b' } })).status()).toBe(401)
+  // Un enlace adulterado no deja entrar y lo dice.
+  const falso = await anonimo.newPage()
+  await falso.goto(`/academia/sala?e=${encodeURIComponent(enlace.searchParams.get('e')!.replace(/.$/, 'x'))}`)
+  await expect(falso.getByRole('alert')).toContainText('Ese enlace ya no sirve')
   await anonimo.close()
   const cerrada = await cel.request.post('/api/academia/sala', { data: { accion: 'votar', interaccion: 'post', pregunta: 'e1', valor: 'b' } })
   expect(cerrada.status()).toBe(409)
