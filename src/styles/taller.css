@@ -197,6 +197,26 @@
 .tl-on .esc-portada .cinta { position: absolute; top: 470px; left: 0; flex-wrap: nowrap; width: max-content; font-size: 30px; }
 .tl-on .esc-portada .tl-titulo { margin-top: 30px; }
 
+/* Clawd, la mascota (Clawd.astro + scripts/taller/clawd.ts). En documento va
+   en el flujo, pequeño y a la derecha; en presentación se para abajo a la
+   derecha, debajo de la cinta, y los tokens que teclea suben hasta ella. */
+.clawd { position: relative; align-self: flex-end; width: 200px; }
+.clawd svg { display: block; width: 100%; height: auto; overflow: visible; }
+.tl-on .clawd { position: absolute; right: 120px; bottom: 34px; width: 392px; }
+.clawd-piso { fill: #000; opacity: .28; }
+.clawd-parpado { transform-box: fill-box; transform-origin: 50% 50%; animation: clawd-parpadeo 4.6s steps(1) infinite; }
+.clawd.quieto .clawd-respira { animation: clawd-respira 1.4s steps(1) infinite; }
+@keyframes clawd-parpadeo {
+  0%, 93%, 96%, 98.5%, 100% { transform: scaleY(1); }
+  94.5%, 97.5% { transform: scaleY(.5); }
+}
+@keyframes clawd-respira { 50% { transform: translateY(1px); } }
+.clawd-globo { position: absolute; left: 50%; top: -6%; translate: -50% 0; font: 600 26px/1 var(--font-mono); color: var(--tinta); background: #6fd2c9; padding: 8px 14px; border-radius: 4px; opacity: 0; pointer-events: none; white-space: nowrap; box-shadow: 0 4px 0 #2f8f87; }
+.clawd-tk { position: absolute; left: 0; top: 0; z-index: 3; pointer-events: none; font-size: 30px; will-change: transform, opacity; }
+@media (prefers-reduced-motion: reduce) {
+  .clawd-parpado, .clawd.quieto .clawd-respira { animation: none; }
+}
+
 /* ---------- Sala (QR) ---------- */
 .esc-sala .tl-cuerpo { display: grid; grid-template-columns: minmax(0, 1fr); gap: 24px; align-items: center; }
 .tl-on .esc-sala .tl-cuerpo { grid-template-columns: 420px 1fr; gap: 72px; }
