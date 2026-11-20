@@ -1,6 +1,16 @@
-# Banco de recursos de las capacitaciones (plan, sin construir)
+# Banco de recursos de las capacitaciones
 
-> Plan del 2026-11-20. Destino del QR de la guía rápida impresa (`/academia/taller/1/entregables`): `ekosolv.codebymike.net/academia/recursos/<área>`. Hoy esas direcciones dan 404.
+> Plan del 2026-11-20. Destino del QR de la guía rápida impresa (`/academia/taller/1/entregables`): `ekosolv.codebymike.net/academia/recursos/<área>`.
+>
+> **Fase 1 construida el 2026-11-20** (Mike eligió solo la fase 1). Falta desplegar: hasta entonces las direcciones dan 404 en producción.
+
+## Dónde quedó cada cosa
+
+- Contenido (puro): `src/lib/talleres/recursos.ts` (junta `entregables1.ts`, `taller1.ts` y `conectarZoho.ts`; fuentes oficiales por área). Para la capacitación 2: sumar su función en `POR_TALLER`.
+- Página: `src/pages/academia/recursos/[...area].astro` (índice y banco por área, selector de áreas, botón Copiar, guía de Zoho con las maquetas en pasos plegables).
+- Excepción pública: `esRecursos` en `src/middleware.ts`.
+- PDF: `public/recursos/taller1-<área>-checklist.pdf` y `-guia.pdf`. Se regeneran con `BASE=http://localhost:<puerto> ADMIN_USER=… ADMIN_PASS=… node scripts/entregables-pdf.mjs 1` cada vez que cambie `entregables1.ts`.
+- Prueba en navegador sin sesión: `e2e/recursos.spec.ts`.
 
 ## Qué es
 
@@ -59,8 +69,7 @@ Optimizada para celular primero, porque se llega por QR.
 - Capturas en celular (390 px) y escritorio.
 - Después de desplegar: abrir las seis direcciones en producción y escanear con el celular el QR de una hoja impresa de prueba.
 
-## Decisiones pendientes de Mike
+## Decisiones
 
-1. ¿Fase 1 sola (en código, rápida) o también la Fase 2 (editable desde el panel)?
-2. ¿Se incluyen los PDF de las hojas impresas como descarga?
-3. ¿Cada área ve solo lo suyo o puede pasar a las otras áreas con el selector?
+- Solo fase 1 (Mike, 2026-11-20). La fase 2 queda sin hacer hasta que la pida.
+- Se tomaron los valores del plan: PDF de las hojas como descarga y selector para pasar a otras áreas.
