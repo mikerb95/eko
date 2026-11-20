@@ -96,6 +96,12 @@ export default defineConfig({
   adapter: vercel(),
   integrations: [securityHeaders()],
 
+  // Atajo del QR del proyector: más corto de escanear y de escribir a mano.
+  // 302 para que ningún navegador lo guarde si la sala cambia de ruta.
+  redirects: {
+    '/sala': { status: 302, destination: '/academia/sala' },
+  },
+
   // Astro 7 cambió el default a 'jsx', que colapsa los espacios entre elementos
   // inline (rompería separadores como "<span>·</span>"). Conservamos el de v6.
   compressHTML: true,

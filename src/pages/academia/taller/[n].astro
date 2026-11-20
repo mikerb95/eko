@@ -46,7 +46,8 @@ else if (!admin && !seguir) {
 // una URL de despliegue de Vercel (eko-….vercel.app), esa URL pide el login de
 // Vercel, y ningún QR debe llevar a un login. En desarrollo se usa la URL local.
 const origen = import.meta.env.DEV ? Astro.url.origin : SITE_URL
-const urlSala = `${origen}/academia/sala`
+// Atajo corto (redirect en astro.config.mjs): QR menos denso y fácil de dictar.
+const urlSala = `${origen}/sala`
 const urlResumen = `${origen}/academia/taller/${t.n}/resumen`
 const qr = (url: string, oscuro = false) =>
   QRCode.toString(url, { type: 'svg', margin: 0, errorCorrectionLevel: 'M', color: { dark: oscuro ? '#0E1C26' : '#0E1C26', light: '#ffffff00' } })
