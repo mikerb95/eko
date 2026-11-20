@@ -24,26 +24,30 @@ export interface EstadoTaller {
   taller: number
   escena: string
   interaccion: string
+  /** Clic dentro de la escena (0 = recién llegada). */
+  paso: number
   updated_at: string
 }
+
+const filaEstado = (x: any): EstadoTaller => ({ taller: num(x.taller), escena: str(x.escena), interaccion: str(x.interaccion), paso: num(x.paso), updated_at: str(x.updated_at) })
 
 export async function leerEstado(taller: number): Promise<EstadoTaller | null> {
   const c = await db()
   const r = await c.execute({ sql: 'SELECT * FROM ac_taller_estado WHERE taller = ?', args: [taller] })
   const x: any = r.rows[0]
-  return x ? { taller: num(x.taller), escena: str(x.escena), interaccion: str(x.interaccion), updated_at: str(x.updated_at) } : null
+  return x ? filaEstado(x) : null
 }
 
 export function enCurso(e: EstadoTaller | null, ref = Date.now()): boolean {
   return !!e && ref - Date.parse(e.updated_at) < HORAS_EN_CURSO * 3600_000
 }
 
-export async function fijarEstado(taller: number, escena: string, interaccion: string): Promise<void> {
+export async function fijarEstado(taller: number, escena: string, interaccion: string, paso = 0): Promise<void> {
   const c = await db()
   await c.execute({
-    sql: `INSERT INTO ac_taller_estado (taller, escena, interaccion, updated_at) VALUES (?, ?, ?, ?)
-          ON CONFLICT (taller) DO UPDATE SET escena = excluded.escena, interaccion = excluded.interaccion, updated_at = excluded.updated_at`,
-    args: [taller, escena, interaccion, ahora()],
+    sql: `INSERT INTO ac_taller_estado (taller, escena, interaccion, paso, updated_at) VALUES (?, ?, ?, ?, ?)
+          ON CONFLICT (taller) DO UPDATE SET escena = excluded.escena, interaccion = excluded.interaccion, paso = excluded.paso, updated_at = excluded.updated_at`,
+    args: [taller, escena, interaccion, String(paso), ahora()],
   })
 }
 
@@ -52,7 +56,7 @@ export async function tallerEnCurso(): Promise<EstadoTaller | null> {
   const c = await db()
   const r = await c.execute('SELECT * FROM ac_taller_estado ORDER BY updated_at DESC LIMIT 1')
   const x: any = r.rows[0]
-  const e = x ? { taller: num(x.taller), escena: str(x.escena), interaccion: str(x.interaccion), updated_at: str(x.updated_at) } : null
+  const e = x ? filaEstado(x) : null
   return enCurso(e) ? e : null
 }
 
@@ -301,4 +305,48 @@ export async function misRespuestas(taller: number, interaccion: string, usuario
     args: [taller, interaccion, usuario_id],
   })
   return Object.fromEntries(r.rows.map((x: any) => [str(x.pregunta), str(x.valor)]))
+}
+
+// ---------- PC vinculado (/pc) ----------
+
+/** Minutos que sirve el código de dos números que muestra el celular. */
+export const MINUTOS_CODIGO_PC = 5
+
+/**
+ * Código de dos números (10 a 99) para abrir la presentación en el PC de esta
+ * persona. Si ya tiene uno vigente, es el mismo; si no, se elige uno que no
+ * tenga nadie más en ese momento. null si los 90 están ocupados (no pasa con
+ * un grupo normal: cada código vive pocos minutos).
+ */
+export async function codigoPC(taller: number, asistente_id: number): Promise<{ codigo: string; vence: string } | null> {
+  const c = await db()
+  const ya = ahora()
+  await c.execute({ sql: 'DELETE FROM ac_taller_codigos_pc WHERE vence_at <= ?', args: [ya] })
+  const mio = await c.execute({ sql: 'SELECT codigo, vence_at FROM ac_taller_codigos_pc WHERE taller = ? AND asistente_id = ?', args: [taller, asistente_id] })
+  const m: any = mio.rows[0]
+  if (m) return { codigo: str(m.codigo), vence: str(m.vence_at) }
+  const usados = new Set((await c.execute({ sql: 'SELECT codigo FROM ac_taller_codigos_pc WHERE taller = ?', args: [taller] })).rows.map((x: any) => str(x.codigo)))
+  const libres = Array.from({ length: 90 }, (_, k) => String(k + 10)).filter((k) => !usados.has(k))
+  const vence = new Date(Date.now() + MINUTOS_CODIGO_PC * 60_000).toISOString()
+  // Si dos celulares eligen el mismo a la vez, la llave primaria frena al segundo y prueba otro.
+  for (let intento = 0; intento < 5 && libres.length; intento++) {
+    const [codigo] = libres.splice(Math.floor(Math.random() * libres.length), 1)
+    const r = await c.execute({
+      sql: 'INSERT INTO ac_taller_codigos_pc (taller, codigo, asistente_id, vence_at) VALUES (?, ?, ?, ?) ON CONFLICT DO NOTHING',
+      args: [taller, codigo!, asistente_id, vence],
+    })
+    if (r.rowsAffected > 0) return { codigo: codigo!, vence }
+  }
+  return null
+}
+
+/** Usa el código: si está vigente lo borra y devuelve de quién era. */
+export async function canjearCodigoPC(taller: number, codigo: string): Promise<number | null> {
+  const c = await db()
+  const r = await c.execute({
+    sql: 'DELETE FROM ac_taller_codigos_pc WHERE taller = ? AND codigo = ? AND vence_at > ? RETURNING asistente_id',
+    args: [taller, codigo, ahora()],
+  })
+  const x: any = r.rows[0]
+  return x ? num(x.asistente_id) : null
 }

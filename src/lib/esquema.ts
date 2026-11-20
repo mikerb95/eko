@@ -655,6 +655,16 @@ export const TABLAS: readonly string[] = [
     PRIMARY KEY (taller, usuario_id)
   )`,
 
+  // Código de dos números que muestra el celular para vincular el PC del
+  // participante (/pc). Vence en minutos y se borra al usarlo.
+  `CREATE TABLE IF NOT EXISTS ac_taller_codigos_pc (
+    taller INTEGER NOT NULL,
+    codigo TEXT NOT NULL,
+    asistente_id INTEGER NOT NULL,
+    vence_at TEXT NOT NULL,
+    PRIMARY KEY (taller, codigo)
+  )`,
+
   `CREATE TABLE IF NOT EXISTS ac_certificados (
     codigo TEXT PRIMARY KEY,
     usuario_id INTEGER NOT NULL,
@@ -699,6 +709,8 @@ export const COLUMNAS: readonly (readonly [tabla: string, columna: string])[] = 
   // Respuesta que la IA le prepara a quien dicta para cada pregunta de la
   // sala (src/lib/talleres/motorIA.ts). Vacía = todavía no se ha preparado.
   ['ac_taller_preguntas', 'respuesta_ia'],
+  // Paso de la escena en curso: lo siguen el celular (pasos guiados) y el PC vinculado.
+  ['ac_taller_estado', 'paso'],
 ]
 
 /** Tablas que deben existir al terminar. Sirve para verificar tras migrar. */
@@ -712,6 +724,7 @@ export const TABLAS_ESPERADAS: readonly string[] = [
   'ac_progreso',
   'ac_sesiones',
   'ac_taller_asistentes',
+  'ac_taller_codigos_pc',
   'ac_taller_estado',
   'ac_taller_practicas',
   'ac_taller_preguntas',
