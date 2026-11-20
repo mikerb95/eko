@@ -5,9 +5,11 @@
 // animaciones son solo CSS (src/styles/maquetas.css): arrancan al aparecer y
 // con movimiento reducido quedan quietas en su estado final.
 //
-// Son ilustraciones, no capturas: la del conector copia lo que se vio en el
-// directorio de Claude el 2026-11-19; la de autorización de Zoho y la de
-// permisos se ajustan cuando haya capturas reales.
+// Son ilustraciones, no capturas, pero copian las pantallas reales vistas el
+// 2026-11-19 al conectar un CRM de prueba (docs/capturas/zoho/): el conector
+// con la región, las dos autorizaciones de Zoho y los permisos por
+// herramienta, con sus etiquetas en inglés tal como salen. El aviso con el que
+// Claude pide aprobación antes de leer (maqueta `prueba`) no se vio.
 interface Props {
   id: string
 }
@@ -86,8 +88,9 @@ const { id } = Astro.props
           {id === 'prueba' && (
             <>
               <span class="mq-burbuja mq-yo mq-ap" style="--d:.1s">¿Cuáles son mis cinco tratos abiertos más recientes en Zoho?</span>
-              <span class="mq-herramienta mq-ap" style="--d:.8s"><span class="mq-giro" />Zoho CRM · Get_Records · solo lectura</span>
-              <span class="mq-burbuja mq-ia mq-tabla mq-ap" style="--d:2.2s">
+              <span class="mq-aprobar mq-ap" style="--d:.8s"><span>Claude quiere usar <code>ZohoCRM_searchRecords</code></span><span class="mq-botones"><span class="mq-boton mq-sec">Deny</span><span class="mq-boton mq-pulso" style="--d:1.2s">Allow</span></span></span>
+              <span class="mq-herramienta mq-ap" style="--d:2.2s"><span class="mq-giro" />Zoho CRM · searchRecords · lectura</span>
+              <span class="mq-burbuja mq-ia mq-tabla mq-ap" style="--d:3.4s">
                 <span><b>Trato</b><b>Etapa</b></span>
                 <span><i>Cliente de ejemplo 1</i><i>Propuesta</i></span>
                 <span><i>Cliente de ejemplo 2</i><i>Negociación</i></span>
@@ -110,13 +113,20 @@ const { id } = Astro.props
             <b>Zoho CRM</b>
             <span class="mq-sub">By Zoho · MCP Server for Zoho CRM Workflows</span>
           </div>
-          <span class="mq-boton mq-pulso" style="--d:2.2s">Conectar</span>
+          <span class="mq-boton mq-pulso" style="--d:1.6s">Connect</span>
         </div>
         <div class="mq-datos">
-          <span class="mq-ap" style="--d:.4s"><em>Desarrollador</em>Zoho <span class="mq-verif">Verificado</span></span>
-          <span class="mq-ap" style="--d:.8s"><em>Herramientas</em>41</span>
-          <span class="mq-ap" style="--d:1.2s"><em>Envía datos a</em>claude-zohocrm.zohomcp.com</span>
-          <span class="mq-ap" style="--d:1.6s"><em>Autorización</em>Requiere iniciar sesión</span>
+          <span class="mq-ap" style="--d:.3s"><em>Developer</em>Zoho <span class="mq-verif">Verified</span></span>
+          <span class="mq-ap" style="--d:.6s"><em>Herramientas</em>41</span>
+          <span class="mq-ap" style="--d:.9s"><em>Envía datos a</em>claude-zohocrm.zohomcp.com</span>
+        </div>
+        <div class="mq-modal mq-ap" style="--d:2.8s">
+          <b>Connect Zoho CRM</b>
+          <span class="mq-sub">Choose the region where your account is hosted.</span>
+          <span class="mq-opcion mq-elegida"><i />United States</span>
+          <span class="mq-opcion"><i />Europe</span>
+          <span class="mq-opcion"><i />India</span>
+          <span class="mq-boton mq-pulso" style="--d:3.4s">Connect</span>
         </div>
       </div>
     </div>
@@ -124,30 +134,42 @@ const { id } = Astro.props
 
   {id === 'oauth' && (
     <div class="mq-ventana">
-      <div class="mq-barra"><i /><i /><i /><span class="mq-url">accounts.zoho.com</span></div>
-      <div class="mq-cuerpo mq-centro">
-        <b class="mq-marca mq-marca-zoho">ZOHO</b>
-        <span class="mq-campo"><span class="mq-tipeo" style="--n:20;--t:1.2s">su.nombre@ekosolv.com</span></span>
-        <span class="mq-campo mq-clave mq-ap" style="--d:1.4s">••••••••</span>
-        <span class="mq-permiso mq-ap" style="--d:2s"><b>Claude</b> solicita acceso a su Zoho CRM</span>
-        <span class="mq-botones mq-ap" style="--d:2.4s"><span class="mq-boton mq-sec">Rechazar</span><span class="mq-boton mq-pulso" style="--d:2.8s">Aceptar</span></span>
-        <span class="mq-nota-chica mq-ap" style="--d:2.4s">La contraseña se escribe aquí, en Zoho</span>
+      <div class="mq-barra"><i /><i /><i /><span class="mq-url">mcp.zoho.com · accounts.zoho.com</span></div>
+      <div class="mq-cuerpo mq-dos">
+        <div class="mq-pantalla mq-primera">
+          <span class="mq-et">Pantalla 1 · Zoho MCP</span>
+          <b>This application wants to access your Zoho MCP Account</b>
+          <span class="mq-sub">Access your Zoho MCP account associated with Tools</span>
+          <span class="mq-botones"><span class="mq-boton mq-sec">Deny</span><span class="mq-boton mq-pulso" style="--d:.8s">Allow</span></span>
+        </div>
+        <div class="mq-pantalla mq-segunda mq-ap" style="--d:2.4s">
+          <span class="mq-et">Pantalla 2 · Zoho Accounts</span>
+          <b>MCP would like to access the following information.</b>
+          <ul class="mq-scopes">
+            <li>get deals data</li>
+            <li>get contacts data</li>
+            <li class="mq-ojo">Update resources in a module</li>
+            <li class="mq-ojo">Delete resources from a module</li>
+          </ul>
+          <span class="mq-botones"><span class="mq-boton mq-sec">Reject</span><span class="mq-boton mq-pulso" style="--d:3.2s">Accept</span></span>
+        </div>
       </div>
     </div>
   )}
 
   {id === 'permisos' && (
     <div class="mq-ventana">
-      <div class="mq-barra"><i /><i /><i /><span class="mq-url">Zoho CRM · Permisos de herramientas</span></div>
+      <div class="mq-barra"><i /><i /><i /><span class="mq-url">Zoho CRM · Permissions</span></div>
       <div class="mq-cuerpo">
-        <span class="mq-grupo">Lectura</span>
-        {['Get_Records', 'Search_Records', 'Get_Modules'].map((h) => (
-          <span class="mq-fila"><code>{h}</code><span class="mq-seg"><i class="on">Permitir</i><i>Bloquear</i></span></span>
+        <span class="mq-grupo"><span>Read-only tools · 21</span><span class="mq-estado mq-aprob">Needs approval</span></span>
+        {['ZohoCRM_searchRecords', 'ZohoCRM_getRecord'].map((h) => (
+          <span class="mq-fila"><code>{h}</code><span class="mq-estado mq-aprob">Needs approval</span></span>
         ))}
-        <span class="mq-grupo mq-grupo-esc">Escritura y borrado</span>
-        {['Create_Records', 'Update_Record', 'Delete_Record'].map((h, k) => (
-          <span class="mq-fila mq-cambia" style={`--d:${0.8 + k * 0.7}s`}><code>{h}</code><span class="mq-seg"><i class="permitir">Permitir</i><i class="bloquear">Bloquear</i></span></span>
+        <span class="mq-grupo mq-grupo-esc"><span>Write/delete tools · 19</span><span class="mq-estado mq-cambia" style="--d:1s"><i class="antes">Needs approval</i><i class="despues">Blocked</i></span></span>
+        {['ZohoCRM_createRecords', 'ZohoCRM_updateRecord', 'ZohoCRM_deleteRecord'].map((h, k) => (
+          <span class="mq-fila mq-fila-esc"><code>{h}</code><span class="mq-estado mq-cambia" style={`--d:${1.4 + k * 0.25}s`}><i class="antes">Needs approval</i><i class="despues">Blocked</i></span></span>
         ))}
+        <span class="mq-menu mq-ap" style="--d:.3s"><i>Always allow</i><i>Needs approval</i><i>Always ask</i><i class="mq-menu-sel">Blocked</i></span>
       </div>
     </div>
   )}
