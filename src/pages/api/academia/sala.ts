@@ -8,8 +8,9 @@ import { AREA_IDS, nombreModulo } from '../../../lib/academia/reglas'
 import { MAX_INSTRUCCION, MIN_INSTRUCCION, PRACTICAS_DIA, validarInstruccion } from '../../../lib/academia/practica'
 import { practicar, PracticaNoDisponible } from '../../../lib/academia/motorPractica'
 import { interaccionDe, interaccionPublica, PREGUNTAS_DIA, registroSala, validarPregunta, votoValido, MAX_PREGUNTA } from '../../../lib/talleres/reglas'
-import { guardarPracticaSala, guardarPregunta, marcarEnSala, misRespuestas, practicasSalaDeHoy, preguntasDeHoyDe, liberarEnlace, registrarAsistente, reservarEnlace, votar } from '../../../lib/talleres/datos'
+import { codigoPC, MINUTOS_CODIGO_PC, guardarPracticaSala, guardarPregunta, marcarEnSala, misRespuestas, practicasSalaDeHoy, preguntasDeHoyDe, liberarEnlace, registrarAsistente, reservarEnlace, votar } from '../../../lib/talleres/datos'
 import { salaActual } from '../../../lib/talleres/sala'
+import type { PasoGuiado } from '../../../lib/talleres/tipos'
 
 // La sala del celular (/academia/sala). Pública: se llega por el QR del
 // proyector y no pide usuario ni contraseña (excepción en src/middleware.ts).
@@ -25,7 +26,10 @@ import { salaActual } from '../../../lib/talleres/sala'
 // puede enviarle una pregunta a quien dicta, que la ve en el presentador.
 //
 // GET           → capacitación en curso, si la persona ya está registrada, pregunta abierta, sus respuestas y si hay práctica
-// POST {accion} → registrar (envía el enlace al correo) | entrar | votar | practicar | preguntar
+// POST {accion} → registrar (envía el enlace al correo) | entrar | votar | practicar | preguntar | codigo_pc
+//
+// codigo_pc: el celular muestra un código de dos números para abrir la
+// presentación en el PC de la persona (/pc). Ver /api/academia/pc.
 
 export const prerender = false
 
@@ -42,7 +46,16 @@ export const GET: APIRoute = async ({ cookies }) => {
       taller: t.n,
       titulo: t.titulo,
       escena: escena?.titulo ?? '',
+      // Posición exacta de la presentación: la sigue el PC vinculado (/pc).
+      escenaId: estado.escena,
+      paso: estado.paso,
       kicker: escena?.kicker ?? '',
+      // Práctica guiada: el paso actual, con su maqueta (el celular la anima).
+      guia: (() => {
+        const pasos = escena?.tipo === 'conectar' ? ((escena.datos?.pasos ?? []) as PasoGuiado[]) : []
+        const p = pasos[Math.min(estado.paso, pasos.length - 1)]
+        return p ? { ...p, paso: Math.min(estado.paso, pasos.length - 1), total: pasos.length - 1 } : null
+      })(),
       idea: t.celular?.[estado.escena]?.idea ?? '',
       practica: escena?.tipo === 'practica' ? { consigna: String(escena.datos?.consigna ?? ''), maximo: MAX_INSTRUCCION } : null,
       interaccion: i ? interaccionPublica(i) : null,
@@ -90,6 +103,13 @@ export const POST: APIRoute = async ({ request, cookies, url }) => {
     }
 
     if (!asistente) return json({ error: 'Registre su nombre para participar.', registrar: true }, 401)
+
+    // Código de dos números para abrir la presentación en el PC (/pc).
+    if (b?.accion === 'codigo_pc') {
+      const c = await codigoPC(t.n, asistente.id)
+      if (!c) return json({ error: 'No hay códigos libres en este momento. Intente de nuevo en un minuto.' }, 503)
+      return json({ ...c, minutos: MINUTOS_CODIGO_PC })
+    }
 
     if (b?.accion === 'entrar') {
       await marcarEnSala(t.n, asistente.id)
