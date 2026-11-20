@@ -451,8 +451,8 @@ function crear(escena: HTMLElement, raiz: HTMLElement): Clawd {
    */
   function soltarBurbuja(o: { d?: number; destino?: { x: number; y: number }; dura?: number } = {}) {
     const nada = { reventar: () => {} }
-    if (!vivo || !pompa || document.hidden || raiz.querySelectorAll('.clawd-burbuja').length > 14) return nada
-    const d = o.d ?? azar(16, 42)
+    if (!vivo || !pompa || document.hidden || raiz.querySelectorAll('.clawd-burbuja').length > 18) return nada
+    const d = o.d ?? azar(22, 58)
     const b = document.createElement('span')
     b.className = 'clawd-burbuja'
     b.style.setProperty('--d', `${d.toFixed(0)}px`)
@@ -462,8 +462,10 @@ function crear(escena: HTMLElement, raiz: HTMLElement): Clawd {
     sueltos.add(b)
     const p = enRaiz(pompa)
     const dura = o.dura ?? azar(3.4, 6)
-    const x1 = o.destino ? o.destino.x : p.x - azar(70, 360)
-    const y1 = o.destino ? o.destino.y : p.y - azar(240, 560)
+    // Clawd está cerca del borde de arriba: las sopla hacia la izquierda,
+    // sobre el fondo oscuro, y suben poco para que no se salgan de la pantalla.
+    const x1 = o.destino ? o.destino.x : p.x - azar(160, 640)
+    const y1 = o.destino ? o.destino.y : p.y + azar(-170, 70)
     gsap.set(b, { x: p.x, y: p.y })
     const anims: gsap.core.Animation[] = []
     let reventada = false
@@ -556,11 +558,11 @@ function crear(escena: HTMLElement, raiz: HTMLElement): Clawd {
       // Sopla despacito y largo: sale una sola, enorme.
       tl.to(respira, { scaleY: 0.96, scaleX: 1.03, ...o, duration: 1.1, ease: 'sine.inOut' })
         .to(pompa, { scale: 1.4, transformOrigin: '50% 50%', duration: 1.1, ease: 'sine.in' }, '<')
-        .call(() => void soltarBurbuja({ d: azar(78, 96), dura: azar(6, 7.5) }))
+        .call(() => void soltarBurbuja({ d: azar(100, 128), dura: azar(6.5, 8) }))
         .set(pompa, { scale: 1, opacity: 0.25 })
     } else {
       tl.to(respira, { scaleY: 0.94, scaleX: 1.05, ...o, duration: 0.16, ease: 'power2.out' })
-      const n = entero(4, 7)
+      const n = entero(5, 9)
       let t = 0
       for (let k = 0; k < n; k++) {
         tl.call(() => void soltarBurbuja(), [], `<${t.toFixed(2)}`)
