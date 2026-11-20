@@ -696,6 +696,9 @@ export const COLUMNAS: readonly (readonly [tabla: string, columna: string])[] = 
   // después el material. enlace_at frena reenvíos seguidos.
   ['ac_taller_asistentes', 'correo'],
   ['ac_taller_asistentes', 'enlace_at'],
+  // Respuesta que la IA le prepara a quien dicta para cada pregunta de la
+  // sala (src/lib/talleres/motorIA.ts). Vacía = todavía no se ha preparado.
+  ['ac_taller_preguntas', 'respuesta_ia'],
 ]
 
 /** Tablas que deben existir al terminar. Sirve para verificar tras migrar. */

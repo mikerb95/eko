@@ -214,6 +214,8 @@ export interface PreguntaSala {
   nombre: string
   area: string
   created_at: string
+  /** Respuesta preparada por la IA para quien dicta ('' = aún no). */
+  respuesta_ia: string
 }
 
 export async function preguntasDeHoyDe(asistente_id: number, hoy: string): Promise<number> {
@@ -234,19 +236,41 @@ export async function guardarPregunta(taller: number, hoy: string, asistente_id:
 export async function preguntasPendientes(taller: number, hoy: string): Promise<PreguntaSala[]> {
   const c = await db()
   const r = await c.execute({
-    sql: `SELECT p.id, p.escena, p.texto, p.created_at, a.nombre, a.apellido, a.area
+    sql: `SELECT p.id, p.escena, p.texto, p.created_at, p.respuesta_ia, a.nombre, a.apellido, a.area
           FROM ac_taller_preguntas p JOIN ac_taller_asistentes a ON a.id = p.asistente_id
           WHERE p.taller = ? AND p.fecha = ? AND p.respondida = 0 ORDER BY p.id`,
     args: [taller, hoy],
   })
-  return r.rows.map((x: any) => ({
+  return r.rows.map(filaPregunta)
+}
+
+/** Una pregunta de la sala por id, o null si no es de esa capacitación. */
+export async function preguntaSala(taller: number, id: number): Promise<PreguntaSala | null> {
+  const c = await db()
+  const r = await c.execute({
+    sql: `SELECT p.id, p.escena, p.texto, p.created_at, p.respuesta_ia, a.nombre, a.apellido, a.area
+          FROM ac_taller_preguntas p JOIN ac_taller_asistentes a ON a.id = p.asistente_id
+          WHERE p.id = ? AND p.taller = ?`,
+    args: [id, taller],
+  })
+  return r.rows[0] ? filaPregunta(r.rows[0]) : null
+}
+
+export async function guardarRespuestaIA(taller: number, id: number, texto: string): Promise<void> {
+  const c = await db()
+  await c.execute({ sql: 'UPDATE ac_taller_preguntas SET respuesta_ia = ? WHERE id = ? AND taller = ?', args: [texto, id, taller] })
+}
+
+function filaPregunta(x: any): PreguntaSala {
+  return {
     id: num(x.id),
     escena: str(x.escena),
     texto: str(x.texto),
     nombre: `${str(x.nombre)} ${str(x.apellido)}`.trim(),
     area: str(x.area),
     created_at: str(x.created_at),
-  }))
+    respuesta_ia: str(x.respuesta_ia),
+  }
 }
 
 export async function marcarRespondida(taller: number, id: number): Promise<void> {
