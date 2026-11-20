@@ -121,7 +121,7 @@ const nDatos = segmentos.filter((s) => s.dato).length
     <p class="docu" data-docu>
       {segmentos.map((s) =>
         s.dato ? (
-          <button type="button" class="dato" data-dato aria-pressed="false" title="Tapar este dato">
+          <button type="button" class="dato" data-dato aria-pressed="false" title="Tapar este dato (solo si no es la cuenta de Ekosolv)">
             <span class="orig">{s.t}</span><span class="rol">[{s.dato}]</span><span class="tapa" aria-hidden="true" />
           </button>
         ) : (
@@ -129,7 +129,8 @@ const nDatos = segmentos.filter((s) => s.dato).length
         ),
       )}
     </p>
-    <p class="marcador">Datos personales tapados: <b data-tapados>0</b> de {nDatos}</p>
-    <p class="llamado" data-paso="1"><span class="pt" />El documento sigue sirviendo para la tarea: kilos, residuo y empresa siguen ahí.</p>
+    <p class="marcador">Datos personales en el documento: {nDatos}. Tapados: <b data-tapados>0</b></p>
+    <p class="llamado"><span class="pt" />En la cuenta de Ekosolv se pega completo: la IA no entrena con él y el proveedor lo trata bajo contrato.</p>
+    <p class="llamado" data-paso="1"><span class="pt" />En una cuenta personal no se pega. Si no hay otra salida, se tapa todo esto primero.</p>
   </>
 )}

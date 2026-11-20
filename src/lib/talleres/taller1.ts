@@ -811,17 +811,19 @@ export const TALLER_1: Taller = {
       id: 'anonimizar',
       bloque: 'seguridad',
       tipo: 'anonimizar',
-      kicker: 'Cómo anonimizar',
-      titulo: 'Tape lo personal antes de pegar',
+      kicker: 'Dónde pegar',
+      titulo: 'Use la cuenta de Ekosolv, no la suya',
       minutos: 8,
       pasos: 1,
       provisional: true,
       notas: [
-        'Haga clic sobre cada dato personal y pregúntele a la sala cuál sigue: el ejercicio es entrenar el ojo. Lo que más se olvida: el correo y la dirección, además del nombre y la cédula.',
-        'Paso 1: tape los que falten y lea el resultado: kilos, residuo y empresa siguen ahí, y la tarea se puede hacer igual. La técnica es cambiar por roles ("el conductor", "la coordinadora ambiental") en vez de borrar, para que la IA entienda quién hace qué. Si después hay que volver a poner los nombres, la tabla de equivalencias la guarda usted, nunca la IA. El certificado es de ejemplo.',
+        'Muestre el certificado completo y diga: "Esto, con nombre, cédula y celular, se pega tal cual en la cuenta de Ekosolv." La cuenta de la empresa es plan Team: Anthropic no entrena con lo que se pega y firma un acuerdo de tratamiento de datos, así que queda como encargado de Ekosolv, igual que Google con el correo o Zoho con el CRM. Eso es lo que pide la Ley 1581 cuando los datos salen del país. Antes del sábado confirme que el plan contratado sea Team y no Pro individual: Pro se rige por los términos de consumidor.',
+        'Paso 1: los datos se tapan solos. "Esto es lo que tocaría hacer en una cuenta personal, y por eso no se usa para el trabajo: en esas cuentas lo que se pega puede usarse para entrenar y queda por fuera de la empresa." Puede hacer clic sobre cada dato para destaparlo o taparlo.',
+        'Lo que vale en cualquier cuenta: contraseñas y claves, nunca; datos de salud (incapacidades, historias clínicas), solo si la tarea de verdad los necesita. Y no califique con pulgar arriba o abajo una conversación con datos de clientes: esa conversación puede llegarle al proveedor como retroalimentación. El certificado es de ejemplo.',
       ],
       siPreguntan: [
-        { p: '¿El nombre de la empresa cliente también se tapa?', r: 'El nombre de una empresa no es un dato personal para la Ley 1581, pero puede ser confidencial. Si no hace falta para la tarea, cámbielo por "el cliente"; si hace falta (por ejemplo, para saber qué autoridad la vigila), déjelo.' },
+        { p: '¿Y si estoy en el celular y no tengo abierta la cuenta de Ekosolv?', r: 'Entre a la cuenta de la empresa también en el celular. Si no puede, espere a estar en el computador: el documento de trabajo no se pega en la cuenta personal.' },
+        { p: '¿Entonces la IA se queda con los datos?', r: 'Las conversaciones quedan guardadas en la cuenta de Ekosolv, como un correo en Gmail, y la empresa decide cuánto tiempo. No se usan para entrenar la IA ni las ve otra empresa.' },
       ],
       datos: {
         segmentos: [

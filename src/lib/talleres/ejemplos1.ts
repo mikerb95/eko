@@ -193,14 +193,14 @@ export const CELULAR_TALLER1: Record<string, GuiaCelular> = {
     },
   },
   anonimizar: {
-    idea: 'Antes de pegar un documento, cambie nombres, cédulas, teléfonos y correos por un rol: "el conductor", "el cliente". El documento sigue sirviendo para la tarea.',
+    idea: 'Pegue documentos de trabajo solo en la cuenta de Ekosolv: ahí se pueden pegar completos, con nombres y datos. En una cuenta personal, no. En ninguna: contraseñas ni claves.',
     areas: {
-      operaciones: { titulo: 'Qué cambiar en un auto', texto: 'Nombres de funcionarios y del representante legal, cédulas y direcciones de predios cuando no hagan falta. Escriba "el representante legal" en vez del nombre.' },
-      logistica: { titulo: 'Qué cambiar en un correo', texto: 'Nombre, celular y correo de quien escribe, y los datos del conductor. El residuo, la cantidad y la fecha se dejan: son lo que se necesita para la tarea.' },
-      ventas: { titulo: 'Qué cambiar en un Brief', texto: 'El celular y el correo personal del contacto. Para redactar la propuesta basta con "el jefe de planta" y el sector del cliente.' },
-      mercadeo: { titulo: 'Qué cambiar en un caso', texto: 'El nombre del cliente si no autorizó publicarlo, y los datos de personas que aparezcan en fotos o testimonios.' },
-      gerencia: { titulo: 'Qué no se sube', texto: 'Salarios, datos de salud y evaluaciones de desempeño no se suben ni siquiera anonimizados. En el reporte de oportunidades, cambie el nombre de cada contacto por su cargo.' },
-      finanzas: { titulo: 'Qué cambiar en nómina y bancos', texto: 'Cédulas, cuentas bancarias y nombres de empleados y clientes: cámbielos por "Empleado 1" o "Cliente A". Los salarios de cada persona no se suben; para la tarea bastan totales o rangos.' },
+      operaciones: { titulo: 'Un auto en la cuenta de Ekosolv', texto: 'El auto se pega completo, con funcionarios, representante legal y predios. Lo que no va es la clave del portal de la autoridad.' },
+      logistica: { titulo: 'Un correo en la cuenta de Ekosolv', texto: 'El correo del cliente se pega tal cual, con nombre, celular y datos del conductor. Desde el celular, entre con la cuenta de la empresa, no con la suya.' },
+      ventas: { titulo: 'Un Brief en la cuenta de Ekosolv', texto: 'El Brief va completo, con los datos del contacto. Lo que no se hace es copiarlo a una IA personal para "adelantar" desde la casa.' },
+      mercadeo: { titulo: 'Un caso en la cuenta de Ekosolv', texto: 'Puede pegar el caso completo para trabajarlo. Otra cosa es publicarlo: el nombre del cliente y las personas de las fotos salen solo con autorización.' },
+      gerencia: { titulo: 'Reportes en la cuenta de Ekosolv', texto: 'El reporte de oportunidades va con contactos y valores. Salarios, salud y evaluaciones de desempeño, solo si la tarea de verdad los necesita.' },
+      finanzas: { titulo: 'Nómina y bancos en la cuenta de Ekosolv', texto: 'Para el procedimiento de nómina bastan totales; los datos de cada empleado, solo si la tarea los pide. Claves bancarias y tokens, nunca.' },
     },
   },
   comparacion: {
