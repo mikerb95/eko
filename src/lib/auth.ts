@@ -2,7 +2,13 @@
 // El secreto viene de AUTH_SECRET; las credenciales viven en la tabla users (src/lib/users.ts).
 
 export const SESSION_COOKIE = 'eko_admin'
-const SESSION_TTL_SECONDS = 60 * 60 * 8 // 8h
+export const SESSION_TTL_SECONDS = 60 * 60 * 8 // 8h
+// Una capacitación dura 4 horas y nadie puede quedar por fuera en medio: si a
+// la sesión le quedan menos de 4 h y la persona la está usando, el middleware
+// la renueva por otras 8 h. Tope absoluto de 16 h desde el login, para que un
+// usuario borrado o con otro rol no conserve el acceso indefinidamente.
+const SESSION_RENEW_BELOW_SECONDS = 60 * 60 * 4
+const SESSION_MAX_SECONDS = 60 * 60 * 16
 
 function env(key: string, fallback = ''): string {
   return (import.meta.env as any)[key] || (process.env as any)[key] || fallback
@@ -54,14 +60,19 @@ export interface Session {
   u: string // username
   n: string // display name
   r: string // role
+  exp: number // vence (segundos epoch)
+  ini: number // login original (segundos epoch)
 }
 
-export async function createSession(user: { username: string; name: string; role: string }): Promise<string> {
+export async function createSession(user: { username: string; name: string; role: string }, ini?: number): Promise<string> {
+  const now = Math.floor(Date.now() / 1000)
+  const inicio = ini ?? now
   const payload = b64url(enc.encode(JSON.stringify({
     u: user.username,
     n: user.name,
     r: user.role,
-    exp: Math.floor(Date.now() / 1000) + SESSION_TTL_SECONDS,
+    ini: inicio,
+    exp: Math.min(now + SESSION_TTL_SECONDS, inicio + SESSION_MAX_SECONDS),
   })))
   const sig = b64url(await hmac(payload))
   return `${payload}.${sig}`
@@ -76,10 +87,19 @@ export async function verifySession(token: string | undefined | null): Promise<S
     const data = JSON.parse(new TextDecoder().decode(b64urlToBytes(payload)))
     if (typeof data.exp !== 'number' || data.exp < Math.floor(Date.now() / 1000)) return null
     if (typeof data.u !== 'string' || typeof data.r !== 'string') return null // sesiones antiguas sin rol: re-login
-    return { u: data.u, n: String(data.n || data.u), r: data.r }
+    const ini = typeof data.ini === 'number' ? data.ini : data.exp - SESSION_TTL_SECONDS
+    return { u: data.u, n: String(data.n || data.u), r: data.r, exp: data.exp, ini }
   } catch {
     return null
   }
+}
+
+/** Token renovado si a la sesión le quedan menos de 4 h y no pasa el tope; si no, null. */
+export async function renovarSession(s: Session): Promise<string | null> {
+  const now = Math.floor(Date.now() / 1000)
+  if (s.exp - now >= SESSION_RENEW_BELOW_SECONDS) return null
+  if (s.ini + SESSION_MAX_SECONDS <= s.exp) return null
+  return createSession({ username: s.u, name: s.n, role: s.r }, s.ini)
 }
 
 export function sessionCookie(token: string, secure: boolean): string {

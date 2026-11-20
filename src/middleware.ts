@@ -1,5 +1,5 @@
 import { defineMiddleware } from 'astro:middleware'
-import { PC_COOKIE, SESSION_COOKIE, verifySession } from './lib/auth'
+import { PC_COOKIE, SESSION_COOKIE, SESSION_TTL_SECONDS, renovarSession, verifySession } from './lib/auth'
 import { pasePC } from './lib/talleres/pc'
 import { canWrite } from './lib/reglasEscritura'
 
@@ -149,6 +149,15 @@ export const onRequest = defineMiddleware(async (context, next) => {
       status: 403,
       headers: { 'content-type': 'application/json' },
     })
+  }
+
+  // Renovación deslizante: quien está usando el sitio no pierde la sesión en
+  // medio de una capacitación de 4 horas (ver SESSION_RENEW_BELOW_SECONDS).
+  if (pathname !== '/api/admin/logout') {
+    const nuevo = await renovarSession(session)
+    if (nuevo) {
+      context.cookies.set(SESSION_COOKIE, nuevo, { path: '/', httpOnly: true, sameSite: 'lax', secure: import.meta.env.PROD, maxAge: SESSION_TTL_SECONDS })
+    }
   }
 
   context.locals.user = session.n

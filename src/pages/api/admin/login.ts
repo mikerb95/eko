@@ -1,5 +1,5 @@
 import type { APIRoute } from 'astro'
-import { createSession, SESSION_COOKIE } from '../../../lib/auth'
+import { createSession, SESSION_COOKIE, SESSION_TTL_SECONDS } from '../../../lib/auth'
 import { verifyLogin } from '../../../lib/users'
 import { checkRateLimit, clientIp, resetRateLimit } from '../../../lib/rateLimit'
 import { json } from '../../../lib/apiError'
@@ -52,7 +52,7 @@ export const POST: APIRoute = async (context) => {
     httpOnly: true,
     sameSite: 'lax',
     secure: import.meta.env.PROD,
-    maxAge: 60 * 60 * 8,
+    maxAge: SESSION_TTL_SECONDS,
   })
   return json({ ok: true })
 }
