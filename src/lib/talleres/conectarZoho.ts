@@ -21,8 +21,10 @@
  * también crear, actualizar y borrar. La lectura se impone en Claude: pestaña
  * Permissions del conector, grupos "Read-only tools" (21) y "Write/delete
  * tools" (19), cada herramienta con Always allow, Needs approval, Always ask o
- * Blocked (por defecto Needs approval). El aviso con el que Claude pide
- * aprobación antes de usar una herramienta no se vio: su maqueta es ilustrativa.
+ * Blocked (por defecto Needs approval). En el chat, el modo de permisos viene
+ * en Auto, y en Auto Claude no pregunta: para ver el aviso de aprobación
+ * ("Claude wants to use ... from Zoho CRM": Decline, Allow once, Always allow)
+ * hay que pasarlo a Manual.
  */
 import type { Escena, PasoGuiado } from './tipos.ts'
 
@@ -93,8 +95,8 @@ export const PASOS_ZOHO: PasoGuiado[] = [
   {
     concepto: 'Conector o navegador',
     titulo: 'Compruebe que quedó conectado',
-    hacer: 'Pregúntele: "¿Cuáles son mis cinco tratos abiertos más recientes en Zoho?". Claude le pide permiso para leer: apruébelo y fíjese que use el conector de Zoho.',
-    queEs: 'Con el conector, Claude le pide los datos directo a Zoho: es más rápido y exacto. El navegador queda para lo que no tiene conector: cualquier página que usted pueda abrir.',
+    hacer: 'Debajo del chat cambie el modo de Auto a Manual. Pregúntele: "¿Cuáles son mis cinco tratos abiertos más recientes en Zoho?". Cuando Claude pida permiso, toque Allow once.',
+    queEs: 'En Manual, Claude le muestra qué herramienta va a usar y qué va a consultar, y espera su permiso. En Auto actúa solo: por eso la escritura va en Blocked y no en "pedir aprobación". Con el conector, los datos llegan directo de Zoho.',
     maqueta: 'prueba',
   },
 ]
@@ -117,7 +119,7 @@ export const ESCENA_ZOHO: Escena = {
     'Paso 6, autorizar. Son dos pantallas, compruébelo en las capturas de docs/capturas/zoho: primero "Zoho MCP: This application wants to access your Zoho MCP Account" con Deny y Allow; después la de Zoho Accounts, "MCP would like to access the following information", con una lista larga y Accept y Reject al final (hay que bajar para verlos). La contraseña se escribe en Zoho, nunca en el chat de Claude. Zoho le da a Claude una llave limitada (eso es OAuth): solo ve lo que el usuario de Zoho de cada persona ya puede ver. Punto clave: la lista pide también "Update resources", "Add resources" y "Delete resources". En Zoho no se puede elegir solo lectura; el límite se pone en Claude en el paso 7. Cada uno conecta con su propio usuario y no con el de un administrador. La llave se quita desde Claude (desconectar) o desde la cuenta de Zoho. Zoho cobra el uso en créditos de API: con consultas normales no se nota.',
     'Paso 7, permisos. Este es el corazón de la práctica. En Claude, conector Zoho CRM, pestaña Permissions: dos grupos, "Read-only tools" (21, como ZohoCRM_searchRecords o ZohoCRM_getRecord) y "Write/delete tools" (19, como ZohoCRM_createRecords, ZohoCRM_updateRecord y ZohoCRM_deleteRecord, que borra para siempre). Cada uno tiene cuatro opciones: Always allow, Needs approval, Always ask y Blocked; por defecto todo viene en Needs approval. Que pongan el grupo de escritura en Blocked con el menú de la derecha del grupo (cambia las 19 de una vez). Por qué Blocked y no Needs approval: la misma pantalla avisa que en modo Auto Claude puede actuar sin preguntar aunque diga Needs approval; Blocked no deja nunca. La lectura se deja en Needs approval para que vean a Claude pedir permiso en el paso 9. Más adelante, con confianza, la escritura se abre con Always ask.',
     'Paso 8, control del navegador. Claude abre una pestaña propia y trabaja ahí: toma una imagen de la pantalla, decide dónde hacer clic, hace clic, vuelve a mirar. Antes de entrar a un sitio nuevo pide permiso, y hay un botón para detenerlo en cualquier momento. Que miren la pestaña mientras trabaja: así se aprende qué hace. La frase lleva el límite otra vez ("solo lee, no hagas clic en guardar ni en borrar") porque el navegador no tiene el candado del paso 7: ahí el límite es la instrucción y los permisos de su usuario de Zoho.',
-    'Paso 9, comprobar. Antes de leer, Claude pide permiso porque la lectura quedó en Needs approval: que lo aprueben y vean el nombre de la herramienta que va a usar. Con el conector, Claude le pide los datos directo a Zoho: más rápido y exacto que mirando la pantalla. Que comparen la respuesta con lo que ven en su CRM. Cierre: "El conector para lo que tiene conector; el navegador para todo lo demás. Y siempre: objetivo, límite y revisar."',
+    'Paso 9, comprobar. Hallazgo clave (capturas 8 a 10 en docs/capturas/zoho): debajo del chat está el modo de permisos y viene en Auto ("Claude runs on its own and pauses to ask if anything looks unsafe"); en Auto, Claude NO pide permiso aunque la herramienta diga Needs approval. Que lo pasen a Manual ("Claude asks before using new tools or opening new sites"). Entonces sale "Claude wants to use ZohoCRM_executeCOQLQuery from Zoho CRM" con la consulta que va a hacer y tres botones: Decline, Allow once y Always allow. Que toquen Allow once y lean la consulta: es un SELECT, solo lee. Este es el argumento final de por qué la escritura va en Blocked: en Auto, "pedir aprobación" no protege. Con el conector, Claude le pide los datos directo a Zoho: más rápido y exacto que mirando la pantalla. Que comparen la respuesta con lo que ven en su CRM. Cierre: "El conector para lo que tiene conector; el navegador para todo lo demás. Y siempre: objetivo, límite y revisar."',
   ],
   siPreguntan: [
     { p: '¿Claude puede ver todo el CRM de la empresa?', r: 'No. Ve lo mismo que su usuario de Zoho, con los mismos permisos de su perfil. Si usted no ve un módulo en Zoho, Claude tampoco.' },

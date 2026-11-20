@@ -8,8 +8,8 @@
 // Son ilustraciones, no capturas, pero copian las pantallas reales vistas el
 // 2026-11-19 al conectar un CRM de prueba (docs/capturas/zoho/): el conector
 // con la región, las dos autorizaciones de Zoho y los permisos por
-// herramienta, con sus etiquetas en inglés tal como salen. El aviso con el que
-// Claude pide aprobación antes de leer (maqueta `prueba`) no se vio.
+// herramienta y el aviso con el que Claude pide aprobación antes de leer, con
+// sus etiquetas en inglés tal como salen (los tratos son datos de ejemplo de Zoho).
 interface Props {
   id: string
 }
@@ -88,13 +88,13 @@ const { id } = Astro.props
           {id === 'prueba' && (
             <>
               <span class="mq-burbuja mq-yo mq-ap" style="--d:.1s">¿Cuáles son mis cinco tratos abiertos más recientes en Zoho?</span>
-              <span class="mq-aprobar mq-ap" style="--d:.8s"><span>Claude quiere usar <code>ZohoCRM_searchRecords</code></span><span class="mq-botones"><span class="mq-boton mq-sec">Deny</span><span class="mq-boton mq-pulso" style="--d:1.2s">Allow</span></span></span>
-              <span class="mq-herramienta mq-ap" style="--d:2.2s"><span class="mq-giro" />Zoho CRM · searchRecords · lectura</span>
+              <span class="mq-aprobar mq-ap" style="--d:.8s"><span>Claude wants to use <code>ZohoCRM_executeCOQLQuery</code> from Zoho CRM</span><span class="mq-botones"><span class="mq-boton mq-sec">Decline</span><span class="mq-boton mq-pulso" style="--d:1.2s">Allow once</span><span class="mq-boton mq-sec">Always allow</span></span></span>
+              <span class="mq-herramienta mq-ap" style="--d:2.2s"><span class="mq-giro" />Used Zoho CRM: executeCOQLQuery</span>
               <span class="mq-burbuja mq-ia mq-tabla mq-ap" style="--d:3.4s">
                 <span><b>Trato</b><b>Etapa</b></span>
-                <span><i>Cliente de ejemplo 1</i><i>Propuesta</i></span>
-                <span><i>Cliente de ejemplo 2</i><i>Negociación</i></span>
-                <span><i>Cliente de ejemplo 3</i><i>Calificación</i></span>
+                <span><i>Benton</i><i>Qualification</i></span>
+                <span><i>Chanay</i><i>Needs Analysis</i></span>
+                <span><i>Chemel</i><i>Value Proposition</i></span>
               </span>
             </>
           )}
