@@ -30,6 +30,8 @@ try {
   console.error('[admin/academia] carga', e?.stack || e)
   errorCarga = 'No se pudo cargar la academia.'
 }
+// resuelta_at es ISO en UTC: la fecha que se muestra es la de Bogotá.
+const diaBogota = (iso: string) => new Intl.DateTimeFormat('en-CA', { timeZone: 'America/Bogota' }).format(new Date(iso))
 const dudasPendientes = opiniones.filter((o) => o.respuestas.duda && !o.resolucion).length
 const porRevisar = estado ? estado.entregas.filter((e) => e.estado === 'enviada').length : 0
 const cuentas = { academia: estado?.personas.length ?? 0, academiaRevisar: porRevisar }
@@ -130,7 +132,7 @@ const catalogos = { modulos: MODULOS_ACADEMIA, colores: COLOR, sitio: SITE_URL }
             <form class="ac-op-resolver" data-opinion={o.id}>
               <label>Cómo se resolvió la duda<textarea name="resolucion" rows="2" maxlength="1000" placeholder="Le expliqué en la sesión siguiente que…">{o.resolucion}</textarea></label>
               <div class="ac-op-pie">
-                <small class="muted" data-op-meta>{o.resuelta_at && `Resuelta el ${fechaLarga(o.resuelta_at.slice(0, 10))} por ${o.resuelta_por}`}</small>
+                <small class="muted" data-op-meta>{o.resuelta_at && `Resuelta el ${fechaLarga(diaBogota(o.resuelta_at))} por ${o.resuelta_por}`}</small>
                 <button type="submit" class="btn-ghost">Guardar</button>
               </div>
             </form>
