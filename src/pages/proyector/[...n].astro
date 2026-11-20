@@ -1,0 +1,7 @@
+---
+// Atajo de quien dicta: ekosolv.codebymike.net/proyector (src/lib/talleres/atajo.ts).
+export const prerender = false
+import { numeroAtajo } from '../../lib/talleres/atajo'
+
+return Astro.redirect(`/academia/taller/${await numeroAtajo(Astro.params.n)}`, 302)
+---
