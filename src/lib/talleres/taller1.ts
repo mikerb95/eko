@@ -110,6 +110,7 @@ export const TALLER_1: Taller = {
   n: 1,
   titulo: 'Inteligencia artificial, por dentro',
   subtitulo: 'Qué es, cómo funciona, en qué sirve y cómo usarla con seguridad en Ekosolv',
+  firma: 'Por: Michael Rodriguez',
   modulos: ['general'],
   minutosTotales: 240,
   bloques: [

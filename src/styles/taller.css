@@ -181,6 +181,9 @@
 .esc-portada .tl-titulo { font-size: clamp(36px, 10vw, 56px); max-width: 14ch; }
 .tl-on .esc-portada .tl-titulo { font-size: 128px; line-height: .96; }
 .esc-portada .sub { font-size: 1.05em; color: #b9c6ce; max-width: 40ch; }
+.esc-portada .sub .firma { display: inline-block; margin-top: .7em; font-size: .78em; color: #7fa3ae; }
+/* Palabras que Clawd todavía no ha escrito: ocupan su lugar para que nada salte. */
+.esc-portada .sub .pal-c.oculta { visibility: hidden; }
 .esc-portada .cinta { display: flex; gap: 10px; flex-wrap: wrap; opacity: .9; }
 .tl-on .esc-portada .cinta { position: absolute; top: 470px; left: 0; flex-wrap: nowrap; width: max-content; font-size: 30px; }
 .tl-on .esc-portada .tl-titulo { margin-top: 30px; }

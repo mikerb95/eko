@@ -21,7 +21,12 @@ const maxTarea = Math.max(1, ...(d?.tareas.map((x) => x.n) ?? [1]))
     <div class="cinta" aria-hidden="true" data-cinta>
       {[...cinta, ...cinta].map((tk, i) => <span class={`tk t${i % 4}`}>{tk}</span>)}
     </div>
-    <p class="sub">{t.subtitulo}</p>  </>
+    {/* Clawd la escribe palabra por palabra (papelPortada). Sin JS se ve completa. */}
+    <p class="sub" data-escribe>
+      {t.subtitulo.split(' ').map((p, i) => <>{i > 0 && ' '}<span class="pal-c">{p}</span></>)}
+      {t.firma && <><br /><span class="firma">{t.firma.split(' ').map((p, i) => <>{i > 0 && ' '}<span class="pal-c">{p}</span></>)}</span></>}
+    </p>
+  </>
 )}
 
 {e.tipo === 'sala' && (

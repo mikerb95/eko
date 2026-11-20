@@ -158,6 +158,8 @@ export interface Taller {
   n: number
   titulo: string
   subtitulo: string
+  /** Línea de autoría bajo el subtítulo de la portada. */
+  firma?: string
   /** Módulos de la academia que asisten (para marcar la asistencia del día). */
   modulos: string[]
   minutosTotales: number
