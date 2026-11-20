@@ -754,6 +754,9 @@ export const COLUMNAS: readonly (readonly [tabla: string, columna: string])[] = 
   // nuevo con uno viejo; `orden` es el último botón del presentador (JSON {id, nombre}).
   ['ac_taller_estado', 'mov'],
   ['ac_taller_estado', 'orden'],
+  // Correo con el enlace al banco de recursos de su área (docs/plan-recursos.md):
+  // cuándo se le envió. Vacío = pendiente.
+  ['ac_taller_asistentes', 'recursos_at'],
 ]
 
 /** Tablas que deben existir al terminar. Sirve para verificar tras migrar. */

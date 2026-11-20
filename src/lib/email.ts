@@ -342,3 +342,36 @@ export async function enviarEnlaceSala(p: { to: string; nombre: string; capacita
     from: env('SALA_FROM') || SALA_FROM_DEFECTO,
   })
 }
+
+/**
+ * Material de una capacitación (docs/plan-recursos.md): el enlace a la ruta de
+ * su área en el banco de recursos público. Lo envía quien administra desde
+ * /admin/academia, pestaña Material.
+ */
+export async function enviarRecursos(p: { to: string; nombre: string; capacitacion: string; area: string; url: string }): Promise<SendResult> {
+  const titulo = `${p.nombre}, aquí está el material de la capacitación`
+  const html = `<div style="margin:0;padding:24px;background-color:#f4f6f4;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Helvetica,Arial,sans-serif">
+  <table role="presentation" width="100%" cellpadding="0" cellspacing="0" bgcolor="#ffffff" style="max-width:560px;margin:0 auto;background-color:#ffffff;border-radius:12px;overflow:hidden">
+    <tr><td bgcolor="#16261e" style="padding:20px 24px;background-color:#16261e">
+      <span style="color:#ffffff;font-size:15px;font-weight:600;letter-spacing:.02em">Ekosolv · Academia de IA</span>
+    </td></tr>
+    <tr><td style="padding:24px">
+      <h1 style="margin:0 0 12px;font-size:18px;line-height:1.35;color:#16261e">${escapeHtml(titulo)}</h1>
+      <p style="margin:0 0 8px;color:#16261e;font-size:14px;line-height:1.55;font-weight:600">${escapeHtml(p.capacitacion)}</p>
+      <p style="margin:0;color:#3d4b44;font-size:14px;line-height:1.55">En el banco de recursos de ${escapeHtml(p.area)} encuentra las instrucciones para copiar, la guía para conectar Zoho, las preguntas frecuentes, el glosario y las hojas que se repartieron. No pide usuario ni contraseña.</p>
+      <table role="presentation" cellpadding="0" cellspacing="0" style="margin:22px 0 0"><tr><td bgcolor="#2f7d4f" style="border-radius:8px;background-color:#2f7d4f">
+        <a href="${escapeHtml(p.url)}" style="display:inline-block;padding:12px 22px;color:#ffffff;border-radius:8px;text-decoration:none;font-size:15px;font-weight:600">Abrir el banco de recursos</a>
+      </td></tr></table>
+      <p style="margin:20px 0 0;color:#5b6b62;font-size:12px;line-height:1.5">Guarde este correo: el mismo enlace se va llenando con el material de cada capacitación.</p>
+    </td></tr>
+  </table>
+</div>`
+  const text = `${titulo}\n\n${p.capacitacion}\n\nBanco de recursos de ${p.area}: ${p.url}\n\nInstrucciones para copiar, la guía para conectar Zoho, preguntas frecuentes, glosario y las hojas que se repartieron. No pide usuario ni contraseña.\n`
+  return send({
+    subject: 'Material de la capacitación de IA',
+    html,
+    text,
+    to: [p.to],
+    from: env('SALA_FROM') || SALA_FROM_DEFECTO,
+  })
+}

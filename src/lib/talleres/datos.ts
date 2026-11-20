@@ -497,3 +497,54 @@ function leerRespuestas(v: unknown): Record<string, string> {
     return {}
   }
 }
+
+// ── Material por correo (docs/plan-recursos.md) ──
+
+export interface GrupoMaterial {
+  taller: number
+  fecha: string
+  /** Personas registradas ese día (con o sin correo). */
+  registrados: number
+  /** Correos distintos a los que ya se les envió. */
+  enviados: number
+  /** Correos distintos que faltan. */
+  pendientes: number
+}
+
+/** Cada sesión (capacitación y fecha) con cuántos correos van enviados y cuántos faltan. */
+export async function gruposMaterial(): Promise<GrupoMaterial[]> {
+  const c = await db()
+  const r = await c.execute(`SELECT taller, fecha, COUNT(*) AS registrados,
+      COUNT(DISTINCT CASE WHEN correo <> '' AND recursos_at <> '' THEN lower(correo) END) AS enviados,
+      COUNT(DISTINCT CASE WHEN correo <> '' AND recursos_at = '' THEN lower(correo) END) AS pendientes
+    FROM ac_taller_asistentes GROUP BY taller, fecha ORDER BY fecha DESC, taller DESC`)
+  return r.rows.map((x: any) => ({ taller: num(x.taller), fecha: str(x.fecha), registrados: num(x.registrados), enviados: num(x.enviados), pendientes: num(x.pendientes) }))
+}
+
+/**
+ * Quienes de esa sesión todavía no han recibido el material, uno por correo
+ * (si alguien se registró dos veces con el mismo correo, recibe uno solo).
+ */
+export async function pendientesMaterial(taller: number, fecha: string): Promise<Asistente[]> {
+  const c = await db()
+  const r = await c.execute({
+    sql: `SELECT * FROM ac_taller_asistentes WHERE taller = ? AND fecha = ? AND correo <> '' AND recursos_at = '' ORDER BY id`,
+    args: [taller, fecha],
+  })
+  const vistos = new Set<string>()
+  return r.rows.map(filaAsistente).filter((a) => {
+    const k = a.correo.toLowerCase()
+    if (vistos.has(k)) return false
+    vistos.add(k)
+    return true
+  })
+}
+
+/** Marca como enviado el material a ese correo en esa sesión (todas sus filas). */
+export async function marcarMaterial(taller: number, fecha: string, correo: string): Promise<void> {
+  const c = await db()
+  await c.execute({
+    sql: `UPDATE ac_taller_asistentes SET recursos_at = ? WHERE taller = ? AND fecha = ? AND lower(correo) = lower(?)`,
+    args: [ahora(), taller, fecha, correo],
+  })
+}
