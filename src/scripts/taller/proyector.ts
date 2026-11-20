@@ -17,6 +17,7 @@
 import { CURVA, SplitText, amarrarSignos, gsap, reducido } from '../motion/core'
 import { canal, direccionTecla, enviar, leerDatos, type Mensaje } from './comun'
 import { HOOKS, type Api } from './escenas'
+import { crearCortina, soportaTransiciones } from './cortina'
 
 const ANCHO_MIN = 760
 
@@ -100,19 +101,43 @@ function montar() {
     }
   }
 
-  const entrada = (k: number) => {
-    const el = els[k]!
-    if (reducido()) return
-    const titulo = el.querySelector<HTMLElement>('.tl-titulo')
-    if (titulo) {
-      let split = titulos.get(k)
-      if (!split) {
-        amarrarSignos(titulo)
-        split = SplitText.create(titulo, { type: 'lines,words', mask: 'lines' })
-        titulos.set(k, split)
-      }
-      gsap.fromTo(split.words, { yPercent: 110 }, { yPercent: 0, duration: 0.9, stagger: 0.045, ease: 'expo.out' })
+  // Palabras del título (SplitText, una vez por escena) y del kicker (cada
+  // palabra en su span dentro de un envoltorio, porque el kicker es flex).
+  const palabrasTitulo = (k: number): HTMLElement[] => {
+    const titulo = els[k]!.querySelector<HTMLElement>('.tl-titulo')
+    if (!titulo) return []
+    let split = titulos.get(k)
+    if (!split) {
+      amarrarSignos(titulo)
+      split = SplitText.create(titulo, { type: 'lines,words', mask: 'lines' })
+      titulos.set(k, split)
     }
+    return split.words as HTMLElement[]
+  }
+  const palabrasKicker = (el: HTMLElement): HTMLElement[] => {
+    const kicker = el.querySelector<HTMLElement>('.tl-kicker')
+    if (!kicker) return []
+    if (!kicker.querySelector('.tl-kicker-txt')) {
+      const env = document.createElement('span')
+      env.className = 'tl-kicker-txt'
+      ;(kicker.textContent ?? '').trim().split(/\s+/).filter(Boolean).forEach((w, q) => {
+        if (q) env.append(' ')
+        const s = document.createElement('span')
+        s.className = 'tl-kw'
+        s.textContent = w
+        env.append(s)
+      })
+      kicker.replaceChildren(env)
+    }
+    return [...kicker.querySelectorAll<HTMLElement>('.tl-kw')]
+  }
+
+  // Con transición, la cortina ya anima título, kicker y cuerpo.
+  const entrada = (k: number, conTransicion: boolean) => {
+    const el = els[k]!
+    if (reducido() || conTransicion) return
+    const palabras = palabrasTitulo(k)
+    if (palabras.length) gsap.fromTo(palabras, { yPercent: 110 }, { yPercent: 0, duration: 0.9, stagger: 0.045, ease: 'expo.out' })
     gsap.fromTo(el.querySelector('.tl-kicker'), { autoAlpha: 0, x: -14 }, { autoAlpha: 1, x: 0, duration: 0.5, ease: CURVA, clearProps: 'all' })
     const visibles = [...el.querySelectorAll<HTMLElement>('.tl-cuerpo > *')].filter((x) => !x.classList.contains('pend'))
     gsap.fromTo(visibles, { autoAlpha: 0, y: 30 }, { autoAlpha: 1, y: 0, duration: 0.7, stagger: 0.09, delay: 0.2, ease: CURVA, clearProps: 'transform,opacity,visibility' })
@@ -140,23 +165,9 @@ function montar() {
     }, 250)
   }
 
-  // Cambio de escena con View Transitions: la escena que sale se desliza hacia
-  // un lado y la nueva entra por el otro (según se avance o se retroceda).
-  // Sin soporte del navegador o con movimiento reducido, el cambio es directo.
-  // Si llega otro clic a mitad de la transición, la anterior se termina de
-  // golpe y arranca la nueva.
-  let transicionActual: { skipTransition(): void; finished: Promise<void> } | null = null
-  const transicion = (cambiar: () => void, adelante: boolean) => {
-    const doc = document as Document & { startViewTransition?: (fn: () => void) => { skipTransition(): void; finished: Promise<void> } }
-    if (!doc.startViewTransition || reducido()) return cambiar()
-    document.documentElement.dataset.tlDir = adelante ? 'adelante' : 'atras'
-    transicionActual?.skipTransition()
-    const t = doc.startViewTransition(cambiar)
-    transicionActual = t
-    t.finished.finally(() => {
-      if (transicionActual === t) transicionActual = null
-    }).catch(() => {})
-  }
+  // Cambio de escena con cortina (ver cortina.ts). Sin soporte del navegador
+  // o con movimiento reducido, el cambio es directo.
+  const cortina = soportaTransiciones() ? crearCortina(lienzo, pie) : null
 
   const pasoHook = (el: HTMLElement, k: number, p: number, previo: number) => {
     try {
@@ -176,14 +187,14 @@ function montar() {
       const anterior = i
       i = k
       paso = p
-      const montar = () => {
+      const mostrar = (conTransicion: boolean) => {
         // Si mientras tanto se movió un paso dentro de esta misma escena, vale ese.
         const pp = i === k ? paso : p
         if (anterior >= 0) salir(anterior)
         el.classList.add('activa')
         limpiezas.set(k, [])
         aplicarPasos(el, pp, pp, false)
-        entrada(k)
+        entrada(k, conTransicion)
         try {
           HOOKS[el.dataset.tipo!]?.entrar?.(el, apiPara(k), pp)
         } catch (e) {
@@ -192,8 +203,19 @@ function montar() {
         pasoHook(el, k, pp, -1)
         actualizarPie()
       }
-      if (anterior >= 0) transicion(montar, k > anterior)
-      else montar()
+      if (anterior >= 0 && cortina && !reducido()) {
+        const bv = datos.escenas[anterior]!.bloque
+        const bn = datos.escenas[k]!.bloque
+        const nb = datos.bloques.findIndex((b) => b.id === bn)
+        cortina.correr({
+          viejo: els[anterior]!,
+          nuevo: el,
+          adelante: k > anterior,
+          bloque: bv !== bn && nb >= 0 ? { titulo: datos.bloques[nb]!.titulo, rotulo: `Bloque ${nb + 1} de ${datos.bloques.length}` } : null,
+          palabras: (esc) => ({ kicker: palabrasKicker(esc), titulo: palabrasTitulo(els.indexOf(esc)) }),
+          cambiar: () => mostrar(true),
+        })
+      } else mostrar(false)
       if (local) guardarEstado()
     } else {
       const previo = paso
