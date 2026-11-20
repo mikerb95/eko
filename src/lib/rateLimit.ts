@@ -46,6 +46,12 @@ export function checkRateLimit(
   return { allowed: true, retryAfterSeconds: 0 }
 }
 
+/** true si la clave ya gastó sus intentos, sin contar uno más. */
+export function isRateLimited(key: string, maxAttempts = DEFAULT_MAX_ATTEMPTS): boolean {
+  const bucket = buckets.get(key)
+  return !!bucket && bucket.resetAt > Date.now() && bucket.count >= maxAttempts
+}
+
 export function resetRateLimit(key: string): void {
   buckets.delete(key)
 }

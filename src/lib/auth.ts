@@ -107,6 +107,10 @@ export function clearCookie(secure: boolean): string {
 // trae usuario ni rol).
 
 export const SALA_COOKIE = 'eko_sala'
+// El PC vinculado con el código de dos números (/pc) recibe el mismo pase en
+// otra cookie: con ella solo se ve la presentación siguiendo la escena; no
+// vota ni pregunta (la API de la sala solo lee eko_sala).
+export const PC_COOKIE = 'eko_pc'
 export const SALA_TTL_SECONDS = 60 * 60 * 14
 
 export interface PaseSala {
