@@ -22,6 +22,7 @@ const datos = {
     kicker: e.kicker,
     titulo: e.titulo,
     notas: e.notas,
+    siPreguntan: e.siPreguntan ?? [],
     pasos: e.pasos,
     minutos: e.minutos,
     bloque: e.bloque,
@@ -64,6 +65,10 @@ const datos = {
         <h2 data-titulo></h2>
         <p class="pr-meta"><span data-numero></span> · <span data-paso></span> · <span data-plan></span></p>
         <ol class="pr-notas" data-notas></ol>
+        <section class="pr-preguntan" data-preguntan hidden>
+          <h3>Si preguntan</h3>
+          <div data-preguntan-lista></div>
+        </section>
         <div class="pr-acciones">
           <button type="button" class="pr-btn sec" data-anterior>← Anterior</button>
           <button type="button" class="pr-btn" data-siguiente>Siguiente →</button>

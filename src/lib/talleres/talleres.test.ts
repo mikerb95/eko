@@ -69,6 +69,7 @@ for (const t of Object.values(TALLERES)) {
       ids.add(e.id)
       assert.ok(t.bloques.some((b) => b.id === e.bloque), `bloque de ${e.id}`)
       assert.ok(e.notas.length > 0, `notas de ${e.id}`)
+      if (e.pasos > 0) assert.equal(e.notas.length, e.pasos + 1, `una nota por paso más la de llegada en ${e.id}`)
       if (e.interaccion) assert.ok(interaccionDe(t, e.interaccion), `interacción de ${e.id}`)
       if (e.demo) assert.ok(t.demos.some((d) => d.id === e.demo), `demo de ${e.id}`)
     }

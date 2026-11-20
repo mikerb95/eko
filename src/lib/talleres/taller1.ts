@@ -266,8 +266,12 @@ export const TALLER_1: Taller = {
       minutos: 2,
       pasos: 0,
       notas: [
-        'Bienvenida. Presentarse en una frase y decir el objetivo del día: entender qué hay detrás de la IA para usarla bien desde el lunes.',
-        'Cuatro horas, con descanso a mitad. Hoy no hace falta saber nada de tecnología.',
+        'Abra con el porqué, no con la tecnología: "Muchos de ustedes ya le han preguntado algo a ChatGPT o a Claude. Hoy vamos a ver qué pasa por dentro, porque quien entiende cómo funciona sabe cuándo creerle y cuándo no."',
+        'Lo que se llevan hoy, en tres frases: por qué la IA a veces inventa con total seguridad, cómo pedirle para que acierte al primer o segundo intento, y qué información de Ekosolv y de los clientes nunca se sube.',
+        'Baje la tensión desde el inicio: no hace falta saber de tecnología, nadie va a quedar expuesto y la IA no viene a reemplazar a nadie. Viene a quitar lo repetitivo para que quede tiempo para lo que pide criterio.',
+      ],
+      siPreguntan: [
+        { p: '¿Nos van a reemplazar con esto?', r: 'No es el objetivo ni es lo que la IA hace bien. Redacta, resume y ordena rápido, pero se equivoca con seguridad y no conoce a los clientes ni la norma vigente si alguien no se los da. Siempre necesita a una persona con criterio que revise. Lo que cambia es el tipo de trabajo: menos copiar y pegar, más revisar y decidir.' },
       ],
     },
     {
@@ -279,8 +283,12 @@ export const TALLER_1: Taller = {
       minutos: 5,
       pasos: 0,
       notas: [
-        'Que escaneen el código y escriban su nombre, apellido, cargo y área. No necesitan usuario ni contraseña: con eso queda su asistencia.',
-        'Al entrar queda marcada la asistencia de hoy. El contador sube en pantalla: esperar a la mayoría antes de seguir.',
+        'Mientras escanean, rompa el hielo a mano alzada: "¿Quién usó una IA esta semana? ¿Para qué?" Anote dos o tres usos reales: los puede retomar en "Dónde le ahorra horas" y en la práctica.',
+        'Explique para qué es el celular: votar, ver en cada tema un ejemplo de su propia área y mandarle preguntas a quien dicta. Pida que elijan bien el área: de eso depende qué ejemplos les salen.',
+        'Arranque cuando haya entrado la mayoría; quien llegue tarde escanea sin interrumpir. Con el registro queda la asistencia de hoy.',
+      ],
+      siPreguntan: [
+        { p: '¿Qué hacen con mis datos?', r: 'Solo se piden nombre, cargo y área: sirven para la asistencia y para mostrarle ejemplos de su área. En la pantalla las votaciones se ven en grupo, nunca por persona.' },
       ],
     },
     {
@@ -293,8 +301,9 @@ export const TALLER_1: Taller = {
       pasos: 0,
       interaccion: 'pre',
       notas: [
-        'No es un examen y nadie ve las respuestas de nadie. Sirve para comparar al final cuánto avanzó el grupo.',
-        'Dar unos tres minutos. Seguir cuando el contador se acerque al total de la sala.',
+        'Diga: "No es un examen: nadie ve sus respuestas y no cuenta para nada. Respondan lo que creen hoy, sin buscar en internet. Si aciertan por suerte, al final no vamos a poder medir lo que aprendimos."',
+        'Qué mide cada pregunta: 1, qué hace la IA al responder (predice); 2, verificar normas; 3, cómo pedir; 4, datos personales; 5, memoria entre conversaciones. Son las cinco ideas que todos deben llevarse, y al cierre se repiten iguales.',
+        'No dé respuestas ni pistas ahora, aunque pregunten: todas se resuelven durante la sesión y al final verán cuánto subió el grupo.',
       ],
     },
     {
@@ -306,8 +315,13 @@ export const TALLER_1: Taller = {
       minutos: 3,
       pasos: 3,
       notas: [
-        'Estos son los datos de la encuesta que el propio equipo respondió en /ia. No son cifras de afuera: son las suyas.',
-        'Cerrar con: el objetivo no es reemplazar a nadie, es devolverles esas horas para lo que requiere criterio.',
+        'Diga: "Antes de hablar de tecnología, hablemos de ustedes. Estas cifras no son de un estudio de otra empresa: salen de la encuesta que ustedes respondieron."',
+        'Paso 1, cuántos respondieron: agradezca la participación y diga para qué sirve: con estas respuestas se van a ajustar los temas de las capacitaciones por área.',
+        'Paso 2, horas al mes en tareas repetitivas: vuélvalas tangibles haciendo la cuenta en voz alta. Cada 160 horas equivalen, más o menos, a una persona trabajando un mes entero. Pregunte: "¿Qué harían con ese tiempo?"',
+        'Paso 3, las tareas que más se repiten: pida a alguien que se reconozca en la primera y cuente cuánto le toma. Cierre: "La meta no es reemplazar a nadie: es devolverles esas horas para el trabajo que necesita criterio. Hoy empezamos por entender la herramienta."',
+      ],
+      siPreguntan: [
+        { p: '¿Estas cifras son exactas?', r: 'Son lo que cada persona estimó en la encuesta, no una medición con cronómetro. Sirven para ver el orden de magnitud y qué tareas pesan más, que es lo que importa para decidir por dónde empezar.' },
       ],
     },
 
@@ -321,9 +335,13 @@ export const TALLER_1: Taller = {
       minutos: 8,
       pasos: 3,
       notas: [
-        'Paso 1: así funciona el software de siempre. Alguien escribe reglas "si pasa esto, haga aquello".',
-        'Paso 2: llega un caso que nadie previó, una luminaria LED con batería de litio. Ninguna regla lo cubre y el programa se queda sin respuesta.',
-        'Paso 3: un modelo no tiene reglas escritas. Vio miles de ejemplos ya clasificados y ubica el caso nuevo cerca de los parecidos: es RAEE y lleva un componente peligroso. Eso es aprender de ejemplos.',
+        'La idea que hay que dejar: la IA no es un programa más con más reglas, es otra forma de construir software. Si esto queda claro, todo lo demás del día tiene sentido.',
+        'Paso 1: el software de siempre (Zoho, Siigo, Excel) hace exactamente lo que alguien dejó escrito: "si dice bombilla, es RAEE". Su ventaja es que es predecible y nunca inventa. Su límite: solo sabe lo que alguien previó.',
+        'Paso 2, la luminaria LED con batería de litio: pregunte a la sala qué es. Operaciones lo sabe: un RAEE con un componente peligroso. Ninguna regla de la lista lo cubre, y el programa se queda sin respuesta o, peor, lo clasifica mal.',
+        'Paso 3: el modelo no tiene reglas; vio miles de ejemplos clasificados y ubica el caso nuevo cerca de los parecidos. Diga: "Esa es su gran ventaja y también su riesgo: como no sigue reglas, puede acertar en casos que nadie previó y equivocarse en casos que parecían obvios."',
+      ],
+      siPreguntan: [
+        { p: '¿Entonces la IA reemplaza a Zoho o a Siigo?', r: 'No, se complementan. El sistema guarda los datos y hace las cuentas exactas; la IA lee, interpreta y redacta. Lo valioso es conectarlos: que la IA lea un correo y deje el registro listo en Zoho, y que la cifra final la calcule el sistema.' },
       ],
       datos: {
         reglas: [
@@ -348,9 +366,14 @@ export const TALLER_1: Taller = {
       minutos: 8,
       pasos: 3,
       notas: [
-        'Paso 1: por dentro, un modelo es una red de números que se pueden subir o bajar, como perillas. Al principio están al azar y responde basura.',
-        'Paso 2: entrenar es mostrarle un ejemplo, medir cuánto se equivocó y mover un poquito cada perilla para equivocarse menos. Repetido miles de millones de veces, el error baja.',
-        'Paso 3: los modelos grandes tienen miles de millones de perillas. El número exacto de Claude no es público. Nadie programa lo que sabe: sale del ajuste.',
+        'Esta escena le quita la magia a la IA: por dentro no hay nadie pensando, hay números. Cuanto más concreto lo diga, mejor lo entienden.',
+        'Paso 1: imagine una consola de sonido con miles de millones de perillas. Al principio están al azar: si le pide terminar una frase, escribe letras sin sentido.',
+        'Paso 2, entrenar es un ciclo: se le muestra un texto tapando la palabra siguiente, el modelo adivina, se mide qué tan lejos quedó y cada perilla se mueve un poquito en la dirección que reduce el error. Repetido con una cantidad enorme de texto, termina escribiendo bien.',
+        'Paso 3, remate: "Nadie le escribió a Claude qué es un RAEE: lo aprendió ajustando perillas. Por eso ni sus creadores pueden señalar dónde guarda un dato, y por eso no se le cree por autoridad: se le verifica." El número exacto de perillas de Claude no es público.',
+      ],
+      siPreguntan: [
+        { p: '¿Aprende de lo que yo le escribo?', r: 'No en el momento: sus perillas quedan fijas después del entrenamiento y la conversación no las cambia. Si la empresa usa las conversaciones para entrenar versiones futuras depende del plan: en los planes de empresa de Anthropic no se usan; en las cuentas personales hay una opción en la configuración de privacidad que conviene revisar.' },
+        { p: '¿La IA piensa?', r: 'Calcula. Puede encadenar razonamientos muy útiles, pero no sabe si algo es cierto: produce lo más probable según lo que aprendió. Por eso se revisa.' },
       ],
     },
     {
@@ -362,9 +385,11 @@ export const TALLER_1: Taller = {
       minutos: 8,
       pasos: 1,
       notas: [
-        'El texto se parte en trozos: palabras comunes enteras, palabras largas en pedazos, cifras en grupos. Cada trozo es un token.',
-        'Escribir en vivo algo que digan ellos, por ejemplo el nombre de un cliente o una norma. Mostrar cómo "Resolución" se parte.',
-        'Paso 1: por qué importa: el límite de lo que la IA puede leer y el costo se miden en tokens, no en páginas. La partición en pantalla es aproximada, para ilustrar.',
+        'Pida a la sala una palabra o el nombre de un cliente y escríbalo en vivo. Las palabras comunes van enteras; las largas, los nombres propios y las cifras se parten. Muestre "Resolución" y un número de radicado: los números se parten en muchos pedazos. Como referencia, una página de texto en español ronda los 700 a 1.000 tokens.',
+        'Paso 1, por qué les importa: lo que la IA puede leer de una vez y lo que cuesta se miden en tokens. Consecuencia práctica: un Excel exportado con miles de filas de cifras llena la capacidad mucho antes que un auto de puro texto. Exporten solo las columnas y el periodo que necesitan. La partición en pantalla es aproximada.',
+      ],
+      siPreguntan: [
+        { p: '¿Cuánto cuesta usar esto?', r: 'En el plan de suscripción se paga una tarifa fija por usuario, con un límite de uso por periodo que también se mide en tokens: las conversaciones larguísimas o los archivos enormes lo gastan más rápido. Por eso conviene abrir una conversación nueva para cada tarea.' },
       ],
       datos: {
         texto: 'ARTÍCULO PRIMERO. Requerir a la sociedad para que presente los certificados de disposición final, conforme a la Resolución 1407 de 2018.',
@@ -379,10 +404,13 @@ export const TALLER_1: Taller = {
       minutos: 10,
       pasos: 2,
       notas: [
-        'Esta es la idea central del día. Ante un texto, el modelo calcula qué tan probable es cada token que podría seguir.',
-        'Paso 1: elige uno, lo agrega y vuelve a calcular. Así escribe un párrafo entero, token por token.',
-        'Paso 2: la temperatura. Baja: casi siempre elige lo más probable, respuestas parecidas. Alta: se arriesga más. Por eso la misma pregunta da redacciones distintas. Mover el control y generar varias veces.',
-        'Las probabilidades en pantalla son un ejemplo ilustrativo.',
+        'Diga: "Si se llevan una sola idea de hoy, que sea esta: la IA no busca la respuesta, la escribe palabra por palabra eligiendo la más probable." Lea la frase en pantalla y pregunte cómo la completarían: casi todos dirán "gestor". Eso mismo calcula el modelo.',
+        'Paso 1: use "Elegir el siguiente token" varias veces. Muestre que elige uno, lo pega y vuelve a calcular con la frase más larga. Un párrafo entero es eso repetido cientos de veces, y en ningún momento hay un paso en el que verifique lo que escribió.',
+        'Paso 2, la temperatura: baja, casi siempre elige "gestor" y las respuestas se parecen; alta, a veces elige "operador" o hasta "camión". Por eso la misma pregunta da redacciones distintas, y es normal. En claude.ai no hay un control de temperatura: se maneja con la instrucción ("cíñete al documento" o "dame ideas arriesgadas"). Las probabilidades en pantalla son ilustrativas.',
+      ],
+      siPreguntan: [
+        { p: 'Si le pregunto dos veces y me dice cosas distintas, ¿cuál es la buena?', r: 'Ninguna por ser la primera o la segunda. Si las dos dicen lo mismo con otras palabras, bien. Si cambian los datos (una fecha, un artículo, una cifra), es señal de que está adivinando: vaya al documento.' },
+        { p: '¿Entonces copia de internet?', r: 'No copia ni busca, salvo que la herramienta tenga la búsqueda activada y muestre las fuentes. Escribe a partir de lo que aprendió; por eso puede producir frases que nunca existieron, verdaderas o falsas.' },
       ],
       datos: {
         frase: 'El generador de RAEE debe entregar los residuos a un',
@@ -405,9 +433,13 @@ export const TALLER_1: Taller = {
       minutos: 7,
       pasos: 3,
       notas: [
-        'Paso 1: cada palabra se convierte en una posición en un mapa con miles de dimensiones. Aquí lo vemos en dos.',
-        'Paso 2: durante el entrenamiento, las palabras que aparecen en contextos parecidos terminan cerca. Nadie le dijo que el tóner es peligroso: lo aprendió de cómo se usa la palabra.',
-        'Paso 3: la luminaria queda entre RAEE y RESPEL, igual que en la vida real. Por eso entiende sinónimos y frases que nunca vio escritas igual.',
+        'Esta escena explica por qué la IA entiende sinónimos y también por qué a veces confunde términos vecinos. Para Operaciones es clave: en la norma, palabras cercanas no siempre significan lo mismo.',
+        'Paso 1: cada palabra se vuelve una posición en un mapa. El mapa real tiene miles de dimensiones; aquí está aplanado a dos para poder verlo.',
+        'Paso 2: las palabras que aparecen en frases parecidas terminan cerca. Nadie le dijo que el tóner es peligroso: lo dedujo porque aparece junto a "aceite usado", "pilas" y "RESPEL" en miles de textos.',
+        'Paso 3, la luminaria queda entre RAEE y RESPEL, como en la vida real. Doble filo: por eso entiende "medidas de manejo" cuando usted dice "obligaciones del PMA", pero también puede tratar como iguales "aprovechamiento" y "disposición final", que en la norma no lo son. Pídale que use los términos exactos del documento.',
+      ],
+      siPreguntan: [
+        { p: '¿Así funciona Google?', r: 'Los buscadores modernos usan una idea parecida para encontrar textos por significado y no solo por palabras exactas. La diferencia: el buscador le devuelve documentos que existen; la IA le escribe un texto nuevo.' },
       ],
       datos: {
         grupos: [
@@ -445,9 +477,14 @@ export const TALLER_1: Taller = {
       minutos: 8,
       pasos: 3,
       notas: [
-        'Paso 1: preentrenamiento. Lee una cantidad enorme de texto: libros, páginas públicas, código. Ahí aprende el idioma y muchísimos datos, buenos y malos.',
-        'Paso 2: ajuste. Personas le muestran buenas respuestas y califican las suyas. Ahí aprende a seguir instrucciones, a ser útil y a negarse a lo dañino.',
-        'Paso 3: fecha de corte. Lo que pasó después de su entrenamiento no lo sabe, a menos que usted se lo muestre o que la herramienta busque en internet. Una norma de la semana pasada, por ejemplo.',
+        'Esta escena responde dos preguntas que siempre salen: de dónde saca lo que sabe y por qué no sabe lo reciente.',
+        'Paso 1, preentrenamiento: lee una cantidad enorme de texto (libros, páginas públicas, código) y aprende a predecirlo. Ahí aprende el idioma y muchísimos datos, buenos y malos: también leyó normas derogadas, foros con errores y páginas desactualizadas.',
+        'Paso 2, ajuste con personas: personas escriben buenas respuestas y califican las del modelo. Así aprende a seguir instrucciones, a ser útil y a negarse a lo dañino. De aquí sale su tono amable y seguro, que no es lo mismo que tener razón.',
+        'Paso 3, fecha de corte: lo posterior no lo sabe. Ejemplo concreto: si mañana la ANLA o una CAR expide una resolución, la IA no la conoce hasta que usted le pegue el texto o la herramienta busque en internet y muestre la fuente. Tampoco sabe nada interno de Ekosolv: clientes, precios, gestores.',
+      ],
+      siPreguntan: [
+        { p: '¿Cómo sé hasta qué fecha sabe?', r: 'Pregúntele, y tome la respuesta como aproximada. La regla práctica: todo lo de los últimos meses, y todo lo que cambia con el tiempo (normas, tarifas, UVT, salario mínimo), se le da o se verifica.' },
+        { p: 'Si activo la búsqueda en internet, ¿ya no inventa?', r: 'Inventa menos sobre lo reciente, pero puede leer una fuente mala o resumirla mal. Abra los enlaces que cite y confirme el dato en la página oficial.' },
       ],
       datos: {
         etapas: [
@@ -466,9 +503,13 @@ export const TALLER_1: Taller = {
       minutos: 8,
       pasos: 3,
       notas: [
-        'Todo lo que la IA tiene en cuenta al responder está en la conversación: sus mensajes, los documentos que adjuntó y sus propias respuestas. Eso es la ventana de contexto.',
-        'Paso 1: un auto de 40 páginas cabe sin problema. Paso 2: un PMA completo también, pero ocupa buena parte. Paso 3: todo el archivo de expedientes no cabe: hay que elegir qué darle.',
-        'La capacidad es del orden de unos cientos de páginas, según el modelo y el plan. Y al abrir una conversación nueva, la mesa queda vacía: no recuerda la anterior, salvo que use un proyecto.',
+        'Diga: "Todo lo que la IA tiene en cuenta está sobre la mesa: sus mensajes, lo que adjuntó y lo que ella misma respondió. Lo que no está en la mesa no existe para ella."',
+        'Paso 1, un auto de 40 páginas cabe de sobra. Es el caso típico de Operaciones: el documento entero cabe, así que no hay razón para darle solo un pedazo.',
+        'Paso 2, un PMA completo también cabe, pero ocupa buena parte de la mesa. Dato útil: en conversaciones muy largas la IA le presta menos atención a lo que quedó en medio. Para una tarea puntual rinde más una conversación nueva con lo justo que una de horas con todo.',
+        'Paso 3, el archivo de expedientes no cabe: hay que elegir. Y al abrir una conversación nueva la mesa queda vacía. La solución son los proyectos de Claude: ahí se dejan fijos documentos e instrucciones (la plantilla de propuesta, el manual, la guía de voz) y cada conversación del proyecto los tiene a mano. La capacidad exacta depende del modelo y del plan: hablamos de cientos de páginas.',
+      ],
+      siPreguntan: [
+        { p: '¿Claude tiene memoria entre conversaciones?', r: 'Tiene una función de memoria que se puede activar, y los proyectos guardan documentos e instrucciones. Pero no hay que contar con que recuerde un detalle de hace una semana: lo importante se deja en el proyecto o se vuelve a pegar.' },
       ],
       datos: {
         docs: [
@@ -488,9 +529,14 @@ export const TALLER_1: Taller = {
       minutos: 5,
       pasos: 3,
       notas: [
-        'Paso 1: el modelo es el cerebro: Claude, GPT, Gemini, Llama. Lo hacen pocas empresas en el mundo.',
-        'Paso 2: la aplicación es por donde usted lo usa: claude.ai, ChatGPT, Gemini, Copilot. En Ekosolv vamos a trabajar con Claude.',
-        'Paso 3: las herramientas le dan manos: leer PDF e imágenes, buscar en internet, conectarse a sistemas como Zoho. Cuando la IA usa herramientas por su cuenta para cumplir una tarea, hablamos de agentes.',
+        'Esta escena ordena el vocabulario: modelo, aplicación, herramienta y agente. Mucha confusión viene de mezclarlos.',
+        'Paso 1, el modelo es el cerebro: Claude (Anthropic), GPT (OpenAI), Gemini (Google), Llama (Meta). Los entrenan pocas empresas porque cuesta muchísimo. Todos funcionan igual por dentro: lo que se ve hoy aplica a cualquiera.',
+        'Paso 2, la aplicación es por donde se usa: claude.ai, ChatGPT, Copilot. Muchas aplicaciones traen IA adentro (Canva, Notion, Zia en Zoho), con un modelo de estos detrás. En Ekosolv se trabaja con Claude, y las reglas de seguridad aplican también a las IA que vienen dentro de otras aplicaciones.',
+        'Paso 3, herramientas y agentes: leer PDF e imágenes, buscar en internet, conectarse a sistemas. Cuando la IA encadena pasos sola (lee el correo, crea el registro en Zoho, avisa al cliente) es un agente. Para Gerencia y Logística es lo más prometedor. La regla no cambia: lo que hace un agente se revisa, sobre todo si escribe en un sistema o le habla a un cliente.',
+      ],
+      siPreguntan: [
+        { p: '¿Por qué Claude y no ChatGPT?', r: 'Ekosolv eligió trabajar con una sola herramienta para que todos compartan instrucciones y proyectos. Lo que se aprende hoy sirve igual para ChatGPT o Gemini, porque por dentro funcionan igual.' },
+        { p: '¿Se puede conectar Claude a nuestro Zoho?', r: 'Técnicamente sí, con integraciones, y es de lo que más tiempo ahorra cuando se automatiza. Primero conviene dominar el uso a mano: saber pedir y revisar es lo que hace que una automatización salga bien.' },
       ],
       datos: {
         capas: [
@@ -510,8 +556,9 @@ export const TALLER_1: Taller = {
       pasos: 2,
       interaccion: 'comp',
       notas: [
-        'Dos preguntas rápidas desde el celular. Esperar respuestas y revelar con cada clic.',
-        'Si más de un tercio falla, repasar tokens o temperatura antes de seguir.',
+        'Diga: "Dos preguntas rápidas para ver si vamos bien. No importa equivocarse: así sé qué repetir." Espere a que vote la mayoría antes de revelar.',
+        'Paso 1, qué es un token: si muchos eligen "contraseña" o "moneda", repita en una frase: es un pedazo de texto, y en tokens se mide lo que la IA lee y lo que cuesta.',
+        'Paso 2, respuestas distintas: si muchos creen que la respuesta sale idéntica, vuelva a la temperatura con un ejemplo: "Pídale dos veces el mismo correo y verá dos redacciones. Si lo que cambia es un dato, está adivinando." Si más de un tercio falló alguna, dedique dos minutos a repasarla antes de seguir.',
       ],
     },
 
@@ -525,8 +572,16 @@ export const TALLER_1: Taller = {
       minutos: 8,
       pasos: 6,
       notas: [
-        'Un ejemplo por área, con un clic cada uno. Preguntar a alguien de cada área si le suena.',
-        'Lo común: leer y resumir documentos largos, pasar información a tablas, redactar primeros borradores y revisar contra una lista.',
+        'Pase de la teoría al trabajo: "Hasta aquí, cómo funciona. Ahora, dónde le ahorra horas a cada uno." En cada área, pregúntele a alguien de esa área cuánto le toma hoy esa tarea.',
+        'Operaciones: un auto de la ANLA o de la CAR tiene obligaciones repartidas en varios artículos, con plazos que corren desde la ejecutoria. La IA hace la primera pasada (obligación, artículo, plazo, responsable) y el consultor revisa y lleva las vigencias al calendario. Lo que se ahorra es la lectura; la revisión sigue siendo del consultor.',
+        'Logística: el correo trae solicitudes en formatos distintos. La IA las separa del resto, saca cliente, residuo, cantidad y fecha, y deja listos el registro para Zoho y el aviso al cliente. Ojo: si falta un dato, debe escribir "no aparece", no completarlo.',
+        'Ventas: del Brief de Zoho al borrador de la propuesta con la estructura de Ekosolv. El comercial pone precios y alcance; la IA, la redacción.',
+        'Mercadeo: una norma nueva convertida en un artículo y tres publicaciones con la voz de la marca. Toda cifra y toda cita se verifica antes de publicar.',
+        'Gerencia: el borrador de la propuesta sale de la oportunidad en Zoho, y el tablero muestra cuáles están listas para cerrar y cuáles llevan días quietas. Más adelante eso mismo se puede automatizar: avisos de oportunidades frías y un resumen semanal del embudo.',
+        'Finanzas: el proceso de nómina o de cierre de mes que hoy vive en la cabeza de una persona, convertido en procedimiento escrito para el manual. Se cuenta tal cual y la IA lo ordena en pasos, responsables y controles. Cierre con lo común a las seis áreas: leer y resumir, pasar a tablas, escribir primeros borradores y revisar contra una lista.',
+      ],
+      siPreguntan: [
+        { p: '¿Y si mi tarea no aparece aquí?', r: 'Pregúntese si es de uno de esos cuatro tipos: leer algo largo, pasar información a una tabla, escribir un primer borrador o revisar contra una lista. Si lo es, la IA probablemente ayuda. En la práctica de hoy cada uno elige una tarea propia.' },
       ],
       datos: {
         areas: [
@@ -550,9 +605,14 @@ export const TALLER_1: Taller = {
       interaccion: 'verdad',
       provisional: true,
       notas: [
-        'Cuatro afirmaciones como las que podría escribir la IA. Que voten en el celular si cada una es verdad o inventada.',
-        'Revelar una por clic. La cuarta es la más importante: una norma real con un dato falso.',
-        'Mike: antes de la sesión, verificar estas citas y cambiarlas por normas que el equipo use a diario.',
+        'Diga: "Cuatro frases como las que podría escribir la IA. Voten en el celular si cada una es verdad o inventada." No adelante cuántas son falsas. Espere los votos antes de cada revelación.',
+        'Paso 1, Ley 1672 de 2013: verdad. Es la ley de la política pública de gestión integral de RAEE; la reglamenta el Decreto 284 de 2018.',
+        'Paso 2, la "Resolución 2290 de 2019" y el "SIRAEE": inventada. Haga notar por qué engaña: número plausible, año plausible, sigla que suena oficial. Pregunte a quien votó verdad por qué: casi siempre es "porque sonaba muy específica". Que sea específica no prueba nada.',
+        'Paso 3, Resolución 1407 de 2018: verdad. Es la norma de responsabilidad extendida del productor para envases y empaques, modificada después por la Resolución 1342 de 2020.',
+        'Paso 4, la más importante: el Decreto 1076 de 2015 existe (es el decreto único del sector ambiente), pero esa "multa única de 50 salarios" no. Una norma real con un dato falso pasa cualquier revisión superficial: no basta con confirmar que la norma existe, hay que leer el artículo. Antes de la sesión, cambie estas citas por normas que el equipo use a diario.',
+      ],
+      siPreguntan: [
+        { p: '¿Cómo verifico rápido una norma?', r: 'En una fuente oficial: SUIN-Juriscol, la página de la autoridad que la expidió o el Diario Oficial. Busque el número y el año, abra el texto, lea el artículo que la IA citó y revise si fue modificado o derogado.' },
       ],
     },
     {
@@ -564,9 +624,13 @@ export const TALLER_1: Taller = {
       minutos: 6,
       pasos: 2,
       notas: [
-        'Volver a la idea 4: predice lo probable. Ante "la Resolución ____ de 2019", muchos números son probables y ninguno destaca.',
-        'Paso 1: elige uno y sigue escribiendo con total seguridad. No miente a propósito: completa el patrón.',
-        'Paso 2: por eso inventa más con números, fechas, artículos y hechos recientes, y menos cuando el dato está en el documento que usted le dio.',
+        'Conecte con la idea 4: "¿Recuerdan que elige la palabra más probable? Miren qué pasa cuando le toca escribir un número de resolución." Señale que ningún número destaca: todos son más o menos igual de probables.',
+        'Paso 1: elige uno igual, porque su trabajo es seguir escribiendo, y sigue con total seguridad. No miente a propósito: completa el patrón. No tiene una alarma interna confiable que le avise "este dato no lo sé", y el tono es el mismo cuando acierta que cuando se equivoca.',
+        'Paso 2, dónde inventa más: números de normas, artículos, fechas, cifras, nombres propios y hechos recientes. Dónde inventa menos: cuando el dato está en el documento que usted le dio. La lección práctica: no le pregunte de memoria; dele el documento y pídale que diga de dónde sale cada dato.',
+      ],
+      siPreguntan: [
+        { p: '¿Y si le digo que no invente?', r: 'Ayuda, sobre todo si le da una salida: "si no aparece en el documento, escribe no aparece". Pero no lo elimina. Lo que de verdad reduce el error es darle el documento y verificar.' },
+        { p: 'Si le pregunto "¿estás segura?", ¿se corrige?', r: 'A veces, pero también puede cambiar una respuesta correcta por una incorrecta solo por complacer. Preguntarle no es verificar; verificar es ir a la fuente.' },
       ],
       datos: {
         frase: 'La obligación de reportar los RAEE está en la Resolución',
@@ -589,8 +653,11 @@ export const TALLER_1: Taller = {
       minutos: 7,
       pasos: 4,
       notas: [
-        'Un hábito por clic. Insistir: el trabajo de la IA se revisa como el de un practicante nuevo, siempre.',
-        'El tercero ya lo vieron en la lección de la academia: pedir que diga de qué parte del documento sacó cada dato.',
+        'La imagen que debe quedar: el trabajo de la IA se revisa como el de un practicante muy rápido y muy seguro de sí mismo. Es útil, pero nadie firma lo que entrega un practicante sin leerlo.',
+        'Paso 1, normas a la fuente oficial: número, año y artículo. Y confirmar la vigencia: una norma derogada o modificada es tan peligrosa como una inventada. SUIN-Juriscol muestra si un artículo fue modificado.',
+        'Paso 2, cifras contra el original: kilos, fechas, plazos y valores. No todo se revisa con la misma intensidad: empiece por lo que más daño hace si está mal (un plazo ante la autoridad, un valor en una propuesta, un pago).',
+        'Paso 3, pedir de dónde sale cada dato: "indica el artículo o la página; si no aparece, dilo". Así la revisión va directo al punto citado y toma minutos en vez de una hora. Si la IA no puede señalar de dónde sacó un dato, no se usa.',
+        'Paso 4, desconfiar de lo demasiado perfecto: cifras redondas, listas completísimas, citas exactas sin documento delante. Cuanto más redondo parece, más vale revisarlo. Pregunte a la sala cuál de los cuatro hábitos les cuesta más.',
       ],
       datos: {
         pasos: [
@@ -611,7 +678,10 @@ export const TALLER_1: Taller = {
       titulo: 'Quince minutos',
       minutos: 15,
       pasos: 0,
-      notas: ['Al volver: cómo pedirle a la IA para que acierte al primer o segundo intento.'],
+      notas: [
+        'Antes de soltar: "Al volver vamos a ver por qué la misma IA da respuestas malas o excelentes según cómo se le pida, con un auto en vivo."',
+        'Durante el descanso, revise las preguntas que llegaron del celular y elija dos o tres para responder al volver.',
+      ],
       datos: { minutos: 15 },
     },
 
@@ -625,8 +695,15 @@ export const TALLER_1: Taller = {
       minutos: 10,
       pasos: 4,
       notas: [
-        'Casi todos los malos resultados vienen de instrucciones cortas. Una parte por clic.',
-        'Contexto: quién es usted y qué hay que saber. Tarea: un verbo claro. Formato: cómo lo quiere recibir. Ejemplo: cómo debe quedar.',
+        'Diga: "Casi todos los malos resultados vienen de instrucciones de una línea. La IA no lo conoce, no sabe para quién es ni qué va a hacer con la respuesta: si no se lo dice, lo adivina." Pedirle a la IA es como delegarle a alguien nuevo muy capaz.',
+        'Paso 1, contexto: quién es usted, para quién es el resultado y qué hay que saber. Es la parte que más mejora la respuesta y la que más se omite. "Soy consultor de Ekosolv; el cliente es una planta en Funza" cambia el tono y lo que la IA considera importante.',
+        'Paso 2, tarea: un verbo claro y concreto. "Extrae", "compara", "redacta", "clasifica" funcionan; "mira esto" o "ayúdame con" dejan que la IA elija qué hacer.',
+        'Paso 3, formato: cómo lo quiere recibir (tabla con columnas definidas, correo de cinco líneas, viñetas). Incluya qué hacer cuando falta un dato ("escribe no aparece"): es la línea que más reduce lo inventado.',
+        'Paso 4, ejemplo: si tiene uno, péguelo. Una fila de tabla bien hecha o una propuesta ganada enseñan más que cualquier descripción. No es obligatorio, pero cuando el resultado debe verse de una forma exacta es lo que más rinde.',
+      ],
+      siPreguntan: [
+        { p: '¿Hay que decirle "por favor"?', r: 'No cambia la calidad de forma importante. Lo que sí cambia todo es el contexto y el formato. Escríbale como a un compañero: claro y completo.' },
+        { p: '¿Funciona mejor en inglés?', r: 'Funciona muy bien en español. Escriba en el idioma en que quiere la respuesta.' },
       ],
       datos: {
         partes: [
@@ -648,10 +725,13 @@ export const TALLER_1: Taller = {
       demo: 'auto',
       provisional: true,
       notas: [
-        'Primero mostrar el auto. Después pedirle a Claude con cada versión: el botón "Preguntarle a Claude" está aquí y en la pantalla.',
-        'Versión 1: solo "Resúmeme este auto". Sale un párrafo correcto pero inútil para trabajar.',
-        'Versión 2 a 4: un clic por versión. Señalar lo que cambia en la respuesta con cada parte agregada.',
-        'Si la IA no responde, aparece la respuesta guardada con su etiqueta. El auto es de ejemplo hasta tener uno real de Ekosolv.',
+        'Muestre el auto unos segundos y pida con la versión 1, solo "Resúmeme este auto". Lea la respuesta en voz alta y pregunte: "¿Con esto ya sabemos qué hacer el lunes?" Es correcta, pero no sirve para trabajar: no ordena plazos ni responsables.',
+        'Paso 1, más contexto: la respuesta pasa de describir el auto a decir qué tiene que hacer el cliente. Señale que no le pidió una lista: la IA la armó porque entendió para quién era.',
+        'Paso 2, más formato: aparece la tabla con obligación, artículo, plazo y responsable, y "no aparece" donde falta un dato. Esa celda es la prueba de que no está inventando el plazo. Esta tabla ya se revisa artículo por artículo en minutos.',
+        'Paso 3, más ejemplo: la tabla toma la forma exacta de la fila de muestra ("Cliente, con apoyo de Ekosolv") y además dice cuál obligación es la más urgente y por qué. Remate: "Misma IA, mismo auto. Lo único que cambió fue la instrucción." Si la IA no responde, sale la respuesta guardada con su etiqueta; el auto es de ejemplo.',
+      ],
+      siPreguntan: [
+        { p: '¿Cuánto toma escribir una instrucción así?', r: 'Dos o tres minutos la primera vez. Después se guarda y se reutiliza cambiando solo lo que va entre corchetes. Por eso la entrega de hoy es una instrucción guardada.' },
       ],
     },
     {
@@ -663,8 +743,10 @@ export const TALLER_1: Taller = {
       minutos: 10,
       pasos: 3,
       notas: [
-        'Paso 1 y 2: una conversación real se corrige por partes, como con un compañero.',
-        'Paso 3: cuando una instrucción le funcione, guárdela. En Claude se puede crear un proyecto con instrucciones y documentos fijos, para no repetirlos cada vez.',
+        'El error más común después de una mala respuesta es borrar todo y empezar de nuevo, o rendirse. La IA conserva todo lo de la conversación: corregir por partes es más rápido.',
+        'Paso 1, quitar lo que sobra: "esto no está en el auto, quita la fila". Las correcciones concretas funcionan; "quita la fila de notificación" sirve, "está mal" no.',
+        'Paso 2, agregar lo que falta: la fecha límite a partir de la ejecutoria. Fíjese en la respuesta: la IA pide revisar el cálculo de días hábiles. Así debe ser: días hábiles y festivos de Colombia son justo el tipo de cálculo en el que se equivoca, y se cuentan en el calendario.',
+        'Paso 3, guardar: cuando una instrucción funcione, se guarda en un proyecto de Claude con sus documentos fijos. Y si una conversación se enreda después de muchas correcciones, abra una nueva con la instrucción ya corregida: rinde más que seguir parchando.',
       ],
       datos: {
         mensajes: [
@@ -686,8 +768,10 @@ export const TALLER_1: Taller = {
       minutos: 30,
       pasos: 0,
       notas: [
-        'En esta escena la sala del celular se convierte en el revisor: cada persona escribe su instrucción y la IA le dice qué le faltó. Quien cerró la sala, que vuelva a escanear el código.',
-        'Recorrer la sala. A los 20 minutos, pedir 2 o 3 voluntarios y mostrar su instrucción antes y después.',
+        'Consigna en una frase: "Elija una tarea que haga cada semana y le quite tiempo, y escriba la instrucción con las cuatro partes." El revisor del celular dice qué le faltó, no hace la tarea. En el revisor se escribe la instrucción; no se pegan documentos con datos personales. Quien cerró la sala vuelve a escanear el código.',
+        'Primeros cinco minutos: muchos se bloquean eligiendo la tarea. Recorra la sala y sugiera por área: Operaciones, la matriz de un auto o las vigencias de los permisos de un cliente; Logística, clasificar los correos de solicitudes; Gerencia, la propuesta desde una oportunidad de Zoho; Finanzas, el procedimiento de la nómina o la conciliación con el banco; Ventas, del Brief a la propuesta; Mercadeo, una publicación a partir de una norma.',
+        'Lo que más falta en las instrucciones: el contexto (no dicen quiénes son ni para quién es) y qué hacer cuando falta un dato. Si ve el mismo error en varias personas, dígalo en voz alta para todos.',
+        'A los 20 minutos: pida dos o tres voluntarios de áreas distintas y muestre su instrucción antes y después del revisor. Cierre: "Guárdenla: es la base de su entrega en la academia."',
       ],
       datos: {
         pasos: [
@@ -712,9 +796,15 @@ export const TALLER_1: Taller = {
       interaccion: 'semaforo',
       provisional: true,
       notas: [
-        'La Ley 1581 de 2012 protege los datos personales. Compartirlos sin cuidado con una herramienta externa es un riesgo legal y de confianza.',
-        'Cinco casos; votan en el celular y se revela uno por clic.',
-        'Regla corta: documentos públicos sí; documentos de trabajo, anonimizados; datos sensibles y contraseñas, nunca.',
+        'Contexto legal en 30 segundos: la Ley 1581 de 2012 protege los datos personales y la vigila la Superintendencia de Industria y Comercio, que puede imponer multas de hasta 2.000 salarios mínimos. Pegar datos de personas en una IA es tratarlos, y como los servidores están fuera de Colombia, esos datos salen del país. Además del riesgo legal está la confianza del cliente.',
+        'Paso 1, la resolución publicada: se sube. Es un documento público.',
+        'Paso 2, el certificado con nombre y cédula del conductor: se sube anonimizado. La tarea (kilos, residuo, fecha) no necesita saber quién manejaba. Regla: si el dato personal no hace falta para la tarea, se quita.',
+        'Paso 3, las incapacidades médicas: no se sube. Los datos de salud son datos sensibles (artículo 5 de la ley) y tienen protección reforzada. Ni anonimizados vale la pena: en un equipo pequeño es fácil reconocer a la persona.',
+        'Paso 4, el correo del cliente con su celular: anonimizado. Para redactar la respuesta basta "el jefe de planta". Muchos votan "se sube" porque es un cliente; recalque que el contacto del cliente también es dueño de sus datos.',
+        'Paso 5, la contraseña de Zoho: nunca. Ni contraseñas, ni claves bancarias, ni códigos de acceso, en ninguna IA. Regla corta para cerrar: documentos públicos, sí; documentos de trabajo, anonimizados; datos sensibles y contraseñas, nunca. Los casos son de ejemplo: ajústelos con situaciones reales de Ekosolv.',
+      ],
+      siPreguntan: [
+        { p: '¿Y la información de la empresa que no es personal, como precios o contratos?', r: 'La Ley 1581 no la cubre, pero es confidencial. En los planes de empresa de Anthropic las conversaciones no se usan para entrenar, lo que reduce el riesgo; aun así, lo estratégico (precios negociados, contratos con cláusula de confidencialidad) se comparte solo si hace falta para la tarea. Ante la duda, se consulta con Gerencia.' },
       ],
     },
     {
@@ -727,9 +817,11 @@ export const TALLER_1: Taller = {
       pasos: 1,
       provisional: true,
       notas: [
-        'Hacer clic sobre cada dato personal para taparlo, preguntando a la sala cuál sigue.',
-        'Paso 1: tapa los que falten. Mostrar que el documento sigue sirviendo para la tarea sin esos datos.',
-        'Cambiar nombres por roles ("el conductor", "el representante legal") en vez de borrarlos.',
+        'Haga clic sobre cada dato personal y pregúntele a la sala cuál sigue: el ejercicio es entrenar el ojo. Lo que más se olvida: el correo y la dirección, además del nombre y la cédula.',
+        'Paso 1: tape los que falten y lea el resultado: kilos, residuo y empresa siguen ahí, y la tarea se puede hacer igual. La técnica es cambiar por roles ("el conductor", "la coordinadora ambiental") en vez de borrar, para que la IA entienda quién hace qué. Si después hay que volver a poner los nombres, la tabla de equivalencias la guarda usted, nunca la IA. El certificado es de ejemplo.',
+      ],
+      siPreguntan: [
+        { p: '¿El nombre de la empresa cliente también se tapa?', r: 'El nombre de una empresa no es un dato personal para la Ley 1581, pero puede ser confidencial. Si no hace falta para la tarea, cámbielo por "el cliente"; si hace falta (por ejemplo, para saber qué autoridad la vigila), déjelo.' },
       ],
       datos: {
         segmentos: [
@@ -764,7 +856,10 @@ export const TALLER_1: Taller = {
       minutos: 6,
       pasos: 0,
       interaccion: 'post',
-      notas: ['Las mismas preguntas del inicio. Esperar a la mayoría.'],
+      notas: [
+        'Diga: "Las mismas cinco preguntas del inicio. Respondan con lo que saben ahora." No repase antes: la gracia es medir lo que quedó.',
+        'Mientras responden, revise las preguntas del celular que siguen pendientes y elija las que vale la pena contestar en el cierre.',
+      ],
     },
     {
       id: 'comparacion',
@@ -775,8 +870,8 @@ export const TALLER_1: Taller = {
       minutos: 4,
       pasos: 1,
       notas: [
-        'Mostrar el promedio de aciertos antes y después. Paso 1: pregunta por pregunta.',
-        'Comentar la pregunta que menos subió: ahí hay que reforzar en los próximos sábados.',
+        'Muestre el promedio antes y después. Celebre el avance del grupo, no el de personas. Si el salto es pequeño, no lo esconda: diga qué idea faltó reforzar.',
+        'Paso 1, pregunta por pregunta: comente la que más subió (lo que mejor quedó) y la que menos. La que menos subió se retoma en el repaso del próximo sábado; dígalo para que sepan que no queda suelta.',
       ],
     },
     {
@@ -788,8 +883,8 @@ export const TALLER_1: Taller = {
       minutos: 3,
       pasos: 0,
       notas: [
-        'Todo el equipo asiste a los tres sábados que faltan, sin separar por áreas.',
-        'Mientras tanto: entregar en la academia la tarea real de su puesto.',
+        'Todo el equipo asiste a los tres sábados que faltan, sin separar por áreas. Los temas de cada sábado se ajustan con las respuestas de la encuesta: no prometa temas concretos todavía.',
+        'Tarea para la semana: usar la instrucción de la práctica en una tarea real, ajustarla y entregarla en la academia. Pida que traigan un caso en que la IA se haya equivocado: es el mejor material para el repaso.',
       ],
       // Sin temas por sábado: el cronograma todavía no está definido.
       datos: { sabados: [2, 3, 4] },
@@ -802,7 +897,10 @@ export const TALLER_1: Taller = {
       titulo: 'Llévese la tarjeta resumen',
       minutos: 2,
       pasos: 0,
-      notas: ['La tarjeta resumen queda en la academia para descargar e imprimir. Cerrar con la idea del practicante: rápido y capaz, pero su trabajo siempre se revisa.'],
+      notas: [
+        'Pida que escaneen el código para guardar la tarjeta resumen, con las ideas y las instrucciones de hoy. Se puede imprimir y tener a la mano.',
+        'Frase de cierre: "La IA es como un practicante muy rápido y muy seguro de sí mismo. Le puede ahorrar horas, pero lo que entrega se revisa siempre, y lo personal no se le da." Agradezca y responda las preguntas del celular que quedaron pendientes.',
+      ],
     },
   ],
   celular: CELULAR_TALLER1,

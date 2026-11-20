@@ -33,6 +33,8 @@
 
 ## Para agregar la capacitación 2, 3 o 4
 
+**Notas del presentador** (Mike, 2026-11-19): contenido de valor real para quien dicta, no instrucciones de clic. Qué explicar y por qué importa, la frase clave para decir, datos concretos, ejemplos de Ekosolv y errores comunes. Si la escena tiene pasos, una nota por paso más la de llegada (la prueba lo exige) para que se resalte la del momento. Las preguntas probables de la sala van en `siPreguntan`, con su respuesta, y salen plegadas bajo las notas.
+
 Crear `src/lib/talleres/tallerN.ts` con la misma forma (bloques, escenas, interacciones, demos, `repaso` apuntando a preguntas de la 1) y sumarlo en `index.ts`. Si una escena necesita un tipo nuevo, agregar su marcado en `src/components/taller/` y su hook en `escenas.ts`.
 
 ## Pendientes

@@ -12,6 +12,7 @@ interface EscenaPr {
   kicker: string
   titulo: string
   notas: string[]
+  siPreguntan: { p: string; r: string }[]
   pasos: number
   minutos: number
   bloque: string
@@ -65,6 +66,18 @@ function montar(d: DatosPr) {
         // Si hay tantas notas como pasos + 1, la nota k acompaña al paso k.
         if (e.notas.length === e.pasos + 1) li.className = k < paso ? 'ya' : k === paso ? 'ahora' : ''
         return li
+      }),
+    )
+    $('[data-preguntan]').hidden = !e.siPreguntan.length
+    $('[data-preguntan-lista]').replaceChildren(
+      ...e.siPreguntan.map(({ p, r }) => {
+        const det = document.createElement('details')
+        const sum = document.createElement('summary')
+        sum.textContent = p
+        const res = document.createElement('p')
+        res.textContent = r
+        det.append(sum, res)
+        return det
       }),
     )
     const sig = d.escenas[i + 1]

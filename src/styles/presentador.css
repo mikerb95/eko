@@ -23,6 +23,14 @@
 .pr-notas li.ya { color: #8a949d; }
 .pr-notas li.ahora { color: #0E1C26; font-weight: 500; }
 .pr-notas li.ahora::marker { color: #179C91; }
+.pr-preguntan { background: #F4F7F9; border-radius: 14px; padding: 14px 18px; display: grid; gap: 4px; }
+.pr-preguntan[hidden] { display: none; }
+.pr-preguntan h3 { font: 600 13px/1.2 var(--font-sans); letter-spacing: .06em; text-transform: uppercase; color: #6B7580; margin: 0 0 4px; }
+.pr-preguntan details { border-top: 1px solid #E3E8EC; padding: 8px 0; }
+.pr-preguntan details:first-of-type { border-top: 0; }
+.pr-preguntan summary { cursor: pointer; font-size: 17px; font-weight: 500; color: #0E1C26; }
+.pr-preguntan summary::marker { color: #179C91; }
+.pr-preguntan details p { margin: 6px 0 2px; font-size: 16px; line-height: 1.45; color: #33404B; }
 .pr-acciones { display: flex; gap: 10px; flex-wrap: wrap; margin-top: 10px; }
 .pr-btn { display: inline-flex; align-items: center; justify-content: center; gap: 8px; border: 0; cursor: pointer; text-decoration: none; font: 600 16px/1.2 var(--font-sans); color: #fff; background: #124E7D; padding: 13px 22px; border-radius: 999px; }
 .pr-btn:hover { background: #0E3A5C; }

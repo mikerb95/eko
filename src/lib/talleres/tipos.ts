@@ -118,8 +118,15 @@ export interface Escena {
   minutos: number
   /** Clics dentro de la escena antes de pasar a la siguiente (0 = ninguno). */
   pasos: number
-  /** Lo que el presentador dice, en orden. Solo se ve en la vista de presentador. */
+  /**
+   * Notas de la vista de presentador. Si la escena tiene pasos, hay una nota
+   * por paso más la de llegada (pasos + 1): la del paso actual se resalta.
+   * Son contenido de fondo para quien dicta (qué explicar, datos, ejemplos y
+   * errores comunes), no instrucciones de clic.
+   */
   notas: string[]
+  /** Preguntas que probablemente hará la sala, con su respuesta (solo presentador). */
+  siPreguntan?: { p: string; r: string }[]
   /** Interacción que se abre en los celulares mientras la escena está activa. */
   interaccion?: string
   demo?: string
