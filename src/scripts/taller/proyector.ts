@@ -15,7 +15,7 @@
  * por BroadcastChannel; las órdenes del presentador llegan por el mismo canal.
  */
 import { CURVA, SplitText, amarrarSignos, gsap, reducido } from '../motion/core'
-import { API_PC, canal, consultar, direccionTecla, enviar, leerDatos, type Mensaje } from './comun'
+import { API_PC, canal, consultar, direccionTecla, enviar, leerAviso, leerDatos, type Aviso, type Mensaje } from './comun'
 import { HOOKS, type Api } from './escenas'
 import { crearCortina, soportaTransiciones } from './cortina'
 
@@ -40,11 +40,74 @@ function montar() {
   const titulos = new Map<number, SplitText>()
 
   const avisar = canal(datos.n, (m: Mensaje) => {
+    if (m.tipo === 'aviso') return ponerEspera(m.aviso)
     if (!activo) return
     if (m.tipo === 'ir') ir(m.i, m.paso, false)
     else if (m.tipo === 'hola') avisar({ tipo: 'ir', i, paso })
     else if (m.tipo === 'accion') oyentes.get(m.nombre)?.()
   })
+
+  // ---------- Aviso de inicio ("Empezamos en 00:00") ----------
+  // Lo lanza el presentador; tapa la escena hasta que lo quite. En cero se
+  // queda en "Empezamos ya".
+  const espera = lienzo.querySelector<HTMLElement>('[data-espera]')
+  const esperaReloj = espera?.querySelector<HTMLElement>('[data-espera-reloj]')
+  const esperaKicker = espera?.querySelector<HTMLElement>('[data-espera-kicker]')
+  const esperaBarra = espera?.querySelector<HTMLElement>('[data-espera-barra]')
+  let aviso: Aviso | null = null
+  let esperaTic: ReturnType<typeof setInterval> | null = null
+  const cifras = (seg: number) => `${String(Math.floor(seg / 60)).padStart(2, '0')}:${String(seg % 60).padStart(2, '0')}`
+  const pintarEspera = () => {
+    if (!espera || !esperaReloj || !aviso) return
+    const resta = Math.max(0, Math.ceil((aviso.fin - Date.now()) / 1000))
+    const txt = cifras(resta)
+    // Un span por carácter: así solo se anima la cifra que cambia.
+    if (esperaReloj.children.length !== txt.length) {
+      esperaReloj.replaceChildren(
+        ...[...txt].map((c) => {
+          const s = document.createElement('span')
+          s.className = c === ':' ? 'sep' : 'dig'
+          s.textContent = c
+          return s
+        }),
+      )
+    } else {
+      ;[...esperaReloj.children].forEach((s, k) => {
+        if (s.textContent === txt[k]) return
+        s.textContent = txt[k]!
+        if (reducido()) return
+        s.classList.remove('cambia')
+        void (s as HTMLElement).offsetWidth
+        s.classList.add('cambia')
+      })
+    }
+    esperaReloj.setAttribute('aria-label', txt)
+    espera.classList.toggle('cero', resta === 0)
+    if (esperaKicker) esperaKicker.textContent = resta === 0 ? 'Empezamos ya' : 'Empezamos en'
+    esperaBarra?.style.setProperty('--p', String(Math.min(1, Math.max(0, (aviso.fin - Date.now()) / aviso.ms))))
+  }
+  function ponerEspera(a: Aviso | null) {
+    if (!espera) return
+    const estaba = !!aviso
+    aviso = a
+    if (esperaTic) clearInterval(esperaTic)
+    esperaTic = null
+    if (!a) {
+      if (estaba && !reducido()) gsap.to(espera, { autoAlpha: 0, duration: 0.5, ease: CURVA, onComplete: () => espera.classList.remove('on') })
+      else espera.classList.remove('on')
+      return
+    }
+    esperaReloj?.replaceChildren()
+    pintarEspera()
+    esperaTic = setInterval(pintarEspera, 250)
+    espera.classList.add('on')
+    if (estaba) return
+    gsap.killTweensOf(espera)
+    if (reducido()) return void gsap.set(espera, { autoAlpha: 1 })
+    gsap.fromTo(espera, { autoAlpha: 0 }, { autoAlpha: 1, duration: 0.6, ease: CURVA })
+    gsap.fromTo(espera.querySelectorAll('.tl-espera-centro > *'), { autoAlpha: 0, y: 40 }, { autoAlpha: 1, y: 0, duration: 0.9, stagger: 0.1, delay: 0.15, ease: 'expo.out', clearProps: 'transform,opacity,visibility' })
+  }
+  if (datos.admin) ponerEspera(leerAviso(datos.n))
 
   // ---------- Escala ----------
   const escalar = () => {
