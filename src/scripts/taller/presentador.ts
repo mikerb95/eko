@@ -180,6 +180,23 @@ function montar(d: DatosPr) {
     $('[data-iniciar]').textContent = 'Reiniciar cronómetro'
   })
   if (inicio) $('[data-iniciar]').textContent = 'Reiniciar cronómetro'
+
+  // Modo claro/oscuro: el tema inicial lo pone el script del <head>; aquí solo se cambia y se recuerda.
+  const temaBtn = $('[data-tema-btn]')
+  const pintarTema = () => {
+    const oscuro = document.documentElement.dataset.tema === 'oscuro'
+    temaBtn.textContent = oscuro ? 'Modo claro' : 'Modo oscuro'
+    temaBtn.setAttribute('aria-pressed', String(oscuro))
+  }
+  temaBtn.addEventListener('click', () => {
+    const t = document.documentElement.dataset.tema === 'oscuro' ? 'claro' : 'oscuro'
+    document.documentElement.dataset.tema = t
+    try {
+      localStorage.setItem('pr-tema', t)
+    } catch {}
+    pintarTema()
+  })
+  pintarTema()
   addEventListener('keydown', (ev) => {
     const dir = direccionTecla(ev)
     if (dir) {

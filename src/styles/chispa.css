@@ -1,0 +1,28 @@
+/* Logo de Claude que piensa (src/lib/talleres/chispa.ts). Mide 1em: se
+   dimensiona con el font-size del contenedor. Con movimiento reducido queda
+   quieto. */
+.chispa { display: inline-block; width: 1em; height: 1em; flex: none; vertical-align: -.15em; fill: #D97757; overflow: visible; }
+.chispa g, .chispa path { transform-box: view-box; transform-origin: 50% 50%; }
+.chispa-pensando g { animation: chispa-giro 2.4s cubic-bezier(.65, 0, .35, 1) infinite; }
+.chispa-pensando path { animation: chispa-rayo 1.2s ease-in-out calc(var(--i) * -.1s) infinite; }
+@keyframes chispa-giro {
+  0% { transform: rotate(0deg) scale(1); }
+  25% { transform: rotate(90deg) scale(.86); }
+  50% { transform: rotate(180deg) scale(1); }
+  75% { transform: rotate(270deg) scale(.86); }
+  100% { transform: rotate(360deg) scale(1); }
+}
+@keyframes chispa-rayo {
+  0%, 100% { transform: scale(1); }
+  50% { transform: scale(.62); }
+}
+
+/* Renglón "pensando": la chispa y una palabra que titila. */
+.chispa-fila { display: inline-flex; align-items: center; gap: .55em; color: #8a5a45; }
+.chispa-fila .chispa { width: 1.5em; height: 1.5em; }
+.chispa-fila span { animation: chispa-titila 1.6s ease-in-out infinite; }
+@keyframes chispa-titila { 50% { opacity: .45; } }
+
+@media (prefers-reduced-motion: reduce) {
+  .chispa-pensando g, .chispa-pensando path, .chispa-fila span { animation: none; }
+}

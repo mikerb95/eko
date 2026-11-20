@@ -10,9 +10,12 @@
 // con la región, las dos autorizaciones de Zoho y los permisos por
 // herramienta y el aviso con el que Claude pide aprobación antes de leer, con
 // sus etiquetas en inglés tal como salen (los tratos son datos de ejemplo de Zoho).
+// Mientras Claude piensa se ve su logo animado (.mq-pensar, src/lib/talleres/chispa.ts),
+// que se recoge cuando llega la respuesta (--fin).
 interface Props {
   id: string
 }
+import { chispa } from '../../lib/talleres/chispa'
 const { id } = Astro.props
 ---
 
@@ -81,16 +84,19 @@ const { id } = Astro.props
           {id === 'pedir' && (
             <>
               <span class="mq-burbuja mq-yo"><span class="mq-tipeo" style="--n:44;--t:2.2s">Quiero conectar mi Zoho CRM. Solo para leer.</span></span>
-              <span class="mq-burbuja mq-ia mq-ap" style="--d:2.7s">Para eso sirve el conector oficial de Zoho CRM. Lo dejamos en solo lectura:</span>
-              <span class="mq-tarjeta mq-ap" style="--d:3.3s"><span class="mq-logo mq-zoho">Z</span><b>Zoho CRM</b><span class="mq-boton mq-pulso" style="--d:3.8s">Conectar</span></span>
+              <span class="mq-pensar chispa-fila" style="--d:2.4s;--fin:3.6s" set:html={`${chispa()}<span>Pensando</span>`} />
+              <span class="mq-burbuja mq-ia mq-ap" style="--d:3.7s">Para eso sirve el conector oficial de Zoho CRM. Lo dejamos en solo lectura:</span>
+              <span class="mq-tarjeta mq-ap" style="--d:4.3s"><span class="mq-logo mq-zoho">Z</span><b>Zoho CRM</b><span class="mq-boton mq-pulso" style="--d:4.8s">Conectar</span></span>
             </>
           )}
           {id === 'prueba' && (
             <>
               <span class="mq-burbuja mq-yo mq-ap" style="--d:.1s">¿Cuáles son mis cinco tratos abiertos más recientes en Zoho?</span>
-              <span class="mq-aprobar mq-ap" style="--d:.8s"><span>Claude wants to use <code>ZohoCRM_executeCOQLQuery</code> from Zoho CRM</span><span class="mq-botones"><span class="mq-boton mq-sec">Decline</span><span class="mq-boton mq-pulso" style="--d:1.2s">Allow once</span><span class="mq-boton mq-sec">Always allow</span></span></span>
-              <span class="mq-herramienta mq-ap" style="--d:2.2s"><span class="mq-giro" />Used Zoho CRM: executeCOQLQuery</span>
-              <span class="mq-burbuja mq-ia mq-tabla mq-ap" style="--d:3.4s">
+              <span class="mq-pensar chispa-fila" style="--d:.5s;--fin:1.5s" set:html={`${chispa()}<span>Pensando</span>`} />
+              <span class="mq-aprobar mq-ap" style="--d:1.6s"><span>Claude wants to use <code>ZohoCRM_executeCOQLQuery</code> from Zoho CRM</span><span class="mq-botones"><span class="mq-boton mq-sec">Decline</span><span class="mq-boton mq-pulso" style="--d:2s">Allow once</span><span class="mq-boton mq-sec">Always allow</span></span></span>
+              <span class="mq-herramienta mq-ap" style="--d:3s"><span class="mq-giro" />Used Zoho CRM: executeCOQLQuery</span>
+              <span class="mq-pensar chispa-fila" style="--d:3.4s;--fin:4.4s" set:html={`${chispa()}<span>Pensando</span>`} />
+              <span class="mq-burbuja mq-ia mq-tabla mq-ap" style="--d:4.5s">
                 <span><b>Trato</b><b>Etapa</b></span>
                 <span><i>Benton</i><i>Qualification</i></span>
                 <span><i>Chanay</i><i>Needs Analysis</i></span>
@@ -177,7 +183,7 @@ const { id } = Astro.props
   {id === 'navegador' && (
     <div class="mq-ventana mq-controlada">
       <div class="mq-barra"><i /><i /><i /><span class="mq-url">crm.zoho.com · Tratos</span></div>
-      <span class="mq-control">Claude está usando esta pestaña <span class="mq-detener">Detener</span></span>
+      <span class="mq-control"><span><Fragment set:html={chispa()} />Claude está usando esta pestaña</span> <span class="mq-detener">Detener</span></span>
       <div class="mq-cuerpo mq-nav">
         <div class="mq-crm">
           <span class="mq-pestanas"><i>Clientes</i><i class="mq-objetivo-clic">Tratos</i><i>Contactos</i></span>

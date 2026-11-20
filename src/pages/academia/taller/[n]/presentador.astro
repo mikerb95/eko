@@ -43,6 +43,13 @@ const datos = {
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,400..700&family=Geist:wght@300..700&family=Geist+Mono:wght@400..500&display=swap" rel="stylesheet" />
+    <script is:inline>
+      // Tema antes de pintar: lo elegido en este equipo o, si nunca se eligió, el del sistema.
+      try {
+        const t = localStorage.getItem('pr-tema') || (matchMedia('(prefers-color-scheme: dark)').matches ? 'oscuro' : 'claro')
+        document.documentElement.dataset.tema = t
+      } catch {}
+    </script>
   </head>
   <body class="pr">
     <header class="pr-top">
@@ -55,6 +62,7 @@ const datos = {
         <div><span>Esta escena</span><b data-reloj-escena>0:00</b></div>
         <div><span>Ritmo</span><b data-ritmo>a tiempo</b></div>
         <button type="button" class="pr-btn sec" data-iniciar>Iniciar cronómetro</button>
+        <button type="button" class="pr-btn sec pr-tema" data-tema-btn aria-pressed="false">Modo oscuro</button>
       </div>
     </header>
 

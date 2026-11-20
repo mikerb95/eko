@@ -3,7 +3,9 @@
    fija el tamaño (14px en el celular, más grande en el proyector).
    Las animaciones arrancan cuando la maqueta aparece (display: none → visible)
    y con movimiento reducido quedan en su estado final. Ilustraciones, no
-   capturas: colores neutros de aplicación, sin logos reales. */
+   capturas: colores neutros de aplicación. El único logo real es la chispa
+   de Claude cuando piensa (chispa.css). */
+@import './chispa.css';
 
 .mq {
   --mq-tinta: #1d2329;
@@ -104,6 +106,10 @@
 .mq-giro { width: .8em; height: .8em; border-radius: 50%; border: .15em solid currentColor; border-right-color: transparent; animation: mq-giro .8s linear infinite, mq-listo 0s linear 2.1s forwards; }
 @keyframes mq-giro { to { transform: rotate(1turn); } }
 @keyframes mq-listo { to { border-color: var(--mq-verde); background: var(--mq-verde); animation-play-state: paused; } }
+.mq-pensar { align-self: flex-start; font-size: .85em; overflow: hidden; max-height: 2.2em; animation: mq-ap .3s ease var(--d, 0s) both, mq-pensar-fin .25s ease var(--fin, 9s) forwards; }
+@keyframes mq-pensar-fin { to { opacity: 0; max-height: 0; margin-bottom: -.7em; } }
+.mq-control .chispa { margin-right: .45em; font-size: 1.25em; }
+.mq-control > span:first-child { display: inline-flex; align-items: center; }
 .mq-tabla { display: flex; flex-direction: column; gap: .25em; min-width: 70%; }
 .mq-tabla > span { display: grid; grid-template-columns: 1.4fr 1fr; gap: .6em; }
 .mq-tabla > span:first-child { color: var(--mq-mute); font-size: .9em; }
