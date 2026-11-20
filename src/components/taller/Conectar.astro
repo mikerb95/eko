@@ -1,0 +1,46 @@
+---
+// Práctica guiada (escena `conectar`, hoy la de Zoho en la capacitación 1).
+// A la izquierda, la ruta de pasos con el concepto que aparece en cada uno; a
+// la derecha, el paso actual: su maqueta animada, lo que se hace y qué es.
+// El hook `conectar` de escenas.ts marca el paso actual con cada clic. En
+// modo documento (sin JS o en pantallas pequeñas) se ven todos los pasos.
+import type { Escena, PasoGuiado } from '../../lib/talleres/tipos'
+import Maqueta from './Maqueta.astro'
+
+interface Props {
+  e: Escena
+}
+const { e } = Astro.props
+const pasos = (e.datos?.pasos ?? []) as PasoGuiado[]
+---
+
+<div class="cx">
+  <ol class="cx-ruta">
+    {pasos.map((p, k) =>
+      k === 0 ? null : (
+        <li class="cx-ruta-paso" data-cx-k={k}>
+          <span class="cx-n">{k}</span>
+          <span class="cx-ruta-txt">
+            <span class="cx-concepto">{p.concepto}</span>
+            <span>{p.titulo}</span>
+          </span>
+        </li>
+      ),
+    )}
+  </ol>
+  <div class="cx-escenario">
+    {pasos.map((p, k) => (
+      <article class="cx-paso" data-cx-k={k}>
+        <div class="cx-maqueta">
+          <Maqueta id={p.maqueta} />
+        </div>
+        <div class="cx-texto">
+          <p class="cx-cab">{k === 0 ? 'Antes de empezar' : `Paso ${k} de ${pasos.length - 1}`}</p>
+          <h3>{p.titulo}</h3>
+          <p class="cx-hacer">{p.hacer}</p>
+          <p class="cx-quees"><b>{p.concepto}.</b> {p.queEs}</p>
+        </div>
+      </article>
+    ))}
+  </div>
+</div>

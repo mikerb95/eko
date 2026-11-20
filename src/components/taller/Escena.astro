@@ -11,6 +11,7 @@ import Interactivos from './Interactivos.astro'
 import Votaciones from './Votaciones.astro'
 import Pedir from './Pedir.astro'
 import Cierre from './Cierre.astro'
+import Conectar from './Conectar.astro'
 
 interface Props {
   e: Escena
@@ -26,6 +27,7 @@ const grupo = (() => {
   if (['tokens', 'siguiente', 'inventa', 'mapa', 'anonimizar'].includes(e.tipo)) return 'interactivos'
   if (['evaluacion', 'voto', 'verdad', 'semaforo', 'comparacion', 'repaso'].includes(e.tipo)) return 'votaciones'
   if (['metodo', 'constructor', 'iterar'].includes(e.tipo)) return 'pedir'
+  if (e.tipo === 'conectar') return 'conectar'
   return 'cierre'
 })()
 ---
@@ -53,5 +55,6 @@ const grupo = (() => {
     {grupo === 'votaciones' && <Votaciones e={e} t={t} />}
     {grupo === 'pedir' && <Pedir e={e} t={t} ctx={ctx} />}
     {grupo === 'cierre' && <Cierre e={e} t={t} ctx={ctx} />}
+    {grupo === 'conectar' && <Conectar e={e} />}
   </div>
 </section>

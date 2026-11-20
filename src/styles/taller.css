@@ -525,3 +525,40 @@
 @media (prefers-reduced-motion: reduce) {
   .tl * { transition: none !important; animation: none !important; }
 }
+
+/* ---------- Práctica guiada (escena conectar, Conectar.astro) ----------
+   Documento: todos los pasos, uno debajo de otro. Presentación: la ruta a la
+   izquierda y solo el paso actual a la derecha (el hook marca .actual). */
+.cx { display: flex; flex-direction: column; gap: 20px; }
+.cx-ruta { list-style: none; margin: 0; padding: 0; display: none; }
+.cx-escenario { display: flex; flex-direction: column; gap: 28px; }
+.cx-paso { display: grid; gap: 16px; }
+.cx-maqueta { font-size: 14px; max-width: 520px; }
+.cx-texto { display: flex; flex-direction: column; gap: 10px; }
+.cx-cab { font: 500 12.5px/1.2 var(--font-mono); letter-spacing: .1em; text-transform: uppercase; color: var(--c-deep); }
+.cx-texto h3 { font-size: 1.25em; line-height: 1.1; }
+.cx-hacer { font-size: 1em; }
+.cx-quees { font-size: .9em; color: var(--mute); padding: 12px 14px; border-radius: 12px; background: color-mix(in oklab, var(--c-deep) 7%, #fff); }
+.cx-quees b { color: var(--c-deep); }
+
+.tl-on .cx { flex: 1; min-height: 0; display: grid; grid-template-columns: 330px 1fr; gap: 48px; }
+.tl-on .cx-ruta { display: flex; flex-direction: column; gap: 4px; align-self: start; }
+.cx-ruta-paso { display: flex; align-items: center; gap: 14px; padding: 9px 12px; border-radius: 12px; font-size: 17px; line-height: 1.2; color: var(--mute); transition: background .3s, color .3s; }
+.cx-n { width: 30px; height: 30px; border-radius: 50%; flex: none; display: grid; place-items: center; font: 600 14px/1 var(--font-mono); background: #fff; box-shadow: inset 0 0 0 1px var(--linea); transition: background .3s, color .3s, box-shadow .3s; }
+.cx-ruta-txt { display: flex; flex-direction: column; gap: 2px; min-width: 0; }
+.cx-concepto { font: 500 11px/1.1 var(--font-mono); letter-spacing: .08em; text-transform: uppercase; }
+.cx-ruta-paso.hecho .cx-n { background: var(--c-forest); color: #fff; box-shadow: none; }
+.cx-ruta-paso.actual { background: color-mix(in oklab, var(--c-deep) 9%, #fff); color: var(--tinta); }
+.cx-ruta-paso.actual .cx-n { background: var(--c-deep); color: #fff; box-shadow: 0 0 0 5px color-mix(in oklab, var(--c-deep) 18%, transparent); }
+.cx-ruta-paso.actual .cx-concepto { color: var(--c-deep); }
+.tl-on .cx-escenario { display: block; position: relative; min-height: 0; }
+.tl-on .cx-paso { display: none; grid-template-columns: 1.1fr 1fr; gap: 44px; align-items: center; height: 100%; }
+.tl-on .cx-paso.actual { display: grid; animation: cx-entra .5s cubic-bezier(.16, 1, .3, 1) both; }
+.tl-on .cx-maqueta { font-size: 21px; max-width: none; }
+.tl-on .cx-cab { font-size: 15px; }
+.tl-on .cx-texto { gap: 18px; }
+.tl-on .cx-texto h3 { font-size: 40px; }
+.tl-on .cx-hacer { font-size: 25px; line-height: 1.4; }
+.tl-on .cx-quees { font-size: 21px; line-height: 1.45; padding: 18px 22px; border-radius: 16px; }
+@keyframes cx-entra { from { opacity: 0; transform: translateY(18px); } }
+@media (prefers-reduced-motion: reduce) { .tl-on .cx-paso.actual { animation: none; } }

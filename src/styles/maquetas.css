@@ -1,0 +1,162 @@
+/* Maquetas animadas de la práctica guiada (src/components/taller/Maqueta.astro).
+   Se usan en el proyector y en el celular. Todo se mide en em: el contenedor
+   fija el tamaño (14px en el celular, más grande en el proyector).
+   Las animaciones arrancan cuando la maqueta aparece (display: none → visible)
+   y con movimiento reducido quedan en su estado final. Ilustraciones, no
+   capturas: colores neutros de aplicación, sin logos reales. */
+
+.mq {
+  --mq-tinta: #1d2329;
+  --mq-mute: #6b7580;
+  --mq-linea: #e3e0db;
+  --mq-papel: #fbfaf8;
+  --mq-acento: #c96442;
+  --mq-zoho: #d33a2c;
+  --mq-azul: #124E7D;
+  --mq-verde: #2E8B57;
+  font: 400 1em/1.35 var(--font-sans, system-ui, sans-serif);
+  color: var(--mq-tinta);
+  width: 100%;
+}
+.mq em, .mq i { font-style: normal; }
+.mq b { font-weight: 600; }
+.mq code { font: 500 .85em/1 var(--font-mono, ui-monospace, monospace); }
+
+/* Aparición escalonada: cada pieza con --d. */
+.mq-ap { animation: mq-ap .5s cubic-bezier(.16, 1, .3, 1) var(--d, 0s) both; }
+@keyframes mq-ap { from { opacity: 0; transform: translateY(.6em); } }
+
+/* ---------- Ventana genérica (navegador o aplicación) ---------- */
+.mq-ventana { position: relative; background: #fff; border-radius: .9em; box-shadow: 0 .1em .2em rgba(14, 28, 38, .06), 0 .8em 2em rgba(14, 28, 38, .12); overflow: hidden; }
+.mq-barra { display: flex; align-items: center; gap: .4em; padding: .55em .8em; background: #f1efeb; border-bottom: 1px solid var(--mq-linea); }
+.mq-barra > i { width: .6em; height: .6em; border-radius: 50%; background: #d4d0ca; flex: none; }
+.mq-url { margin-left: .5em; flex: 1; min-width: 0; padding: .3em .7em; border-radius: 99px; background: #fff; font-size: .8em; color: var(--mq-mute); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.mq-cuerpo { padding: 1.1em; display: flex; flex-direction: column; gap: .7em; background: var(--mq-papel); }
+.mq-centro { align-items: center; text-align: center; }
+.mq-marca { font: 600 1.3em/1 var(--font-display, sans-serif); color: var(--mq-acento); }
+.mq-marca-zoho { color: var(--mq-zoho); letter-spacing: .12em; }
+.mq-sub { display: block; font-size: .8em; color: var(--mq-mute); }
+.mq-nota-chica { font-size: .78em; color: var(--mq-mute); }
+
+.mq-campo { width: 100%; max-width: 18em; text-align: left; padding: .6em .8em; border: 1px solid var(--mq-linea); border-radius: .6em; background: #fff; font-size: .9em; min-height: 2.5em; display: flex; align-items: center; }
+.mq-clave { letter-spacing: .15em; }
+
+.mq-boton { display: inline-flex; align-items: center; justify-content: center; padding: .55em 1em; border-radius: .6em; background: var(--mq-tinta); color: #fff; font-size: .85em; font-weight: 600; white-space: nowrap; }
+.mq-boton.mq-sec { background: #fff; color: var(--mq-tinta); border: 1px solid var(--mq-linea); }
+.mq-botones { display: flex; gap: .5em; }
+/* El botón que hay que tocar: late como si lo fueran a presionar. */
+.mq-pulso { animation: mq-pulso 1.6s ease-in-out var(--d, 0s) infinite both; }
+@keyframes mq-pulso {
+  0%, 100% { box-shadow: 0 0 0 0 rgba(201, 100, 66, 0); transform: scale(1); }
+  30% { box-shadow: 0 0 0 .45em rgba(201, 100, 66, .28); transform: scale(1.04); }
+  45% { transform: scale(.97); }
+}
+
+.mq-sello { padding: .35em .8em; border-radius: 99px; background: color-mix(in oklab, var(--mq-verde) 14%, #fff); color: #1f6a41; font-size: .8em; font-weight: 600; }
+
+/* Texto que se escribe solo: --n caracteres en --t segundos. */
+.mq-tipeo { display: inline-block; overflow: hidden; white-space: nowrap; vertical-align: bottom; max-width: 100%; border-right: .1em solid var(--mq-acento); animation: mq-tipeo var(--t, 2s) steps(var(--n, 20)) .3s both, mq-parpadeo .8s step-end infinite; }
+@keyframes mq-tipeo { from { width: 0; } to { width: calc(var(--n, 20) * 1ch); } }
+@keyframes mq-parpadeo { 50% { border-color: transparent; } }
+.mq-cursor-texto { width: .1em; height: 1.1em; background: var(--mq-acento); animation: mq-parpadeo .8s step-end infinite; }
+
+/* ---------- Objetivo y límite ---------- */
+.mq-objetivo-fila { display: grid; grid-template-columns: 1fr 1fr; gap: .7em; align-items: stretch; }
+.mq-ficha { display: flex; flex-direction: column; gap: .3em; padding: .9em 1em; border-radius: .8em; background: #fff; box-shadow: 0 .4em 1.2em rgba(14, 28, 38, .08); }
+.mq-ficha b { font-size: 1.05em; display: flex; align-items: center; gap: .4em; }
+.mq-et { font: 500 .7em/1 var(--font-mono, monospace); letter-spacing: .1em; text-transform: uppercase; color: var(--mq-mute); }
+.mq-limite { background: color-mix(in oklab, var(--mq-azul) 8%, #fff); }
+.mq-candado { width: .8em; height: .65em; border-radius: .15em; background: var(--mq-azul); position: relative; margin-top: .25em; }
+.mq-candado::before { content: ''; position: absolute; left: .15em; right: .15em; bottom: 100%; height: .35em; border: .12em solid var(--mq-azul); border-bottom: 0; border-radius: .4em .4em 0 0; }
+.mq-flecha { grid-column: 1 / -1; height: 1.4em; position: relative; }
+.mq-flecha::before { content: ''; position: absolute; left: 50%; top: 0; bottom: .3em; width: .12em; background: var(--mq-linea); }
+.mq-flecha::after { content: ''; position: absolute; left: calc(50% - .3em); bottom: 0; border: .35em solid transparent; border-top-color: var(--mq-mute); border-bottom: 0; }
+.mq-claude { grid-column: 1 / -1; align-items: center; text-align: center; background: color-mix(in oklab, var(--mq-acento) 9%, #fff); }
+.mq-puntos { display: flex; gap: .3em; }
+.mq-puntos i { width: .4em; height: .4em; border-radius: 50%; background: var(--mq-acento); animation: mq-salto 1.2s ease-in-out infinite; }
+.mq-puntos i:nth-child(2) { animation-delay: .15s; }
+.mq-puntos i:nth-child(3) { animation-delay: .3s; }
+@keyframes mq-salto { 0%, 60%, 100% { transform: none; opacity: .5; } 30% { transform: translateY(-.35em); opacity: 1; } }
+
+/* ---------- Extensión ---------- */
+.mq-pieza { width: .9em; height: .9em; border-radius: .2em; background: #cfcac3; flex: none; }
+.mq-fijada, .mq-logo { display: inline-grid; place-items: center; flex: none; border-radius: .35em; background: var(--mq-acento); color: #fff; font-weight: 700; }
+.mq-fijada { width: 1.3em; height: 1.3em; font-size: .75em; }
+.mq-logo { width: 2.2em; height: 2.2em; font-size: 1em; }
+.mq-logo.mq-zoho { background: linear-gradient(135deg, #e42527 0 25%, #089949 25% 50%, #226db4 50% 75%, #f9b21d 75%); }
+.mq-tienda, .mq-conector { display: grid; grid-template-columns: auto 1fr auto; align-items: center; gap: .8em; padding: .8em; border-radius: .7em; background: #fff; border: 1px solid var(--mq-linea); }
+.mq-aviso { align-self: flex-start; padding: .45em .8em; border-radius: .5em; background: var(--mq-tinta); color: #fff; font-size: .8em; }
+
+/* ---------- Aplicación de escritorio ---------- */
+.mq-cuenta { padding: .2em .6em; border-radius: 99px; background: color-mix(in oklab, var(--mq-azul) 12%, #fff); color: var(--mq-azul); font-size: .72em; font-weight: 600; }
+.mq-app-cuerpo { flex-direction: row; padding: 0; gap: 0; min-height: 13em; }
+.mq-lado { width: 3.2em; flex: none; background: #f1efeb; padding: .8em .6em; display: flex; flex-direction: column; gap: .5em; }
+.mq-lado i { height: .5em; border-radius: 99px; background: #dcd8d2; }
+.mq-chat { flex: 1; min-width: 0; padding: 1em; display: flex; flex-direction: column; gap: .6em; justify-content: center; }
+.mq-saludo { font: 600 1.2em/1.1 var(--font-display, sans-serif); text-align: center; }
+.mq-entrada { display: flex; align-items: center; min-height: 2.6em; padding: 0 .9em; border: 1px solid var(--mq-linea); border-radius: .8em; background: #fff; }
+.mq-burbuja { max-width: 92%; padding: .6em .8em; border-radius: .8em; font-size: .88em; }
+.mq-yo { align-self: flex-end; background: #ece9e4; }
+.mq-ia { align-self: flex-start; background: #fff; border: 1px solid var(--mq-linea); }
+.mq-tarjeta { align-self: flex-start; display: flex; align-items: center; gap: .6em; padding: .5em .6em; border-radius: .7em; background: #fff; border: 1px solid var(--mq-linea); }
+.mq-tarjeta .mq-logo { width: 1.6em; height: 1.6em; }
+.mq-herramienta { align-self: flex-start; display: inline-flex; align-items: center; gap: .5em; padding: .4em .7em; border-radius: 99px; background: color-mix(in oklab, var(--mq-azul) 9%, #fff); color: var(--mq-azul); font: 500 .75em/1.2 var(--font-mono, monospace); }
+.mq-giro { width: .8em; height: .8em; border-radius: 50%; border: .15em solid currentColor; border-right-color: transparent; animation: mq-giro .8s linear infinite, mq-listo 0s linear 2.1s forwards; }
+@keyframes mq-giro { to { transform: rotate(1turn); } }
+@keyframes mq-listo { to { border-color: var(--mq-verde); background: var(--mq-verde); animation-play-state: paused; } }
+.mq-tabla { display: flex; flex-direction: column; gap: .25em; min-width: 70%; }
+.mq-tabla > span { display: grid; grid-template-columns: 1.4fr 1fr; gap: .6em; }
+.mq-tabla > span:first-child { color: var(--mq-mute); font-size: .9em; }
+
+/* ---------- Conector ---------- */
+.mq-datos { display: grid; gap: .45em; font-size: .85em; }
+.mq-datos > span { display: flex; flex-wrap: wrap; align-items: center; gap: .2em .6em; }
+.mq-datos em { min-width: 8.5em; color: var(--mq-mute); }
+.mq-verif { padding: .1em .5em; border-radius: 99px; background: color-mix(in oklab, var(--mq-azul) 12%, #fff); color: var(--mq-azul); font-size: .85em; font-weight: 600; }
+
+/* ---------- Autorización en Zoho ---------- */
+.mq-permiso { font-size: .9em; max-width: 18em; }
+
+/* ---------- Permisos por herramienta ---------- */
+.mq-grupo { font: 500 .7em/1 var(--font-mono, monospace); letter-spacing: .1em; text-transform: uppercase; color: var(--mq-verde); margin-top: .2em; }
+.mq-grupo-esc { color: var(--mq-zoho); }
+.mq-fila { display: flex; align-items: center; justify-content: space-between; gap: .6em; padding: .45em .6em; border-radius: .5em; background: #fff; border: 1px solid var(--mq-linea); }
+.mq-fila code { min-width: 0; overflow: hidden; text-overflow: ellipsis; }
+.mq-seg { display: inline-flex; flex: none; border-radius: 99px; background: #f1efeb; padding: .15em; font-size: .72em; }
+.mq-seg i { padding: .3em .7em; border-radius: 99px; color: var(--mq-mute); }
+.mq-seg i.on { background: var(--mq-verde); color: #fff; }
+/* Las de escritura empiezan permitidas y pasan a bloqueadas una por una. */
+.mq-cambia .permitir { animation: mq-apaga .3s ease var(--d) both; }
+.mq-cambia .bloquear { animation: mq-bloquea .3s ease var(--d) both; }
+@keyframes mq-apaga { from { background: var(--mq-verde); color: #fff; } to { background: transparent; color: var(--mq-mute); } }
+@keyframes mq-bloquea { from { background: transparent; color: var(--mq-mute); } to { background: var(--mq-zoho); color: #fff; } }
+
+/* ---------- Control del navegador ---------- */
+.mq-controlada { box-shadow: 0 0 0 .2em color-mix(in oklab, var(--mq-acento) 70%, #fff), 0 .8em 2em rgba(14, 28, 38, .12); animation: mq-brillo 2.4s ease-in-out infinite; }
+@keyframes mq-brillo { 50% { box-shadow: 0 0 0 .35em color-mix(in oklab, var(--mq-acento) 35%, #fff), 0 .8em 2em rgba(14, 28, 38, .12); } }
+.mq-control { display: flex; align-items: center; justify-content: space-between; gap: .6em; padding: .4em .8em; background: color-mix(in oklab, var(--mq-acento) 12%, #fff); color: #8a3d22; font-size: .78em; font-weight: 600; }
+.mq-detener { padding: .2em .6em; border-radius: .4em; background: #fff; color: var(--mq-tinta); border: 1px solid var(--mq-linea); font-weight: 600; }
+.mq-nav { flex-direction: row; gap: .9em; align-items: flex-start; }
+.mq-crm { position: relative; flex: 1.2; min-width: 0; display: flex; flex-direction: column; gap: .45em; padding: .7em; border-radius: .6em; background: #fff; border: 1px solid var(--mq-linea); }
+.mq-pestanas { display: flex; gap: .3em; font-size: .72em; }
+.mq-pestanas i { padding: .25em .5em; border-radius: .4em; background: #f1efeb; }
+.mq-objetivo-clic { animation: mq-elegida .3s ease 1.3s both; }
+@keyframes mq-elegida { to { background: var(--mq-azul); color: #fff; } }
+.mq-renglon { height: .6em; border-radius: 99px; background: #ece9e4; }
+.mq-renglon:nth-of-type(odd) { width: 80%; }
+.mq-puntero { position: absolute; left: 70%; top: 75%; width: 1.1em; height: 1.1em; clip-path: polygon(0 0, 0 100%, 30% 72%, 52% 100%, 66% 92%, 45% 66%, 85% 66%); background: var(--mq-tinta); filter: drop-shadow(0 .1em .1em rgba(0, 0, 0, .25)); animation: mq-puntero 4.4s cubic-bezier(.65, 0, .35, 1) .2s infinite both; }
+@keyframes mq-puntero {
+  0% { left: 70%; top: 75%; }
+  25%, 35% { left: 34%; top: 9%; }
+  30% { transform: scale(.85); }
+  60%, 70% { left: 60%; top: 45%; }
+  100% { left: 70%; top: 75%; }
+}
+.mq-bitacora { flex: 1; min-width: 0; margin: 0; padding: 0 0 0 1.2em; display: flex; flex-direction: column; gap: .35em; font-size: .8em; color: var(--mq-mute); }
+.mq-bitacora li::marker { color: var(--mq-acento); font-weight: 600; }
+.mq-limite-li { color: var(--mq-azul); font-weight: 600; }
+
+@media (prefers-reduced-motion: reduce) {
+  .mq *, .mq { animation-duration: 0s !important; animation-delay: 0s !important; animation-iteration-count: 1 !important; }
+  .mq-tipeo { width: auto; border-right: 0; }
+}
