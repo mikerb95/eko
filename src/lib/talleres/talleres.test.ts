@@ -205,3 +205,17 @@ test('registro de la sala: nombres con mayúscula inicial y datos obligatorios',
   assert.deepEqual(registroSala({ nombre: 'Laura', apellido: 'Gómez', correo: 'laura@ekosolv', area: 'ventas' }, areas), { error: 'Escriba un correo válido.' })
   assert.deepEqual(registroSala({ nombre: 'Laura', apellido: 'Gómez', correo: 'l@e.co', area: 'otra' }, areas), { error: 'Elija su área.' })
 })
+
+const MAQUETAS = new Set(['objetivo', 'cuenta', 'extension', 'desktop', 'pedir', 'conector', 'oauth', 'permisos', 'navegador', 'prueba'])
+for (const t of Object.values(TALLERES)) {
+  test(`taller ${t.n}: las prácticas guiadas tienen un paso por clic y maquetas conocidas`, () => {
+    for (const e of t.escenas.filter((x) => x.tipo === 'conectar')) {
+      const pasos = e.datos?.pasos as { maqueta: string; hacer: string; queEs: string }[]
+      assert.equal(pasos.length, e.pasos + 1, `${e.id}: un paso guiado por clic más la llegada`)
+      for (const p of pasos) {
+        assert.ok(MAQUETAS.has(p.maqueta), `${e.id}: maqueta ${p.maqueta}`)
+        assert.ok(p.hacer && p.queEs, `${e.id}: paso incompleto`)
+      }
+    }
+  })
+}
