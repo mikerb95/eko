@@ -74,11 +74,7 @@
 .mq-flecha::before { content: ''; position: absolute; left: 50%; top: 0; bottom: .3em; width: .12em; background: var(--mq-linea); }
 .mq-flecha::after { content: ''; position: absolute; left: calc(50% - .3em); bottom: 0; border: .35em solid transparent; border-top-color: var(--mq-mute); border-bottom: 0; }
 .mq-claude { grid-column: 1 / -1; align-items: center; text-align: center; background: color-mix(in oklab, var(--mq-acento) 9%, #fff); }
-.mq-puntos { display: flex; gap: .3em; }
-.mq-puntos i { width: .4em; height: .4em; border-radius: 50%; background: var(--mq-acento); animation: mq-salto 1.2s ease-in-out infinite; }
-.mq-puntos i:nth-child(2) { animation-delay: .15s; }
-.mq-puntos i:nth-child(3) { animation-delay: .3s; }
-@keyframes mq-salto { 0%, 60%, 100% { transform: none; opacity: .5; } 30% { transform: translateY(-.35em); opacity: 1; } }
+.mq-chispa-grande { font-size: 1.6em; margin-top: .15em; }
 
 /* ---------- Extensión ---------- */
 .mq-pieza { width: .9em; height: .9em; border-radius: .2em; background: #cfcac3; flex: none; }

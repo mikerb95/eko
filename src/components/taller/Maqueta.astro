@@ -34,7 +34,7 @@ const { id } = Astro.props
       <div class="mq-ficha mq-claude mq-ap" style="--d:1.4s">
         <span class="mq-et">Claude</span>
         <b>Resuelve el cómo</b>
-        <span class="mq-puntos"><i /><i /><i /></span>
+        <Fragment set:html={chispa(true, 'mq-chispa-grande')} />
       </div>
     </div>
   )}
