@@ -44,7 +44,7 @@ const bezier = (c: Curva) => `cubic-bezier(${c.join(',')})`
 const FRANJA = { w: 0.035, t: 1.05, curva: [0.5, 0, 0.3, 1] as Curva }
 // El panel de bloque entra rápido, frena en el centro para que se lea el
 // nombre y sale rápido.
-const PANEL = { w: 1.3, t: 1.6, curva: [0.2, 0.85, 0.8, 0.15] as Curva }
+const PANEL = { w: 1.3, t: 3.2, curva: [0.2, 0.85, 0.8, 0.15] as Curva }
 // El vuelo arranca de una vez y llega pronto: si dura lo mismo que la
 // franja, la palabra se encima con las vecinas que la franja va descubriendo.
 const VUELO: Curva = [0.45, 0, 0.2, 1]
