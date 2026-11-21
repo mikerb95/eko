@@ -5,7 +5,7 @@
  * el proyector está en otro equipo, se siguen por el servidor (seguirRed).
  */
 import { inicioDeEscenas, reloj } from '../../lib/talleres/reglas'
-import { avisoLocal, canal, idOrden, seguirRed, consultar, cuentaAviso, direccionTecla, enviar, leerDatos, type Aviso, type AvisoRed, type Mensaje } from './comun'
+import { avisoLocal, canal, idOrden, mantenerDespierto, seguirRed, consultar, cuentaAviso, direccionTecla, enviar, leerDatos, type Aviso, type AvisoRed, type Mensaje } from './comun'
 
 interface EscenaPr {
   id: string
@@ -371,4 +371,5 @@ function montar(d: DatosPr) {
 
   pintar()
   avisar({ tipo: 'hola' })
+  mantenerDespierto()
 }

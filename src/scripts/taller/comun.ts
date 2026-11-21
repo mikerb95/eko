@@ -190,3 +190,25 @@ export function direccionTecla(ev: KeyboardEvent): 1 | -1 | 0 {
   if (['ArrowLeft', 'PageUp', 'ArrowUp', 'Backspace'].includes(ev.key)) return -1
   return 0
 }
+
+/**
+ * Evita que el equipo entre en reposo o apague la pantalla mientras la
+ * página está abierta (Screen Wake Lock). El navegador suelta el bloqueo
+ * cuando la pestaña queda oculta, así que se vuelve a pedir al regresar.
+ * Si el navegador no lo soporta (o no es HTTPS), no pasa nada.
+ */
+export function mantenerDespierto() {
+  const wl = (navigator as Navigator & { wakeLock?: { request(tipo: 'screen'): Promise<{ released: boolean }> } }).wakeLock
+  if (!wl) return
+  let bloqueo: { released: boolean } | null = null
+  const pedir = async () => {
+    if (document.hidden || (bloqueo && !bloqueo.released)) return
+    try {
+      bloqueo = await wl.request('screen')
+    } catch (e) {
+      console.error('[taller] wake lock', e)
+    }
+  }
+  void pedir()
+  document.addEventListener('visibilitychange', () => void pedir())
+}

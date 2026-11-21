@@ -17,7 +17,7 @@
  * servidor (seguirRed en comun.ts).
  */
 import { CURVA, SplitText, amarrarSignos, gsap, reducido } from '../motion/core'
-import { API_PC, avisoLocal, canal, seguirRed, consultar, cuentaAviso, direccionTecla, enviar, leerDatos, type Aviso, type AvisoRed, type Mensaje } from './comun'
+import { API_PC, avisoLocal, canal, mantenerDespierto, seguirRed, consultar, cuentaAviso, direccionTecla, enviar, leerDatos, type Aviso, type AvisoRed, type Mensaje } from './comun'
 import { HOOKS, sincronizarCuenta, type Api } from './escenas'
 import { crearCortina } from './cortina'
 import { clawdSuelto } from './clawd'
@@ -436,6 +436,10 @@ function montar() {
     })
   }
   evaluar()
+  // Quien dicta y el PC vinculado proyectan: el equipo no debe dormirse en
+  // plena capacitación. El PC vinculado solo llega aquí con la sesión en curso
+  // (al terminar, la página se recarga y queda el aviso).
+  if ((datos.admin || datos.seguir) && !datos.vista) mantenerDespierto()
   if (datos.seguir) seguirPresentacion()
   // Vista previa del control remoto: la página que la contiene dice qué escena mostrar.
   if (datos.vista) {
