@@ -202,12 +202,18 @@ export function direccionTecla(ev: KeyboardEvent): 1 | -1 | 0 {
 export function mantenerDespierto() {
   if (!('wakeLock' in navigator)) return
   let bloqueo: WakeLockSentinel | null = null
+  // Mientras llega la respuesta del navegador no se pide otra vez (volver a
+  // la pestaña y tocar casi al tiempo pediría dos bloqueos).
+  let pidiendo = false
   const pedir = async () => {
-    if (document.visibilityState !== 'visible' || (bloqueo && !bloqueo.released)) return
+    if (pidiendo || document.visibilityState !== 'visible' || (bloqueo && !bloqueo.released)) return
+    pidiendo = true
     try {
       bloqueo = await navigator.wakeLock.request('screen')
     } catch (e) {
       console.warn('[taller] wake lock', e)
+    } finally {
+      pidiendo = false
     }
   }
   void pedir()
