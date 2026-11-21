@@ -8,7 +8,7 @@
  * respuestas desde el panel.
  */
 import { asegurarEsquema, cliente } from '../db'
-import type { Respuesta } from './preguntas'
+import { AREAS_PROPUESTAS, TAREAS, etiqueta, type AreaId, type Respuesta } from './preguntas'
 import type { Fila } from './resumen'
 
 const CLAVE = 'diagnostico'
@@ -84,6 +84,51 @@ export async function listarRespuestas(): Promise<Fila[]> {
       creado: String(row.creado),
     } as Fila
   })
+}
+
+export interface CambioArea {
+  id: number
+  nombre: string
+  antes: AreaId
+  area: AreaId
+  /** Etiquetas de las tareas marcadas que no existen en el área nueva y se quitaron. */
+  quitadas: string[]
+}
+
+/**
+ * Corrige el área de una respuesta (alguien eligió la que no era). Cambia la
+ * columna y el área dentro de los datos, y deja la respuesta como si se
+ * hubiera enviado desde el área nueva: las tareas marcadas son propias de cada
+ * área, así que las que no existen en la nueva se quitan (lo escrito en "otra
+ * tarea" se conserva); propuestas y certificados solo quedan donde aplican.
+ */
+export async function cambiarArea(id: number, area: AreaId): Promise<CambioArea | null> {
+  await asegurarEsquema()
+  const res = await cliente().execute({ sql: 'SELECT datos FROM diagnostico_respuestas WHERE id = ?', args: [id] })
+  const fila = res.rows[0]
+  if (!fila) return null
+  const d = JSON.parse(String(fila.datos)) as Respuesta
+  const antes = (d.area || 'operaciones') as AreaId
+  const validas = new Set(TAREAS[area].map((o) => o.id))
+  const tareas = d.tareas ?? []
+  const quitadas = tareas.filter((t) => !validas.has(t)).map((t) => etiqueta(TAREAS[antes] ?? [], t))
+  d.area = area
+  d.tareas = tareas.filter((t) => validas.has(t))
+  if (!AREAS_PROPUESTAS.includes(area)) {
+    d.propuesta_rol = d.propuesta_horas = d.propuestas_mes = d.propuesta_demora = ''
+  }
+  if (area !== 'logistica') {
+    d.certificados_mes = d.certificado_min = d.seguimiento_gestores = d.certificado_demora = ''
+  }
+  d.ia_aclaraciones = (d.ia_aclaraciones ?? []).filter(
+    (a) =>
+      (a.campo !== 'propuesta_demora' || !!d.propuesta_rol) && (a.campo !== 'certificado_demora' || area === 'logistica'),
+  )
+  await cliente().execute({
+    sql: 'UPDATE diagnostico_respuestas SET area = ?, datos = ? WHERE id = ?',
+    args: [area, JSON.stringify(d), id],
+  })
+  return { id, nombre: d.nombre, antes, area, quitadas }
 }
 
 export async function eliminarRespuesta(id: number): Promise<void> {

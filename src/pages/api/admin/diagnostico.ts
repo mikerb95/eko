@@ -2,11 +2,13 @@ import type { APIRoute } from 'astro'
 import { fail, json } from '../../../lib/apiError'
 import {
   abrirEncuesta,
+  cambiarArea,
   cerrarEncuesta,
   eliminarRespuesta,
   leerEstado,
   listarRespuestas,
 } from '../../../lib/diagnostico/datos'
+import { AREA_IDS, type AreaId } from '../../../lib/diagnostico/preguntas'
 import { aCSV, resumir } from '../../../lib/diagnostico/resumen'
 
 export const prerender = false
@@ -42,6 +44,20 @@ export const POST: APIRoute = async ({ request, locals }) => {
     b = await request.json()
   } catch {
     return json({ error: 'JSON inválido' }, 400)
+  }
+  // Corregir el área de una respuesta (desde la vista del presentador).
+  if (b.accion === 'area') {
+    const id = Number(b.id)
+    const area = String(b.area) as AreaId
+    if (!id) return json({ error: 'Elija la persona.' }, 400)
+    if (!AREA_IDS.includes(area)) return json({ error: 'Elija un área válida.' }, 400)
+    try {
+      const cambio = await cambiarArea(id, area)
+      if (!cambio) return json({ error: 'Esa respuesta ya no existe.' }, 404)
+      return json({ ok: true, cambio })
+    } catch (e) {
+      return fail('diagnostico', e)
+    }
   }
   const acciones = { abrir: abrirEncuesta, cerrar: cerrarEncuesta } as const
   const accion = acciones[String(b.accion) as keyof typeof acciones]
