@@ -195,7 +195,7 @@ export function direccionTecla(ev: KeyboardEvent): 1 | -1 | 0 {
  * Evita que el equipo entre en reposo o apague la pantalla mientras la
  * página está abierta (Screen Wake Lock). El navegador suelta el bloqueo
  * cuando la pestaña queda oculta (o se bloquea el teléfono), así que se vuelve
- * a pedir al regresar; también con cada toque, por si el primer intento se
+ * a pedir al regresar; también con cada toque o tecla, por si el primer intento se
  * rechazó por falta de interacción (pasa en Safari). Si el navegador no lo
  * soporta (o no es HTTPS), no pasa nada.
  */
@@ -218,5 +218,10 @@ export function mantenerDespierto() {
   }
   void pedir()
   document.addEventListener('visibilitychange', () => void pedir())
-  document.addEventListener('pointerdown', () => void pedir())
+  // Reintento con interacción real: en pantallas táctiles el navegador no
+  // cuenta `pointerdown` como gesto del usuario (sí `click`), y en el proyector
+  // nadie toca la pantalla, solo el teclado o el clicker. En captura para que
+  // ningún botón que detenga el evento impida el reintento.
+  document.addEventListener('click', () => void pedir(), { capture: true, passive: true })
+  document.addEventListener('keydown', () => void pedir(), { capture: true, passive: true })
 }
