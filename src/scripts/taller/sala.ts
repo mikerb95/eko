@@ -1,10 +1,11 @@
 /**
  * La sala en el celular, en dos momentos:
  *
- * 1. Registro (sin cuenta): nombres y apellidos con la primera letra de cada
- *    palabra en mayúscula mientras se escribe, correo y área. Al enviarlo le
- *    llega al correo el enlace de entrada; al abrirlo queda la asistencia y
- *    entra a la sala.
+ * 1. Registro (sin cuenta): primero solo el correo. Si ya se registró antes,
+ *    le llega de una vez el enlace de entrada. Si es nuevo, aparecen nombres y
+ *    apellidos (con la primera letra de cada palabra en mayúscula mientras se
+ *    escribe) y área, que se piden solo esa vez. Al abrir el enlace queda la
+ *    asistencia y entra a la sala.
  * 2. Sala: consulta cada 2 segundos qué pregunta está abierta y pinta sus
  *    opciones; al tocar una, la guarda (se puede cambiar mientras siga
  *    abierta). Avisa que sigue en la sala cada 30 segundos, que es lo que
@@ -20,7 +21,7 @@
  *
  * Mientras la página esté abierta, la pantalla del celular no se apaga.
  */
-import { capitalizarNombre, soloLetrasNombre } from '../../lib/talleres/reglas'
+import { capitalizarNombre, correoValido, soloLetrasNombre } from '../../lib/talleres/reglas'
 import { pintarRevision } from '../academia/revision'
 import { API_SALA, avisoLocal, consultar as consultarTaller, cuentaAviso, enviar as enviarTaller, type Aviso, type AvisoRed } from './comun'
 
@@ -120,9 +121,30 @@ function montarRegistro(form: HTMLFormElement) {
   form.addEventListener('input', limpiarError)
   form.addEventListener('change', limpiarError)
 
+  // Paso 2 (correo nuevo): se muestran y habilitan nombre, apellido y área.
+  const nuevo = form.querySelector<HTMLElement>('[data-sl-nuevo]')!
+  const extras = [...nuevo.querySelectorAll<HTMLInputElement | HTMLSelectElement>('input, select')]
+  const correo = form.querySelector<HTMLInputElement>('input[name="correo"]')!
+  const pedirDatos = (si: boolean) => {
+    nuevo.hidden = !si
+    for (const c of extras) c.disabled = !si
+    boton.textContent = si ? 'Enviarme el enlace' : 'Continuar'
+  }
+  // Si cambia el correo, se vuelve a preguntar si ya existe.
+  let correoRevisado = ''
+  correo.addEventListener('input', () => {
+    if (!nuevo.hidden && correoValido(correo.value) !== correoRevisado) pedirDatos(false)
+  })
+
   form.addEventListener('submit', async (ev) => {
     ev.preventDefault()
-    const campos = [...form.querySelectorAll<HTMLInputElement | HTMLSelectElement>('input, select')]
+    if (!correo.checkValidity() || !correo.value.trim()) {
+      correo.setAttribute('aria-invalid', 'true')
+      correo.focus()
+      decir('Escriba un correo válido.', 'error')
+      return
+    }
+    const campos = [correo, ...(nuevo.hidden ? [] : extras)]
     const vacio = campos.find((c) => !c.value.trim())
     if (vacio) {
       vacio.setAttribute('aria-invalid', 'true')
@@ -131,17 +153,18 @@ function montarRegistro(form: HTMLFormElement) {
       decir(vacio.tagName === 'SELECT' ? 'Elija su área.' : `Escriba su ${nombre === 'nombres' ? 'nombre' : nombre === 'apellidos' ? 'apellido' : nombre}.`, 'error')
       return
     }
-    const correo = form.querySelector<HTMLInputElement>('input[name="correo"]')!
-    if (!correo.checkValidity()) {
-      correo.setAttribute('aria-invalid', 'true')
-      correo.focus()
-      decir('Escriba un correo válido.', 'error')
-      return
-    }
     boton.disabled = true
-    decir('Enviando el enlace…')
+    decir(nuevo.hidden ? 'Revisando el correo…' : 'Enviando el enlace…')
     try {
-      const r = (await enviar({ accion: 'registrar', ...Object.fromEntries(campos.map((c) => [c.name, c.value])) })) as { correo?: string; enlace?: string }
+      const r = (await enviar({ accion: 'registrar', ...Object.fromEntries(campos.map((c) => [c.name, c.value])) })) as { correo?: string; enlace?: string; nuevo?: boolean }
+      if (r.nuevo) {
+        correoRevisado = correoValido(correo.value)
+        pedirDatos(true)
+        boton.disabled = false
+        decir('')
+        extras[0].focus()
+        return
+      }
       // En desarrollo sin Resend el enlace vuelve en la respuesta: se abre directo.
       if (r.enlace) return void location.assign(r.enlace)
       const enviado = document.querySelector<HTMLElement>('[data-sl-enviado]')!
@@ -151,6 +174,7 @@ function montarRegistro(form: HTMLFormElement) {
       enviado.querySelector<HTMLButtonElement>('[data-sl-otra]')!.onclick = () => {
         enviado.hidden = true
         form.hidden = false
+        pedirDatos(false)
         boton.disabled = false
         decir('')
         correo.focus()
