@@ -1,14 +1,14 @@
 ---
-// Informe para Gerencia: lo que dice el diagnóstico en horas y en pesos.
+// Informe para Gerencia: lo que dice el diagnóstico en horas.
 //
 // Convierte la encuesta de la capacitación en el argumento de la
 // automatización: cuánto tiempo se va hoy en propuestas y en tareas
 // repetitivas, y cuánto se recupera, con los datos del propio equipo. Se
 // imprime a PDF desde el navegador (Ctrl+P); la barra de supuestos no sale.
 //
-// Los supuestos (costo por hora y cuánto reduce la automatización el tiempo de
-// una propuesta) los pone quien prepara el informe. Sin costo por hora, el
-// informe habla solo en horas.
+// El supuesto (cuánto reduce la automatización el tiempo de una propuesta) lo
+// pone quien prepara el informe. El informe habla solo en horas, nunca en costo
+// por hora del equipo.
 export const prerender = false
 import { listarRespuestas } from '../../../lib/diagnostico/datos'
 import { resumir, SEMANAS_MES, type Fila } from '../../../lib/diagnostico/resumen'
@@ -30,20 +30,10 @@ const cert = r.certificados
 const horasMesCert = Math.round((cert.horasMesEmision + cert.horasMesSeguimiento) * 10) / 10
 const horasMesRep = Math.round(r.horasTotal * SEMANAS_MES)
 
-// Mensualidad de la automatización por volumen, meses 1 a 18. Fuente: la
-// propuesta vigente (propuesta_ekosolv_ia.html y sección 7 de
-// oferta_automatizacion_ekosolv.md). Si cambian allá, cambiarlas aquí.
-const PLANES = [
-  { hasta: 20, mensual: 1_185_000 },
-  { hasta: 40, mensual: 1_400_000 },
-  { hasta: 80, mensual: 1_700_000 },
-]
-const EXCEDENTE = 25_000
-
 const fmt = (n: number) => n.toLocaleString('es-CO', { maximumFractionDigits: 1 })
 const hoy = new Date().toLocaleDateString('es-CO', { day: 'numeric', month: 'long', year: 'numeric', timeZone: 'America/Bogota' })
 const areasTexto = r.areas.filter((a) => a.n > 0).map((a) => a.etiqueta).join(', ')
-const datos = { horasMesCert, horasMesProp: p.horasMes, horasMesRep, volumen: p.volumen, planes: PLANES, excedente: EXCEDENTE }
+const datos = { horasMesProp: p.horasMes }
 ---
 
 <!doctype html>
@@ -61,13 +51,9 @@ const datos = { horasMesCert, horasMesProp: p.horasMes, horasMesRep, volumen: p.
     <!-- Barra de quien prepara el informe; no se imprime. -->
     <aside class="barra">
       <a href="/admin/diagnostico" class="volver">← Diagnóstico</a>
-      <label>Costo por hora del equipo
-        <span class="campo"><i>$</i><input id="s-costo" type="number" min="0" step="1000" placeholder="Sin definir" /></span>
-      </label>
       <label>La automatización reduce el tiempo de una propuesta en
         <span class="campo"><input id="s-red" type="number" min="0" max="100" step="5" value="60" /><i>%</i></span>
       </label>
-      <label class="check"><input id="s-plan" type="checkbox" /> Comparar con la mensualidad</label>
       <button type="button" onclick="window.print()">Imprimir o guardar PDF</button>
     </aside>
 
@@ -95,7 +81,6 @@ const datos = { horasMesCert, horasMesProp: p.horasMes, horasMesRep, volumen: p.
             <div><b>{fmt(horasMesRep)} h</b><span>al mes en tareas que se repiten, todo el equipo</span></div>
             <div><b>{p.horasMes ? `${fmt(p.horasMes)} h` : 'Sin datos'}</b><span>al mes armando, revisando y aprobando propuestas</span></div>
             <div><b>{p.horasPorPropuesta ? `${fmt(p.horasPorPropuesta)} h` : 'Sin datos'}</b><span>de trabajo por cada propuesta, sumando a todos los que participan</span></div>
-            <div class="dinero" hidden><b data-v="valor-rec"></b><span>al mes vale el tiempo que se recupera en propuestas</span></div>
           </section>
 
           <section>
@@ -128,7 +113,7 @@ const datos = { horasMesCert, horasMesProp: p.horasMes, horasMesRep, volumen: p.
                   <p>
                     La propuesta sale del Brief de Zoho CRM como borrador completo el mismo día, y la persona revisa y ajusta en
                     vez de armarla desde cero. Si eso reduce el tiempo de cada propuesta en un <b data-v="red"></b>, el equipo
-                    recupera <b data-v="horas-rec"></b> al mes<span class="dinero" hidden>, que a costo de nómina valen <b data-v="valor-rec"></b></span>.
+                    recupera <b data-v="horas-rec"></b> al mes.
                   </p>
                 </div>
               </>
@@ -178,7 +163,7 @@ const datos = { horasMesCert, horasMesProp: p.horasMes, horasMesRep, volumen: p.
                   </>
                 )}
                 <p class="nota">
-                  En total, <b>{fmt(horasMesCert)} horas al mes</b><span class="dinero" hidden>, que a costo de nómina valen <b data-v="valor-cert"></b></span>.
+                  En total, <b>{fmt(horasMesCert)} horas al mes</b>.
                   La emisión de certificados no está en el alcance actual de la automatización: es candidata para una siguiente fase,
                   y la capacitación de Logística ya ataca parte de ese tiempo.
                 </p>
@@ -206,21 +191,11 @@ const datos = { horasMesCert, horasMesProp: p.horasMes, horasMesRep, volumen: p.
             <p class="nota">La capacitación ataca este tiempo en todas las áreas. La automatización se concentra en propuestas y cumplimiento.</p>
           </section>
 
-          <section class="plan" hidden>
-            <h2><span>05</span> Frente a la mensualidad</h2>
-            <p>
-              Con {fmt(p.volumen)} propuestas al mes corresponde el plan de <b data-v="plan-nombre"></b>, con una mensualidad de
-              <b data-v="plan-valor"></b>. Equivale a <b data-v="plan-horas"></b> del equipo al mes; la automatización le
-              devuelve <b data-v="horas-rec"></b> en propuestas, que valen <b data-v="valor-rec"></b>.
-            </p>
-            <p class="resultado" data-v="plan-balance"></p>
-          </section>
 
           <footer class="metodo">
             <b>Cómo se calculó.</b> Cada persona respondió con rangos; se toma el punto medio de cada uno (por ejemplo, "entre 3 y
             6 horas" cuenta como 4,5). Un mes son {String(SEMANAS_MES).replace('.', ',')} semanas. Si alguien respondió dos veces,
             cuenta la última. Son cifras declaradas por el equipo, útiles para decidir, no una medición.
-            <span class="dinero" hidden>Costo por hora usado: <b data-v="costo"></b>.</span>
             Reducción supuesta del tiempo por propuesta: <b data-v="red"></b>.
           </footer>
         </>
@@ -230,51 +205,21 @@ const datos = { horasMesCert, horasMesProp: p.horasMes, horasMesRep, volumen: p.
     <script is:inline define:vars={{ datos }}>
       ;(() => {
         const $ = (s) => document.querySelector(s)
-        const pesos = (n) => '$' + Math.round(n).toLocaleString('es-CO')
         const horas = (n) => `${n.toLocaleString('es-CO', { maximumFractionDigits: 0 })} horas`
         const poner = (k, t) => document.querySelectorAll(`[data-v="${k}"]`).forEach((el) => (el.textContent = t))
-        const costo = $('#s-costo'), red = $('#s-red'), plan = $('#s-plan')
+        const red = $('#s-red')
 
-        // Los supuestos viajan en la URL para que el PDF y el enlace digan lo mismo.
+        // El supuesto viaja en la URL para que el PDF y el enlace digan lo mismo.
         const q = new URLSearchParams(location.search)
-        if (q.get('costo')) costo.value = q.get('costo')
         if (q.get('red')) red.value = q.get('red')
-        plan.checked = q.get('plan') === '1'
-
-        function planDe(vol) {
-          const p = datos.planes.find((x) => vol <= x.hasta)
-          if (p) return { nombre: `hasta ${p.hasta} propuestas al mes`, valor: p.mensual }
-          const ultimo = datos.planes[datos.planes.length - 1]
-          return { nombre: `hasta ${ultimo.hasta} propuestas al mes más ${vol - ultimo.hasta} adicionales`, valor: ultimo.mensual + (vol - ultimo.hasta) * datos.excedente }
-        }
 
         function calcular() {
-          const c = Math.max(0, Number(costo.value) || 0)
           const pr = Math.min(100, Math.max(0, Number(red.value) || 0))
-          const rec = datos.horasMesProp * (pr / 100)
           poner('red', `${pr}%`)
-          poner('horas-rec', horas(rec))
-          poner('costo', pesos(c))
-          poner('valor-rec', pesos(rec * c))
-          poner('valor-cert', pesos(datos.horasMesCert * c))
-          document.querySelectorAll('.dinero').forEach((el) => (el.hidden = !c))
-          const p = planDe(datos.volumen)
-          poner('plan-nombre', p.nombre)
-          poner('plan-valor', pesos(p.valor))
-          poner('plan-horas', c ? horas(p.valor / c) : '')
-          const saldo = rec * c - p.valor
-          poner('plan-balance', saldo >= 0
-            ? `El tiempo recuperado vale ${pesos(saldo)} más que la mensualidad, cada mes.`
-            : `El tiempo recuperado en propuestas cubre el ${Math.round((rec * c / p.valor) * 100)}% de la mensualidad, sin contar el agente de cumplimiento ni el resto de tareas.`)
-          const sec = $('.plan')
-          if (sec) sec.hidden = !(plan.checked && c && datos.volumen)
-          const u = new URLSearchParams()
-          if (c) u.set('costo', String(c))
-          if (pr !== 60) u.set('red', String(pr))
-          if (plan.checked) u.set('plan', '1')
-          history.replaceState(null, '', location.pathname + (u.toString() ? `?${u}` : ''))
+          poner('horas-rec', horas(datos.horasMesProp * (pr / 100)))
+          history.replaceState(null, '', location.pathname + (pr !== 60 ? `?red=${pr}` : ''))
         }
-        ;[costo, red, plan].forEach((el) => el.addEventListener('input', calcular))
+        red.addEventListener('input', calcular)
         calcular()
       })()
     </script>
@@ -294,7 +239,6 @@ const datos = { horasMesCert, horasMesProp: p.horasMes, horasMesRep, volumen: p.
         padding: 14px 24px; background: #fff; border-bottom: 1px solid var(--line); font-size: 13px;
       }
       .barra label { display: flex; flex-direction: column; gap: 5px; color: var(--ink-2); }
-      .barra .check { flex-direction: row; align-items: center; gap: 8px; padding-bottom: 8px; }
       .campo { display: inline-flex; align-items: center; gap: 6px; border: 1px solid var(--line); border-radius: 8px; padding: 6px 10px; background: #fff; }
       .campo i { font-style: normal; color: var(--mute); }
       .campo input { border: 0; outline: 0; font: inherit; width: 120px; }
@@ -344,7 +288,6 @@ const datos = { horasMesCert, horasMesProp: p.horasMes, horasMesRep, volumen: p.
       .lista { list-style: none; margin: 8px 0 12px; padding: 0; }
       .lista li { display: flex; justify-content: space-between; padding: 7px 0; border-bottom: 1px solid #ece8e3; font-size: 13.5px; }
       .nota { font-size: 13px; color: var(--mute) !important; }
-      .resultado { font-weight: 600; color: var(--deep) !important; }
       .metodo { margin-top: 40px; padding-top: 16px; border-top: 1px solid var(--line); font-size: 12px; color: var(--mute); }
       .metodo b { color: var(--ink-2); }
       .aviso { margin: 30px 0; color: var(--ink-2); }
