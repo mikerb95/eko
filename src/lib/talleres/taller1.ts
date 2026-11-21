@@ -5,10 +5,9 @@
  * las lecciones de la capacitación general de la academia
  * (src/lib/academia/semilla.ts), que quedan como material de repaso.
  *
- * Lo marcado como `provisional` es contenido de ejemplo que se reemplaza por
- * documentos reales de Ekosolv cuando lleguen (el documento de la demo, las
- * citas del juego de verdad o alucinación y los casos del semáforo). La vista
- * de presentador lo avisa.
+ * Los ejemplos (el documento de la demo, las citas del juego de verdad o
+ * alucinación y los casos del semáforo) se dejan como material definitivo: Mike
+ * decidió el 2026-11-21 que sirven y quitar el aviso de "ejemplo ilustrativo".
  */
 import type { Interaccion, Pregunta, Taller } from './tipos.ts'
 import { CELULAR_TALLER1 } from './ejemplos1.ts'
@@ -221,7 +220,6 @@ export const TALLER_1: Taller = {
       id: 'auto',
       documentoTitulo: 'Auto de seguimiento (ejemplo)',
       documento: AUTO,
-      provisional: true,
       versiones: [
         {
           id: 'v1',
@@ -606,7 +604,6 @@ export const TALLER_1: Taller = {
       minutos: 12,
       pasos: 4,
       interaccion: 'verdad',
-      provisional: true,
       notas: [
         'Diga: "Cuatro frases como las que podría escribir la IA. Voten en el celular si cada una es verdad o inventada." No adelante cuántas son falsas. Espere los votos antes de cada revelación.',
         'Paso 1, Ley 1672 de 2013: verdad. Es la ley de la política pública de gestión integral de RAEE; la reglamenta el Decreto 284 de 2018.',
@@ -726,7 +723,6 @@ export const TALLER_1: Taller = {
       minutos: 20,
       pasos: 3,
       demo: 'auto',
-      provisional: true,
       notas: [
         'Muestre el auto unos segundos y pida con la versión 1, solo "Resúmeme este auto". Lea la respuesta en voz alta y pregunte: "¿Con esto ya sabemos qué hacer el lunes?" Es correcta, pero no sirve para trabajar: no ordena plazos ni responsables.',
         'Paso 1, más contexto: la respuesta pasa de describir el auto a decir qué tiene que hacer el cliente. Señale que no le pidió una lista: la IA la armó porque entendió para quién era.',
@@ -798,7 +794,6 @@ export const TALLER_1: Taller = {
       minutos: 10,
       pasos: 5,
       interaccion: 'semaforo',
-      provisional: true,
       notas: [
         'Contexto legal en 30 segundos: la Ley 1581 de 2012 protege los datos personales y la vigila la Superintendencia de Industria y Comercio, que puede imponer multas de hasta 2.000 salarios mínimos. Pegar datos de personas en una IA es tratarlos, y como los servidores están fuera de Colombia, esos datos salen del país. Por eso importa la cuenta: la de Ekosolv es plan Team, el proveedor no entrena con lo que se pega y firma un acuerdo de tratamiento de datos, igual que Google con el correo o Zoho con el CRM. Una cuenta personal no tiene nada de eso. Diga antes de votar que los casos 1 a 3 son en la cuenta de Ekosolv.',
         'Paso 1, la resolución publicada: se sube. Es un documento público.',
@@ -819,7 +814,6 @@ export const TALLER_1: Taller = {
       titulo: 'Use la cuenta de Ekosolv, no la suya',
       minutos: 7,
       pasos: 1,
-      provisional: true,
       notas: [
         'Muestre el certificado completo y diga: "Esto, con nombre, cédula y celular, se pega tal cual en la cuenta de Ekosolv." La cuenta de la empresa es plan Team: Anthropic no entrena con lo que se pega y firma un acuerdo de tratamiento de datos, así que queda como encargado de Ekosolv, igual que Google con el correo o Zoho con el CRM. Eso es lo que pide la Ley 1581 cuando los datos salen del país. Antes del sábado confirme que el plan contratado sea Team y no Pro individual: Pro se rige por los términos de consumidor.',
         'Paso 1: los datos se tapan solos. "Esto es lo que tocaría hacer en una cuenta personal, y por eso no se usa para el trabajo: en esas cuentas lo que se pega puede usarse para entrenar y queda por fuera de la empresa." Puede hacer clic sobre cada dato para destaparlo o taparlo. Para cerrar, lo que vale en cualquier cuenta: contraseñas y claves, nunca; datos de salud (incapacidades, historias clínicas), solo si la tarea de verdad los necesita. Y no califique con pulgar arriba o abajo una conversación con datos de clientes: esa conversación puede llegarle al proveedor como retroalimentación. El certificado es de ejemplo.',

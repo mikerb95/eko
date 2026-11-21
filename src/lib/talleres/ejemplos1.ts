@@ -9,8 +9,8 @@
  *   al registrarse: una situación concreta (`titulo`) y qué pasa y qué hacer
  *   (`texto`).
  *
- * Los ejemplos por área son ilustrativos, no documentos reales de Ekosolv: el
- * celular los marca así. Enfoque por área que pidió Mike (2026-11-19):
+ * Los ejemplos por área son ilustrativos, no documentos reales de Ekosolv, pero
+ * se muestran sin aviso (decisión de Mike, 2026-11-21). Enfoque por área que pidió Mike (2026-11-19):
  * - Gerencia: Zoho, tableros de control, cierre de oportunidades, propuestas y
  *   automatización de procesos.
  * - Finanzas: Zoho Books (facturas, recaudos, cartera) y Siigo Nube (nómina,
