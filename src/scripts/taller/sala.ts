@@ -460,6 +460,7 @@ function montar(raiz: HTMLElement) {
       sub.textContent = 'Cuando empiece la sesión, esta página se actualiza sola.'
       lista.replaceChildren()
       pintarEjemplo(null)
+      pintarHerramientas(null)
       duda.hidden = true
       zonaPC.hidden = true
       decir('')
