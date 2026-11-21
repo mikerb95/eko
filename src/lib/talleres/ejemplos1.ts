@@ -216,7 +216,8 @@ export const CELULAR_TALLER1: Record<string, GuiaCelular> = {
     idea: 'En pantalla está el resultado del grupo en las mismas cinco preguntas, antes y después de hoy.',
   },
   sigue: {
-    idea: 'Faltan tres sábados y asiste todo el equipo. Mientras tanto, practique con una tarea real de su puesto.',
+    idea: 'Faltan tres sábados y asiste todo el equipo. Mientras tanto, practique con una tarea real de su puesto. Abajo están las herramientas que le recomendamos para su área.',
+    herramientas: true,
   },
   cierre: {
     idea: 'Escanee el código de la pantalla para guardar la tarjeta resumen, con las ideas y las instrucciones de hoy. Gracias por participar.',

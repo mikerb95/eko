@@ -7,7 +7,8 @@
 // y entra. Después muestra la pregunta
 // abierta en cada momento y guarda sus respuestas. Cuando no hay nada que
 // votar, muestra la idea de la escena en palabras sencillas y un ejemplo de su
-// área (la tarjeta destacada). Desde el slide 5, una caja para enviarle
+// área (la tarjeta destacada). En "Lo que viene", las herramientas
+// recomendadas para su área (src/lib/talleres/herramientas.ts). Desde el slide 5, una caja para enviarle
 // preguntas a quien dicta. "Abrir en mi PC" queda plegado en una barra fija
 // abajo, que se despliega con un toque.
 // Motor: src/scripts/taller/sala.ts. API: /api/academia/sala.
@@ -77,6 +78,14 @@ const maquetas = [
         <h2 data-sl-ej-titulo></h2>
         <p class="sl-ej-texto" data-sl-ej-texto></p>
         <p class="sl-nota">Ejemplo ilustrativo</p>
+      </aside>
+      <aside class="sl-herr" data-sl-herr hidden>
+        <p class="sl-ej-cabeza">
+          <span class="sl-ej-area" data-sl-herr-area></span>
+          <span class="sl-herr-rotulo">Herramientas para su área</span>
+        </p>
+        <ul class="sl-herr-lista" data-sl-herr-lista></ul>
+        <p class="sl-nota" data-sl-herr-nota></p>
       </aside>
       {maquetas.map((id) => (
         <template data-mq-plantilla={id}>

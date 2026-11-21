@@ -14,7 +14,9 @@
  * 3. Debajo de lo anterior: el ejemplo de la escena en curso para el área de
  *    la persona (tarjeta destacada, que destella al cambiar de tema) y, desde
  *    el slide 5, una caja para enviarle preguntas a quien dicta (las ve en la
- *    vista de presentador). "Abrir en mi PC" va plegado en una barra fija
+ *    vista de presentador). En la escena "Lo que viene", una tarjeta con las
+ *    herramientas recomendadas para su área (disponibles, por verificar y por
+ *    crear). "Abrir en mi PC" va plegado en una barra fija
  *    abajo, con un botón para desplegarlo y volverlo a plegar.
  *
  * 4. Al llegar la presentación a su última escena, el celular pasa solo al
@@ -24,6 +26,7 @@
  * Mientras la página esté abierta, la pantalla del celular no se apaga.
  */
 import { capitalizarNombre, correoValido, soloLetrasNombre } from '../../lib/talleres/reglas'
+import { ESTADO_HERRAMIENTA, TIPO_HERRAMIENTA, type Herramienta } from '../../lib/talleres/herramientas'
 import { pintarRevision } from '../academia/revision'
 import { API_SALA, avisoLocal, consultar as consultarTaller, cuentaAviso, enviar as enviarTaller, type Aviso, type AvisoRed } from './comun'
 
@@ -45,6 +48,8 @@ interface Estado {
   numero?: number
   idea?: string
   ejemplo?: { area: string; titulo: string; texto: string } | null
+  /** Escena "Lo que viene": herramientas recomendadas del área. */
+  herramientas?: { area: string; items: Herramienta[]; aclaracion: string } | null
   practica?: { consigna: string; maximo: number } | null
   guia?: Guia | null
   codigoPC?: string | null
@@ -253,6 +258,40 @@ function montar(raiz: HTMLElement) {
     ejemplo.classList.remove('nuevo')
     void ejemplo.offsetWidth
     ejemplo.classList.add('nuevo')
+  }
+  const herr = $('[data-sl-herr]')
+  let herrVisto = ''
+  const pintarHerramientas = (h: Estado['herramientas']) => {
+    const clave = h ? h.area + h.items.length : ''
+    if (clave === herrVisto) return
+    herrVisto = clave
+    herr.hidden = !h
+    if (!h) return
+    $('[data-sl-herr-area]').textContent = h.area
+    $('[data-sl-herr-nota]').textContent = h.aclaracion
+    $('[data-sl-herr-lista]').replaceChildren(
+      ...h.items.map((x) => {
+        const li = document.createElement('li')
+        li.style.setProperty('--ec', ESTADO_HERRAMIENTA[x.estado].color)
+        const cab = document.createElement('p')
+        cab.className = 'sl-herr-cab'
+        const nombre = document.createElement('b')
+        nombre.textContent = x.nombre
+        const estado = document.createElement('span')
+        estado.className = 'sl-herr-estado'
+        estado.textContent = ESTADO_HERRAMIENTA[x.estado].etiqueta
+        cab.append(nombre, estado)
+        const tipo = document.createElement('small')
+        tipo.textContent = TIPO_HERRAMIENTA[x.tipo]
+        const para = document.createElement('p')
+        para.textContent = x.para
+        li.append(cab, tipo, para)
+        return li
+      }),
+    )
+    herr.classList.remove('nuevo')
+    void herr.offsetWidth
+    herr.classList.add('nuevo')
   }
   let taller = 0
   let ultimaEntrada = 0
@@ -466,6 +505,7 @@ function montar(raiz: HTMLElement) {
     zonaPC.hidden = false
     duda.hidden = (e.numero ?? 0) < DUDAS_DESDE
     pintarEjemplo(e.ejemplo ?? null)
+    pintarHerramientas(e.herramientas ?? null)
     const id = e.interaccion?.id ?? (e.practica ? 'practica' : e.guia ? `guia:${e.escena}:${e.guia.paso}` : `escena:${e.escena}`)
     if (id === abierta) return
     abierta = id

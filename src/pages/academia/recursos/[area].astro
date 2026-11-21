@@ -8,6 +8,7 @@ import '../../../styles/maquetas.css'
 import AcademiaLayout from '../../../layouts/AcademiaLayout.astro'
 import Maqueta from '../../../components/taller/Maqueta.astro'
 import { colorDe } from '../../../lib/academia/ui'
+import { ACLARACION_HERRAMIENTAS, TIPO_HERRAMIENTA, herramientasPorEstado } from '../../../lib/talleres/herramientas'
 import { AREAS_RECURSOS, TOTAL_PROGRAMA, areaRecursos, bancoDe, fuentesDe, rutaRecursos, temarioDe } from '../../../lib/talleres/recursos'
 
 const area = areaRecursos(Astro.params.area)
@@ -15,6 +16,7 @@ if (!area) return Astro.redirect('/academia/recursos')
 const banco = bancoDe(area.id)
 const fuentes = fuentesDe(area.id)
 const color = colorDe(area.id)
+const herramientas = herramientasPorEstado(area.id)
 const colorNivel = { si: '#179C91', cuidado: '#D9A43B', no: '#C2513F' }
 const partes = [
   { id: 'contexto', nombre: 'Contexto', ayuda: 'Quién es usted y qué hay que saber', color: '#124E7D' },
@@ -143,6 +145,25 @@ const dos = (n: number) => String(n).padStart(2, '0')
           </section>
         ))}
 
+        <section class="rc-herr" id="herramientas">
+          <h3>Herramientas para {area.nombre}</h3>
+          <p class="rc-herr-intro">Conectores, skills y MCP que le recomendamos para el día a día con Claude. {ACLARACION_HERRAMIENTAS}</p>
+          {herramientas.map((g) => (
+            <div class="rc-herr-grupo" style={`--ec:${g.color}`}>
+              <h4>{g.etiqueta}{g.estado === 'crear' && <span> · personalizadas, las debemos crear</span>}</h4>
+              <div class="rc-herr-lista">
+                {g.items.map((h) => (
+                  <article>
+                    <small>{TIPO_HERRAMIENTA[h.tipo]}</small>
+                    <b>{h.nombre}</b>
+                    <p>{h.para}</p>
+                  </article>
+                ))}
+              </div>
+            </div>
+          ))}
+        </section>
+
         <section class="rc-fuentes" id="fuentes">
           <h3>Fuentes oficiales para verificar</h3>
           <div class="enlaces">
@@ -159,7 +180,8 @@ const dos = (n: number) => String(n).padStart(2, '0')
               {temarioDe(b).map((t, i) => (
                 <li><a href={`#${ancla(b.n, t.id)}`}><span class="ac-num">{dos(i + 1)}</span><span>{t.titulo}</span></a></li>
               ))}
-              <li><a href="#fuentes"><span class="ac-num">{dos(temarioDe(b).length + 1)}</span><span>Fuentes oficiales</span></a></li>
+              <li><a href="#herramientas"><span class="ac-num">{dos(temarioDe(b).length + 1)}</span><span>Herramientas para su área</span></a></li>
+              <li><a href="#fuentes"><span class="ac-num">{dos(temarioDe(b).length + 2)}</span><span>Fuentes oficiales</span></a></li>
             </ol>
           </details>
         ))}
@@ -202,7 +224,7 @@ const dos = (n: number) => String(n).padStart(2, '0')
 
   .rc-cuerpo { display: grid; gap: 40px; min-width: 0; }
   .rc-cap { display: grid; gap: 32px; }
-  .rc-cap > section, .rc-fuentes { scroll-margin-top: 90px; }
+  .rc-cap > section, .rc-fuentes, .rc-herr { scroll-margin-top: 90px; }
   .rc-cap-cab { display: flex; align-items: center; gap: 14px; padding-bottom: 16px; border-bottom: 1px solid var(--line); }
   .rc-num { flex: none; width: 44px; height: 44px; border-radius: 50%; background: var(--ink); color: #fff; display: grid; place-items: center; font: 600 18px/1 var(--font-display); }
   .rc-cap-cab h2 { font-size: 26px; line-height: 1.1; margin: 0; }
@@ -275,6 +297,19 @@ const dos = (n: number) => String(n).padStart(2, '0')
   .enlaces span { grid-column: 1; font-size: 13.5px; line-height: 1.4; color: var(--mute); }
   .enlaces i { grid-column: 2; grid-row: 1 / span 2; font-style: normal; font: 500 12px/1 var(--font-mono); color: var(--verde); }
 
+  .rc-herr { display: grid; gap: 18px; }
+  .rc-herr h3 { margin: 0; }
+  .rc-herr-intro { margin: 0; font-size: 15px; line-height: 1.5; color: var(--ink-2); max-width: 70ch; }
+  .rc-herr-grupo { display: grid; gap: 8px; }
+  .rc-herr-grupo h4 { font: 600 15px/1.2 var(--font-display); margin: 0 0 2px; display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+  .rc-herr-grupo h4::before { content: ''; width: 8px; height: 8px; border-radius: 50%; background: var(--ec); }
+  .rc-herr-grupo h4 span { font: 400 14px/1.2 var(--font-sans); color: var(--mute); }
+  .rc-herr-lista { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+  .rc-herr-lista article { background: #fff; border-radius: var(--r-md); padding: 13px 16px; display: grid; gap: 3px; align-content: start; }
+  .rc-herr-lista small { font: 500 11px/1.2 var(--font-mono); letter-spacing: .08em; text-transform: uppercase; color: var(--ec); }
+  .rc-herr-lista b { font: 600 16px/1.25 var(--font-display); }
+  .rc-herr-lista p { margin: 2px 0 0; font-size: 14px; line-height: 1.5; color: var(--ink-2); }
+
   .rc-temario summary { list-style: none; cursor: pointer; display: flex; justify-content: space-between; align-items: center; gap: 12px; }
   .rc-temario summary::-webkit-details-marker { display: none; }
   .rc-temario summary h2 { margin: 0; }
@@ -293,7 +328,7 @@ const dos = (n: number) => String(n).padStart(2, '0')
   @media (max-width: 640px) {
     .plantilla { grid-template-columns: 1fr 1fr; }
     .doble { grid-template-columns: 1fr; gap: 32px; }
-    .glosario { grid-template-columns: 1fr; }
+    .glosario, .rc-herr-lista { grid-template-columns: 1fr; }
     .paso { padding-left: 16px; }
   }
 </style>

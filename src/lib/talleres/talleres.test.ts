@@ -243,3 +243,19 @@ test('validarOpinion guarda solo los campos del formulario y exige al menos una 
   assert.ok('error' in validarOpinion(null, 'operaciones', 1))
   assert.ok('error' in validarOpinion({ duda: 'a'.repeat(MAX_RESPUESTA_OPINION + 1) }, 'operaciones', 1))
 })
+
+test('herramientas: las seis áreas tienen recomendaciones, ordenadas y sin guion largo', async () => {
+  const { herramientasDe, herramientasPorEstado, ACLARACION_HERRAMIENTAS } = await import('./herramientas.ts')
+  const orden = ['lista', 'verificar', 'crear']
+  for (const area of AREA_IDS) {
+    const hs = herramientasDe(area)
+    assert.ok(hs.length >= 3, `${area} sin herramientas`)
+    assert.ok(hs.some((h) => h.estado === 'lista'), `${area} sin nada disponible hoy`)
+    const idx = hs.map((h) => orden.indexOf(h.estado))
+    assert.deepEqual(idx, [...idx].sort((a, b) => a - b), `${area} desordenada`)
+    assert.equal(herramientasPorEstado(area).reduce((s, g) => s + g.items.length, 0), hs.length)
+    for (const h of hs) assert.ok(!/[—–]/.test(h.nombre + h.para), `${area}: guion largo en ${h.nombre}`)
+  }
+  assert.match(ACLARACION_HERRAMIENTAS, /las debemos crear/)
+  assert.ok(TALLER_1.celular?.sigue?.herramientas, 'la escena "sigue" debe mostrar las herramientas')
+})

@@ -10,6 +10,7 @@ import { practicar, PracticaNoDisponible } from '../../../lib/academia/motorPrac
 import { correoValido, interaccionDe, interaccionPublica, PREGUNTAS_DIA, registroSala, validarPregunta, votoValido, MAX_PREGUNTA } from '../../../lib/talleres/reglas'
 import { avisoPublico, codigoPC, codigoVigente, MINUTOS_CODIGO_PC, guardarOpinion, guardarPracticaSala, guardarPregunta, marcarEnSala, misRespuestas, opinionDe, practicasSalaDeHoy, preguntasDeHoyDe, liberarEnlace, registrarAsistente, registroPorCorreo, reservarEnlace, votar } from '../../../lib/talleres/datos'
 import { validarOpinion } from '../../../lib/talleres/opinion'
+import { ACLARACION_HERRAMIENTAS, herramientasDe } from '../../../lib/talleres/herramientas'
 import { salaActual } from '../../../lib/talleres/sala'
 import { anotar } from '../../../lib/bitacora'
 import { clientIp } from '../../../lib/rateLimit'
@@ -75,6 +76,10 @@ export const GET: APIRoute = async ({ cookies }) => {
         const ej = t.celular?.[estado.escena]?.areas?.[asistente.area]
         return ej ? { area: nombreModulo(asistente.area), ...ej } : null
       })(),
+      // Escenas marcadas: herramientas recomendadas del área (herramientas.ts).
+      herramientas: t.celular?.[estado.escena]?.herramientas
+        ? { area: nombreModulo(asistente.area), items: herramientasDe(asistente.area), aclaracion: ACLARACION_HERRAMIENTAS }
+        : null,
       mias: i ? await misRespuestas(t.n, i.id, asistente.id) : {},
       // Código para el PC que sigue vigente (si ya se usó, el celular lo quita).
       codigoPC: await codigoVigente(t.n, asistente.id),

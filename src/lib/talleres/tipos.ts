@@ -124,6 +124,8 @@ export interface GuiaCelular {
   idea: string
   /** id de área → ejemplo de esa idea en su trabajo. */
   areas?: Record<string, EjemploArea>
+  /** Muestra las herramientas recomendadas del área (herramientas.ts). */
+  herramientas?: boolean
 }
 
 export interface Escena {
