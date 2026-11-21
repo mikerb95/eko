@@ -60,7 +60,7 @@ export interface Demo {
   documentoTitulo: string
   documento: string
   /** true mientras el documento sea de ejemplo y no uno real de Ekosolv. */
-  provisional: boolean
+  provisional?: boolean
   versiones: VersionDemo[]
 }
 

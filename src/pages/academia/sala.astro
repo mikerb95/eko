@@ -7,7 +7,9 @@
 // y entra. Después muestra la pregunta
 // abierta en cada momento y guarda sus respuestas. Cuando no hay nada que
 // votar, muestra la idea de la escena en palabras sencillas y un ejemplo de su
-// área. Abajo, una caja para enviarle preguntas a quien dicta.
+// área (la tarjeta destacada). Desde el slide 5, una caja para enviarle
+// preguntas a quien dicta. "Abrir en mi PC" queda plegado en una barra fija
+// abajo, que se despliega con un toque.
 // Motor: src/scripts/taller/sala.ts. API: /api/academia/sala.
 export const prerender = false
 import AcademiaLayout from '../../layouts/AcademiaLayout.astro'
@@ -68,29 +70,20 @@ const maquetas = [
       <div class="sl-preguntas" data-sl-preguntas></div>
       <p class="sl-estado" data-sl-estado></p>
       <aside class="sl-ejemplo" data-sl-ejemplo hidden>
-        <p class="n" data-sl-ej-area></p>
+        <p class="sl-ej-cabeza">
+          <span class="sl-ej-area" data-sl-ej-area></span>
+          <span class="sl-ej-rotulo">Ejemplo de este tema</span>
+        </p>
         <h2 data-sl-ej-titulo></h2>
-        <p data-sl-ej-texto></p>
+        <p class="sl-ej-texto" data-sl-ej-texto></p>
+        <p class="sl-nota">Ejemplo ilustrativo</p>
       </aside>
-      <div class="sl-pc-zona">
-        <button type="button" class="ac-btn ac-btn-sec" data-sl-pc-abrir>Abrir en mi PC</button>
-        <div class="sl-pc" data-sl-pc hidden>
-          <p>En el navegador de su PC escriba esta dirección:</p>
-          <p class="sl-pc-url">{dirPC}</p>
-          <p>Y cuando se la pida, este código:</p>
-          <p class="sl-pc-codigo" data-sl-pc-codigo>··</p>
-          <div class="sl-pc-fila">
-            <p data-sl-pc-vence role="status"></p>
-            <button type="button" class="ac-btn ac-btn-sec" data-sl-pc-cerrar>Listo</button>
-          </div>
-        </div>
-      </div>
       {maquetas.map((id) => (
         <template data-mq-plantilla={id}>
           <Maqueta id={id} />
         </template>
       ))}
-      <form class="sl-form sl-duda" data-sl-duda novalidate>
+      <form class="sl-form sl-duda" data-sl-duda novalidate hidden>
         <label>
           <span>¿Tiene una pregunta?</span>
           <textarea name="texto" rows="2" maxlength="400" placeholder="Escríbala aquí: le llega a quien dicta."></textarea>
@@ -98,6 +91,28 @@ const maquetas = [
         <button type="submit" class="ac-btn ac-btn-sec">Enviar pregunta</button>
         <p class="sl-estado" data-sl-duda-estado role="status"></p>
       </form>
+      <div class="sl-pc-zona" data-sl-pc-zona hidden>
+        <button type="button" class="sl-pc-toggle" data-sl-pc-toggle aria-expanded="false" aria-controls="sl-pc-cuerpo">
+          <span class="sl-pc-toggle-txt">
+            <b>Ver la presentación en su PC</b>
+            <span data-sl-pc-toggle-sub>Toque para ver la dirección y el código</span>
+          </span>
+          <i aria-hidden="true"></i>
+        </button>
+        <div class="sl-pc-cuerpo" id="sl-pc-cuerpo" data-sl-pc-cuerpo hidden>
+          <button type="button" class="ac-btn ac-btn-sec" data-sl-pc-abrir>Abrir en mi PC</button>
+          <div class="sl-pc" data-sl-pc hidden>
+            <p>En el navegador de su PC escriba esta dirección:</p>
+            <p class="sl-pc-url">{dirPC}</p>
+            <p>Y cuando se la pida, este código:</p>
+            <p class="sl-pc-codigo" data-sl-pc-codigo>··</p>
+            <div class="sl-pc-fila">
+              <p data-sl-pc-vence role="status"></p>
+              <button type="button" class="ac-btn ac-btn-sec" data-sl-pc-cerrar>Listo</button>
+            </div>
+          </div>
+        </div>
+      </div>
     </section>
   ) : (
     <section class="sl">

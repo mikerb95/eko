@@ -12,8 +12,10 @@
  *    alimenta el contador del proyector.
  *
  * 3. Debajo de lo anterior: el ejemplo de la escena en curso para el área de
- *    la persona y una caja para enviarle preguntas a quien dicta (las ve en
- *    la vista de presentador).
+ *    la persona (tarjeta destacada, que destella al cambiar de tema) y, desde
+ *    el slide 5, una caja para enviarle preguntas a quien dicta (las ve en la
+ *    vista de presentador). "Abrir en mi PC" va plegado en una barra fija
+ *    abajo, con un botón para desplegarlo y volverlo a plegar.
  *
  * 4. Al llegar la presentación a su última escena, el celular pasa solo al
  *    formulario de cierre de su área (/academia/sala/opinion), si todavía no
@@ -39,6 +41,8 @@ interface Estado {
   interaccion?: { id: string; tipo: string; titulo: string; preguntas: { id: string; enunciado: string; opciones: { id: string; texto: string }[] }[] } | null
   mias?: Record<string, string>
   kicker?: string
+  /** Número del slide en curso, desde 1. */
+  numero?: number
   idea?: string
   ejemplo?: { area: string; titulo: string; texto: string } | null
   practica?: { consigna: string; maximo: number } | null
@@ -60,6 +64,9 @@ interface Guia {
   queEs: string
   maqueta: string
 }
+
+/** Desde este slide (Idea 1 · Aprender de ejemplos) aparece la caja de preguntas. */
+const DUDAS_DESDE = 5
 
 const raiz = document.querySelector<HTMLElement>('[data-sala]')
 if (raiz) montar(raiz)
@@ -227,7 +234,9 @@ function montar(raiz: HTMLElement) {
   let abierta: string | null = null
   let ejemploVisto = ''
   const ejemplo = $('[data-sl-ejemplo]')
-  montarDuda(raiz.querySelector<HTMLFormElement>('[data-sl-duda]')!)
+  const duda = raiz.querySelector<HTMLFormElement>('[data-sl-duda]')!
+  montarDuda(duda)
+  const zonaPC = $('[data-sl-pc-zona]')
   const pc = montarPC(raiz)
   const avisoInicio = montarEspera(raiz)
 
@@ -237,9 +246,13 @@ function montar(raiz: HTMLElement) {
     ejemploVisto = clave
     ejemplo.hidden = !e
     if (!e) return
-    $('[data-sl-ej-area]').textContent = `En su área · ${e.area}`
+    $('[data-sl-ej-area]').textContent = e.area
     $('[data-sl-ej-titulo]').textContent = e.titulo
     $('[data-sl-ej-texto]').textContent = e.texto
+    // Destello corto para que se note que llegó el ejemplo del tema nuevo.
+    ejemplo.classList.remove('nuevo')
+    void ejemplo.offsetWidth
+    ejemplo.classList.add('nuevo')
   }
   let taller = 0
   let ultimaEntrada = 0
@@ -432,6 +445,8 @@ function montar(raiz: HTMLElement) {
       sub.textContent = 'Cuando empiece la sesión, esta página se actualiza sola.'
       lista.replaceChildren()
       pintarEjemplo(null)
+      duda.hidden = true
+      zonaPC.hidden = true
       decir('')
       return
     }
@@ -448,6 +463,8 @@ function montar(raiz: HTMLElement) {
     taller = e.taller!
     entrar()
     pc?.vigente(e.codigoPC ?? null)
+    zonaPC.hidden = false
+    duda.hidden = (e.numero ?? 0) < DUDAS_DESDE
     pintarEjemplo(e.ejemplo ?? null)
     const id = e.interaccion?.id ?? (e.practica ? 'practica' : e.guia ? `guia:${e.escena}:${e.guia.paso}` : `escena:${e.escena}`)
     if (id === abierta) return
@@ -507,13 +524,23 @@ function montarEspera(raiz: HTMLElement): { poner(r: AvisoRed | null | undefined
 }
 
 /**
- * "Abrir en mi PC": pide el código de dos números y lo muestra grande, con
- * la dirección corta que se escribe en el PC (/pc) y cuánto le queda.
+ * "Abrir en mi PC": va plegado en una barra fija abajo; al desplegarla pide
+ * el código de dos números y lo muestra grande, con la dirección corta que se
+ * escribe en el PC (/pc) y cuánto le queda.
  */
 function montarPC(raiz: HTMLElement): { vigente(actual: string | null): void } | null {
   const abrir = raiz.querySelector<HTMLButtonElement>('[data-sl-pc-abrir]')
   const caja = raiz.querySelector<HTMLElement>('[data-sl-pc]')
-  if (!abrir || !caja) return null
+  const toggle = raiz.querySelector<HTMLButtonElement>('[data-sl-pc-toggle]')
+  const cuerpo = raiz.querySelector<HTMLElement>('[data-sl-pc-cuerpo]')
+  if (!abrir || !caja || !toggle || !cuerpo) return null
+  const toggleSub = toggle.querySelector<HTMLElement>('[data-sl-pc-toggle-sub]')!
+  const desplegar = (si: boolean) => {
+    cuerpo.hidden = !si
+    toggle.setAttribute('aria-expanded', String(si))
+    toggleSub.textContent = si ? 'Toque para ocultar' : 'Toque para ver la dirección y el código'
+  }
+  toggle.addEventListener('click', () => desplegar(cuerpo.hidden))
   const codigo = caja.querySelector<HTMLElement>('[data-sl-pc-codigo]')!
   const vence = caja.querySelector<HTMLElement>('[data-sl-pc-vence]')!
   let reloj: ReturnType<typeof setInterval> | null = null
@@ -526,6 +553,7 @@ function montarPC(raiz: HTMLElement): { vigente(actual: string | null): void } |
     parar()
     caja.hidden = true
     abrir.hidden = false
+    desplegar(false)
   }
   const pedir = async () => {
     abrir.disabled = true

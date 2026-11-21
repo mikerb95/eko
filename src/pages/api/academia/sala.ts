@@ -58,6 +58,8 @@ export const GET: APIRoute = async ({ cookies }) => {
       escenaId: estado.escena,
       paso: estado.paso,
       kicker: escena?.kicker ?? '',
+      // Número de slide (desde 1): el celular decide desde cuál muestra la caja de preguntas.
+      numero: t.escenas.findIndex((x) => x.id === estado.escena) + 1,
       // Aviso "Empezamos en 00:00" que puso quien dicta.
       aviso: avisoPublico(estado),
       // Práctica guiada: el paso actual, con su maqueta (el celular la anima).
