@@ -48,12 +48,12 @@ export interface BancoCapacitacion {
 }
 
 const ENFOQUE: Record<string, string> = {
-  gerencia: 'Zoho, propuestas, cierre de oportunidades y automatización de procesos.',
-  finanzas: 'Zoho Books, Siigo Nube, nómina, cartera y manuales de procedimiento.',
-  operaciones: 'Autos de la ANLA y la CAR, obligaciones, vigencias y cambios de norma.',
-  logistica: 'Correo, solicitudes de recolección, avisos y tableros en Zoho.',
+  gerencia: 'Zoho, propuestas, seguimiento de propuestas enviadas y cierre de oportunidades.',
+  finanzas: 'Requerimientos de la DIAN y Hacienda, comparativos de balances y conciliación, con Zoho Books y Siigo Nube.',
+  operaciones: 'Autos de la ANLA y la CAR, obligaciones, vigencias e informe anual.',
+  logistica: 'Correo, solicitudes de recolección, certificados y seguimiento a gestores en Zoho.',
   ventas: 'Briefs, propuestas y seguimiento comercial.',
-  mercadeo: 'Contenido, redes y blog.',
+  mercadeo: 'Tendencias en sostenibilidad, piezas para Canva y la voz de Ekosolv en redes.',
 }
 
 export interface Termino {
@@ -68,10 +68,7 @@ export interface Termino {
  * las respuestas que otra escena dejó desactualizadas.
  */
 const ESCENAS_SIN_FAQ = new Set(['sala', 'diagnostico'])
-const PREGUNTAS_FUERA = new Set([
-  // La práctica final sí conecta Zoho; esta respuesta decía que primero a mano.
-  '¿Se puede conectar Claude a nuestro Zoho?',
-])
+const PREGUNTAS_FUERA = new Set<string>([])
 function preguntasDe(t: typeof TALLER_1): BancoCapacitacion['preguntas'] {
   return t.bloques
     .map((b) => ({

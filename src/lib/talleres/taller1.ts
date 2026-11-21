@@ -539,7 +539,7 @@ export const TALLER_1: Taller = {
       ],
       siPreguntan: [
         { p: '¿Por qué Claude y no ChatGPT?', r: 'Ekosolv eligió trabajar con una sola herramienta para que todos compartan instrucciones y proyectos. Lo que se aprende hoy sirve igual para ChatGPT o Gemini, porque por dentro funcionan igual.' },
-        { p: '¿Se puede conectar Claude a nuestro Zoho?', r: 'Técnicamente sí, con integraciones, y es de lo que más tiempo ahorra cuando se automatiza. Primero conviene dominar el uso a mano: saber pedir y revisar es lo que hace que una automatización salga bien.' },
+        { p: '¿Se puede conectar Claude a nuestro Zoho?', r: 'Sí, y lo hacemos hoy al final, con el conector de Zoho CRM desde la cuenta de Ekosolv. Claude le pide permiso antes de leer o cambiar cualquier registro. Por eso primero se aprende a pedir y a revisar: es lo que hace que la conexión salga bien.' },
       ],
       datos: {
         capas: [
