@@ -16,7 +16,7 @@ Estado: **construida** (2026-11-19). Lo que pidió Mike y lo que se decidió est
 
 - El PC vinculado **sigue la escena** de quien dicta (no se navega libre).
 - Cada uno entra con **su propia cuenta**, probablemente del plan Team de Ekosolv.
-- En el taller el conector queda en **solo lectura**.
+- En el taller el conector queda en **lectura y escritura**, con la escritura en Always ask (Mike, 2026-11-21; antes era solo lectura).
 - El código lo muestra el celular y se escribe en el PC (el flujo que propuso Mike).
 
 ### Lo que se encontró al revisar el conector (2026-11-19)
@@ -37,7 +37,7 @@ Cada pendiente con la fecha en que se abrió. Al cerrarlo, se pasa a "Resueltos"
 | P4 | 2026-11-19 | Saber **quién tiene usuario propio en Zoho** y Claude Desktop instalado. Los pasos 4 a 7 también se pueden hacer desde claude.ai en Chrome. | Mike | Abierto |
 | P5 | 2026-11-19 | **Plan B** para quien no pueda instalar la extensión o la aplicación por permisos del equipo: seguir en la pantalla grande y en el celular. Confirmar si los PC de Ekosolv dejan instalar extensiones. | Mike | Abierto |
 | P6 | 2026-11-19 | Probar el **PC vinculado en producción** (ekosolv.codebymike.net/pc) con un celular y un PC reales antes del sábado. En local ya pasó la prueba `e2e/zoho-pc.spec.ts`. | Mike | Abierto |
-| P8 | 2026-11-19 | **Desconectar o dejar** el conector de prueba en la cuenta de Mike (CRM de prueba "CodeByMike" con datos de ejemplo, escritura bloqueada). Sirve para ensayar el sábado. | Mike | Abierto |
+| P8 | 2026-11-19 | **Desconectar o dejar** el conector de prueba en la cuenta de Mike (CRM de prueba "CodeByMike" con datos de ejemplo, escritura en Blocked; para ensayar la versión del 2026-11-21 hay que pasarla a Always ask). Sirve para ensayar el sábado. | Mike | Abierto |
 
 ### Resueltos
 
@@ -46,7 +46,7 @@ Cada pendiente con la fecha en que se abrió. Al cerrarlo, se pasa a "Resueltos"
 | R1 | 2026-11-19 | 2026-11-19 | Tiempo: con el bloque de Zoho la capacitación 1 pasaba de 4 h a 4 h 40. | Mike: todo se dicta en 4 h y el descanso sigue en 15 min. Apertura 12, Por dentro 55, Alcances 30, Descanso 15, Cómo pedir 38, Práctica guiada 25, Seguridad 17, Conectar Zoho 35, Cierre 13. |
 | R2 | 2026-11-19 | 2026-11-19 | Si el PC vinculado sigue la escena o se navega libre. | Mike: sigue la escena de quien dicta. |
 | R3 | 2026-11-19 | 2026-11-19 | Con qué cuenta entra cada persona. | Mike: cada uno con su cuenta, probablemente del plan Team (confirmar en P2). |
-| R4 | 2026-11-19 | 2026-11-19 | Permisos del conector en el taller. | Mike: solo lectura. |
+| R4 | 2026-11-19 | 2026-11-21 | Permisos del conector en el taller. | Mike (2026-11-19): solo lectura. Cambiado el 2026-11-21: lectura y escritura, con "Write/delete tools" en Always ask y la lectura en Needs approval. Ajustados el paso 7 y su maqueta `permisos`, la frase del paso 4, las notas, las preguntas, el checklist, el glosario y el banco de recursos. |
 | R5 | 2026-11-19 | 2026-11-19 | Navegadores compatibles con la extensión. | Revisado en el soporte de Anthropic: solo Google Chrome, no Edge ni Brave. Corregido en el contenido. |
 | R6 | 2026-11-19 | 2026-11-19 | P1: capturas reales de la autorización de Zoho y de los permisos por herramienta. | Mike creó un CRM de prueba gratis con su Google ("CodeByMike", con datos de ejemplo) y se conectó el conector. Capturas en `docs/capturas/zoho/` (1 a 7). Hallazgos: al tocar Connect, Claude pide la **región** de la cuenta; vienen **dos autorizaciones** (Zoho MCP: Deny/Allow; Zoho Accounts: "MCP would like to access the following information", Accept/Reject) y en ninguna se elige solo lectura, porque Zoho pide también crear, actualizar y borrar; en Claude, pestaña **Permissions**, hay 21 herramientas de lectura y 19 de escritura, cada una con Always allow, Needs approval, Always ask o Blocked (por defecto Needs approval), y la misma pantalla avisa que en modo Auto "Needs approval" puede no preguntar. Se dejó la escritura en **Blocked** y la lectura en Needs approval. Ajustados los pasos 5, 6, 7 y 9, sus notas y las maquetas `conector`, `oauth`, `permisos` y `prueba`. Nota: el directorio dice 41 herramientas y la pestaña Permissions muestra 40. |
 | R7 | 2026-11-19 | 2026-11-19 | P7: el aviso real con el que Claude pide aprobación antes de leer. | Consulta de prueba en claude.ai con el conector (capturas 8 a 10). El chat viene en modo **Auto** y en Auto Claude no pregunta; en **Manual** sale "Claude wants to use ZohoCRM_executeCOQLQuery from Zoho CRM" con la consulta y Decline, Allow once, Always allow. Con Allow once respondió los 5 tratos de ejemplo. El modo se dejó otra vez en Auto. Ajustados el paso 9 (pasar a Manual), sus notas y la maqueta `prueba`. |
