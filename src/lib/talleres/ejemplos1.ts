@@ -118,12 +118,12 @@ export const CELULAR_TALLER1: Record<string, GuiaCelular> = {
     },
   },
   ecosistema: {
-    idea: 'Claude o GPT son el modelo: el cerebro. claude.ai o ChatGPT son la aplicación por donde usted lo usa. Las herramientas le permiten leer archivos, buscar en internet o conectarse a otros sistemas.',
+    idea: 'Claude es el modelo: el cerebro. claude.ai, Claude Desktop y la app del celular son por donde usted lo usa. Las herramientas le permiten leer archivos, buscar en internet o conectarse a otros sistemas.',
     areas: {
       operaciones: { titulo: 'Vigilar los cambios en la norma', texto: 'Con búsqueda en internet, la IA puede revisar lo que publican la ANLA, las CAR o el Diario Oficial y avisarle de una norma nueva. Lo que encuentre se confirma en la fuente antes de actuar.' },
       logistica: { titulo: 'Del correo a Zoho', texto: 'Una herramienta conectada puede leer el correo, reconocer una solicitud, crear el registro en Zoho y avisarle al cliente. Eso es darle "manos" a la IA; alguien revisa lo que hizo.' },
       ventas: { titulo: 'Zoho y la IA', texto: 'Hoy se copia el Brief de Zoho y se pega en la conversación. Una herramienta conectada podría leerlo directamente: eso es darle "manos" a la IA.' },
-      mercadeo: { titulo: 'La IA dentro de otras aplicaciones', texto: 'Canva, LinkedIn o Copilot traen IA adentro, y detrás hay un modelo como Claude o GPT. Las reglas para pedir bien son las mismas.' },
+      mercadeo: { titulo: 'La IA dentro de otras aplicaciones', texto: 'Canva o LinkedIn traen su propia IA adentro. Las reglas para pedir bien que aprende hoy con Claude sirven igual ahí.' },
       gerencia: { titulo: 'Un tablero que se explica', texto: 'Conectada a Zoho, la IA puede leer el tablero de oportunidades y decirle cuáles llevan días sin moverse y qué falta para cerrarlas. Es un agente: hace varios pasos solo, y su resultado se revisa.' },
       finanzas: { titulo: 'Zoho Books, Siigo y Excel', texto: 'Claude puede leer un Excel exportado de Zoho Books o de Siigo Nube, o un extracto bancario y hacer cálculos. Pídale que muestre los pasos o las fórmulas para poder verificarlos.' },
     },

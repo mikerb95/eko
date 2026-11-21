@@ -267,7 +267,7 @@ export const TALLER_1: Taller = {
       minutos: 2,
       pasos: 0,
       notas: [
-        'Abra con el porqué, no con la tecnología: "Muchos de ustedes ya le han preguntado algo a ChatGPT o a Claude. Hoy vamos a ver qué pasa por dentro, porque quien entiende cómo funciona sabe cuándo creerle y cuándo no."',
+        'Abra con el porqué, no con la tecnología: "Muchos de ustedes ya le han preguntado algo a Claude. Hoy vamos a ver qué pasa por dentro, porque quien entiende cómo funciona sabe cuándo creerle y cuándo no."',
         'Lo que se llevan hoy, en tres frases: por qué la IA a veces inventa con total seguridad, cómo pedirle para que acierte al primer o segundo intento, y qué información de Ekosolv y de los clientes nunca se sube.',
         'Baje la tensión desde el inicio: no hace falta saber de tecnología, nadie va a quedar expuesto y la IA no viene a reemplazar a nadie. Viene a quitar lo repetitivo para que quede tiempo para lo que pide criterio.',
       ],
@@ -530,19 +530,18 @@ export const TALLER_1: Taller = {
       minutos: 4,
       pasos: 3,
       notas: [
-        'Esta escena ordena el vocabulario: modelo, aplicación, herramienta y agente. Mucha confusión viene de mezclarlos.',
-        'Paso 1, el modelo es el cerebro: Claude (Anthropic), GPT (OpenAI), Gemini (Google), Llama (Meta). Los entrenan pocas empresas porque cuesta muchísimo. Todos funcionan igual por dentro: lo que se ve hoy aplica a cualquiera.',
-        'Paso 2, la aplicación es por donde se usa: claude.ai, ChatGPT, Copilot. Muchas aplicaciones traen IA adentro (Canva, Notion, Zia en Zoho), con un modelo de estos detrás. En Ekosolv se trabaja con Claude, y las reglas de seguridad aplican también a las IA que vienen dentro de otras aplicaciones.',
+        'Esta escena ordena el vocabulario con Claude como ejemplo: modelo, aplicación, herramienta y agente. Mucha confusión viene de mezclarlos.',
+        'Paso 1, el modelo es el cerebro: Claude, de Anthropic, en sus versiones Opus, Sonnet y Haiku (más capaz o más rápido). Entrenar un modelo así cuesta muchísimo; Ekosolv lo usa ya entrenado.',
+        'Paso 2, la aplicación es por donde se usa Claude: claude.ai en el navegador, Claude Desktop en el computador y la app del celular. Es el mismo Claude y la misma cuenta de Ekosolv en los tres. Ojo: Canva, Notion o Zia en Zoho traen su propia IA adentro, y las reglas de seguridad de hoy también aplican ahí.',
         'Paso 3, herramientas y agentes: leer PDF e imágenes, buscar en internet, conectarse a sistemas. Cuando la IA encadena pasos sola (lee el correo, crea el registro en Zoho, avisa al cliente) es un agente. Para Gerencia y Logística es lo más prometedor. La regla no cambia: lo que hace un agente se revisa, sobre todo si escribe en un sistema o le habla a un cliente.',
       ],
       siPreguntan: [
-        { p: '¿Por qué Claude y no ChatGPT?', r: 'Ekosolv eligió trabajar con una sola herramienta para que todos compartan instrucciones y proyectos. Lo que se aprende hoy sirve igual para ChatGPT o Gemini, porque por dentro funcionan igual.' },
         { p: '¿Se puede conectar Claude a nuestro Zoho?', r: 'Sí, y lo hacemos hoy al final, con el conector de Zoho CRM desde la cuenta de Ekosolv. Claude le pide permiso antes de leer o cambiar cualquier registro. Por eso primero se aprende a pedir y a revisar: es lo que hace que la conexión salga bien.' },
       ],
       datos: {
         capas: [
-          { titulo: 'Modelos', items: ['Claude', 'GPT', 'Gemini', 'Llama'], texto: 'El cerebro. Lo entrenan pocas empresas.' },
-          { titulo: 'Aplicaciones', items: ['claude.ai', 'ChatGPT', 'Gemini', 'Copilot'], texto: 'Por donde usted lo usa.' },
+          { titulo: 'Modelos', items: ['Opus', 'Sonnet', 'Haiku'], texto: 'El cerebro: Claude, de Anthropic.' },
+          { titulo: 'Aplicaciones', items: ['claude.ai', 'Claude Desktop', 'App del celular'], texto: 'Por donde usted lo usa.' },
           { titulo: 'Herramientas y agentes', items: ['Leer PDF e imágenes', 'Buscar en internet', 'Conectarse a Zoho', 'Trabajar por pasos'], texto: 'Lo que le permite actuar.' },
         ],
       },

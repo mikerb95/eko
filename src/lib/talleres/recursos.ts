@@ -83,7 +83,7 @@ function preguntasDe(t: typeof TALLER_1): BancoCapacitacion['preguntas'] {
 
 /** Glosario de la capacitación 1: las palabras que se usan en la sesión. */
 const GLOSARIO_TALLER1: Termino[] = [
-  { termino: 'Modelo de IA', definicion: 'Programa que aprendió de una cantidad enorme de texto a predecir cómo sigue un escrito. Claude, GPT y Gemini son modelos.' },
+  { termino: 'Modelo de IA', definicion: 'Programa que aprendió de una cantidad enorme de texto a predecir cómo sigue un escrito. Claude es el modelo que usa Ekosolv.' },
   { termino: 'Token', definicion: 'Pedazo de texto con el que trabaja la IA: una palabra corta, parte de una palabra larga o unas cifras. Lo que cabe y lo que cuesta se mide en tokens.' },
   { termino: 'Predecir el siguiente token', definicion: 'Lo único que hace el modelo: elegir, uno tras otro, el pedazo de texto más probable. Por eso suena natural y por eso puede decir algo falso con seguridad.' },
   { termino: 'Alucinación', definicion: 'Cuando la IA escribe algo que suena bien pero no es cierto: una norma, un artículo, una cifra o una fecha que no existen.' },
