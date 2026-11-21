@@ -743,7 +743,7 @@ export const RF: RequerimientoFuncional[] = [
     modulo: 'seguridad',
     nombre: 'Restringir orígenes con CSP',
     descripcion:
-      'La política permite solo lo que el sitio carga de verdad: fuentes de Google, pósters de YouTube y el iframe de youtube-nocookie; bloquea object-src y frame-ancestors.',
+      'La política permite solo lo que el sitio carga de verdad: fuentes de Google, pósters de YouTube y el iframe de youtube-nocookie; bloquea object-src y limita frame-ancestors al propio sitio (lo usa la vista previa del control remoto).',
     prioridad: 'alta',
     estado: 'parcial',
     archivos: ['astro.config.mjs'],

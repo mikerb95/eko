@@ -25,6 +25,30 @@
   gap: 10px;
 }
 .ct-meta { display: flex; justify-content: space-between; gap: 12px; font: 500 12px/1.2 var(--font-mono); letter-spacing: .06em; text-transform: uppercase; color: #7D8B96; }
+.ct-meta { align-items: center; }
+.ct-meta-der { display: flex; align-items: center; gap: 10px; }
+/* Pantalla completa: discreto, arriba a la derecha y lejos del mando. */
+.ct-full {
+  width: 30px;
+  height: 30px;
+  margin: -6px -6px -6px 0;
+  padding: 0;
+  border: 0;
+  border-radius: 9px;
+  background: transparent;
+  color: #5E6B75;
+  display: grid;
+  place-items: center;
+  cursor: pointer;
+  touch-action: manipulation;
+  transition: color .15s, background-color .15s;
+}
+.ct-full[hidden] { display: none; }
+.ct-full:active, .ct-full:focus-visible { color: #E9EEF1; background: #13222D; outline: none; }
+.ct-full svg { width: 16px; height: 16px; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
+.ct-full .ct-full-cerrar, .ct-full[aria-pressed="true"] .ct-full-abrir { display: none; }
+.ct-full[aria-pressed="true"] .ct-full-cerrar { display: block; }
+@media (hover: hover) { .ct-full:hover { color: #E9EEF1; } }
 .ct-kicker { font: 500 12px/1.2 var(--font-mono); letter-spacing: .1em; text-transform: uppercase; color: #3FC2B5; }
 .ct h1 { font-family: var(--font-display); font-weight: var(--display-weight); font-size: 24px; line-height: 1.1; letter-spacing: -0.02em; color: #fff; }
 .ct-lista { margin: 4px 0 0; padding-left: 1.2em; display: grid; gap: 12px; font-size: 18px; line-height: 1.45; color: #C5CFD6; }

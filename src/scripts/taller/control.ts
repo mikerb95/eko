@@ -159,6 +159,39 @@ function montar(d: DatosCt) {
   $('[data-siguiente]').addEventListener('click', () => avanzar(1))
   $('[data-anterior]').addEventListener('click', () => avanzar(-1))
 
+  // ---------- Pantalla completa ----------
+  // iPhone no tiene la API de pantalla completa: ahí el botón no aparece.
+  const docFs = document as Document & {
+    webkitFullscreenEnabled?: boolean
+    webkitFullscreenElement?: Element | null
+    webkitExitFullscreen?: () => void
+  }
+  const raiz = document.documentElement as HTMLElement & { webkitRequestFullscreen?: () => void }
+  const enFull = () => !!(document.fullscreenElement ?? docFs.webkitFullscreenElement)
+  const botonFull = $<HTMLButtonElement>('[data-full]')
+  if (document.fullscreenEnabled || docFs.webkitFullscreenEnabled) {
+    botonFull.hidden = false
+    const marcarFull = () => {
+      const on = enFull()
+      botonFull.setAttribute('aria-pressed', String(on))
+      botonFull.setAttribute('aria-label', on ? 'Salir de pantalla completa' : 'Pantalla completa')
+    }
+    botonFull.addEventListener('click', () => {
+      try {
+        if (enFull()) {
+          if (document.exitFullscreen) document.exitFullscreen().catch(() => {})
+          else docFs.webkitExitFullscreen?.()
+        } else if (raiz.requestFullscreen) raiz.requestFullscreen({ navigationUI: 'hide' }).catch(() => {})
+        else raiz.webkitRequestFullscreen?.()
+      } catch (e) {
+        console.error('[control] pantalla completa', e)
+      }
+      botonFull.blur()
+    })
+    document.addEventListener('fullscreenchange', marcarFull)
+    document.addEventListener('webkitfullscreenchange', marcarFull)
+  }
+
   // Pantalla siempre encendida mientras el control esté abierto.
   mantenerDespierto()
 

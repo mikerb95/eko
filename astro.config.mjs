@@ -25,13 +25,17 @@ const CSP = [
   "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com",
   "font-src 'self' https://fonts.gstatic.com data:",
   "img-src 'self' data: https://img.youtube.com",
-  "frame-src https://www.youtube-nocookie.com https://player.vimeo.com",
+  // 'self': el control remoto del celular (/academia/taller/<n>/control) muestra
+  // la escena siguiente con el proyector en un iframe del mismo sitio.
+  "frame-src 'self' https://www.youtube-nocookie.com https://player.vimeo.com",
   // vercel.com: los casos del taller (/ia) suben los archivos directo a Vercel
   // Blob con un token de un solo uso (src/pages/api/diagnostico-casos/subir.ts).
   "connect-src 'self' https://vercel.com",
   "base-uri 'self'",
   "form-action 'self'",
-  "frame-ancestors 'none'",
+  // 'self' y no 'none' por el mismo iframe del control remoto: solo el propio
+  // sitio puede enmarcar sus páginas.
+  "frame-ancestors 'self'",
   "object-src 'none'",
 ].join('; ')
 
@@ -39,7 +43,7 @@ const SECURITY_HEADERS = {
   'Content-Security-Policy': CSP,
   'Strict-Transport-Security': 'max-age=63072000; includeSubDomains; preload',
   'X-Content-Type-Options': 'nosniff',
-  'X-Frame-Options': 'DENY',
+  'X-Frame-Options': 'SAMEORIGIN',
   'Referrer-Policy': 'strict-origin-when-cross-origin',
   'Permissions-Policy': 'camera=(), microphone=(), geolocation=(), browsing-topics=()',
   // Todo el sitio fuera de buscadores: vive en un subdominio de codebymike.net

@@ -42,7 +42,16 @@ const datos = {
   </head>
   <body class="ct">
     <section class="ct-notas" aria-live="polite">
-      <p class="ct-meta"><span data-numero></span><span data-paso></span></p>
+      <p class="ct-meta">
+        <span data-numero></span>
+        <span class="ct-meta-der">
+          <span data-paso></span>
+          <button type="button" class="ct-full" data-full aria-label="Pantalla completa" aria-pressed="false" hidden>
+            <svg class="ct-full-abrir" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 9V4h5M15 4h5v5M20 15v5h-5M9 20H4v-5" /></svg>
+            <svg class="ct-full-cerrar" viewBox="0 0 24 24" aria-hidden="true"><path d="M9 4v5H4M20 9h-5V4M15 20v-5h5M4 15h5v5" /></svg>
+          </button>
+        </span>
+      </p>
       <p class="ct-kicker" data-kicker></p>
       <h1 data-titulo></h1>
       <ol class="ct-lista" data-notas></ol>
