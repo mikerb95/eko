@@ -28,7 +28,7 @@
 import { capitalizarNombre, correoValido, soloLetrasNombre } from '../../lib/talleres/reglas'
 import { ESTADO_HERRAMIENTA, TIPO_HERRAMIENTA, type Herramienta } from '../../lib/talleres/herramientas'
 import { pintarRevision } from '../academia/revision'
-import { API_SALA, avisoLocal, consultar as consultarTaller, cuentaAviso, enviar as enviarTaller, type Aviso, type AvisoRed } from './comun'
+import { API_SALA, avisoLocal, consultar as consultarTaller, cuentaAviso, enviar as enviarTaller, mantenerDespierto, type Aviso, type AvisoRed } from './comun'
 
 const consultar = <T>(p: Record<string, string | number>) => consultarTaller<T>(p, API_SALA)
 const enviar = (c: Record<string, unknown>) => enviarTaller(c, 15_000, API_SALA)
@@ -77,32 +77,8 @@ const raiz = document.querySelector<HTMLElement>('[data-sala]')
 if (raiz) montar(raiz)
 const registro = document.querySelector<HTMLFormElement>('[data-sl-registro]')
 if (registro) montarRegistro(registro)
+// Celular o PC: la pantalla no se apaga mientras la sala esté abierta.
 mantenerDespierto()
-
-/**
- * Pide que la pantalla no se apague mientras la sala esté abierta (Screen
- * Wake Lock). El navegador lo suelta cuando la pestaña se oculta, así que se
- * vuelve a pedir al regresar; y como Safari a veces lo niega sin un toque,
- * también se reintenta en cada toque. Si el navegador no lo soporta, la sala
- * funciona igual y la pantalla se apaga como siempre.
- */
-function mantenerDespierto() {
-  if (!('wakeLock' in navigator)) return
-  let activo = false
-  const pedir = async () => {
-    if (activo || document.visibilityState !== 'visible') return
-    activo = true
-    try {
-      const lock = await navigator.wakeLock.request('screen')
-      lock.addEventListener('release', () => (activo = false))
-    } catch {
-      activo = false
-    }
-  }
-  void pedir()
-  document.addEventListener('visibilitychange', () => void pedir())
-  addEventListener('pointerdown', () => void pedir(), { passive: true })
-}
 
 function montarRegistro(form: HTMLFormElement) {
   const estado = form.querySelector<HTMLElement>('[data-sl-estado]')!
