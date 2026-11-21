@@ -25,6 +25,7 @@ interface DatosPr {
   n: number
   titulo: string
   bloques: { id: string; titulo: string; minutos: number }[]
+  areas: { id: string; etiqueta: string }[]
   escenas: EscenaPr[]
 }
 
@@ -264,6 +265,104 @@ function montar(d: DatosPr) {
   $('[data-espera-quitar]').addEventListener('click', () => void ponerAviso(null))
   pintarAviso()
   setInterval(pintarAviso, 1000)
+
+  // Corregir el área de una respuesta de la encuesta (/ia): alguien eligió la
+  // que no era. Trae la lista al abrir la caja y guarda sin recargar la vista.
+  {
+    const API_DIAG = '/api/admin/diagnostico'
+    const caja = $<HTMLDetailsElement>('[data-area]')
+    const form = $<HTMLFormElement>('[data-area-form]')
+    const selPersona = $<HTMLSelectElement>('[data-area-persona]')
+    const selArea = $<HTMLSelectElement>('[data-area-nueva]')
+    const guardar = $<HTMLButtonElement>('[data-area-guardar]')
+    const estado = $('[data-area-estado]')
+    const nombreArea = (id: string) => d.areas.find((a) => a.id === id)?.etiqueta ?? id
+    let personas: { id: number; nombre: string; area: string }[] = []
+    let cargando = false
+    let ocupado = false
+
+    const decir = (texto: string, tipo: 'ok' | 'error' | 'info') => {
+      estado.textContent = texto
+      estado.dataset.tipo = tipo
+      estado.hidden = false
+    }
+    const actual = () => personas.find((p) => p.id === Number(selPersona.value))
+    const repasar = () => {
+      const p = actual()
+      selArea.disabled = !p || ocupado
+      guardar.disabled = !p || ocupado || selArea.value === p.area
+      guardar.textContent = ocupado ? 'Guardando…' : 'Guardar'
+    }
+    const pintarPersonas = () => {
+      const elegida = selPersona.value
+      selPersona.replaceChildren(new Option(personas.length ? 'Elija a la persona' : 'Aún no hay respuestas', ''))
+      for (const p of personas) selPersona.add(new Option(`${p.nombre} · ${nombreArea(p.area)}`, String(p.id)))
+      selPersona.value = personas.some((p) => String(p.id) === elegida) ? elegida : ''
+      selPersona.disabled = !personas.length
+      repasar()
+    }
+    const cargar = async () => {
+      if (cargando) return
+      cargando = true
+      try {
+        const r = await consultar<{ respuestas: { id: number; nombre: string; area: string }[] }>({}, API_DIAG)
+        personas = r.respuestas
+          .map((x) => ({ id: x.id, nombre: x.nombre || 'Sin nombre', area: x.area }))
+          .sort((a, b) => a.nombre.localeCompare(b.nombre, 'es'))
+        pintarPersonas()
+      } catch (err) {
+        console.error('[presentador] respuestas', err)
+        decir(err instanceof Error ? err.message : 'No se pudieron traer las respuestas.', 'error')
+      } finally {
+        cargando = false
+      }
+    }
+
+    // Cada vez que se abre trae la lista fresca (pudo llegar una respuesta nueva).
+    caja.addEventListener('toggle', () => {
+      if (caja.open) void cargar()
+    })
+    selPersona.addEventListener('change', () => {
+      const p = actual()
+      if (p) selArea.value = p.area
+      estado.hidden = true
+      repasar()
+    })
+    selArea.addEventListener('change', () => {
+      estado.hidden = true
+      repasar()
+    })
+    form.addEventListener('submit', async (ev) => {
+      ev.preventDefault()
+      const p = actual()
+      if (!p || ocupado || selArea.value === p.area) return
+      ocupado = true
+      repasar()
+      estado.hidden = true
+      try {
+        const r = await enviar<{ cambio: { antes: string; area: string; quitadas: string[] } }>(
+          { accion: 'area', id: p.id, area: selArea.value },
+          15_000,
+          API_DIAG,
+        )
+        p.area = r.cambio.area
+        let texto = `Listo: ${p.nombre} quedó en ${nombreArea(r.cambio.area)}.`
+        const q = r.cambio.quitadas
+        if (q.length) {
+          texto += q.length === 1
+            ? ` Se quitó la tarea marcada "${q[0]}", que es solo de ${nombreArea(r.cambio.antes)}.`
+            : ` Se quitaron ${q.length} tareas marcadas que son solo de ${nombreArea(r.cambio.antes)}.`
+        }
+        decir(texto, 'ok')
+      } catch (err) {
+        console.error('[presentador] cambiar área', err)
+        decir(err instanceof Error ? err.message : 'No se pudo guardar el cambio.', 'error')
+      } finally {
+        ocupado = false
+        pintarPersonas()
+      }
+    })
+  }
 
   // Relojes: el ritmo compara el tiempo real con el minuto planeado de la escena.
   setInterval(() => {

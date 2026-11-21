@@ -8,6 +8,7 @@ export const prerender = false
 import '../../../../styles/global.css'
 import '../../../../styles/presentador.css'
 import { tallerDe } from '../../../../lib/talleres'
+import { AREAS } from '../../../../lib/diagnostico/preguntas'
 
 const t = tallerDe(Astro.params.n)
 if (!t) return new Response('Esta capacitación no existe.', { status: 404 })
@@ -17,6 +18,7 @@ const datos = {
   n: t.n,
   titulo: t.titulo,
   bloques: t.bloques,
+  areas: AREAS.map((a) => ({ id: a.id, etiqueta: a.etiqueta })),
   escenas: t.escenas.map((e) => ({
     id: e.id,
     tipo: e.tipo,
@@ -113,6 +115,28 @@ const datos = {
         <details class="pr-caja pr-lista">
           <summary>Quiénes se registraron</summary>
           <ol data-lista></ol>
+        </details>
+        <details class="pr-caja pr-area" data-area>
+          <summary>
+            <span class="pr-area-tit">Corregir el área de una respuesta</span>
+            <span class="pr-area-sub">Encuesta de /ia</span>
+          </summary>
+          <form class="pr-area-form" data-area-form>
+            <label class="pr-campo">
+              <span>Persona</span>
+              <select data-area-persona required disabled>
+                <option value="">Cargando respuestas…</option>
+              </select>
+            </label>
+            <label class="pr-campo">
+              <span>Área</span>
+              <select data-area-nueva required disabled>
+                {AREAS.map((a) => <option value={a.id}>{a.etiqueta}</option>)}
+              </select>
+            </label>
+            <button type="submit" class="pr-btn" data-area-guardar disabled>Guardar</button>
+          </form>
+          <p class="pr-area-estado" data-area-estado role="status" aria-live="polite" hidden></p>
         </details>
         <section class="pr-caja pr-dudas" aria-live="polite">
           <span>Preguntas de la sala</span><b data-n-dudas>0</b>

@@ -109,5 +109,40 @@
 .pr-espera-error[hidden] { display: none; }
 .pr-espera .pr-btn:disabled { opacity: .6; cursor: progress; }
 
+/* Corregir el área de una respuesta de la encuesta. */
+.pr-area { display: block; }
+.pr-area summary { cursor: pointer; display: flex; flex-direction: column; gap: 2px; list-style: none; }
+.pr-area summary::-webkit-details-marker { display: none; }
+.pr-area .pr-area-tit { font: 600 15px/1.25 var(--font-sans); color: var(--pr-tinta); display: flex; align-items: center; justify-content: space-between; gap: 10px; }
+.pr-area .pr-area-tit::after { content: '+'; font: 500 18px/1 var(--font-mono); color: var(--pr-acento); transition: transform .2s ease; }
+.pr-area[open] .pr-area-tit::after { transform: rotate(45deg); }
+.pr-area .pr-area-sub { font: 500 11.5px/1.2 var(--font-mono); letter-spacing: .08em; text-transform: uppercase; color: var(--pr-suave); }
+.pr-area-form { display: grid; gap: 10px; margin-top: 14px; }
+.pr-campo { display: grid; gap: 6px; }
+.pr-area .pr-campo > span { font: 500 11.5px/1 var(--font-mono); letter-spacing: .08em; text-transform: uppercase; color: var(--pr-suave); }
+.pr-campo select {
+  appearance: none; width: 100%; min-width: 0; cursor: pointer;
+  font: 500 15px/1.2 var(--font-sans); color: var(--pr-tinta);
+  padding: 12px 40px 12px 14px; border: 0; border-radius: 12px;
+  background: var(--pr-hundido) no-repeat right 14px center / 12px 8px;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 12 8'%3E%3Cpath d='M1 1.5 6 6.5 11 1.5' fill='none' stroke='%238a949d' stroke-width='1.8' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
+  box-shadow: inset 0 0 0 1px var(--pr-linea-suave);
+  transition: box-shadow .15s ease;
+}
+.pr-campo select:hover:not(:disabled) { box-shadow: inset 0 0 0 1px var(--pr-linea); }
+.pr-campo select:focus-visible { outline: 0; box-shadow: inset 0 0 0 2px var(--pr-acento); }
+.pr-campo select:disabled { cursor: not-allowed; color: var(--pr-apagado); }
+.pr-campo option { color: #0E1C26; background: #fff; }
+.pr-area-form .pr-btn { margin-top: 4px; padding: 12px 18px; }
+.pr-area-form .pr-btn:disabled { opacity: .45; cursor: not-allowed; }
+.pr-area-form .pr-btn:disabled:hover { background: var(--pr-primario); }
+.pr-area-estado { margin: 12px 0 0; padding: 10px 12px 10px 34px; border-radius: 12px; position: relative; font-size: 13.5px; line-height: 1.45; animation: pr-area-entra .25s ease; }
+.pr-area-estado[hidden] { display: none; }
+.pr-area-estado::before { content: ''; position: absolute; left: 13px; top: 15px; width: 9px; height: 9px; border-radius: 50%; background: currentColor; }
+.pr-area-estado[data-tipo="ok"] { background: color-mix(in oklab, var(--pr-acento) 14%, var(--pr-sup)); color: var(--pr-acento-tinta); }
+.pr-area-estado[data-tipo="error"] { background: color-mix(in oklab, var(--pr-error) 12%, var(--pr-sup)); color: var(--pr-error); }
+@keyframes pr-area-entra { from { opacity: 0; transform: translateY(-4px); } }
+@media (prefers-reduced-motion: reduce) { .pr-area-estado { animation: none; } .pr-area .pr-area-tit::after { transition: none; } }
+
 /* Botón de tema en la barra de arriba. */
 .pr-tema { padding: 10px 16px; font-size: 14px; }
