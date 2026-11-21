@@ -17,7 +17,7 @@
  * servidor (seguirRed en comun.ts).
  */
 import { CURVA, SplitText, amarrarSignos, gsap, reducido } from '../motion/core'
-import { API_PC, avisoLocal, canal, mantenerDespierto, seguirRed, consultar, cuentaAviso, direccionTecla, enviar, leerDatos, type Aviso, type AvisoRed, type Mensaje } from './comun'
+import { API_PC, avisoLocal, canal, huboActividad, mantenerDespierto, seguirRed, sondear, consultar, cuentaAviso, direccionTecla, enviar, leerDatos, type Aviso, type AvisoRed, type Mensaje } from './comun'
 import { HOOKS, sincronizarCuenta, type Api } from './escenas'
 import { crearCortina } from './cortina'
 import { clawdSuelto } from './clawd'
@@ -157,7 +157,7 @@ function montar() {
         })
         .catch((e) => console.error('[taller] sala en el aviso', e))
     }
-    setInterval(mirarSala, 2500)
+    sondear(mirarSala, 2500)
   }
 
   // ---------- Escala ----------
@@ -189,6 +189,10 @@ function montar() {
       fn()
       const id = setInterval(fn, ms)
       limpiezas.get(k)?.push(() => clearInterval(id))
+    },
+    sondear(fn, ms) {
+      fn()
+      limpiezas.get(k)?.push(sondear(fn, ms))
     },
     limpiar(fn) {
       limpiezas.get(k)?.push(fn)
@@ -461,14 +465,16 @@ function montar() {
         ponerEspera(r.aviso)
         sincronizarCuenta(r.escena, r.enEscena)
         const k = ids.indexOf(r.escena ?? '')
-        if (k >= 0 && (k !== i || (r.paso ?? 0) !== paso)) ir(k, r.paso ?? 0, false)
+        if (k >= 0 && (k !== i || (r.paso ?? 0) !== paso)) {
+          huboActividad()
+          ir(k, r.paso ?? 0, false)
+        }
       } catch (e) {
         console.error('[taller] seguir', e)
       }
     }
     void mirar()
-    setInterval(mirar, 2000)
-    document.addEventListener('visibilitychange', () => void mirar())
+    sondear(mirar, 2000)
   }
 }
 

@@ -42,6 +42,45 @@ export const API_SALA = '/api/academia/sala'
 /** El PC vinculado con el código del celular. */
 export const API_PC = '/api/academia/pc'
 
+/**
+ * Consultas periódicas al servidor. Cada una gasta CPU de Vercel (el plan tiene
+ * tope mensual) y estas pantallas suelen quedar abiertas horas, así que:
+ * - con la pestaña oculta no se pregunta nada; al volver se pregunta de una.
+ * - si pasan REPOSO_MS sin que nadie toque la pantalla ni cambie la
+ *   presentación, se pregunta cada LENTO_MS en vez de cada `ms`. El primer
+ *   toque o el primer cambio que llegue devuelve el ritmo normal.
+ */
+const REPOSO_MS = 20 * 60_000
+const LENTO_MS = 15_000
+let ultimaActividad = Date.now()
+export const huboActividad = () => void (ultimaActividad = Date.now())
+if (typeof window !== 'undefined') {
+  for (const ev of ['pointerdown', 'keydown', 'touchstart']) addEventListener(ev, huboActividad, { passive: true, capture: true })
+}
+
+export function sondear(fn: () => unknown, ms: number): () => void {
+  let ultima = 0
+  const tic = () => {
+    if (document.hidden) return
+    const ahora = Date.now()
+    const ritmo = ahora - ultimaActividad > REPOSO_MS ? Math.max(ms, LENTO_MS) : ms
+    if (ahora - ultima < ritmo - 50) return
+    ultima = ahora
+    void fn()
+  }
+  const alVolver = () => {
+    if (document.hidden) return
+    ultima = 0
+    tic()
+  }
+  const id = setInterval(tic, ms)
+  document.addEventListener('visibilitychange', alVolver)
+  return () => {
+    clearInterval(id)
+    document.removeEventListener('visibilitychange', alVolver)
+  }
+}
+
 export async function consultar<T = any>(params: Record<string, string | number>, api = API): Promise<T> {
   const qs = new URLSearchParams(Object.entries(params).map(([k, v]) => [k, String(v)]))
   const r = await fetch(`${api}?${qs}`, { headers: { accept: 'application/json' } })
@@ -157,6 +196,7 @@ export function seguirRed(
       }
       conBase = true
       if (r.mov <= visto || pedido < ultimoLocal + QUIETO_MS) return
+      if (visto) huboActividad()
       visto = r.mov
       const k = op.ids.indexOf(r.escena)
       if (k >= 0) op.alMover(k, r.paso)
@@ -168,8 +208,7 @@ export function seguirRed(
   }
 
   void mirar()
-  setInterval(mirar, 1000)
-  document.addEventListener('visibilitychange', () => void mirar())
+  sondear(mirar, 1000)
 
   return {
     local: () => void (ultimoLocal = Date.now()),

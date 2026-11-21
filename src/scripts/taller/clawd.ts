@@ -1058,7 +1058,7 @@ export function papelPortada(escena: HTMLElement, api: Api): void {
   }
   if (!api.admin) return
   let ultimo: number | null = null
-  api.cada(() => {
+  api.sondear(() => {
     consultar({ que: 'panel', n: api.n })
       .then((r) => {
         const n = Number(r?.sala) || 0
@@ -1110,5 +1110,5 @@ export function papelVotos(escena: HTMLElement, api: Api): void {
       })
       .catch(() => {})
   leerSala()
-  api.cada(leerSala, 4000)
+  api.sondear(leerSala, 4000)
 }

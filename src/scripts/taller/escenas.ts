@@ -4,7 +4,7 @@
  * - `entrar(el, api, paso)`: al llegar a la escena (bucles, sondeos, oyentes).
  * - `paso(el, paso, previo, api)`: después de cada clic dentro de la escena.
  *   `previo` es -1 cuando se acaba de entrar.
- * Lo que se registre con `api.cada`, `api.limpiar` o `api.al` se apaga solo al
+ * Lo que se registre con `api.cada`, `api.sondear`, `api.limpiar` o `api.al` se apaga solo al
  * salir de la escena. Con movimiento reducido no hay tweens: se fija el valor.
  */
 import { CURVA, gsap, reducido } from '../motion/core'
@@ -19,6 +19,8 @@ export interface Api {
   admin: boolean
   datos: DatosTaller
   cada(fn: () => void, ms: number): void
+  /** Como `cada`, pero para lo que consulta al servidor: se frena con la pestaña oculta o la sala quieta (ver sondear en comun.ts). */
+  sondear(fn: () => void, ms: number): void
   limpiar(fn: () => void): void
   al(nombre: string, fn: () => void): void
 }
@@ -61,7 +63,7 @@ const reveladosAhora = (el: HTMLElement, paso: number, previo: number, sel = '[d
 function sondear(el: HTMLElement, api: Api, pintar: (r: any) => void, ms = 2000) {
   const i = el.dataset.interaccion
   if (!i) return
-  api.cada(() => {
+  api.sondear(() => {
     consultar({ que: 'resultados', n: api.n, i })
       .then((r) => {
         pintar(r)
@@ -150,7 +152,7 @@ const sala: Hook = {
     const n = $(el, '[data-sala-n]')
     if (!n || !api.admin) return
     let ultimo = 0
-    api.cada(() => {
+    api.sondear(() => {
       consultar({ que: 'panel', n: api.n })
         .then((r) => {
           if (r.sala !== ultimo) contar(n, r.sala, fmt, ultimo)
@@ -169,7 +171,7 @@ const evaluacion: Hook = {
     let sala = 0
     let ultimo = 0
     if (api.admin) {
-      api.cada(() => {
+      api.sondear(() => {
         consultar({ que: 'panel', n: api.n }).then((r) => (sala = r.sala)).catch(() => {})
       }, 4000)
     }

@@ -28,7 +28,7 @@
 import { capitalizarNombre, correoValido, soloLetrasNombre } from '../../lib/talleres/reglas'
 import { ESTADO_HERRAMIENTA, TIPO_HERRAMIENTA, type Herramienta } from '../../lib/talleres/herramientas'
 import { pintarRevision } from '../academia/revision'
-import { API_SALA, avisoLocal, consultar as consultarTaller, cuentaAviso, enviar as enviarTaller, mantenerDespierto, type Aviso, type AvisoRed } from './comun'
+import { API_SALA, avisoLocal, consultar as consultarTaller, cuentaAviso, enviar as enviarTaller, huboActividad, mantenerDespierto, sondear, type Aviso, type AvisoRed } from './comun'
 
 const consultar = <T>(p: Record<string, string | number>) => consultarTaller<T>(p, API_SALA)
 const enviar = (c: Record<string, unknown>) => enviarTaller(c, 15_000, API_SALA)
@@ -443,6 +443,8 @@ function montar(raiz: HTMLElement) {
     lista.replaceChildren(p)
   }
 
+  // Si quien dicta cambia de escena, la sala vuelve al ritmo normal de consulta.
+  let escenaVista: string | undefined
   const refrescar = async () => {
     let e: Estado
     try {
@@ -451,6 +453,8 @@ function montar(raiz: HTMLElement) {
       decir(err instanceof Error ? err.message : 'Sin conexión. Reintentando…', 'error')
       return
     }
+    if (escenaVista !== undefined && (e.escena ?? '') !== escenaVista) huboActividad()
+    escenaVista = e.escena ?? ''
     avisoInicio?.poner(e.enCurso ? e.aviso : null)
     if (!e.enCurso) {
       taller = 0
@@ -502,7 +506,7 @@ function montar(raiz: HTMLElement) {
   }
 
   refrescar()
-  setInterval(refrescar, 2000)
+  sondear(refrescar, 2000)
 }
 
 /**
