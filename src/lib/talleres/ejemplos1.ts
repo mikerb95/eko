@@ -20,7 +20,12 @@
  *   vigencias y cambios en las leyes.
  * - Logística: Zoho, tableros, revisión del correo, avisos de eventos y
  *   seguimiento de cifras y solicitudes.
- * Ventas y Mercadeo quedan pendientes de iterar. Las pruebas exigen idea en toda escena sin votación ni
+ * Ajustes con la encuesta de /ia (2026-11-21): Logística suma certificados y
+ * seguimiento a gestores; Finanzas pasa a comparativos de balances y
+ * requerimientos de la DIAN o Hacienda (la conciliación se queda); Gerencia
+ * suma el seguimiento de propuestas enviadas; Operaciones, el informe anual;
+ * Mercadeo, tendencias, publicaciones propias y Canva. Ventas sigue pendiente
+ * (nadie respondió). Las pruebas exigen idea en toda escena sin votación ni
  * práctica, y ejemplo para las seis áreas donde haya `areas`.
  */
 import type { GuiaCelular } from './tipos.ts'
@@ -42,7 +47,7 @@ export const CELULAR_TALLER1: Record<string, GuiaCelular> = {
       logistica: { titulo: 'Correos que no siguen un formato', texto: 'Un cliente escribe "necesitamos que pasen por unas canecas el jueves" y otro manda una tabla. Una regla de correo no reconoce los dos como solicitud de recolección. La IA sí, y puede pasar los datos a Zoho en el mismo formato.' },
       ventas: { titulo: 'El cliente no usa las palabras del catálogo', texto: 'Un prospecto escribe: "tenemos unos equipos viejos y unas canecas de aceite". Ningún formulario lo clasifica. La IA entiende que habla de RAEE y de RESPEL.' },
       mercadeo: { titulo: 'Comentarios en redes', texto: 'Clasificar comentarios por palabras clave falla con la ironía o con preguntas mal escritas. La IA los agrupa por lo que la persona quiso decir.' },
-      gerencia: { titulo: 'Oportunidades que se enfrían', texto: 'Un tablero con reglas fijas solo marca la oportunidad que lleva 30 días quieta. La IA puede leer el último correo del cliente y notar que dijo "lo miramos el otro año", aunque en Zoho la etapa siga abierta.' },
+      gerencia: { titulo: 'Propuestas que se enfrían', texto: 'Un tablero con reglas fijas solo marca la propuesta enviada que lleva 30 días quieta. La IA puede leer el último correo del cliente y notar que dijo "lo miramos el otro año", aunque en Zoho la etapa siga abierta.' },
       finanzas: { titulo: 'Pagos que no se llaman igual', texto: 'El extracto dice "PAGO PSE 8901..." y en Zoho Books la factura figura con el nombre del cliente. Una regla exacta no los cruza. La IA reconoce que es el mismo pago y propone la conciliación para que usted la confirme.' },
     },
   },
@@ -75,8 +80,8 @@ export const CELULAR_TALLER1: Record<string, GuiaCelular> = {
       logistica: { titulo: 'El aviso al cliente', texto: 'Si pide un aviso de "su recolección quedó programada para el..." y no le da la fecha, la IA pondrá una que suene bien. Las fechas y las cifras de cada aviso salen de Zoho.' },
       ventas: { titulo: 'Tres versiones del seguimiento', texto: 'Pedir tres versiones de un correo sirve justamente porque cada vez elige palabras distintas. Usted escoge la que suena a Ekosolv.' },
       mercadeo: { titulo: 'Ideas contra datos', texto: 'Para una lluvia de ideas conviene que se arriesgue. Para un texto que cita una norma, pídale que se ciña al documento que le entrega.' },
-      gerencia: { titulo: 'Tres versiones del cierre', texto: 'Pedir tres versiones del correo para cerrar una oportunidad sirve justamente porque cada vez elige palabras distintas. Usted escoge la que mejor le habla a ese cliente.' },
-      finanzas: { titulo: 'Un total que suena bien', texto: 'Si le pregunta el costo de la nómina del mes sin darle el reporte, escribirá un número probable, no el real. Las cifras salen de Siigo Nube, nunca de la memoria de la IA.' },
+      gerencia: { titulo: 'Tres versiones del seguimiento', texto: 'Pedir tres versiones del correo para retomar una propuesta enviada hace dos semanas sirve justamente porque cada vez elige palabras distintas. Usted escoge la que mejor le habla a ese cliente.' },
+      finanzas: { titulo: 'El saldo que suena bien', texto: 'Si le pide el comparativo de balances sin darle los dos balances, escribirá variaciones probables, no las reales. Las cifras salen de Siigo Nube, nunca de la memoria de la IA.' },
     },
   },
   mapa: {
@@ -96,7 +101,7 @@ export const CELULAR_TALLER1: Record<string, GuiaCelular> = {
       operaciones: { titulo: 'La norma que cambió', texto: 'Si la autoridad expidió una resolución hace poco o una ley cambió un trámite, la IA puede no saberlo y responder con la regla anterior. Pegue el texto vigente y confírmelo en la fuente oficial.' },
       logistica: { titulo: 'Lo que pasó hoy', texto: 'La IA no sabe qué recolecciones se hicieron hoy ni qué correos llegaron, a menos que una herramienta conectada a Zoho o al correo se lo muestre. Esas cifras salen de los registros, no de ella.' },
       ventas: { titulo: 'Investigar un prospecto', texto: 'Lo que sabe de una empresa puede estar desactualizado. Si la herramienta no busca en internet, confirme en la página del cliente antes de la reunión.' },
-      mercadeo: { titulo: 'Fechas del calendario', texto: 'Puede proponerle fechas o tendencias de un año anterior. El calendario editorial siempre se revisa contra el año en curso.' },
+      mercadeo: { titulo: 'Tendencias de este año', texto: 'Sin búsqueda en internet, la IA le da las tendencias en sostenibilidad que conocía hasta su fecha de corte. Con búsqueda, pídale la fuente y la fecha de cada una.' },
       gerencia: { titulo: 'Cómo va cada oportunidad', texto: 'La IA no sabe en qué va un cliente ni qué se habló en la última reunión. Para preparar el cierre, dele lo que está en Zoho: etapa, última nota y propuesta enviada.' },
       finanzas: { titulo: 'Valores que cambian cada año', texto: 'La UVT, el salario mínimo, el auxilio de transporte y las tarifas de impuestos cambian, y la IA puede darle los de otro año. Confírmelos en la DIAN, la Secretaría de Hacienda o la fuente oficial.' },
     },
@@ -104,12 +109,12 @@ export const CELULAR_TALLER1: Record<string, GuiaCelular> = {
   contexto: {
     idea: 'La IA solo tiene en cuenta lo que está en la conversación abierta: sus mensajes y los archivos que adjuntó. Al abrir una conversación nueva, empieza sin recordar nada.',
     areas: {
-      operaciones: { titulo: 'Elija qué darle', texto: 'El auto completo cabe; el expediente entero, no. Para responder un auto, dele el auto, la licencia o el permiso y el último informe presentado.' },
+      operaciones: { titulo: 'El informe anual', texto: 'Para consolidar el informe anual, dele la estructura del informe del año pasado y los Excel de este año, no todas las carpetas. En una conversación nueva no recuerda nada de la anterior.' },
       logistica: { titulo: 'Ayer se lo explicó, hoy no lo recuerda', texto: 'Si en otra conversación le explicó cómo clasificar los correos de solicitudes, en una nueva no lo sabe. Déjelo fijo en un proyecto de Claude o en la automatización que hace esa tarea.' },
       ventas: { titulo: 'Un proyecto por cliente grande', texto: 'En un proyecto de Claude puede dejar fijos el Brief, las propuestas anteriores y el tono de Ekosolv, para no repetirlos en cada conversación.' },
-      mercadeo: { titulo: 'La voz de la marca, siempre a la mano', texto: 'Si pega la guía de voz al inicio, o la deja en un proyecto, todas las publicaciones salen con el mismo tono.' },
+      mercadeo: { titulo: 'Sus publicaciones como guía', texto: 'Si deja en un proyecto de Claude las publicaciones que ya tiene guardadas, la IA toma ese tono en todas las nuevas sin que tenga que explicárselo cada vez.' },
       gerencia: { titulo: 'Un proyecto para las propuestas', texto: 'En un proyecto de Claude puede dejar fijos el portafolio, las propuestas que se ganaron y los precios de referencia, para no repetirlos cada vez que arma una propuesta.' },
-      finanzas: { titulo: 'Este periodo y el anterior', texto: 'Para explicar por qué cambió el costeo de un servicio, los dos periodos tienen que estar en la misma conversación. Si le falta uno, la IA puede inventar la comparación.' },
+      finanzas: { titulo: 'Este periodo y el anterior', texto: 'Para explicar por qué cambió una cuenta del balance, los dos periodos tienen que estar en la misma conversación. Si le falta uno, la IA puede inventar la comparación.' },
     },
   },
   ecosistema: {
@@ -126,30 +131,30 @@ export const CELULAR_TALLER1: Record<string, GuiaCelular> = {
   areas: {
     idea: 'La IA ahorra tiempo sobre todo en cuatro tipos de tarea: leer y resumir documentos largos, pasar información a tablas, escribir primeros borradores y revisar contra una lista.',
     areas: {
-      operaciones: { titulo: 'Responder un auto a tiempo', texto: 'Sacar de un auto de la ANLA o de la CAR las obligaciones, los plazos y los responsables, citando el artículo, y llevar las vigencias a un calendario.' },
-      logistica: { titulo: 'La bandeja de entrada en orden', texto: 'Leer los correos del día, separar las solicitudes de recolección, pasarlas a Zoho y avisarle al cliente cuando cambie el estado de su servicio.' },
+      operaciones: { titulo: 'El informe anual y los autos', texto: 'Juntar la información de varios archivos en la estructura del informe anual para radicar, y sacar de un auto de la ANLA o de la CAR las obligaciones, los plazos y los responsables, citando el artículo.' },
+      logistica: { titulo: 'La bandeja de entrada en orden', texto: 'Leer los correos del día, separar las solicitudes de recolección, pasarlas a Zoho y avisarle al cliente cuando cambie el estado de su servicio. También ver qué gestores no han enviado los soportes de los certificados y redactarles el recordatorio.' },
       ventas: { titulo: 'Del Brief a la propuesta', texto: 'Convertir un Brief de Zoho en el borrador de una propuesta con la estructura de Ekosolv, listo para ajustar.' },
-      mercadeo: { titulo: 'De una norma a una campaña', texto: 'Convertir una norma nueva en un artículo para el blog y tres publicaciones, con la voz de la marca.' },
-      gerencia: { titulo: 'De la oportunidad a la propuesta', texto: 'Armar el borrador de la propuesta desde la oportunidad de Zoho y ver en el tablero cuáles están listas para cerrar.' },
-      finanzas: { titulo: 'El manual que nadie ha escrito', texto: 'Convertir la explicación de cómo se hace el cierre de mes, la nómina o el costeo en un procedimiento escrito, paso a paso, para el manual.' },
+      mercadeo: { titulo: 'De una tendencia al calendario', texto: 'Buscar tendencias en sostenibilidad del mes, proponer temas y escribir el texto de las piezas que luego se diseñan en Canva.' },
+      gerencia: { titulo: 'De la plantilla al seguimiento', texto: 'Armar el borrador de la propuesta sobre el estándar de Ekosolv y, cada semana, ver qué propuestas enviadas no han tenido respuesta y con qué correo retomarlas.' },
+      finanzas: { titulo: 'El requerimiento respondido a tiempo', texto: 'Leer un requerimiento de la DIAN o de la Secretaría de Hacienda, listar qué pide y en qué plazo, y armar el borrador de la respuesta con los soportes.' },
     },
   },
   inventa: {
     idea: 'Cuando la IA no tiene un dato, igual escribe algo que suena probable. Le pasa sobre todo con números de normas, fechas, artículos y cifras, y casi nunca con lo que está en el documento que usted le dio.',
     areas: {
       operaciones: { titulo: 'El artículo que no existe', texto: 'Si pregunta qué artículo exige algo o hasta cuándo rige un permiso sin darle el documento, puede responder con total seguridad. Toda cita y toda vigencia se confirman en el texto oficial.' },
-      logistica: { titulo: 'Cifras que no estaban', texto: 'Si un correo no dice cuántos kilos son o la fecha está incompleta, la IA puede completarlos con algo razonable. Pídale que escriba "no aparece" y deje la solicitud pendiente.' },
+      logistica: { titulo: 'Los kilos que no estaban', texto: 'Si el soporte del gestor no trae los kilos o la fecha de disposición, la IA puede completar el certificado con una cifra razonable. Pídale que escriba "no aparece" y deje el certificado pendiente hasta que el gestor responda.' },
       ventas: { titulo: 'Clientes que nunca lo fueron', texto: 'Si le pide "agrega casos de éxito", puede inventar empresas y cifras. En una propuesta no queda nada que usted no haya confirmado.' },
       mercadeo: { titulo: 'La estadística sin fuente', texto: '"El 70 % de las empresas..." suena bien y puede ser inventado. Toda cifra que se publica lleva una fuente verificada.' },
       gerencia: { titulo: 'Casos de éxito inventados', texto: 'Si le pide "agrega casos de éxito" a una propuesta, puede inventar clientes y cifras. En una propuesta no queda nada que usted no haya confirmado.' },
-      finanzas: { titulo: 'Un procedimiento que suena bien', texto: 'Si le pide el manual de un proceso sin explicárselo, escribirá cómo se hace "normalmente", no cómo lo hace Ekosolv. El manual sale de lo que hace el equipo; la IA solo lo ordena.' },
+      finanzas: { titulo: 'El artículo que no existe', texto: 'Al responder un requerimiento, la IA puede citar con total seguridad un artículo del Estatuto Tributario o un plazo equivocado. Toda norma y todo plazo se confirman en la fuente oficial.' },
     },
   },
   verificar: {
     idea: 'Lo que entrega la IA se revisa como el trabajo de alguien nuevo: cada norma en la fuente oficial, cada cifra contra el documento original, y se le pide que diga de dónde sacó cada dato.',
     areas: {
       operaciones: { titulo: 'Antes de responderle a la autoridad', texto: 'Abra cada norma citada en la fuente oficial, confirme que siga vigente y cuente cada plazo en el calendario. Si la IA no dice de qué página salió una obligación, no la use.' },
-      logistica: { titulo: 'Antes de cargar en Zoho', texto: 'Compare las cifras de la tabla con el correo o el certificado de origen, o por lo menos los totales por cliente. Un error aquí aparece después en el tablero y en el certificado del cliente.' },
+      logistica: { titulo: 'Antes de enviar el certificado', texto: 'Cruce los kilos y las fechas del certificado con lo registrado en Zoho y con el soporte del gestor. Un error aquí le llega al cliente en un documento que él usa para sus propios informes.' },
       ventas: { titulo: 'Antes de enviar la propuesta', texto: 'Revise que precios, alcance y plazos sean los del Brief y no los que la IA supuso. Lo que dice la propuesta compromete a Ekosolv.' },
       mercadeo: { titulo: 'Antes de publicar', texto: 'Confirme cifras, nombres de normas y lo que se dice de los servicios. Una publicación con un dato falso queda circulando aunque la borre.' },
       gerencia: { titulo: 'Antes de enviar la propuesta', texto: 'Revise que precios, alcance y plazos sean los de la oportunidad en Zoho y no los que la IA supuso. Lo que dice la propuesta compromete a Ekosolv.' },
@@ -165,9 +170,9 @@ export const CELULAR_TALLER1: Record<string, GuiaCelular> = {
       operaciones: { titulo: 'Las cuatro partes con un auto', texto: 'Contexto: soy consultor de Ekosolv; el cliente tiene un permiso ante la CAR. Tarea: extrae las obligaciones del auto adjunto. Formato: tabla con obligación, artículo, plazo y responsable. Ejemplo: una fila ya llena.' },
       logistica: { titulo: 'Las cuatro partes con el correo', texto: 'Contexto: soy de logística de Ekosolv y reviso las solicitudes que llegan por correo. Tarea: identifica las solicitudes de recolección. Formato: cliente, residuo, cantidad, dirección y fecha pedida. Ejemplo: una fila ya llena.' },
       ventas: { titulo: 'Las cuatro partes con un Brief', texto: 'Contexto: soy comercial de Ekosolv; adjunto el Brief de un cliente industrial. Tarea: redacta el borrador de la propuesta. Formato: las secciones de nuestra plantilla. Ejemplo: una propuesta aprobada.' },
-      mercadeo: { titulo: 'Las cuatro partes con una publicación', texto: 'Contexto: manejo las redes de Ekosolv; adjunto la guía de voz. Tarea: escribe tres publicaciones sobre esta norma. Formato: LinkedIn, máximo 120 palabras cada una. Ejemplo: una publicación que funcionó.' },
+      mercadeo: { titulo: 'Las cuatro partes con una publicación', texto: 'Contexto: manejo las redes de Ekosolv; adjunto tres publicaciones nuestras que funcionaron. Tarea: escribe tres publicaciones sobre esta norma. Formato: LinkedIn, máximo 120 palabras cada una. Ejemplo: una publicación que funcionó.' },
       gerencia: { titulo: 'Las cuatro partes con una propuesta', texto: 'Contexto: soy gerente de Ekosolv; adjunto la oportunidad de Zoho y una propuesta que ganamos. Tarea: redacta el borrador para este cliente. Formato: las secciones de nuestra plantilla. Ejemplo: la propuesta ganada.' },
-      finanzas: { titulo: 'Las cuatro partes con un procedimiento', texto: 'Contexto: llevo la nómina de Ekosolv y le cuento cómo la liquido. Tarea: conviértelo en un procedimiento para el manual. Formato: objetivo, responsable, pasos numerados y controles. Ejemplo: un procedimiento que ya tenemos.' },
+      finanzas: { titulo: 'Las cuatro partes con un comparativo', texto: 'Contexto: soy contadora de Ekosolv; adjunto el balance de este año y el del anterior, exportados de Siigo Nube. Tarea: explica las variaciones mayores al 10 %. Formato: tabla con cuenta, valor anterior, valor actual, variación y posible causa. Ejemplo: una fila ya llena.' },
     },
   },
   constructor: {
@@ -178,7 +183,7 @@ export const CELULAR_TALLER1: Record<string, GuiaCelular> = {
       ventas: { titulo: 'La diferencia con una tarea suya', texto: 'Corta: "Haz una propuesta." Completa: "Soy comercial de Ekosolv. Con este Brief, redacta el borrador de la propuesta con nuestras secciones. No inventes precios: deja [PRECIO] donde vaya."' },
       mercadeo: { titulo: 'La diferencia con una tarea suya', texto: 'Corta: "Escribe un post sobre RAEE." Completa: "Con esta guía de voz, escribe una publicación de LinkedIn de 100 palabras sobre esta norma, para jefes de planta. Cierra con una pregunta."' },
       gerencia: { titulo: 'La diferencia con una tarea suya', texto: 'Corta: "Haz una propuesta." Completa: "Soy gerente de Ekosolv. Con esta oportunidad de Zoho, redacta el borrador de la propuesta con nuestras secciones. No inventes precios: deja [PRECIO] donde vaya."' },
-      finanzas: { titulo: 'La diferencia con una tarea suya', texto: 'Corta: "Revisa la conciliación." Completa: "Llevo la tesorería de Ekosolv. Cruza este extracto bancario con los recaudos de Zoho Books y lista en una tabla los movimientos que no coinciden, con fecha y valor."' },
+      finanzas: { titulo: 'La diferencia con una tarea suya', texto: 'Corta: "Responde este requerimiento." Completa: "Soy la contadora de Ekosolv. Lee este requerimiento de la DIAN y lista en una tabla cada punto que pide, su plazo y el soporte que lo responde. No redactes la respuesta todavía."' },
     },
   },
   iterar: {
@@ -189,7 +194,7 @@ export const CELULAR_TALLER1: Record<string, GuiaCelular> = {
       ventas: { titulo: 'Corregir por partes', texto: '"Más corto: el cliente es de producción, no ambiental." Y después: "Cambia el cierre: propón una visita técnica en vez de una llamada."' },
       mercadeo: { titulo: 'Corregir por partes', texto: '"Menos formal, pero sin emojis." Y después: "Empieza con la pregunta que se hace el cliente, no con la norma."' },
       gerencia: { titulo: 'Corregir por partes', texto: '"Más corto: el cliente es de producción, no ambiental." Y después: "Cambia el cierre: propón una fecha para firmar."' },
-      finanzas: { titulo: 'Corregir por partes', texto: '"Agrega quién revisa cada paso." Y después: "Marca qué pasos se podrían automatizar y cuáles necesitan criterio."' },
+      finanzas: { titulo: 'Corregir por partes', texto: '"Ahora redacta la respuesta al punto 2 con este soporte." Y después: "Cita solo los documentos que adjunté."' },
     },
   },
   anonimizar: {
@@ -200,7 +205,7 @@ export const CELULAR_TALLER1: Record<string, GuiaCelular> = {
       ventas: { titulo: 'Un Brief en la cuenta de Ekosolv', texto: 'El Brief va completo, con los datos del contacto. Lo que no se hace es copiarlo a una IA personal para "adelantar" desde la casa.' },
       mercadeo: { titulo: 'Un caso en la cuenta de Ekosolv', texto: 'Puede pegar el caso completo para trabajarlo. Otra cosa es publicarlo: el nombre del cliente y las personas de las fotos salen solo con autorización.' },
       gerencia: { titulo: 'Reportes en la cuenta de Ekosolv', texto: 'El reporte de oportunidades va con contactos y valores. Salarios, salud y evaluaciones de desempeño, solo si la tarea de verdad los necesita.' },
-      finanzas: { titulo: 'Nómina y bancos en la cuenta de Ekosolv', texto: 'Para el procedimiento de nómina bastan totales; los datos de cada empleado, solo si la tarea los pide. Claves bancarias y tokens, nunca.' },
+      finanzas: { titulo: 'Nómina y bancos en la cuenta de Ekosolv', texto: 'Para un comparativo bastan los balances; los datos de cada empleado, solo si la tarea los pide. Claves de la DIAN, del banco y tokens, nunca.' },
     },
   },
   // En esta escena el celular muestra el paso guiado (conectarZoho.ts); la idea queda de respaldo.
