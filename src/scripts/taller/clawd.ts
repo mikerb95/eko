@@ -460,7 +460,7 @@ function crear(escena: HTMLElement, raiz: HTMLElement): Clawd {
     gsap.killTweensOf(hojas)
     hojas.forEach((h, k) => {
       gsap.set(h, { clearProps: 'transform,opacity,visibility' })
-      h.setAttribute('visibility', k < n ? 'visible' : 'hidden')
+      h.setAttribute('visibility', k < n ? 'inherit' : 'hidden')
     })
     const nuevas = hojas.slice(enPila, n)
     if (anim && animar && nuevas.length) {
@@ -474,7 +474,7 @@ function crear(escena: HTMLElement, raiz: HTMLElement): Clawd {
     if (!anim) return apilar(quedan)
     apilar(enPila)
     const llegan = hojas.slice(enPila)
-    llegan.forEach((h) => h.setAttribute('visibility', 'visible'))
+    llegan.forEach((h) => h.setAttribute('visibility', 'inherit'))
     await esperar(gsap.from(llegan, { y: -9, opacity: 0, duration: 0.3, stagger: 0.07, ease: 'bounce.out', snap: { y: 1 } }))
     if (!vivo) return
     // Se tambalea y las de arriba se caen por el borde de la mesa.
@@ -587,7 +587,7 @@ function crear(escena: HTMLElement, raiz: HTMLElement): Clawd {
 
   function sacar() {
     conJuguete = true
-    varita!.setAttribute('visibility', 'visible')
+    varita!.setAttribute('visibility', 'inherit')
     mirar(-1, -1)
     return gsap
       .timeline()
@@ -617,7 +617,7 @@ function crear(escena: HTMLElement, raiz: HTMLElement): Clawd {
     const o = { transformOrigin: '50% 100%' }
     tl.call(() => mirar(-1, 0))
       .to(respira, { scaleY: 1.08, scaleX: 0.97, ...o, duration: 0.45, ease: 'power2.out' })
-      .call(() => boca?.setAttribute('visibility', 'visible'))
+      .call(() => boca?.setAttribute('visibility', 'inherit'))
     if (gigante) {
       // Sopla despacito y largo: sale una sola, enorme.
       tl.to(respira, { scaleY: 0.96, scaleX: 1.03, ...o, duration: 1.1, ease: 'sine.inOut' })
@@ -717,7 +717,7 @@ function crear(escena: HTMLElement, raiz: HTMLElement): Clawd {
   async function chispitas(sigue: () => boolean) {
     if (!bengala || !punta) return
     conJuguete = true
-    bengala.setAttribute('visibility', 'visible')
+    bengala.setAttribute('visibility', 'inherit')
     mirar(-1, -1)
     await paso(
       gsap
@@ -857,7 +857,7 @@ function crear(escena: HTMLElement, raiz: HTMLElement): Clawd {
     nuevaLinea()
     cursor?.setAttribute('x', String(pluma.inicio))
     cursor?.setAttribute('y', '-1.5')
-    pc.setAttribute('visibility', 'visible')
+    pc.setAttribute('visibility', 'inherit')
     mirar(-1, 0)
     await paso(
       gsap

@@ -221,7 +221,7 @@
 .clawd.quieto .clawd-respira, .clawd.duerme .clawd-respira { animation: clawd-respira 1.4s steps(1) infinite; }
 .clawd.duerme .clawd-respira { animation-duration: 2.4s; }
 .clawd-sudor { visibility: hidden; }
-.clawd.suda .clawd-sudor { visibility: visible; animation: clawd-gota 1.2s steps(1) infinite; }
+.clawd.suda .clawd-sudor { visibility: inherit; animation: clawd-gota 1.2s steps(1) infinite; }
 @keyframes clawd-parpadeo {
   0%, 93%, 96%, 98.5%, 100% { transform: scaleY(1); }
   94.5%, 97.5% { transform: scaleY(.5); }
