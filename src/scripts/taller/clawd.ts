@@ -27,8 +27,12 @@ export interface Clawd {
   teclear(on: boolean, o?: { alRafaga?: () => void; alGolpe?: () => void; descansos?: boolean }): void
   /** Salto con aterrizaje; con `brazos` los levanta y con `saludo` saluda al bajar. */
   saltar(o?: { brazos?: boolean; saludo?: boolean; alto?: number }): Promise<void>
-  /** Globo. Sin `ms` el texto queda fijo; con `ms` se ve ese tiempo y vuelve el fijo. */
-  decir(texto: string, o?: { ms?: number; tipo?: 'pregunta' | 'ok' }): void
+  /**
+   * Globo. Sin `ms` el texto queda fijo; con `ms` se ve ese tiempo y vuelve el
+   * fijo. Con `soltar`, si hay otro temporal a la vista, ese no se borra: se
+   * vuelve un globo de pensamiento que se va flotando hacia arriba.
+   */
+  decir(texto: string, o?: { ms?: number; tipo?: 'pregunta' | 'ok'; soltar?: boolean }): void
   callar(): void
   ojos(m: Ojos): void
   mirar(x: number, y: number): void
@@ -278,9 +282,36 @@ function crear(escena: HTMLElement, raiz: HTMLElement): Clawd {
     else gsap.set(globo, { autoAlpha: 1, y: 0, scale: 1 })
   }
 
-  function decir(texto: string, o: { ms?: number; tipo?: 'pregunta' | 'ok' } = {}) {
+  /** Copia del globo a la vista que se vuelve pensamiento y sube flotando. */
+  function soltarGlobo() {
+    const r = globo.cloneNode(true) as HTMLElement
+    r.removeAttribute('data-clawd-globo')
+    r.classList.add('clawd-recuerdo')
+    globo.after(r)
+    sueltos.add(r)
+    gsap.killTweensOf(globo)
+    gsap.set(globo, { autoAlpha: 0 })
+    gsap.set(r, { autoAlpha: 1, x: 0, y: 0, scale: 1 })
+    const dura = 3.6
+    const tl = gsap.timeline({
+      onComplete: () => {
+        sueltos.delete(r)
+        r.remove()
+      },
+    })
+    tl.to(r, { scale: 0.92, duration: 0.1, ease: 'power2.out' })
+      .to(r, { scale: 1, duration: 0.22, ease: 'back.out(3)' })
+      .to(r, { y: -280, scale: 0.72, duration: dura, ease: 'sine.in' }, 0.12)
+      .to(r, { keyframes: { x: [0, -16, 10, -24, -6] }, duration: dura, ease: 'sine.inOut' }, 0.12)
+      .to(r, { autoAlpha: 0, duration: 1.3, ease: 'power1.in' }, dura - 1.1)
+    seguir(tl)
+  }
+
+  function decir(texto: string, o: { ms?: number; tipo?: 'pregunta' | 'ok'; soltar?: boolean } = {}) {
     if (!vivo) return
     if (o.ms) {
+      const aLaVista = Number(gsap.getProperty(globo, 'autoAlpha')) > 0.5
+      if (o.soltar && anim && temporal && aLaVista && globo.textContent !== texto) soltarGlobo()
       temporal?.kill()
       pintarGlobo(texto, o.tipo ?? '')
       temporal = seguir(

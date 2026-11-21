@@ -113,6 +113,8 @@ export interface EstadoRed {
   escena: string
   paso: number
   mov: number
+  /** Cuánto lleva la escena actual (ms, reloj del servidor); null si no se sabe. */
+  enEscena: number | null
   orden: { id: string; nombre: string } | null
   aviso: AvisoRed | null
 }
@@ -133,7 +135,7 @@ const QUIETO_MS = 2000
  */
 export function seguirRed(
   n: number,
-  op: { ids: string[]; alMover: (k: number, paso: number) => void; alOrden?: (nombre: string) => void; alAviso?: (a: AvisoRed | null) => void },
+  op: { ids: string[]; alMover: (k: number, paso: number) => void; alOrden?: (nombre: string) => void; alAviso?: (a: AvisoRed | null) => void; alTiempo?: (escena: string, enEscena: number | null) => void },
 ) {
   let visto = 0
   let ultimoLocal = 0
@@ -148,6 +150,7 @@ export function seguirRed(
     try {
       const r = await consultar<EstadoRed>({ que: 'estado', n })
       op.alAviso?.(r.aviso)
+      op.alTiempo?.(r.escena, r.enEscena)
       if (r.orden && !atendidas.has(r.orden.id)) {
         atendidas.add(r.orden.id)
         if (conBase) op.alOrden?.(r.orden.nombre)

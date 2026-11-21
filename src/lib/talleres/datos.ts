@@ -30,6 +30,8 @@ export interface EstadoTaller {
   aviso: { fin: number; ms: number } | null
   /** Marca (ms del servidor) del último cambio de escena o paso; 0 si nunca se movió con esta columna. */
   mov: number
+  /** Marca (ms del servidor) de cuando se llegó a la escena actual; 0 si no se sabe. Cambiar solo de paso no la mueve. */
+  escenaDesde: number
   /** Último botón del presentador para el proyector ("pedir", "generar"). */
   orden: { id: string; nombre: string } | null
   updated_at: string
@@ -53,7 +55,7 @@ const leerAvisoFila = (v: unknown): EstadoTaller['aviso'] => {
   }
 }
 
-const filaEstado = (x: any): EstadoTaller => ({ taller: num(x.taller), escena: str(x.escena), interaccion: str(x.interaccion), paso: num(x.paso), aviso: leerAvisoFila(x.aviso), mov: num(x.mov), orden: leerOrdenFila(x.orden), updated_at: str(x.updated_at) })
+const filaEstado = (x: any): EstadoTaller => ({ taller: num(x.taller), escena: str(x.escena), interaccion: str(x.interaccion), paso: num(x.paso), aviso: leerAvisoFila(x.aviso), mov: num(x.mov), escenaDesde: num(x.escena_desde), orden: leerOrdenFila(x.orden), updated_at: str(x.updated_at) })
 
 /** Una hora después de llegar a cero, un aviso olvidado deja de mostrarse (no tapa la siguiente sesión). */
 export const MINUTOS_AVISO_VENCIDO = 60
@@ -89,6 +91,14 @@ export async function leerEstado(taller: number): Promise<EstadoTaller | null> {
   return x ? filaEstado(x) : null
 }
 
+/**
+ * Cuánto lleva (ms) la escena actual según el reloj del servidor. Se manda lo
+ * transcurrido y no la hora, porque el reloj de cada equipo es distinto.
+ */
+export function enEscena(e: EstadoTaller | null, ref = Date.now()): number | null {
+  return e?.escenaDesde ? Math.max(0, ref - e.escenaDesde) : null
+}
+
 export function enCurso(e: EstadoTaller | null, ref = Date.now()): boolean {
   return !!e && ref - Date.parse(e.updated_at) < HORAS_EN_CURSO * 3600_000
 }
@@ -98,9 +108,11 @@ export async function fijarEstado(taller: number, escena: string, interaccion: s
   const c = await db()
   const mov = Date.now()
   await c.execute({
-    sql: `INSERT INTO ac_taller_estado (taller, escena, interaccion, paso, mov, updated_at) VALUES (?, ?, ?, ?, ?, ?)
-          ON CONFLICT (taller) DO UPDATE SET escena = excluded.escena, interaccion = excluded.interaccion, paso = excluded.paso, mov = excluded.mov, updated_at = excluded.updated_at`,
-    args: [taller, escena, interaccion, String(paso), String(mov), ahora()],
+    sql: `INSERT INTO ac_taller_estado (taller, escena, interaccion, paso, mov, escena_desde, updated_at) VALUES (?, ?, ?, ?, ?, ?, ?)
+          ON CONFLICT (taller) DO UPDATE SET
+            escena_desde = CASE WHEN ac_taller_estado.escena = excluded.escena AND ac_taller_estado.escena_desde <> '' THEN ac_taller_estado.escena_desde ELSE excluded.escena_desde END,
+            escena = excluded.escena, interaccion = excluded.interaccion, paso = excluded.paso, mov = excluded.mov, updated_at = excluded.updated_at`,
+    args: [taller, escena, interaccion, String(paso), String(mov), String(mov), ahora()],
   })
   return mov
 }

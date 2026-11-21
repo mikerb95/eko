@@ -72,14 +72,27 @@ function sondear(el: HTMLElement, api: Api, pintar: (r: any) => void, ms = 2000)
   }, ms)
 }
 
-/** Cuenta regresiva que sigue corriendo aunque se salga y se vuelva a la escena. */
+/**
+ * Cuenta regresiva. Arranca al entrar a la escena, pero la hora que manda es
+ * la del servidor (sincronizarCuenta): así el proyector, el presentador y los
+ * PC vinculados muestran lo mismo aunque cada uno haya abierto la página o
+ * llegado a la escena en un momento distinto.
+ */
 const inicios = new Map<string, number>()
+/** Margen para no hacer saltar el reloj por la demora normal de la red. */
+const DESFASE_MS = 1500
+export function sincronizarCuenta(escena: string | undefined, transcurrido: number | null | undefined) {
+  if (!escena || typeof transcurrido !== 'number' || !Number.isFinite(transcurrido)) return
+  const inicio = Date.now() - transcurrido
+  const actual = inicios.get(escena)
+  if (actual === undefined || Math.abs(actual - inicio) > DESFASE_MS) inicios.set(escena, inicio)
+}
 function regresiva(el: HTMLElement, api: Api, alSegundo?: (s: number) => void) {
   const c = $(el, '[data-cuenta-regresiva]')
   if (!c) return
   const total = Number(c.dataset.cuentaRegresiva)
   const id = el.dataset.escena!
-  if (!inicios.has(id)) inicios.set(id, Date.now())
+  inicios.set(id, Date.now())
   const tic = () => {
     const s = Math.max(0, total - Math.floor((Date.now() - inicios.get(id)!) / 1000))
     c.textContent = `${Math.floor(s / 60)}:${String(s % 60).padStart(2, '0')}`

@@ -18,7 +18,7 @@
  */
 import { CURVA, SplitText, amarrarSignos, gsap, reducido } from '../motion/core'
 import { API_PC, avisoLocal, canal, seguirRed, consultar, cuentaAviso, direccionTecla, enviar, leerDatos, type Aviso, type AvisoRed, type Mensaje } from './comun'
-import { HOOKS, type Api } from './escenas'
+import { HOOKS, sincronizarCuenta, type Api } from './escenas'
 import { crearCortina } from './cortina'
 import { clawdSuelto } from './clawd'
 
@@ -130,13 +130,15 @@ function montar() {
     // Mientras el aviso está puesto, Clawd saluda por su nombre a quien se
     // registra en la sala con el QR. Los que ya estaban registrados cuando
     // aparece el aviso no se saludan (la primera consulta solo toma la base).
+    // Si llega alguien con un saludo todavía a la vista, ese se va flotando
+    // como globo de pensamiento y el nuevo ocupa su lugar.
     let vistos: number | null = null
     const saludar = (nombres: string[]) => {
       if (!clawd || !nombres.length) return
       const [a, b] = nombres
       const texto =
         nombres.length === 1 ? `¡Hola, ${a}!` : nombres.length === 2 ? `¡Hola, ${a} y ${b}!` : `¡Hola, ${a}, ${b} y ${nombres.length - 2} más!`
-      clawd.decir(texto, { ms: 3200, tipo: 'ok' })
+      clawd.decir(texto, { ms: 3200, tipo: 'ok', soltar: true })
       void clawd.saltar({ brazos: true, saludo: true })
     }
     const mirarSala = () => {
@@ -424,6 +426,7 @@ function montar() {
     red = seguirRed(datos.n, {
       ids: datos.escenas.map((e) => e.id),
       alAviso: ponerEspera,
+      alTiempo: sincronizarCuenta,
       alMover: (k, p) => {
         if (activo && (k !== i || p !== paso)) ir(k, p, false)
       },
@@ -449,9 +452,10 @@ function montar() {
     const mirar = async () => {
       if (!activo || document.hidden) return
       try {
-        const r = await consultar<{ enCurso: boolean; escena?: string; paso?: number; aviso?: AvisoRed | null }>({}, API_PC)
+        const r = await consultar<{ enCurso: boolean; escena?: string; paso?: number; enEscena?: number | null; aviso?: AvisoRed | null }>({}, API_PC)
         if (!r.enCurso) return void location.reload()
         ponerEspera(r.aviso)
+        sincronizarCuenta(r.escena, r.enEscena)
         const k = ids.indexOf(r.escena ?? '')
         if (k >= 0 && (k !== i || (r.paso ?? 0) !== paso)) ir(k, r.paso ?? 0, false)
       } catch (e) {

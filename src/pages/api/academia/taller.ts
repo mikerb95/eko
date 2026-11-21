@@ -4,7 +4,7 @@ import { hoyEnBogota } from '../../../lib/agente/diasHabiles'
 import { nombreModulo } from '../../../lib/academia/reglas'
 import { tallerDe } from '../../../lib/talleres'
 import { compararEvaluacion, contarVotos, interaccionDe } from '../../../lib/talleres/reglas'
-import { asistentesDeHoy, avisoPublico, enSala, fijarAviso, fijarEstado, fijarOrden, leerEstado, guardarRespuestaIA, marcarRespondida, preguntaSala, preguntasPendientes, respuestas, sesionesDeHoy } from '../../../lib/talleres/datos'
+import { asistentesDeHoy, avisoPublico, enEscena, enSala, fijarAviso, fijarEstado, fijarOrden, leerEstado, guardarRespuestaIA, marcarRespondida, preguntaSala, preguntasPendientes, respuestas, sesionesDeHoy } from '../../../lib/talleres/datos'
 import { preguntarDemo, responderPregunta } from '../../../lib/talleres/motorIA'
 import { anotar } from '../../../lib/bitacora'
 
@@ -17,7 +17,7 @@ import { anotar } from '../../../lib/bitacora'
 // GET ?que=comparacion&n   → evaluación de entrada contra salida
 // GET ?que=panel&n         → sala, asistencia, preguntas de la sala, aviso de bloque del día y aviso de inicio (presentador)
 // GET ?que=aviso&n         → aviso "Empezamos en 00:00" (proyector de quien dicta)
-// GET ?que=estado&n        → escena, paso, último botón y aviso: así se siguen
+// GET ?que=estado&n        → escena, paso, cuánto lleva la escena, último botón y aviso: así se siguen
 //                            proyector y presentador aunque estén en equipos distintos
 // POST {accion}            → estado | orden | aviso | ia | respuesta_ia | respondida
 
@@ -53,7 +53,7 @@ export const GET: APIRoute = async ({ url, locals }) => {
     if (que === 'estado') {
       if (!esAdmin(locals)) return json({ error: 'Solo administradores' }, 403)
       const e = await leerEstado(t.n)
-      return json({ escena: e?.escena ?? '', paso: e?.paso ?? 0, mov: e?.mov ?? 0, orden: e?.orden ?? null, aviso: avisoPublico(e) })
+      return json({ escena: e?.escena ?? '', paso: e?.paso ?? 0, mov: e?.mov ?? 0, enEscena: enEscena(e), orden: e?.orden ?? null, aviso: avisoPublico(e) })
     }
 
     if (que === 'panel') {

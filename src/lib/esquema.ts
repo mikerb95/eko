@@ -754,6 +754,9 @@ export const COLUMNAS: readonly (readonly [tabla: string, columna: string])[] = 
   // nuevo con uno viejo; `orden` es el último botón del presentador (JSON {id, nombre}).
   ['ac_taller_estado', 'mov'],
   ['ac_taller_estado', 'orden'],
+  // Marca (ms del servidor) de cuando se llegó a la escena actual: con ella
+  // todos los equipos muestran la misma cuenta regresiva (descanso, práctica).
+  ['ac_taller_estado', 'escena_desde'],
   // Correo con el enlace al banco de recursos de su área (docs/plan-recursos.md):
   // cuándo se le envió. Vacío = pendiente.
   ['ac_taller_asistentes', 'recursos_at'],

@@ -4,7 +4,7 @@ import { PC_COOKIE, SALA_TTL_SECONDS, crearPaseSala } from '../../../lib/auth'
 import { hoyEnBogota } from '../../../lib/agente/diasHabiles'
 import { checkRateLimit, clientIp, isRateLimited } from '../../../lib/rateLimit'
 import { tallerDe } from '../../../lib/talleres'
-import { asistenteDe, avisoPublico, canjearCodigoPC, tallerEnCurso } from '../../../lib/talleres/datos'
+import { asistenteDe, avisoPublico, canjearCodigoPC, enEscena, tallerEnCurso } from '../../../lib/talleres/datos'
 import { vistaPC } from '../../../lib/talleres/pc'
 import { anotar } from '../../../lib/bitacora'
 
@@ -27,7 +27,7 @@ export const GET: APIRoute = async ({ cookies }) => {
   try {
     const v = await vistaPC(cookies.get(PC_COOKIE)?.value)
     if (!v) return json({ enCurso: false })
-    return json({ enCurso: true, taller: v.estado.taller, escena: v.estado.escena, paso: v.estado.paso, aviso: avisoPublico(v.estado) })
+    return json({ enCurso: true, taller: v.estado.taller, escena: v.estado.escena, paso: v.estado.paso, enEscena: enEscena(v.estado), aviso: avisoPublico(v.estado) })
   } catch (e) {
     return fail('academia/pc', e)
   }

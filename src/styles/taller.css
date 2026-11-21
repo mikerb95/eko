@@ -235,6 +235,12 @@
 .clawd-globo[data-tipo='pregunta'] { background: var(--c-rojo); color: #fff; box-shadow: 0 4px 0 #7d2c1d; }
 .clawd-globo[data-tipo='ok'] { background: #7fd49c; box-shadow: 0 4px 0 #2e8b57; }
 .clawd--piensa .clawd-globo { left: 0; translate: 0 0; }
+/* Saludo anterior que se va flotando (soltarGlobo en clawd.ts): globo de
+   pensamiento redondo con dos burbujitas que bajan hacia Clawd. */
+.clawd-globo.clawd-recuerdo { border-radius: 1.2em; padding: .32em .8em; z-index: 1; }
+.clawd-recuerdo::before, .clawd-recuerdo::after { content: ''; position: absolute; border-radius: 50%; background: inherit; box-shadow: inherit; }
+.clawd-recuerdo::before { width: .5em; height: .5em; right: -.15em; bottom: -.6em; }
+.clawd-recuerdo::after { width: .3em; height: .3em; right: -.6em; bottom: -1.05em; }
 /* En "siguiente token" Clawd está pegado al margen izquierdo: las opciones crecen hacia la derecha. */
 .clawd--piensa .clawd-piensa { left: 0; translate: 0 0; }
 .clawd--inventa .clawd-piensa { left: auto; right: -40px; translate: 0 0; }
