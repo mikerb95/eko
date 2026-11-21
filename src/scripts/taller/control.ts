@@ -5,9 +5,8 @@
  * hechos desde el proyector o el presentador.
  *
  * La vista previa es el proyector en un iframe (?vista=1) que muestra la
- * escena siguiente. Mientras queden pasos por revelar en la escena actual
- * está borrosa y se va aclarando paso a paso; queda nítida cuando el
- * siguiente toque ya cambia de escena.
+ * escena siguiente, siempre nítida. Cuando el siguiente toque ya cambia de
+ * escena se marca con un borde verde.
  */
 import { canal, enviar, leerDatos, mantenerDespierto, seguirRed, type Mensaje } from './comun'
 
@@ -101,13 +100,9 @@ function montar(d: DatosCt) {
     )
     ;(ahora as HTMLElement | null)?.scrollIntoView({ block: 'nearest', behavior: 'smooth' })
 
-    // Borrosa mientras el siguiente toque solo revela pasos; se aclara a medida
-    // que avanzan y queda nítida (100 %) cuando el siguiente toque cambia de escena.
+    // Siempre nítida; el borde verde marca que el siguiente toque cambia de escena.
     const quedan = e.pasos - paso
-    const fraccion = e.pasos ? paso / e.pasos : 1
     prev.classList.toggle('nitida', quedan <= 0)
-    prev.style.setProperty('--borroso', quedan > 0 ? `${(14 - 8 * fraccion).toFixed(1)}px` : '0px')
-    prev.style.setProperty('--opaco', quedan > 0 ? (0.35 + 0.3 * fraccion).toFixed(2) : '1')
     $('[data-sig-que]').textContent = quedan > 0 ? (quedan === 1 ? 'Falta 1 paso' : `Faltan ${quedan} pasos`) : i + 1 < total ? 'Escena nueva' : 'Última escena'
     $<HTMLButtonElement>('[data-siguiente]').disabled = quedan <= 0 && i + 1 >= total
     $<HTMLButtonElement>('[data-anterior]').disabled = i === 0 && paso === 0

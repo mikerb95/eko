@@ -122,8 +122,6 @@
 
 .ct-prev {
   --s: .12;
-  --borroso: 14px;
-  --opaco: .35;
   position: absolute;
   left: 12px;
   bottom: 12px;
@@ -146,20 +144,13 @@
   transform: scale(var(--s));
   transform-origin: 0 0;
 }
-/* El desenfoque va en el recuadro ya escalado: es más liviano que desenfocar el lienzo de 1600 px. */
 .ct-prev-img {
   position: absolute;
   inset: 0;
-  filter: blur(var(--borroso));
-  opacity: var(--opaco);
-  transition: filter .45s ease, opacity .45s ease;
 }
 .ct-prev iframe[hidden] { display: none; }
-/* Nítida: el siguiente toque cambia de escena. */
+/* Borde verde: el siguiente toque cambia de escena. */
 .ct-prev.nitida { box-shadow: 0 6px 18px rgb(0 0 0 / .35), 0 0 0 2px #3FC2B5; }
 .ct-prev-fin { position: absolute; inset: 0; display: grid; place-items: center; font: 600 18px/1 var(--font-display); color: #7D8B96; }
 .ct-prev-fin[hidden] { display: none; }
 
-@media (prefers-reduced-motion: reduce) {
-  .ct-prev-img { transition: none; }
-}
