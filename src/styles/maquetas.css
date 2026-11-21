@@ -125,8 +125,6 @@
 .mq-grupo-esc { color: var(--mq-zoho); }
 .mq-fila { display: flex; align-items: center; justify-content: space-between; gap: .6em; padding: .4em .6em; border-radius: .5em; background: #fff; border: 1px solid var(--mq-linea); }
 .mq-fila code { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-size: .78em; }
-.mq-fila-esc code { animation: mq-atenua .3s ease 1.6s both; }
-@keyframes mq-atenua { to { opacity: .45; } }
 .mq-estado { position: relative; display: inline-grid; flex: none; font-size: .7em; font-weight: 600; white-space: nowrap; }
 .mq-estado > i, .mq-aprob { grid-area: 1 / 1; padding: .25em .6em; border-radius: 99px; }
 .mq-aprob { background: #f1efeb; color: var(--mq-tinta); }
@@ -135,7 +133,7 @@
 .mq-cambia .despues { background: var(--mq-zoho); color: #fff; animation: mq-entra .25s ease var(--d) both; }
 @keyframes mq-sale { to { opacity: 0; } }
 @keyframes mq-entra { from { opacity: 0; transform: scale(.8); } }
-/* El menú del grupo de escritura: se abre, se elige Blocked y se cierra. */
+/* El menú del grupo de escritura: se abre, se elige Always ask y se cierra. */
 .mq-menu { position: absolute; right: 1.1em; top: 7.2em; display: flex; flex-direction: column; padding: .3em; border-radius: .6em; background: #2a2a2a; color: #eee; font-size: .7em; box-shadow: 0 .6em 1.4em rgba(0, 0, 0, .25); animation: mq-ap .3s ease .3s both, mq-cierra .2s ease 1s forwards; }
 .mq-menu i { padding: .35em .8em; border-radius: .4em; }
 .mq-menu-sel { animation: mq-marca .2s ease .7s both; }

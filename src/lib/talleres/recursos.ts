@@ -99,7 +99,7 @@ const GLOSARIO_TALLER1: Termino[] = [
   { termino: 'MCP', definicion: 'El idioma común con el que una IA se conecta con otras herramientas, como Zoho.' },
   { termino: 'Conector', definicion: 'Una conexión ya armada entre Claude y una herramienta concreta. El de Zoho CRM lo hizo Zoho.' },
   { termino: 'Autorización', definicion: 'El paso en que usted le da permiso a Claude en la página de Zoho. La contraseña se escribe en Zoho, nunca en Claude, y el permiso se puede quitar cuando quiera.' },
-  { termino: 'Solo lectura', definicion: 'Consultar sin crear, cambiar ni borrar nada. En el conector se logra dejando bloqueadas las herramientas de escritura.' },
+  { termino: 'Lectura y escritura', definicion: 'Leer es consultar sin tocar nada; escribir es crear, cambiar o borrar registros. En el conector la escritura va en Always ask: Claude pide permiso antes de cada cambio.' },
   { termino: 'Modo Auto y modo Manual', definicion: 'En Auto, Claude usa las herramientas sin preguntar. En Manual, le muestra qué va a hacer y espera su permiso.' },
   { termino: 'Claude in Chrome', definicion: 'Extensión de Google Chrome que deja que Claude use una pestaña como usted: leer, hacer clic y escribir.' },
 ]
@@ -163,7 +163,7 @@ export const fuentesDe = (area: string): Enlace[] => [...FUENTES_COMUNES, ...(FU
 // El paso 0 de la práctica habla de la sala ("Abrir en mi PC, aquí abajo"):
 // en el banco la llegada va como introducción y la guía empieza en el paso 1.
 const GUIA_ZOHO = {
-  titulo: 'Conectar Claude con Zoho CRM, solo para leer',
+  titulo: 'Conectar Claude con Zoho CRM para leer y escribir',
   intro: `${PASOS_ZOHO[0].queEs} Necesita un PC con Google Chrome, su usuario de Zoho y la cuenta de Claude de Ekosolv.`,
   pasos: PASOS_ZOHO.slice(1),
 }

@@ -205,7 +205,7 @@ export const CELULAR_TALLER1: Record<string, GuiaCelular> = {
   },
   // En esta escena el celular muestra el paso guiado (conectarZoho.ts); la idea queda de respaldo.
   zoho: {
-    idea: 'Vamos a conectar Claude con su Zoho CRM, solo para leer. Siga los pasos en la pantalla o aquí en el celular.',
+    idea: 'Vamos a conectar Claude con su Zoho CRM para leer y escribir, con su permiso en cada cambio. Siga los pasos en la pantalla o aquí en el celular.',
   },
   comparacion: {
     idea: 'En pantalla está el resultado del grupo en las mismas cinco preguntas, antes y después de hoy.',

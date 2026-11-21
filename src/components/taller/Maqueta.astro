@@ -28,7 +28,7 @@ const { id } = Astro.props
       </div>
       <div class="mq-ficha mq-limite mq-ap" style="--d:.6s">
         <span class="mq-et">Límite</span>
-        <b><span class="mq-candado" />Solo leer</b>
+        <b><span class="mq-candado" />Escribir con permiso</b>
       </div>
       <div class="mq-flecha mq-ap" style="--d:1.1s" />
       <div class="mq-ficha mq-claude mq-ap" style="--d:1.4s">
@@ -83,9 +83,9 @@ const { id } = Astro.props
           )}
           {id === 'pedir' && (
             <>
-              <span class="mq-burbuja mq-yo"><span class="mq-tipeo" style="--n:44;--t:2.2s">Quiero conectar mi Zoho CRM. Solo para leer.</span></span>
+              <span class="mq-burbuja mq-yo"><span class="mq-tipeo" style="--n:52;--t:2.2s">Quiero conectar mi Zoho CRM. Escribe con mi permiso.</span></span>
               <span class="mq-pensar chispa-fila" style="--d:2.4s;--fin:3.6s" set:html={`${chispa()}<span>Pensando</span>`} />
-              <span class="mq-burbuja mq-ia mq-ap" style="--d:3.7s">Para eso sirve el conector oficial de Zoho CRM. Lo dejamos en solo lectura:</span>
+              <span class="mq-burbuja mq-ia mq-ap" style="--d:3.7s">Para eso sirve el conector oficial de Zoho CRM. Lee y escribe, y cada cambio le pide permiso:</span>
               <span class="mq-tarjeta mq-ap" style="--d:4.3s"><span class="mq-logo mq-zoho">Z</span><b>Zoho CRM</b><span class="mq-boton mq-pulso" style="--d:4.8s">Conectar</span></span>
             </>
           )}
@@ -171,11 +171,11 @@ const { id } = Astro.props
         {['ZohoCRM_searchRecords', 'ZohoCRM_getRecord'].map((h) => (
           <span class="mq-fila"><code>{h}</code><span class="mq-estado mq-aprob">Needs approval</span></span>
         ))}
-        <span class="mq-grupo mq-grupo-esc"><span>Write/delete tools · 19</span><span class="mq-estado mq-cambia" style="--d:1s"><i class="antes">Needs approval</i><i class="despues">Blocked</i></span></span>
+        <span class="mq-grupo mq-grupo-esc"><span>Write/delete tools · 19</span><span class="mq-estado mq-cambia" style="--d:1s"><i class="antes">Needs approval</i><i class="despues">Always ask</i></span></span>
         {['ZohoCRM_createRecords', 'ZohoCRM_updateRecord', 'ZohoCRM_deleteRecord'].map((h, k) => (
-          <span class="mq-fila mq-fila-esc"><code>{h}</code><span class="mq-estado mq-cambia" style={`--d:${1.4 + k * 0.25}s`}><i class="antes">Needs approval</i><i class="despues">Blocked</i></span></span>
+          <span class="mq-fila mq-fila-esc"><code>{h}</code><span class="mq-estado mq-cambia" style={`--d:${1.4 + k * 0.25}s`}><i class="antes">Needs approval</i><i class="despues">Always ask</i></span></span>
         ))}
-        <span class="mq-menu mq-ap" style="--d:.3s"><i>Always allow</i><i>Needs approval</i><i>Always ask</i><i class="mq-menu-sel">Blocked</i></span>
+        <span class="mq-menu mq-ap" style="--d:.3s"><i>Always allow</i><i>Needs approval</i><i class="mq-menu-sel">Always ask</i><i>Blocked</i></span>
       </div>
     </div>
   )}

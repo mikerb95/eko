@@ -80,7 +80,7 @@ export const BLOQUES_CHECKLIST: BloqueChecklist[] = [
     titulo: 'Conectar Zoho',
     items: [
       'Sé conectar Claude con Zoho CRM desde la cuenta de Ekosolv.',
-      'Dejo bloqueada la escritura: la conexión es solo para leer.',
+      'Dejo la escritura en Always ask: Claude lee y escribe, pero cada cambio pasa por mi permiso.',
       'Distingo cuándo Claude usa el conector y cuándo usa el navegador.',
     ],
   },
