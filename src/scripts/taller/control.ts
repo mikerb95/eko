@@ -9,7 +9,7 @@
  * está borrosa y se va aclarando paso a paso; queda nítida cuando el
  * siguiente toque ya cambia de escena.
  */
-import { canal, enviar, leerDatos, seguirRed, type Mensaje } from './comun'
+import { canal, enviar, leerDatos, mantenerDespierto, seguirRed, type Mensaje } from './comun'
 
 interface EscenaCt {
   id: string
@@ -159,22 +159,8 @@ function montar(d: DatosCt) {
   $('[data-siguiente]').addEventListener('click', () => avanzar(1))
   $('[data-anterior]').addEventListener('click', () => avanzar(-1))
 
-  // Pantalla siempre encendida mientras el control esté abierto (Wake Lock).
-  // El navegador la suelta al cambiar de app o bloquear el teléfono, así que se
-  // pide otra vez al volver; también con cada toque, por si el primer intento
-  // se rechazó por falta de interacción.
-  let bloqueo: WakeLockSentinel | null = null
-  const mantenerEncendida = async () => {
-    if (!('wakeLock' in navigator) || document.visibilityState !== 'visible' || (bloqueo && !bloqueo.released)) return
-    try {
-      bloqueo = await navigator.wakeLock.request('screen')
-    } catch (e) {
-      console.warn('[control] wake lock', e)
-    }
-  }
-  void mantenerEncendida()
-  document.addEventListener('visibilitychange', () => void mantenerEncendida())
-  document.addEventListener('pointerdown', () => void mantenerEncendida())
+  // Pantalla siempre encendida mientras el control esté abierto.
+  mantenerDespierto()
 
   pintar()
   avisar({ tipo: 'hola' })

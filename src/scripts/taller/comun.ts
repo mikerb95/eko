@@ -194,21 +194,23 @@ export function direccionTecla(ev: KeyboardEvent): 1 | -1 | 0 {
 /**
  * Evita que el equipo entre en reposo o apague la pantalla mientras la
  * página está abierta (Screen Wake Lock). El navegador suelta el bloqueo
- * cuando la pestaña queda oculta, así que se vuelve a pedir al regresar.
- * Si el navegador no lo soporta (o no es HTTPS), no pasa nada.
+ * cuando la pestaña queda oculta (o se bloquea el teléfono), así que se vuelve
+ * a pedir al regresar; también con cada toque, por si el primer intento se
+ * rechazó por falta de interacción (pasa en Safari). Si el navegador no lo
+ * soporta (o no es HTTPS), no pasa nada.
  */
 export function mantenerDespierto() {
-  const wl = (navigator as Navigator & { wakeLock?: { request(tipo: 'screen'): Promise<{ released: boolean }> } }).wakeLock
-  if (!wl) return
-  let bloqueo: { released: boolean } | null = null
+  if (!('wakeLock' in navigator)) return
+  let bloqueo: WakeLockSentinel | null = null
   const pedir = async () => {
-    if (document.hidden || (bloqueo && !bloqueo.released)) return
+    if (document.visibilityState !== 'visible' || (bloqueo && !bloqueo.released)) return
     try {
-      bloqueo = await wl.request('screen')
+      bloqueo = await navigator.wakeLock.request('screen')
     } catch (e) {
-      console.error('[taller] wake lock', e)
+      console.warn('[taller] wake lock', e)
     }
   }
   void pedir()
   document.addEventListener('visibilitychange', () => void pedir())
+  document.addEventListener('pointerdown', () => void pedir())
 }
