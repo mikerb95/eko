@@ -12,6 +12,7 @@
 import type { Interaccion, Pregunta, Taller } from './tipos.ts'
 import { CELULAR_TALLER1 } from './ejemplos1.ts'
 import { ESCENA_ZOHO } from './conectarZoho.ts'
+import { TECNICO_TALLER1, conTecnico } from './tecnico1.ts'
 
 // ---------- Evaluación de entrada y salida (las mismas preguntas) ----------
 
@@ -256,7 +257,7 @@ export const TALLER_1: Taller = {
       ],
     },
   ],
-  escenas: [
+  escenas: conTecnico(TECNICO_TALLER1, [
     // ── Apertura (15) ──
     {
       id: 'portada',
@@ -903,7 +904,7 @@ export const TALLER_1: Taller = {
         'Frase de cierre: "La IA es como un practicante muy rápido y muy seguro de sí mismo. Le puede ahorrar horas, pero lo que entrega se revisa siempre, y se le habla desde la cuenta de Ekosolv." Agradezca y responda las preguntas del celular que quedaron pendientes.',
       ],
     },
-  ],
+  ]),
   celular: CELULAR_TALLER1,
   resumen: {
     ideas: [

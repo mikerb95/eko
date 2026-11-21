@@ -147,6 +147,8 @@ export interface Escena {
   notas: string[]
   /** Preguntas que probablemente hará la sala, con su respuesta (solo presentador). */
   siPreguntan?: { p: string; r: string }[]
+  /** Aspectos técnicos de IA de la escena (solo presentador, encima de las notas). */
+  tecnico?: PuntoTecnico[]
   /** Interacción que se abre en los celulares mientras la escena está activa. */
   interaccion?: string
   demo?: string
@@ -154,6 +156,12 @@ export interface Escena {
   provisional?: boolean
   /** Datos propios del tipo de escena (los lee su componente). */
   datos?: Record<string, any>
+}
+
+/** Viñeta técnica de la vista de presentador: término opcional en negrilla y su explicación. */
+export interface PuntoTecnico {
+  termino?: string
+  texto: string
 }
 
 export interface Taller {

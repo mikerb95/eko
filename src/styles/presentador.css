@@ -43,6 +43,12 @@
 .pr-notas li.ya { color: var(--pr-apagado); }
 .pr-notas li.ahora { color: var(--pr-tinta); font-weight: 500; }
 .pr-notas li.ahora::marker { color: var(--pr-acento); }
+.pr-tecnico { background: var(--pr-hundido); border-radius: 14px; padding: 14px 18px; display: grid; gap: 6px; }
+.pr-tecnico[hidden] { display: none; }
+.pr-tecnico h3 { font: 600 13px/1.2 var(--font-sans); letter-spacing: .06em; text-transform: uppercase; color: var(--pr-suave); margin: 0; }
+.pr-tecnico ul { margin: 0; padding-left: 1.1em; display: grid; gap: 6px; font-size: 17px; line-height: 1.45; color: var(--pr-texto); }
+.pr-tecnico li::marker { color: var(--pr-acento); }
+.pr-tecnico b { font-weight: 600; color: var(--pr-tinta); }
 .pr-preguntan { background: var(--pr-hundido); border-radius: 14px; padding: 14px 18px; display: grid; gap: 4px; }
 .pr-preguntan[hidden] { display: none; }
 .pr-preguntan h3 { font: 600 13px/1.2 var(--font-sans); letter-spacing: .06em; text-transform: uppercase; color: var(--pr-suave); margin: 0 0 4px; }

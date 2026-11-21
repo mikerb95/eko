@@ -24,6 +24,7 @@ const datos = {
     titulo: e.titulo,
     notas: e.notas,
     siPreguntan: e.siPreguntan ?? [],
+    tecnico: e.tecnico ?? [],
     pasos: e.pasos,
     minutos: e.minutos,
     bloque: e.bloque,
@@ -73,6 +74,10 @@ const datos = {
         <p class="pr-kicker" data-kicker></p>
         <h2 data-titulo></h2>
         <p class="pr-meta"><span data-numero></span> · <span data-paso></span> · <span data-plan></span></p>
+        <section class="pr-tecnico" data-tecnico hidden>
+          <h3>Aspectos técnicos</h3>
+          <ul data-tecnico-lista></ul>
+        </section>
         <ol class="pr-notas" data-notas></ol>
         <section class="pr-preguntan" data-preguntan hidden>
           <h3>Si preguntan</h3>

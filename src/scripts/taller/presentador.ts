@@ -14,6 +14,7 @@ interface EscenaPr {
   titulo: string
   notas: string[]
   siPreguntan: { p: string; r: string }[]
+  tecnico: { termino?: string; texto: string }[]
   pasos: number
   minutos: number
   bloque: string
@@ -60,6 +61,19 @@ function montar(d: DatosPr) {
     $('[data-numero]').textContent = `Escena ${i + 1} de ${d.escenas.length}`
     $('[data-paso]').textContent = e.pasos ? `paso ${paso} de ${e.pasos}` : 'sin pasos'
     $('[data-plan]').textContent = `${e.minutos} min planeados`
+    $('[data-tecnico]').hidden = !e.tecnico.length
+    $('[data-tecnico-lista]').replaceChildren(
+      ...e.tecnico.map(({ termino, texto }) => {
+        const li = document.createElement('li')
+        if (termino) {
+          const b = document.createElement('b')
+          b.textContent = `${termino}:`
+          li.append(b, ' ')
+        }
+        li.append(texto)
+        return li
+      }),
+    )
     const notas = $('[data-notas]')
     notas.replaceChildren(
       ...e.notas.map((n, k) => {
