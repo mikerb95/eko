@@ -121,7 +121,7 @@
 .pr-campo { display: grid; gap: 6px; }
 .pr-area .pr-campo > span { font: 500 11.5px/1 var(--font-mono); letter-spacing: .08em; text-transform: uppercase; color: var(--pr-suave); }
 .pr-campo select {
-  appearance: none; width: 100%; min-width: 0; cursor: pointer;
+  appearance: none; width: 100%; min-width: 0; cursor: pointer; text-overflow: ellipsis; white-space: nowrap; overflow: hidden;
   font: 500 15px/1.2 var(--font-sans); color: var(--pr-tinta);
   padding: 12px 40px 12px 14px; border: 0; border-radius: 12px;
   background: var(--pr-hundido) no-repeat right 14px center / 12px 8px;
