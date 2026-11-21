@@ -3,12 +3,11 @@
 //
 // Convierte la encuesta de la capacitación en el argumento de la
 // automatización: cuánto tiempo se va hoy en propuestas y en tareas
-// repetitivas, y cuánto se recupera, con los datos del propio equipo. Se
+// repetitivas, con los datos del propio equipo. Se
 // imprime a PDF desde el navegador (Ctrl+P); la barra de supuestos no sale.
 //
-// El supuesto (cuánto reduce la automatización el tiempo de una propuesta) lo
-// pone quien prepara el informe. El informe habla solo en horas, nunca en costo
-// por hora del equipo.
+// Es un informe fijo: sin parámetros que cambiar, sin costo por hora ni
+// porcentajes supuestos. Solo las horas que declaró el equipo.
 export const prerender = false
 import { listarRespuestas } from '../../../lib/diagnostico/datos'
 import { resumir, SEMANAS_MES, type Fila } from '../../../lib/diagnostico/resumen'
@@ -33,7 +32,6 @@ const horasMesRep = Math.round(r.horasTotal * SEMANAS_MES)
 const fmt = (n: number) => n.toLocaleString('es-CO', { maximumFractionDigits: 1 })
 const hoy = new Date().toLocaleDateString('es-CO', { day: 'numeric', month: 'long', year: 'numeric', timeZone: 'America/Bogota' })
 const areasTexto = r.areas.filter((a) => a.n > 0).map((a) => a.etiqueta).join(', ')
-const datos = { horasMesProp: p.horasMes }
 ---
 
 <!doctype html>
@@ -51,9 +49,6 @@ const datos = { horasMesProp: p.horasMes }
     <!-- Barra de quien prepara el informe; no se imprime. -->
     <aside class="barra">
       <a href="/admin/diagnostico" class="volver">← Diagnóstico</a>
-      <label>La automatización reduce el tiempo de una propuesta en
-        <span class="campo"><input id="s-red" type="number" min="0" max="100" step="5" value="60" /><i>%</i></span>
-      </label>
       <button type="button" onclick="window.print()">Imprimir o guardar PDF</button>
     </aside>
 
@@ -112,8 +107,7 @@ const datos = { horasMesProp: p.horasMes }
                   <h3>Con la automatización</h3>
                   <p>
                     La propuesta sale del Brief de Zoho CRM como borrador completo el mismo día, y la persona revisa y ajusta en
-                    vez de armarla desde cero. Si eso reduce el tiempo de cada propuesta en un <b data-v="red"></b>, el equipo
-                    recupera <b data-v="horas-rec"></b> al mes.
+                    vez de armarla desde cero.
                   </p>
                 </div>
               </>
@@ -196,33 +190,11 @@ const datos = { horasMesProp: p.horasMes }
             <b>Cómo se calculó.</b> Cada persona respondió con rangos; se toma el punto medio de cada uno (por ejemplo, "entre 3 y
             6 horas" cuenta como 4,5). Un mes son {String(SEMANAS_MES).replace('.', ',')} semanas. Si alguien respondió dos veces,
             cuenta la última. Son cifras declaradas por el equipo, útiles para decidir, no una medición.
-            Reducción supuesta del tiempo por propuesta: <b data-v="red"></b>.
           </footer>
         </>
       )}
     </main>
 
-    <script is:inline define:vars={{ datos }}>
-      ;(() => {
-        const $ = (s) => document.querySelector(s)
-        const horas = (n) => `${n.toLocaleString('es-CO', { maximumFractionDigits: 0 })} horas`
-        const poner = (k, t) => document.querySelectorAll(`[data-v="${k}"]`).forEach((el) => (el.textContent = t))
-        const red = $('#s-red')
-
-        // El supuesto viaja en la URL para que el PDF y el enlace digan lo mismo.
-        const q = new URLSearchParams(location.search)
-        if (q.get('red')) red.value = q.get('red')
-
-        function calcular() {
-          const pr = Math.min(100, Math.max(0, Number(red.value) || 0))
-          poner('red', `${pr}%`)
-          poner('horas-rec', horas(datos.horasMesProp * (pr / 100)))
-          history.replaceState(null, '', location.pathname + (pr !== 60 ? `?red=${pr}` : ''))
-        }
-        red.addEventListener('input', calcular)
-        calcular()
-      })()
-    </script>
 
     <style>
       :root {
@@ -238,10 +210,6 @@ const datos = { horasMesProp: p.horasMes }
         position: sticky; top: 0; z-index: 2; display: flex; flex-wrap: wrap; align-items: end; gap: 14px 22px;
         padding: 14px 24px; background: #fff; border-bottom: 1px solid var(--line); font-size: 13px;
       }
-      .barra label { display: flex; flex-direction: column; gap: 5px; color: var(--ink-2); }
-      .campo { display: inline-flex; align-items: center; gap: 6px; border: 1px solid var(--line); border-radius: 8px; padding: 6px 10px; background: #fff; }
-      .campo i { font-style: normal; color: var(--mute); }
-      .campo input { border: 0; outline: 0; font: inherit; width: 120px; }
       .barra button {
         margin-left: auto; font: 500 13px var(--sans); color: #fff; background: var(--deep); border: 0;
         padding: 10px 16px; border-radius: 999px; cursor: pointer;
