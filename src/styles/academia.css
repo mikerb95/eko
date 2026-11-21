@@ -300,8 +300,10 @@
 @keyframes sl-latido { 50% { transform: scale(1.6); opacity: .5; } }
 @media (prefers-reduced-motion: reduce) { .sl-espera::before { animation: none; } }
 
-/* Registro de la sala (QR): nombres y apellidos lado a lado, correo y área debajo. */
+/* Registro de la sala (QR): primero el correo; si es nuevo, nombres y apellidos lado a lado y área debajo. */
 .sl-form { display: flex; flex-direction: column; gap: 14px; margin-top: 6px; }
+.sl-nuevo { display: flex; flex-direction: column; gap: 14px; }
+.sl-nuevo[hidden] { display: none; }
 .sl-par { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
 .sl-form label { display: flex; flex-direction: column; gap: 6px; min-width: 0; }
 .sl-form label > span { font: 500 11.5px/1 var(--font-mono); letter-spacing: .08em; text-transform: uppercase; color: var(--ink-2); }

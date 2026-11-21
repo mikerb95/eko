@@ -196,6 +196,21 @@ export async function registrarAsistente(t: Taller, hoy: string, r: RegistroSala
 }
 
 /**
+ * Datos con los que se registró este correo la última vez (en cualquier
+ * capacitación). La sala pide primero el correo: si ya existe, entra con estos
+ * datos sin volver a escribir nombre, apellido ni área.
+ */
+export async function registroPorCorreo(correo: string): Promise<Pick<RegistroSala, 'nombre' | 'apellido' | 'area'> | null> {
+  const c = await db()
+  const r = await c.execute({
+    sql: `SELECT nombre, apellido, area FROM ac_taller_asistentes WHERE correo = ? AND nombre != '' ORDER BY id DESC LIMIT 1`,
+    args: [correo],
+  })
+  const f = r.rows[0] as any
+  return f ? { nombre: str(f.nombre), apellido: str(f.apellido), area: str(f.area) } : null
+}
+
+/**
  * Reserva el envío del enlace de entrada: no más de uno por persona cada
  * SEGUNDOS_ENTRE_ENLACES (quien toca dos veces el botón no recibe dos correos
  * y el formulario público no sirve para llenar buzones ajenos). Devuelve

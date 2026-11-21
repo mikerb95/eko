@@ -7,8 +7,8 @@ import { hoyEnBogota } from '../../../lib/agente/diasHabiles'
 import { AREA_IDS, nombreModulo } from '../../../lib/academia/reglas'
 import { MAX_INSTRUCCION, MIN_INSTRUCCION, PRACTICAS_DIA, validarInstruccion } from '../../../lib/academia/practica'
 import { practicar, PracticaNoDisponible } from '../../../lib/academia/motorPractica'
-import { interaccionDe, interaccionPublica, PREGUNTAS_DIA, registroSala, validarPregunta, votoValido, MAX_PREGUNTA } from '../../../lib/talleres/reglas'
-import { avisoPublico, codigoPC, codigoVigente, MINUTOS_CODIGO_PC, guardarOpinion, guardarPracticaSala, guardarPregunta, marcarEnSala, misRespuestas, opinionDe, practicasSalaDeHoy, preguntasDeHoyDe, liberarEnlace, registrarAsistente, reservarEnlace, votar } from '../../../lib/talleres/datos'
+import { correoValido, interaccionDe, interaccionPublica, PREGUNTAS_DIA, registroSala, validarPregunta, votoValido, MAX_PREGUNTA } from '../../../lib/talleres/reglas'
+import { avisoPublico, codigoPC, codigoVigente, MINUTOS_CODIGO_PC, guardarOpinion, guardarPracticaSala, guardarPregunta, marcarEnSala, misRespuestas, opinionDe, practicasSalaDeHoy, preguntasDeHoyDe, liberarEnlace, registrarAsistente, registroPorCorreo, reservarEnlace, votar } from '../../../lib/talleres/datos'
 import { validarOpinion } from '../../../lib/talleres/opinion'
 import { salaActual } from '../../../lib/talleres/sala'
 import { anotar } from '../../../lib/bitacora'
@@ -17,7 +17,8 @@ import type { PasoGuiado } from '../../../lib/talleres/tipos'
 
 // La sala del celular (/academia/sala). Pública: se llega por el QR del
 // proyector y no pide usuario ni contraseña (excepción en src/middleware.ts).
-// La persona escribe nombre, apellido, correo y área y le llega al correo un
+// La persona escribe su correo (y, solo la primera vez, nombre, apellido y
+// área) y le llega al correo un
 // enlace de entrada (Resend, dominio codebymike.net). El enlace lleva un pase
 // firmado que /academia/sala guarda como cookie (eko_sala) y que solo sirve
 // para votar en la capacitación en curso, ese día. Al mismo correo llegará
@@ -29,7 +30,7 @@ import type { PasoGuiado } from '../../../lib/talleres/tipos'
 // puede enviarle una pregunta a quien dicta, que la ve en el presentador.
 //
 // GET           → capacitación en curso, si la persona ya está registrada, pregunta abierta, sus respuestas y si hay práctica
-// POST {accion} → registrar (envía el enlace al correo) | entrar | votar | practicar | preguntar | codigo_pc | opinion
+// POST {accion} → registrar (solo correo: si es nuevo responde {nuevo}; si no, envía el enlace) | entrar | votar | practicar | preguntar | codigo_pc | opinion
 //
 // Al llegar la presentación a su última escena, GET trae `opinion`
 // ('pendiente' o 'enviada') y el celular pasa al formulario de cierre de su
@@ -95,7 +96,18 @@ export const POST: APIRoute = async ({ request, cookies, url, clientAddress }) =
     if (!estado || !t) return json({ error: 'No hay una capacitación en curso. Intente de nuevo cuando empiece la sesión.' }, 409)
 
     if (b?.accion === 'registrar') {
-      const r = registroSala(b, AREA_IDS)
+      // Primero llega solo el correo. Si ya se registró antes, entra con sus
+      // datos de esa vez; si no, el celular pide nombre, apellido y área (una
+      // sola vez) y los manda junto con el correo.
+      const correo = correoValido(b?.correo)
+      if (!correo) return json({ error: 'Escriba un correo válido.' }, 400)
+      let datos = b
+      if (!b?.nombre && !b?.apellido) {
+        const previo = await registroPorCorreo(correo)
+        if (!previo || 'error' in registroSala({ ...previo, correo }, AREA_IDS)) return json({ nuevo: true })
+        datos = { ...previo, correo }
+      }
+      const r = registroSala(datos, AREA_IDS)
       if ('error' in r) return json(r, 400)
       const hoy = hoyEnBogota()
       const { asistente: a, marcados } = await registrarAsistente(t, hoy, r)

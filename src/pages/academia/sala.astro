@@ -1,9 +1,10 @@
 ---
 // La sala: lo que cada participante abre en el celular durante una
 // capacitación presencial (se llega por el código QR del proyector). Es
-// pública: la primera vez pide nombres, apellidos, correo y área (sin usuario
-// ni contraseña) y le envía al correo el enlace de entrada. Al abrirlo
-// (?e=<pase>) queda registrada su asistencia y entra. Después muestra la pregunta
+// pública: pide el correo (sin usuario ni contraseña); si es la primera vez
+// con ese correo pide también nombres, apellidos y área, y le envía al correo
+// el enlace de entrada. Al abrirlo (?e=<pase>) queda registrada su asistencia
+// y entra. Después muestra la pregunta
 // abierta en cada momento y guarda sus respuestas. Cuando no hay nada que
 // votar, muestra la idea de la escena en palabras sencillas y un ejemplo de su
 // área. Abajo, una caja para enviarle preguntas a quien dicta.
@@ -105,33 +106,36 @@ const maquetas = [
       <h1>Antes de empezar, ¿quién es usted?</h1>
       <p class="sl-sub">
         {estado
-          ? 'Escriba sus datos y le enviamos a su correo el enlace para entrar. No necesita usuario ni contraseña.'
-          : 'La sesión todavía no ha empezado. Puede llenar sus datos cuando quien dicta abra la presentación.'}
+          ? 'Escriba su correo y le enviamos el enlace para entrar. No necesita usuario ni contraseña.'
+          : 'La sesión todavía no ha empezado. Puede escribir su correo cuando quien dicta abra la presentación.'}
       </p>
-      {enlaceVencido && <p class="sl-estado error" role="alert">Ese enlace ya no sirve: es de otro día o de otra capacitación. Llene sus datos y le enviamos uno nuevo.</p>}
+      {enlaceVencido && <p class="sl-estado error" role="alert">Ese enlace ya no sirve: es de otro día o de otra capacitación. Escriba su correo y le enviamos uno nuevo.</p>}
       <form class="sl-form" data-sl-registro novalidate>
-        <div class="sl-par">
-          <label>
-            <span>Nombres</span>
-            <input name="nombre" required maxlength="60" autocomplete="given-name" autocapitalize="words" spellcheck="false" data-capitalizar />
-          </label>
-          <label>
-            <span>Apellidos</span>
-            <input name="apellido" required maxlength="60" autocomplete="family-name" autocapitalize="words" spellcheck="false" data-capitalizar />
-          </label>
-        </div>
         <label>
           <span>Correo</span>
           <input name="correo" type="email" required maxlength="120" autocomplete="email" inputmode="email" autocapitalize="off" spellcheck="false" />
         </label>
-        <label>
-          <span>Área</span>
-          <select name="area" required>
-            <option value="" selected disabled>Elija su área</option>
-            {AREAS_ACADEMIA.map((a) => <option value={a.id}>{a.etiqueta}</option>)}
-          </select>
-        </label>
-        <button type="submit" class="ac-btn">Enviarme el enlace</button>
+        <div class="sl-nuevo" data-sl-nuevo hidden>
+          <p class="sl-nota">Es la primera vez que entra con este correo. Díganos quién es (solo se lo pedimos esta vez).</p>
+          <div class="sl-par">
+            <label>
+              <span>Nombres</span>
+              <input name="nombre" required disabled maxlength="60" autocomplete="given-name" autocapitalize="words" spellcheck="false" data-capitalizar />
+            </label>
+            <label>
+              <span>Apellidos</span>
+              <input name="apellido" required disabled maxlength="60" autocomplete="family-name" autocapitalize="words" spellcheck="false" data-capitalizar />
+            </label>
+          </div>
+          <label>
+            <span>Área</span>
+            <select name="area" required disabled>
+              <option value="" selected disabled>Elija su área</option>
+              {AREAS_ACADEMIA.map((a) => <option value={a.id}>{a.etiqueta}</option>)}
+            </select>
+          </label>
+        </div>
+        <button type="submit" class="ac-btn">Continuar</button>
         <p class="sl-estado" data-sl-estado role="status"></p>
         <p class="sl-nota">A este correo le llegará también el material de la capacitación: guías, plantillas y recursos visuales.</p>
       </form>
