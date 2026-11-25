@@ -12,6 +12,9 @@
  *   últimos dígitos del NIT. Solo se siembra el año que esté en EXOGENA.
  * - **Seguridad social (PILA).** Decreto 1990 de 2016: día hábil del mes según
  *   los dos últimos dígitos del NIT del aportante.
+ * - **RUB (beneficiarios finales).** Actualización trimestral: en 2026 la DIAN
+ *   fijó el primer día hábil de febrero, mayo, agosto y noviembre. Los años sin
+ *   calendario publicado se estiman igual.
  * - **Hacienda Bogotá (ICA y reteICA).** Las fija cada año la Secretaría
  *   Distrital de Hacienda con fechas fijas, no por dígito. Van en tablas por
  *   año y quedan marcadas "por verificar" hasta confirmarlas con la resolución.
@@ -34,6 +37,8 @@ export interface Responsabilidades {
   pila: boolean
   ica: 'bimestral' | 'anual' | 'no'
   reteica: boolean
+  /** Informante de beneficiarios finales (casilla 53, código 55 del RUT). */
+  rub: boolean
 }
 
 export interface ObligacionSembrada {
@@ -48,7 +53,7 @@ export interface ObligacionSembrada {
   fuente: string
 }
 
-export const TIPOS = ['retefuente', 'iva', 'renta', 'activos_exterior', 'exogena', 'pila', 'ica', 'reteica', 'requerimiento', 'otra'] as const
+export const TIPOS = ['retefuente', 'iva', 'renta', 'activos_exterior', 'exogena', 'pila', 'ica', 'reteica', 'rub', 'requerimiento', 'otra'] as const
 export type TipoObligacion = (typeof TIPOS)[number]
 
 export const TIPO_TEXTO: Record<TipoObligacion, string> = {
@@ -60,6 +65,7 @@ export const TIPO_TEXTO: Record<TipoObligacion, string> = {
   pila: 'Seguridad social (PILA)',
   ica: 'ICA Bogotá',
   reteica: 'ReteICA Bogotá',
+  rub: 'Beneficiarios finales (RUB)',
   requerimiento: 'Requerimiento',
   otra: 'Otra obligación',
 }
@@ -182,6 +188,9 @@ const EXOGENA: Record<number, readonly { desde: number; hasta: number; vence: st
     { desde: 11, hasta: 15, vence: '2026-05-19' },
   ],
 }
+
+/** Fechas de actualización del RUB publicadas en el calendario oficial. */
+const RUB_OFICIAL: readonly string[] = ['2026-02-02', '2026-05-04', '2026-08-03', '2026-11-03']
 
 /** ICA Bogotá, régimen común bimestral: [año del periodo, bimestre, vence]. */
 const ICA_BIMESTRAL: readonly [number, number, string][] = [
@@ -340,6 +349,23 @@ export function obligacionesDelAnio(r: Responsabilidades, anio: number): Obligac
         vence: nesimoHabil(anio, mes, dia),
         con_pago: true,
         fuente: FUENTE_PILA,
+      })
+    }
+  }
+
+  if (r.rub) {
+    for (const mes of [2, 5, 8, 11]) {
+      const vence = nesimoHabil(anio, mes, 1)
+      out.push({
+        clave: `rub:${anio}-${dos(mes)}`,
+        tipo: 'rub',
+        concepto: 'Beneficiarios finales (RUB): actualizar si hubo cambios en el trimestre',
+        entidad: 'DIAN',
+        periodo: `Trimestre que cierra en ${MESES[mes - 2]} ${anio}`,
+        formulario: 'RUB',
+        vence,
+        con_pago: false,
+        fuente: RUB_OFICIAL.includes(vence) ? FUENTE_DIAN : FUENTE_DIAN_ESTIMADA,
       })
     }
   }

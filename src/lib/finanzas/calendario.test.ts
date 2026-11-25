@@ -92,6 +92,7 @@ const EKOSOLV: Responsabilidades = {
   pila: true,
   ica: 'bimestral',
   reteica: false,
+  rub: true,
 }
 
 test('siembra 2026 de Ekosolv con las fechas del dígito 6', () => {
@@ -114,6 +115,14 @@ test('siembra 2026 de Ekosolv con las fechas del dígito 6', () => {
   // Ordenadas por fecha y sin claves repetidas.
   assert.deepEqual([...obs].sort((a, b) => a.vence.localeCompare(b.vence)).map((o) => o.vence), obs.map((o) => o.vence))
   assert.equal(new Set(obs.map((o) => o.clave)).size, obs.length)
+})
+
+test('RUB: primer día hábil de febrero, mayo, agosto y noviembre (tabla oficial 2026)', () => {
+  const rub = obligacionesDelAnio(EKOSOLV, 2026).filter((o) => o.tipo === 'rub')
+  assert.deepEqual(rub.map((o) => o.vence), ['2026-02-02', '2026-05-04', '2026-08-03', '2026-11-03'])
+  assert.ok(rub.every((o) => !o.con_pago && o.fuente === 'Calendario oficial de la DIAN'))
+  assert.match(obligacionesDelAnio(EKOSOLV, 2027).find((o) => o.tipo === 'rub')!.fuente, /^Estimada/)
+  assert.equal(obligacionesDelAnio({ ...EKOSOLV, rub: false }, 2026).some((o) => o.tipo === 'rub'), false)
 })
 
 test('2027: la DIAN se calcula; exógena e ICA posteriores a febrero quedan como faltantes', () => {

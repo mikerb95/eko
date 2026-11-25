@@ -476,6 +476,7 @@ function renderAjustes() {
       ${ck('activosExterior', 'Declara activos en el exterior')}
       ${ck('exogena', 'Reporta información exógena')}
       ${ck('pila', 'Paga seguridad social de empleados (PILA)')}
+      ${ck('rub', 'Informante de beneficiarios finales (RUB)')}
       ${ck('reteica', 'Agente de retención de ICA en Bogotá')}
     </div>
     <div class="grid2">
@@ -515,7 +516,7 @@ $('#config-form').addEventListener('submit', (e) => {
   e.preventDefault()
   const f = e.currentTarget
   const config = { nit: f.nit.value, dv: f.dv.value, iva: f.iva.value, ica: f.ica.value, topeIaUsd: Number(f.topeIaUsd.value) }
-  for (const k of ['retencion', 'renta', 'granContribuyente', 'activosExterior', 'exogena', 'pila', 'reteica', 'confirmado']) config[k] = f[k].checked
+  for (const k of ['retencion', 'renta', 'granContribuyente', 'activosExterior', 'exogena', 'pila', 'reteica', 'rub', 'confirmado']) config[k] = f[k].checked
   conBoton(f.querySelector('[type=submit]'), $('#config-err'), async () => { await enviar('guardar_config', { config }); avisoOk('Ajustes guardados') })
 })
 $('#sembrar-form').addEventListener('submit', (e) => {

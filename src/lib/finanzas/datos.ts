@@ -20,7 +20,14 @@ export interface Config extends Responsabilidades {
   confirmado: boolean
 }
 
-/** Valores de arranque: NIT real de Ekosolv, responsabilidades por confirmar con el RUT. */
+/**
+ * Valores de arranque, tomados del RUT de Ekosolv (actualización del
+ * 2026-07-16, casilla 53: 05, 07, 09, 10, 14, 42, 48, 52, 55) y de lo que
+ * confirmó Mike el 2026-11-25: no es gran contribuyente, ICA bimestral solo en
+ * Bogotá. El RUT no dice si el IVA es bimestral o cuatrimestral (depende de
+ * los ingresos del año anterior): queda bimestral, que avisa más seguido, y
+ * `confirmado` en false hasta saberlo.
+ */
 export const CONFIG_INICIAL: Config = {
   nit: '900659506',
   dv: '9',
@@ -33,6 +40,7 @@ export const CONFIG_INICIAL: Config = {
   pila: true,
   ica: 'bimestral',
   reteica: false,
+  rub: true,
   topeIaUsd: 10,
   confirmado: false,
 }
@@ -64,7 +72,7 @@ export async function guardarConfig(c: Partial<Config>): Promise<Config> {
     if (!/^\d$/.test(String(c.dv))) throw new UserError('El dígito de verificación es un solo número.')
     limpio.dv = String(c.dv)
   }
-  for (const k of ['retencion', 'renta', 'granContribuyente', 'activosExterior', 'exogena', 'pila', 'reteica', 'confirmado'] as const) {
+  for (const k of ['retencion', 'renta', 'granContribuyente', 'activosExterior', 'exogena', 'pila', 'reteica', 'rub', 'confirmado'] as const) {
     if (c[k] !== undefined) limpio[k] = !!c[k]
   }
   if (c.iva !== undefined) {
