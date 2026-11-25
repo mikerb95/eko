@@ -12,6 +12,9 @@ import { avisoPublico, codigoPC, codigoVigente, MINUTOS_CODIGO_PC, guardarOpinio
 import { validarOpinion } from '../../../lib/talleres/opinion'
 import { ACLARACION_HERRAMIENTAS, herramientasDe } from '../../../lib/talleres/herramientas'
 import { salaActual } from '../../../lib/talleres/sala'
+import { avanceDe, filaDeHoy, guardarAvance } from '../../../lib/talleres/datos'
+import { avisoTurno, miTurno, validarCaso } from '../../../lib/talleres/turnos'
+import { MINUTOS_TURNO, rutaSkill, SKILL_AREA } from '../../../lib/talleres/retos2'
 import { anotar } from '../../../lib/bitacora'
 import { clientIp } from '../../../lib/rateLimit'
 import type { PasoGuiado } from '../../../lib/talleres/tipos'
@@ -31,7 +34,12 @@ import type { PasoGuiado } from '../../../lib/talleres/tipos'
 // puede enviarle una pregunta a quien dicta, que la ve en el presentador.
 //
 // GET           → capacitación en curso, si la persona ya está registrada, pregunta abierta, sus respuestas y si hay práctica
-// POST {accion} → registrar (solo correo: si es nuevo responde {nuevo}; si no, envía el enlace) | entrar | votar | practicar | preguntar | codigo_pc | opinion
+// POST {accion} → registrar (solo correo: si es nuevo responde {nuevo}; si no, envía el enlace) | entrar | votar | practicar | preguntar | codigo_pc | opinion | reto | caso
+//
+// Capacitación 2: en las escenas de la práctica (consigna, retos) GET trae
+// `retos` (pasos y petición de su área, skill para descargar, los que ya hizo
+// y su caso), y en toda la sesión `turno` (su lugar en la fila de
+// acompañamiento y el aviso "Le sigue a usted").
 //
 // Al llegar la presentación a su última escena, GET trae `opinion`
 // ('pendiente' o 'enviada') y el celular pasa al formulario de cierre de su
@@ -49,6 +57,11 @@ export const GET: APIRoute = async ({ cookies }) => {
     if (!asistente) return json({ enCurso: true, registrado: false, taller: t.n, titulo: t.titulo })
     const i = estado.interaccion ? interaccionDe(t, estado.interaccion) : null
     const escena = t.escenas.find((x) => x.id === estado.escena)
+    const hoy = hoyEnBogota()
+    const conRetos = !!t.retos?.length && (escena?.tipo === 'consigna' || escena?.tipo === 'retos')
+    const avance = conRetos ? await avanceDe(t.n, hoy, asistente.id) : null
+    const fila = t.retos?.length ? await filaDeHoy(t.n, hoy) : []
+    const turno = miTurno(fila, asistente.id, MINUTOS_TURNO)
     return json({
       enCurso: true,
       registrado: true,
@@ -83,6 +96,17 @@ export const GET: APIRoute = async ({ cookies }) => {
       mias: i ? await misRespuestas(t.n, i.id, asistente.id) : {},
       // Código para el PC que sigue vigente (si ya se usó, el celular lo quita).
       codigoPC: await codigoVigente(t.n, asistente.id),
+      // Práctica con casos reales (capacitación 2).
+      retos:
+        conRetos && avance
+          ? {
+              items: t.retos!.map((r) => ({ id: r.id, concepto: r.concepto, titulo: r.titulo, meta: r.meta, pasos: r.pasos, peticion: r.peticion[asistente.area] ?? '', planB: r.planB ?? '' })),
+              hechos: avance.retos,
+              caso: avance.caso,
+              skill: SKILL_AREA[asistente.area] ? { ...SKILL_AREA[asistente.area]!, url: rutaSkill(asistente.area) } : null,
+            }
+          : null,
+      turno: turno ? { ...turno, aviso: avisoTurno(turno) } : null,
       // Última escena: el celular pasa al formulario de cierre (si no lo ha enviado).
       opinion: estado.escena === t.escenas.at(-1)?.id ? ((await opinionDe(asistente.id)) ? 'enviada' : 'pendiente') : null,
     })
@@ -168,6 +192,23 @@ export const POST: APIRoute = async ({ request, cookies, url, clientAddress }) =
       if ((await preguntasDeHoyDe(asistente.id, hoy)) >= PREGUNTAS_DIA) return json({ error: `Ya envió ${PREGUNTAS_DIA} preguntas hoy. Hágala en voz alta.` }, 429)
       await guardarPregunta(t.n, hoy, asistente.id, estado.escena, texto)
       return json({ ok: true })
+    }
+
+    // Práctica con casos reales: marcar un reto o escribir el caso que trajo.
+    if (b?.accion === 'reto') {
+      const reto = t.retos?.find((r) => r.id === b.reto)
+      if (!reto) return json({ error: 'Ese reto no existe' }, 400)
+      const r = await guardarAvance(t.n, hoyEnBogota(), asistente.id, { reto: reto.id, hecho: b.hecho !== false })
+      await anotar('reto', { quien: `asistente:${asistente.id}`, taller: t.n, detalle: { reto: reto.id, hecho: b.hecho !== false } })
+      return json({ ok: true, hechos: r.retos })
+    }
+
+    if (b?.accion === 'caso') {
+      if (!t.retos?.length) return json({ error: 'Esta capacitación no tiene práctica con casos.' }, 400)
+      const caso = validarCaso(b.texto)
+      if (!caso) return json({ error: 'Escriba su caso en una línea (hasta 200 caracteres).' }, 400)
+      const r = await guardarAvance(t.n, hoyEnBogota(), asistente.id, { caso })
+      return json({ ok: true, caso: r.caso })
     }
 
     if (b?.accion === 'opinion') {
