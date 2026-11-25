@@ -8,7 +8,7 @@
 |---|---|
 | Alcance | Cuatro módulos de una vez: ficha, documentos y vencimientos, vacaciones y novedades, capacitación y desempeño. |
 | Quién la usa | Solo admin (RR.HH.). Ni jefes de área ni autoservicio. |
-| Quiénes son los empleados | Las mismas cuentas de `users`. La ficha cuelga de `users.id`. |
+| Quiénes son los empleados | Las cuentas de `users` (la ficha cuelga de `users.id`) y, desde el 2026-11-25, empleados sin cuenta del panel creados con "Agregar empleado": viven solo en `th_empleados`, con `nombre` propio y `usuario_id` negativo para no chocar con `users.id`. |
 | Datos sensibles | Salario opcional. Nada de salud: de exámenes e incapacidades solo fechas y enlace al soporte. |
 | Archivos | Solo enlaces (Drive, WorkDrive). El panel no guarda archivos de RR.HH. |
 | Alertas | Tablero + correo semanal + herramienta del asistente IA (solo consulta). |
@@ -39,6 +39,7 @@
 - Middleware bloquea `/api/admin/talento` a no admin también en GET, y el endpoint lo vuelve a revisar.
 - Enlaces solo `http(s)` (se pintan como `<a href>`).
 - Una cuenta con ficha no se puede borrar: se desactiva.
+- Un empleado sin cuenta solo se borra si no tiene historial (documentos, novedades, formación ni evaluaciones); si tiene, se le pone fecha de retiro.
 - Ni el correo ni el asistente reciben salario, documento, contactos, seguridad social ni motivos de incapacidades.
 
 ## Pendientes
@@ -46,4 +47,5 @@
 - Activar correo: `RESEND_API_KEY`, `NOTIFY_FROM` (dominio verificado), `TALENTO_EMAIL` y `CRON_SECRET` en Vercel.
 - Validar con Ekosolv si trabajan sábados y cada cuánto evalúan, y cargar sus cargos reales con criterios.
 - Cargar el ajuste de vacaciones ya disfrutadas de cada persona antigua para que el saldo arranque bien.
+- Si un empleado sin cuenta llega a necesitar entrar al panel, hoy no se puede convertir: habría que agregar "vincular a una cuenta" (mover sus registros del id negativo al de `users`).
 - Posibles fases siguientes: que el asistente proponga novedades con aprobación, exportar a Excel, registro de quién consulta salarios.

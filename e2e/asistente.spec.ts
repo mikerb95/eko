@@ -21,7 +21,7 @@ test('preguntar: ve los pasos y la respuesta', async ({ page }) => {
   await expect(page).toHaveURL(/[?&]c=/)
 
   // Con conversación, la caja baja debajo del hilo para contestar ahí mismo.
-  await expect(page.locator('.asis-atajos')).toBeHidden()
+  await expect(page.locator('#asis-sugerencia')).toBeHidden()
   const respuesta = await page.locator('.asis-respuesta').last().boundingBox()
   const caja = await page.locator('#asis-form').boundingBox()
   expect(caja!.y).toBeGreaterThan(respuesta!.y + respuesta!.height)

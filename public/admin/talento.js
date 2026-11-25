@@ -16,7 +16,7 @@ const opciones = (lista, actual, vacio) =>
   (vacio !== undefined ? `<option value="">${esc(vacio)}</option>` : '') +
   lista.map((o) => `<option value="${esc(o.id)}"${String(o.id) === String(actual ?? '') ? ' selected' : ''}>${esc(o.etiqueta ?? o.nombre)}</option>`).join('')
 const persona = (id) => E.personas.find((p) => p.usuario_id === Number(id))
-const nombreDe = (id) => persona(id)?.nombre || 'Persona sin cuenta'
+const nombreDe = (id) => persona(id)?.nombre || 'Persona'
 const cargoDe = (id) => E.cargos.find((c) => c.id === Number(id))
 const num = (n) => (Number(n) || 0).toLocaleString('es-CO', { maximumFractionDigits: 2 })
 const dia = 864e5
@@ -205,16 +205,17 @@ const listaEquipo = crearLista({
   el: '#equipo-list', buscador: '#equipo-q', chipsEl: '#equipo-chips',
   datos: () => E.personas,
   texto: (p) => [p.nombre, p.username, cargoDe(p.ficha?.cargo_id)?.nombre, et(C.areas, p.ficha?.area), p.ficha?.jefe].join(' '),
-  vacio: ['Todavía no hay cuentas', 'Cree los usuarios del equipo en la sección Usuarios.'],
+  vacio: ['Todavía no hay nadie', 'Agregue empleados con el botón de arriba o cree sus usuarios en la sección Usuarios.'],
   chips: [
     { id: 'activos', lbl: 'Activas', f: activo },
     { id: 'sin_ficha', lbl: 'Sin ficha', f: (p) => !p.ficha && p.cuentaActiva, siHay: true },
+    { id: 'sin_cuenta', lbl: 'Sin cuenta', f: (p) => p.sinCuenta, siHay: true },
     { id: 'retirados', lbl: 'Retiradas', f: (p) => situacion(p) === 'retirado', siHay: true },
     { id: 'todos', lbl: 'Todas', f: () => true },
   ],
   columnas: [
     { k: 'nombre', lbl: 'Persona', orden: (p) => p.nombre.toLowerCase(),
-      html: (p) => `<div class="persona">${avatar(p.nombre, 'sm')}<div><div class="t1">${esc(p.nombre)}</div><div class="t2">${esc(cargoDe(p.ficha?.cargo_id)?.nombre || (p.ficha ? 'Sin cargo' : p.username))}</div></div></div>` },
+      html: (p) => `<div class="persona">${avatar(p.nombre, 'sm')}<div><div class="t1">${esc(p.nombre)}${p.sinCuenta ? ' <span class="pill" title="No entra al panel">Sin cuenta</span>' : ''}</div><div class="t2">${esc(cargoDe(p.ficha?.cargo_id)?.nombre || (p.ficha ? 'Sin cargo' : p.username))}</div></div></div>` },
     { k: 'area', lbl: 'Área', orden: (p) => et(C.areas, p.ficha?.area || 'zzz'), html: (p) => (p.ficha?.area ? esc(et(C.areas, p.ficha.area)) : '<span class="muted">Sin área</span>') },
     { k: 'contrato', lbl: 'Contrato', orden: (p) => p.ficha?.fecha_ingreso || '9999',
       html: (p) => (p.ficha?.tipo_contrato ? `<div class="nw">${esc(et(C.contratos, p.ficha.tipo_contrato))}</div>` : '<span class="muted">Sin definir</span>') + (p.ficha?.fecha_ingreso ? `<div class="t2">${esc(antiguedad(p.ficha.fecha_ingreso) || `Ingresa el ${fmtDate(p.ficha.fecha_ingreso)}`)}</div>` : '') },
@@ -312,15 +313,26 @@ let pestanaPersona = 'ficha'
 
 function abrirPersona(id, pestana = 'ficha') {
   const p = persona(id)
-  if (!p) return avisoError(new Error('Esa persona ya no tiene cuenta en el panel.'))
+  if (!p) return avisoError(new Error('Esa persona ya no está en el panel.'))
   personaAbierta = p.usuario_id
   llenarFicha(p)
   verPestana(pestana)
   abrir(perDrawer)
 }
+/** Empleado nuevo sin cuenta: solo la ficha hasta guardarlo. */
+function nuevoEmpleado() {
+  personaAbierta = null
+  llenarFicha({ usuario_id: '', nombre: '', sinCuenta: true, ficha: null })
+  $('#persona-titulo').textContent = 'Nuevo empleado'
+  $('#persona-sub').textContent = 'Sin cuenta del panel'
+  verPestana('ficha')
+  abrir(perDrawer)
+  fichaForm.elements.nombre.focus()
+}
+$('#nuevo-empleado').addEventListener('click', nuevoEmpleado)
 function cabeceraPersona(p) {
   $('#persona-titulo').textContent = p.nombre
-  const partes = [cargoDe(p.ficha?.cargo_id)?.nombre, p.ficha?.area && et(C.areas, p.ficha.area), SITUACION[situacion(p)][1]].filter(Boolean)
+  const partes = [cargoDe(p.ficha?.cargo_id)?.nombre, p.ficha?.area && et(C.areas, p.ficha.area), SITUACION[situacion(p)][1], p.sinCuenta && 'Sin cuenta del panel'].filter(Boolean)
   $('#persona-sub').textContent = partes.join(' · ')
 }
 function llenarFicha(p) {
@@ -330,6 +342,13 @@ function llenarFicha(p) {
   const f = p.ficha || {}
   const el = fichaForm.elements
   el.usuario_id.value = p.usuario_id
+  // El nombre solo se edita aquí en empleados sin cuenta; el de las cuentas sale de Usuarios.
+  $('#ficha-nombre').hidden = !p.sinCuenta
+  el.nombre.required = !!p.sinCuenta
+  el.nombre.value = p.sinCuenta ? p.nombre : ''
+  $('#empleado-borrar').hidden = !p.sinCuenta || !p.usuario_id
+  // Sin guardar todavía no hay a quién colgarle documentos ni novedades.
+  $$('#persona-tabs .subtab').forEach((b) => { b.disabled = !p.usuario_id && b.dataset.ptab !== 'ficha' })
   el.cargo_id.innerHTML = opciones(E.cargos.map((c) => ({ id: c.id, etiqueta: c.nombre })), f.cargo_id, 'Sin cargo')
   el.area.innerHTML = opciones(C.areas, f.area, 'Sin área')
   el.tipo_contrato.innerHTML = opciones(C.contratos, f.tipo_contrato, 'Sin definir')
@@ -347,12 +366,22 @@ fichaForm.addEventListener('submit', (ev) => {
   datos.vacaciones_ajuste = String(datos.vacaciones_ajuste || '0').replace(',', '.')
   const btn = fichaForm.querySelector('[type=submit]')
   conBoton(btn, $('#ficha-err'), async () => {
-    await enviar('guardar_ficha', datos)
+    const r = await enviar('guardar_ficha', datos)
+    if (!datos.usuario_id && r.resultado) {
+      // Recién creado: la ficha queda abierta y ya se pueden usar las otras pestañas.
+      const p = persona(r.resultado)
+      if (p) { personaAbierta = p.usuario_id; llenarFicha(p) }
+    }
     const t = btn.querySelector('.t')
     t.textContent = 'Guardada'
     setTimeout(() => { t.textContent = 'Guardar ficha' }, 1500)
   })
 })
+
+$('#empleado-borrar').addEventListener('click', (e) => confirmarClic(e.currentTarget, () => conBoton(e.currentTarget, $('#ficha-err'), async () => {
+  await enviar('eliminar_empleado', { usuario_id: personaAbierta })
+  cerrar(perDrawer)
+})))
 
 $('#persona-tabs').addEventListener('click', (e) => { const b = e.target.closest('[data-ptab]'); if (b) verPestana(b.dataset.ptab) })
 function verPestana(tab) {

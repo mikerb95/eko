@@ -2,53 +2,117 @@
    Usa los tokens de admin.css. Las tarjetas se distinguen con sombra y un
    punto de color junto al rótulo, nunca con una franja en el borde. */
 
+/* ---------- Tarjeta del asistente ----------
+   Es la pieza principal del inicio: tinte suave de marca en dos esquinas,
+   saludo a la izquierda y las conversaciones recientes en una columna al
+   lado. Sin overflow: hidden, para que la caja pegajosa del chat funcione. */
 .asis {
-  max-width: 760px;
-  margin: 40px auto 28px;
-  padding: 0 20px;
+  position: relative;
+  margin: 0 0 30px;
+  padding: 28px 32px 26px;
+  background:
+    radial-gradient(80% 120% at 0% 0%, color-mix(in oklab, var(--deep) 9%, transparent), transparent 62%),
+    radial-gradient(55% 90% at 100% 100%, color-mix(in oklab, var(--forest) 7%, transparent), transparent 65%),
+    var(--paper);
+  border: 1px solid var(--line);
+  border-radius: 20px;
+  box-shadow: var(--shadow-2);
 }
-.asis-saludo {
-  font-size: 24px;
+.asis.con-recientes { display: grid; grid-template-columns: minmax(0, 1fr) 300px; gap: 32px; align-items: start; }
+.asis-principal { min-width: 0; }
+
+.asis-kicker {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin: 0;
+  font-size: 12.5px;
   font-weight: 600;
-  letter-spacing: -0.01em;
-  margin: 0 0 16px;
-  text-align: center;
+  color: var(--ink);
 }
+.asis-kicker-rol { font-weight: 400; color: var(--mute); }
+.asis-kicker-rol::before { content: "·"; margin-right: 8px; }
+.asis-estado { width: 8px; height: 8px; border-radius: 50%; background: var(--mute); flex: none; }
+.asis-estado.is-activo {
+  background: var(--forest);
+  box-shadow: 0 0 0 0 color-mix(in oklab, var(--forest) 45%, transparent);
+  animation: asis-latido 2.4s ease-out infinite;
+}
+@keyframes asis-latido { 70%, 100% { box-shadow: 0 0 0 7px transparent; } }
+
+.asis-saludo {
+  margin: 10px 0 22px;
+  font-size: 28px;
+  font-weight: 600;
+  line-height: 1.2;
+  letter-spacing: -0.02em;
+}
+.asis-saludo span { color: var(--deep-2); }
 
 /* ---------- Caja ---------- */
 .asis-caja {
   position: relative;
   display: flex;
   align-items: flex-end;
-  gap: 8px;
+  gap: 10px;
   background: var(--paper);
-  border: 1px solid var(--line);
+  border: 1px solid color-mix(in oklab, var(--deep) 18%, var(--line));
   border-radius: 18px;
-  padding: 10px 10px 10px 18px;
-  box-shadow: 0 6px 24px rgba(16, 40, 36, 0.06);
+  padding: 11px 11px 11px 20px;
+  box-shadow: 0 1px 2px rgba(16, 40, 36, 0.04), 0 10px 30px rgba(16, 40, 36, 0.07);
   transition: border-color 0.15s, box-shadow 0.15s;
 }
 .asis-caja:focus-within {
   border-color: var(--deep);
-  box-shadow: 0 0 0 4px color-mix(in oklab, var(--deep) 12%, transparent), 0 6px 24px rgba(16, 40, 36, 0.06);
+  box-shadow: 0 0 0 4px color-mix(in oklab, var(--deep) 12%, transparent), 0 10px 30px rgba(16, 40, 36, 0.07);
 }
+.asis-campo { position: relative; flex: 1; min-width: 0; display: flex; }
 .asis-caja textarea {
+  width: 100%;
   border: 0;
   box-shadow: none;
   padding: 8px 0;
   resize: none;
-  font-size: 15px;
+  font: inherit;
+  font-size: 16px;
   line-height: 1.5;
   min-height: 24px;
   max-height: 200px;
   background: transparent;
 }
-.asis-caja textarea:focus { box-shadow: none; }
+.asis-caja textarea:focus { box-shadow: none; outline: none; }
+
+/* Ejemplo que se escribe solo (asistente.js). Va encima del textarea con su
+   mismo relleno y letra, para que el texto caiga donde caería lo escrito. */
+.asis-sugerencia {
+  position: absolute;
+  inset: 0;
+  padding: 8px 0;
+  font-size: 16px;
+  line-height: 1.5;
+  color: var(--mute);
+  white-space: nowrap;
+  overflow: hidden;
+  pointer-events: none;
+}
+.asis-cursor {
+  display: inline-block;
+  width: 2px;
+  height: 1.2em;
+  margin-left: 2px;
+  vertical-align: -0.22em;
+  border-radius: 1px;
+  background: var(--deep);
+  animation: asis-cursor 1.05s steps(1) infinite;
+}
+.asis-sugerencia.is-escribiendo .asis-cursor { animation: none; }
+@keyframes asis-cursor { 50% { opacity: 0; } }
+
 .asis-enviar {
   flex: none;
-  width: 38px;
-  height: 38px;
-  border-radius: 50%;
+  width: 40px;
+  height: 40px;
+  border-radius: 12px;
   border: 0;
   display: grid;
   place-items: center;
@@ -62,10 +126,9 @@
 .asis-caja.is-ocupado .asis-enviar { opacity: 0.5; pointer-events: none; }
 
 .asis-nota {
-  margin: 10px 4px 0;
+  margin: 10px 2px 0;
   font-size: 12.5px;
   color: var(--mute);
-  text-align: center;
 }
 
 /* ---------- Resultados del buscador ---------- */
@@ -101,40 +164,18 @@
 }
 .asis-res-pie { margin: 4px 10px 2px; font-size: 12px; color: var(--mute); }
 
-/* ---------- Atajos ---------- */
-.asis-atajos {
-  display: flex;
-  flex-wrap: wrap;
-  justify-content: center;
-  gap: 8px;
-  margin-top: 14px;
-}
-.asis-atajo {
-  font: inherit;
-  font-size: 13px;
-  color: var(--ink-2);
-  background: var(--paper);
-  border: 1px solid var(--line);
-  border-radius: 999px;
-  padding: 7px 14px;
-  cursor: pointer;
-  transition: background 0.15s, color 0.15s;
-}
-.asis-atajo:hover { background: color-mix(in oklab, var(--deep) 8%, var(--paper)); color: var(--deep-2); }
-
 /* ---------- Hilo ---------- */
-.asis-hilo:not(:empty) { margin-top: 24px; display: flex; flex-direction: column; gap: 22px; }
+.asis-hilo:not(:empty) { margin: 0 0 24px; display: flex; flex-direction: column; gap: 22px; }
 
-/* Con conversación (.is-chat, la pone asistente.js) la caja va debajo del hilo
-   y se queda pegada al fondo de la pantalla mientras se lee hacia arriba. Los
-   atajos y las conversaciones recientes se esconden: hacen ruido junto al
-   chat. Vuelven al entrar a /admin sin ?c=. */
-.asis.is-chat { display: flex; flex-direction: column; }
-.asis.is-chat .asis-atajos { display: none; }
-.asis.is-chat .asis-hilo { order: 1; }
-.asis.is-chat .asis-caja { order: 2; margin-top: 24px; position: sticky; bottom: 16px; z-index: 10; }
-.asis.is-chat .asis-nota { order: 3; }
+/* Con conversación (.is-chat, la pone asistente.js) el hilo ocupa la tarjeta,
+   la caja queda pegada al fondo de la pantalla mientras se lee y la columna
+   de recientes se esconde: hace ruido junto al chat. Vuelve al entrar a
+   /admin sin ?c=. */
+.asis.is-chat { display: block; }
+.asis.is-chat .asis-principal { max-width: 820px; margin: 0 auto; }
+.asis.is-chat .asis-saludo { font-size: 22px; margin-bottom: 26px; }
 .asis.is-chat .asis-recientes { display: none; }
+.asis.is-chat .asis-caja { position: sticky; bottom: 16px; z-index: 10; }
 .asis.is-chat .asis-resultados { top: auto; bottom: calc(100% + 6px); }
 .asis-ajena { font-size: 12.5px; color: var(--mute); margin: 0; }
 .asis-pregunta {
@@ -172,7 +213,11 @@
   opacity: 0.6;
 }
 @keyframes asis-pensar { to { width: 48px; } }
-@media (prefers-reduced-motion: reduce) { .asis-turno.is-pensando .asis-respuesta::after { animation: none; } }
+@media (prefers-reduced-motion: reduce) {
+  .asis-turno.is-pensando .asis-respuesta::after,
+  .asis-estado.is-activo,
+  .asis-cursor { animation: none; }
+}
 
 .asis-respuesta { font-size: 14.5px; line-height: 1.6; }
 .asis-respuesta p { margin: 0 0 8px; }
@@ -232,31 +277,42 @@
 .asis-card.is-aprobada { background: color-mix(in oklab, var(--forest) 5%, var(--paper)); }
 .asis-card.is-descartada { opacity: 0.75; }
 
-/* ---------- Recientes ---------- */
-.asis-recientes { margin-top: 26px; }
+/* ---------- Recientes (columna al lado del chat) ---------- */
+.asis-recientes {
+  background: color-mix(in oklab, var(--paper-2) 80%, transparent);
+  border-radius: 14px;
+  padding: 14px 10px 10px;
+}
 .asis-recientes-head {
   display: flex;
   justify-content: space-between;
   align-items: baseline;
-  font-size: 12px;
+  gap: 8px;
+  padding: 0 8px;
+  margin-bottom: 6px;
+  font-size: 11.5px;
+  font-weight: 600;
   color: var(--mute);
   text-transform: uppercase;
-  letter-spacing: 0.04em;
-  margin-bottom: 6px;
+  letter-spacing: 0.05em;
 }
-.asis-recientes-head a { color: var(--deep-2); text-transform: none; letter-spacing: 0; font-size: 12.5px; }
+.asis-recientes-head a { color: var(--deep-2); text-transform: none; letter-spacing: 0; font-size: 12.5px; font-weight: 500; text-decoration: none; }
+.asis-recientes-head a:hover { text-decoration: underline; }
 .asis-recientes ul { list-style: none; margin: 0; padding: 0; }
 .asis-recientes li a {
   display: flex;
   align-items: center;
-  gap: 8px;
-  padding: 7px 10px;
+  gap: 9px;
+  padding: 7px 8px;
   border-radius: 9px;
   color: var(--ink-2);
   text-decoration: none;
-  font-size: 13.5px;
+  font-size: 13px;
+  transition: background 0.15s, color 0.15s;
 }
-.asis-recientes li a:hover { background: var(--paper); color: var(--ink); }
+.asis-recientes li a:hover { background: var(--paper); color: var(--ink); box-shadow: var(--shadow-1); }
+.asis-rec-ico { flex: none; width: 15px; height: 15px; color: var(--mute); }
+.asis-recientes .asis-punto { margin: 0 3.5px; }
 .asis-rec-q { flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .asis-rec-u { flex: none; font-size: 12px; color: var(--mute); }
 
@@ -282,9 +338,14 @@
 .ia-nota { font-size: 12px; }
 #ia-csv { align-self: flex-start; text-decoration: none; }
 
+@media (max-width: 1100px) {
+  .asis.con-recientes { grid-template-columns: minmax(0, 1fr); gap: 22px; }
+}
 @media (max-width: 640px) {
-  .asis { margin-top: 24px; padding: 0 16px; }
-  .asis-saludo { font-size: 20px; }
+  .asis { padding: 20px 16px 18px; border-radius: 16px; margin-bottom: 22px; }
+  .asis-saludo { font-size: 22px; margin-bottom: 18px; }
+  .asis-saludo span { display: block; }
+  .asis-caja { padding-left: 16px; }
   .asis-cambios { grid-template-columns: 1fr; gap: 2px; }
   .asis-cambios dd { margin-bottom: 8px; }
 }

@@ -171,3 +171,4 @@
   .th-avisos .th-aviso-txt { flex-basis: calc(100% - 44px); }
   .th-avisos .plazo-chip { margin-left: 40px; }
 }
+.th-pestanas .subtab:disabled { opacity: .45; cursor: not-allowed; }
