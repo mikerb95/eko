@@ -146,3 +146,26 @@
 
 /* Botón de tema en la barra de arriba. */
 .pr-tema { padding: 10px 16px; font-size: 14px; }
+
+/* Acompañamiento de la práctica (capacitación 2): turno en curso y fila. */
+.pr-turnos { display: flex; flex-direction: column; gap: 12px; }
+.pr-turno-ahora { background: var(--pr-hundido); border-radius: 14px; padding: 14px 16px; display: grid; gap: 8px; }
+.pr-turno-quien { display: flex; flex-direction: column; gap: 2px; margin: 0; }
+.pr-turno-quien b { font: 600 20px/1.2 var(--font-display); }
+.pr-turno-quien small, .pr-turno-reloj small { font: 500 12px/1.2 var(--font-mono); color: var(--pr-suave); text-transform: uppercase; letter-spacing: .06em; }
+.pr-turno-caso { margin: 0; font-size: 14.5px; color: var(--pr-texto); }
+.pr-turno-reloj { margin: 0; display: flex; align-items: baseline; gap: 12px; }
+.pr-turno-reloj b { font: 600 34px/1 var(--font-display); font-variant-numeric: tabular-nums; color: var(--pr-acento); }
+.pr-turno-reloj b.tarde { color: var(--pr-error); }
+.pr-turno-acc { display: flex; gap: 8px; flex-wrap: wrap; }
+.pr-turno-fila { list-style: none; margin: 0; padding: 0; display: grid; gap: 6px; max-height: 340px; overflow: auto; }
+.pr-turno-fila li { display: grid; grid-template-columns: 22px minmax(0, 1fr) auto; gap: 4px 10px; align-items: center; padding: 8px 10px; border-radius: 10px; background: var(--pr-hundido); font-size: 14px; }
+.pr-turno-fila li.hecho { opacity: .55; }
+.pr-turno-fila li.ahora { box-shadow: 0 0 0 2px var(--pr-acento); }
+.pr-turno-fila .n { font: 600 12px/1 var(--font-mono); color: var(--pr-acento); }
+.pr-turno-fila .q b { display: block; font-weight: 600; }
+.pr-turno-fila .q small { color: var(--pr-suave); }
+.pr-turno-fila .acc { display: flex; gap: 4px; }
+.pr-turno-fila .acc button { border: 1px solid var(--pr-linea); background: var(--pr-sup); color: var(--pr-tinta); border-radius: 8px; padding: 4px 8px; font: 500 12px/1 var(--font-sans); cursor: pointer; }
+.pr-turno-fila .acc button:hover { background: var(--pr-sup-hover); }
+.pr-turno-fila .acc button.ya { background: var(--pr-acento-btn); border-color: var(--pr-acento-btn); color: #fff; }
