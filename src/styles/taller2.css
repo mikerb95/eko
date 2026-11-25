@@ -148,6 +148,8 @@
 .tl-on .enc-svg { height: 470px; }
 .enc-svg text { font-family: var(--font-sans); }
 .enc-a-mano { stroke: #B4442F; stroke-width: 3; stroke-dasharray: 2 10; stroke-linecap: round; opacity: .55; }
+.enc-manual { transition: opacity .5s; }
+.enc-manual.apagado { opacity: .25; }
 .enc-copia { fill: #fff; stroke: #B4442F; stroke-width: 2; }
 .enc-copia-txt { font: 600 17px/1 var(--font-mono); fill: #B4442F; }
 .enc-cable { stroke: var(--c); stroke-width: 4; stroke-linecap: round; stroke-dasharray: 1; stroke-dashoffset: 0; opacity: .8; }
@@ -325,3 +327,23 @@
 @media (prefers-reduced-motion: reduce) {
   .tl-on .activa .mdl-estela i, .tl-on .activa .orb-ruta, .tl-on .activa .orb-pulso, .car-carril.corriendo .car-fichas, .tl-on .activa .plg-conectar:not(.pend) { animation: none !important; }
 }
+
+/* Márgenes de párrafos: .tl p los pone en cero, así que van con más especificidad. */
+.tl .rts-rot { margin-bottom: 14px; }
+.tl .rts-cuenta { margin-top: 36px; }
+.tl .rlj-rot { margin-bottom: 10px; }
+.tl .rlj-ojo { margin-top: 12px; }
+.tl .flj-rot { margin-bottom: 14px; }
+
+/* Tablero de la práctica, a escala de proyector (se lee desde el fondo de la sala). */
+.tl-on .rts { gap: 64px; }
+.tl-on .rts-quien { padding: 30px; gap: 32px; margin-bottom: 34px; }
+.tl-on .rts-anillo { width: 200px; height: 200px; }
+.tl-on .rts-anillo b { font-size: 1.1em; }
+.tl-on .rts-datos h3 { font-size: 1.4em; }
+.tl-on .rts-caso { font-size: .62em; }
+.tl-on .rts-fila { gap: 12px; }
+.tl-on .rts-fila li { padding: 14px 20px; font-size: .7em; }
+.tl-on .rts-barras { gap: 30px; margin-top: 8px; }
+.tl-on .rts-barras li { grid-template-columns: 50px 220px 1fr 48px; font-size: .72em; }
+.tl-on .rts-riel { height: 28px; }

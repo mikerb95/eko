@@ -105,7 +105,7 @@ const XSIS = 1170
         </section>
       ))}
     </div>
-    <p class="car-leccion" data-paso="1"><span class="pt" />Rápido no es peor y lento no es mejor: <b>se elige por tarea</b>. Toque una respuesta para leerla completa.</p>
+    <p class="car-leccion" data-paso="1"><span class="pt" /><span>Rápido no es peor y lento no es mejor: <b>se elige por tarea</b>. Toque una respuesta para leerla completa.</span></p>
   </div>
 )}
 
@@ -201,7 +201,7 @@ const XSIS = 1170
         {sistemas.map((s, k) => <line x1={XSIS - 120} y1={ySis(k) + 34} x2={USTED.x + 60} y2={USTED.y} class="enc-a-mano" />)}
         <line x1={USTED.x + 40} y1={USTED.y - 30} x2={CLAUDE.x - 90} y2={CLAUDE.y + 30} class="enc-a-mano" />
         <g data-copia>
-          <rect x="-58" y="-20" width="116" height="40" rx="10" class="enc-copia" />
+          <rect x="-80" y="-20" width="160" height="40" rx="10" class="enc-copia" />
           <text x="0" y="7" text-anchor="middle" class="enc-copia-txt">copiar · pegar</text>
         </g>
       </g>
@@ -242,7 +242,7 @@ const XSIS = 1170
       ))}
     </svg>
     <div class="enc-pie">
-      <p class="enc-paso1" data-paso="1"><span class="pt" style="--c:#B4442F" />Sin conector, <b>usted es el cable</b>: lento y Claude solo ve lo que le pegó.</p>
+      <p class="enc-paso1" data-paso="1"><span class="pt" style="--c:#B4442F" /><span>Sin conector, <b>usted es el cable</b>: lento y Claude solo ve lo que le pegó.</span></p>
       <div class="enc-permisos" data-paso="3">
         <span class="enc-perm leer"><i aria-hidden="true" />Leer · pide permiso</span>
         <span class="enc-perm escribir"><i aria-hidden="true" />Escribir · Always ask o bloqueado</span>
@@ -272,7 +272,7 @@ const XSIS = 1170
         </li>
       ))}
     </ul>
-    <p class="plg-ojo" data-paso="2"><span class="pt" style="--c:#C98A16" />Instalar el plugin <b>no inicia sesión</b> en sus conectores: cada uno se conecta aparte, con su usuario.</p>
+    <p class="plg-ojo" data-paso="2"><span class="pt" style="--c:#C98A16" /><span>Instalar el plugin <b>no inicia sesión</b> en sus conectores: cada uno se conecta aparte, con su usuario.</span></p>
   </div>
 )}
 
@@ -314,7 +314,7 @@ const XSIS = 1170
             ))}
           </tbody>
         </table>
-        <p class="rlj-ojo"><span class="pt" style="--c:#C98A16" />Si el conector está en <b>Always ask</b>, la tarea se queda esperando su permiso.</p>
+        <p class="rlj-ojo"><span class="pt" style="--c:#C98A16" /><span>Si el conector está en <b>Always ask</b>, la tarea se queda esperando su permiso.</span></p>
       </div>
     </div>
   </div>
@@ -339,6 +339,6 @@ const XSIS = 1170
         ))}
       </tbody>
     </table>
-    <p class="flj-mejor" data-paso="2"><span class="pt" />Lo mejor: <b>combinarlas</b>. Zoho marca la Quote como fría; la tarea de Claude del lunes redacta el seguimiento.</p>
+    <p class="flj-mejor" data-paso="2"><span class="pt" /><span>Lo mejor: <b>combinarlas</b>. Zoho marca la Quote como fría; la tarea de Claude del lunes redacta el seguimiento.</span></p>
   </div>
 )}

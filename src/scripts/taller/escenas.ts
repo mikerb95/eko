@@ -901,14 +901,16 @@ const carrera: Hook = {
       llegados++
       c.classList.remove('corriendo')
       c.style.setProperty('--p', '1')
-      $(c, '[data-tiempo]')!.textContent = seg(r.fuente === 'vivo' && r.ms ? r.ms : ms)
+      // Respuesta guardada: el tiempo no es de esta corrida, se muestra el de referencia.
+      const vivo = r.fuente === 'vivo'
+      $(c, '[data-tiempo]')!.textContent = vivo ? seg(r.ms || ms) : `~${Math.round((ESPERA_GUARDADA[c.dataset.carril!] ?? ms) / 1000)} s`
       const puesto = $(c, '[data-puesto]')!
       puesto.textContent = `${llegados}°`
       puesto.classList.add('on')
       sellar([puesto])
       const f = $(c, '[data-fuente]')!
       f.className = `car-fuente ${r.fuente}`
-      f.textContent = r.fuente === 'vivo' ? 'En vivo · Claude' : 'Respuesta guardada'
+      f.textContent = vivo ? 'En vivo · Claude' : 'Respuesta guardada · tiempo de referencia'
       escribir($(c, '[data-texto]')!, aHtml(r.texto))
       $(c, '[data-palabras]')!.textContent = `${r.texto.split(/\s+/).filter(Boolean).length} palabras`
     }
@@ -946,9 +948,15 @@ const carrera: Hook = {
           setTimeout(() => fin(guardada), reducido() ? 0 : ESPERA_GUARDADA[m] ?? 3000)
           continue
         }
+        // Si vuelve la guardada (sin IA o con error), llega a su tiempo de
+        // referencia para que el orden de llegada siga siendo el típico.
+        const aTiempo = (r: { texto: string; fuente: string; ms?: number }) => {
+          if (r.fuente === 'vivo' || reducido()) return fin(r)
+          setTimeout(() => fin(r), Math.max(0, (ESPERA_GUARDADA[m] ?? 3000) - (performance.now() - inicio)))
+        }
         enviar<{ texto: string; fuente: string; ms: number }>({ accion: 'carrera', taller: api.n, carrera: id, modelo: m }, 60_000)
-          .then(fin)
-          .catch(() => fin(guardada))
+          .then(aTiempo)
+          .catch(() => aTiempo(guardada))
       }
     }
     const abrir = (ev: Event) => {
@@ -1040,6 +1048,10 @@ const enchufe: Hook = {
   paso(el, paso, previo) {
     const bucles = ((el as any)._bucles ??= []) as gsap.core.Animation[]
     bucles.splice(0).forEach((t) => t.kill())
+    // Con el conector puesto, el camino a mano queda de fondo y la etiqueta se va.
+    $(el, '[data-manual]')?.classList.toggle('apagado', paso >= 2)
+    const copia = $(el, '[data-copia]')
+    if (copia && paso !== 1) gsap.set(copia, { autoAlpha: 0 })
     if (paso >= 2 && previo < 2 && previo >= 0 && !reducido()) gsap.fromTo($$(el, '.enc-cable'), { strokeDashoffset: 1 }, { strokeDashoffset: 0, duration: 0.8, stagger: 0.12, ease: CURVA })
     if (reducido()) return
     if (paso === 1) {

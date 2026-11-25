@@ -119,7 +119,7 @@ export const TALLER_2: Taller = {
       bloque: 'apertura',
       tipo: 'portada',
       kicker: 'Capacitación 2 de 4 · Todo el equipo',
-      titulo: 'Claude a trabajar: skills, conectores y tareas',
+      titulo: 'Claude a trabajar',
       minutos: 2,
       pasos: 0,
       notas: [
