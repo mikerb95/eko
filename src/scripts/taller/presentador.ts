@@ -27,6 +27,8 @@ interface DatosPr {
   bloques: { id: string; titulo: string; minutos: number }[]
   areas: { id: string; etiqueta: string }[]
   escenas: EscenaPr[]
+  retos: { id: string; concepto: string }[]
+  minutosTurno: number
 }
 
 const datos = leerDatos<DatosPr>('pr-datos')
@@ -101,6 +103,7 @@ function montar(d: DatosPr) {
     $('[data-sig-titulo]').textContent = sig ? sig.titulo : 'Fin de la capacitación'
     $('[data-pedir]').hidden = e.tipo !== 'constructor'
     $('[data-generar]').hidden = e.tipo !== 'siguiente'
+    $('[data-correr]').hidden = e.tipo !== 'carrera'
     const bloques = $('[data-bloques]')
     const idx = d.bloques.findIndex((b) => b.id === e.bloque)
     bloques.replaceChildren(
@@ -180,13 +183,15 @@ function montar(d: DatosPr) {
   $('[data-anterior]').addEventListener('click', () => avanzar(-1))
   // Botones para el proyector: por el canal (mismo equipo) y por el servidor
   // (otro equipo). El id evita que el proyector lo atienda dos veces.
-  const ordenar = (nombre: 'pedir' | 'generar') => {
+  const ordenar = (nombre: 'pedir' | 'generar' | 'correr') => {
     const id = idOrden()
     avisar({ tipo: 'accion', nombre, id })
     enviar({ accion: 'orden', taller: d.n, nombre, id }).catch((e) => console.error('[presentador] orden', e))
   }
   $('[data-pedir]').addEventListener('click', () => ordenar('pedir'))
   $('[data-generar]').addEventListener('click', () => ordenar('generar'))
+  $('[data-correr]').addEventListener('click', () => ordenar('correr'))
+  montarTurnos(d)
   $('[data-iniciar]').addEventListener('click', () => {
     inicio = Date.now()
     try {
@@ -485,4 +490,127 @@ function montar(d: DatosPr) {
   pintar()
   avisar({ tipo: 'hola' })
   mantenerDespierto()
+}
+
+/**
+ * Acompañamiento de la práctica (capacitación 2): la fila de turnos de 15
+ * minutos. "Armar" suma a los registrados de hoy; cada fila tiene Empezar,
+ * Subir y Al final; el turno en curso lleva su reloj y "Terminar y seguir"
+ * llama al siguiente. Lo mismo lo ven el proyector y cada celular.
+ */
+interface TurnoPr {
+  id: number
+  nombre: string
+  area: string
+  caso: string
+  estado: 'espera' | 'ahora' | 'hecho'
+  lleva: number
+  retos: string[]
+}
+function montarTurnos(d: DatosPr) {
+  const caja = document.querySelector<HTMLElement>('[data-turnos]')
+  if (!caja) return
+  const $ = <T extends HTMLElement = HTMLElement>(s: string) => caja.querySelector<T>(s)!
+  const error = $('[data-turnos-error]')
+  let turnos: TurnoPr[] = []
+  let actual: { id: number; desde: number } | null = null
+  let ocupado = false
+  const decirError = (t: string) => {
+    error.textContent = t
+    error.hidden = !t
+  }
+  const reloj = () => {
+    const b = $('[data-turno-reloj]')
+    if (!actual) return
+    const resta = d.minutosTurno * 60_000 - (Date.now() - actual.desde)
+    const s = Math.floor(Math.abs(resta) / 1000)
+    b.textContent = `${resta < 0 ? '+' : ''}${Math.floor(s / 60)}:${String(s % 60).padStart(2, '0')}`
+    b.classList.toggle('tarde', resta < 0)
+  }
+  setInterval(reloj, 1000)
+  const pintar = () => {
+    const enCurso = turnos.find((t) => t.estado === 'ahora')
+    actual = enCurso ? { id: enCurso.id, desde: actual?.id === enCurso.id ? actual.desde : Date.now() - enCurso.lleva } : null
+    $('[data-turno-ahora]').hidden = !enCurso
+    if (enCurso) {
+      $('[data-turno-nombre]').textContent = enCurso.nombre
+      $('[data-turno-area]').textContent = enCurso.area
+      $('[data-turno-caso]').textContent = enCurso.caso ? `Caso: ${enCurso.caso}` : 'Todavía no escribió su caso en el celular.'
+      $('[data-turno-retos]').textContent = `${enCurso.retos.length} de ${d.retos.length} retos`
+      reloj()
+    }
+    $('[data-turno-fila]').replaceChildren(
+      ...turnos.map((t, k) => {
+        const li = document.createElement('li')
+        li.className = t.estado
+        const n = document.createElement('span')
+        n.className = 'n'
+        n.textContent = String(k + 1)
+        const q = document.createElement('div')
+        q.className = 'q'
+        const b = document.createElement('b')
+        b.textContent = t.nombre
+        const sm = document.createElement('small')
+        sm.textContent = `${t.area} · ${t.retos.length}/${d.retos.length} retos${t.caso ? ` · ${t.caso}` : ''}`
+        q.append(b, sm)
+        const acc = document.createElement('div')
+        acc.className = 'acc'
+        const boton = (txt: string, op: string, clase = '') => {
+          const x = document.createElement('button')
+          x.type = 'button'
+          x.textContent = txt
+          if (clase) x.className = clase
+          x.addEventListener('click', () => mover(t.id, op))
+          return x
+        }
+        if (t.estado === 'espera') acc.append(boton('Empezar', 'empezar', 'ya'), boton('Subir', 'subir'), boton('Al final', 'final'))
+        else if (t.estado === 'hecho') acc.append(boton('Volver a la fila', 'final'))
+        li.append(n, q, acc)
+        return li
+      }),
+    )
+    $('[data-turnos-armar]').textContent = turnos.length ? 'Sumar a los que llegaron' : 'Armar la fila'
+  }
+  const cargar = () =>
+    consultar<{ turnos: TurnoPr[] }>({ que: 'turnos', n: d.n })
+      .then((r) => {
+        if (ocupado) return
+        turnos = r.turnos
+        pintar()
+      })
+      .catch(() => {})
+  const mover = async (id: number, op: string) => {
+    if (ocupado) return
+    ocupado = true
+    decirError('')
+    try {
+      await enviar({ accion: 'turno', taller: d.n, id, op })
+    } catch (e) {
+      decirError(e instanceof Error ? e.message : 'No se pudo mover el turno.')
+    } finally {
+      ocupado = false
+      await cargar()
+    }
+  }
+  $('[data-turnos-armar]').addEventListener('click', async () => {
+    decirError('')
+    try {
+      const r = await enviar<{ agregados: number }>({ accion: 'turnos', taller: d.n })
+      if (!r.agregados && !turnos.length) decirError('Todavía no hay personas registradas hoy en la sala.')
+    } catch (e) {
+      decirError(e instanceof Error ? e.message : 'No se pudo armar la fila.')
+    }
+    await cargar()
+  })
+  const terminar = async (seguir: boolean) => {
+    const enCurso = turnos.find((t) => t.estado === 'ahora')
+    if (!enCurso) return
+    const siguiente = turnos.find((t) => t.estado === 'espera')
+    if (seguir && siguiente) await mover(siguiente.id, 'empezar')
+    else await mover(enCurso.id, 'terminar')
+  }
+  $('[data-turno-seguir]').addEventListener('click', () => terminar(true))
+  $('[data-turno-terminar]').addEventListener('click', () => terminar(false))
+  cargar()
+  sondear(cargar, 4000)
 }
