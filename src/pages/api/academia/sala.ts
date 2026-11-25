@@ -12,6 +12,7 @@ import { avisoPublico, codigoPC, codigoVigente, MINUTOS_CODIGO_PC, guardarOpinio
 import { validarOpinion } from '../../../lib/talleres/opinion'
 import { ACLARACION_HERRAMIENTAS, herramientasDe } from '../../../lib/talleres/herramientas'
 import { salaActual } from '../../../lib/talleres/sala'
+import { nombreTaller } from '../../../lib/talleres'
 import { avanceDe, filaDeHoy, guardarAvance } from '../../../lib/talleres/datos'
 import { avisoTurno, miTurno, validarCaso } from '../../../lib/talleres/turnos'
 import { MINUTOS_TURNO, rutaSkill, SKILL_AREA } from '../../../lib/talleres/retos2'
@@ -155,7 +156,7 @@ export const POST: APIRoute = async ({ request, cookies, url, clientAddress }) =
       // Sin Resend en desarrollo, el enlace vuelve en la respuesta para probar sin buzón.
       if (import.meta.env.DEV && !salaEmailConfigured()) return json({ ok: true, correo: r.correo, enlace })
       if (!(await reservarEnlace(a.id))) return json({ error: 'Ya le enviamos el enlace. Revise su correo (también la carpeta de spam) y espere un minuto para pedirlo otra vez.' }, 429)
-      const envio = await enviarEnlaceSala({ to: r.correo, nombre: a.nombre, capacitacion: `Capacitación ${t.n} · ${t.titulo}`, url: enlace })
+      const envio = await enviarEnlaceSala({ to: r.correo, nombre: a.nombre, capacitacion: `${nombreTaller(t)} · ${t.titulo}`, url: enlace })
       if (!envio.sent) {
         console.error('[academia/sala] enlace sin enviar', envio.reason)
         await liberarEnlace(a.id)

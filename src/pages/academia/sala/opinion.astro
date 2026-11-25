@@ -11,6 +11,7 @@ import AcademiaLayout from '../../../layouts/AcademiaLayout.astro'
 import { SALA_COOKIE } from '../../../lib/auth'
 import { nombreModulo } from '../../../lib/academia/reglas'
 import { salaActual } from '../../../lib/talleres/sala'
+import { nombreTaller } from '../../../lib/talleres'
 import { opinionDe } from '../../../lib/talleres/datos'
 import { camposOpinion, MAX_RESPUESTA_OPINION } from '../../../lib/talleres/opinion'
 
@@ -25,7 +26,7 @@ const previas = asistente ? await opinionDe(asistente.id) : null
   {asistente && t ? (
     <section class="sl sl-opinion">
       <p class="sl-quien">{asistente.nombre} {asistente.apellido} · {nombreModulo(asistente.area)}</p>
-      <p class="ac-kicker">Capacitación {t.n} · Cierre</p>
+      <p class="ac-kicker">{nombreTaller(t)} · Cierre</p>
       <h1>¿Cómo le fue hoy?</h1>
       <p class="sl-sub">Sus respuestas no son anónimas: solo las leen quien dicta y la gerencia, para hacerle seguimiento a cada duda hasta resolverla.</p>
       <form class="sl-form" data-op-form data-taller={t.n} novalidate hidden={!!previas}>

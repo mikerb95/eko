@@ -9,7 +9,7 @@ import AcademiaLayout from '../layouts/AcademiaLayout.astro'
 import { PC_COOKIE } from '../lib/auth'
 import { vistaPC } from '../lib/talleres/pc'
 import { tallerEnCurso } from '../lib/talleres/datos'
-import { tallerDe } from '../lib/talleres'
+import { nombreTaller, tallerDe } from '../lib/talleres'
 
 Astro.response.headers.set('cache-control', 'no-store')
 
@@ -23,7 +23,7 @@ const t = estado ? tallerDe(estado.taller) : null
 
 <AcademiaLayout titulo="Ver la presentación en su PC · Ekosolv" sinNav>
   <section class="sl pc">
-    <p class="ac-kicker">{t ? `Capacitación ${t.n} · ${t.titulo}` : 'Presentación en su PC'}</p>
+    <p class="ac-kicker">{t ? `${nombreTaller(t)} · ${t.titulo}` : 'Presentación en su PC'}</p>
     <h1>Escriba el código de su celular</h1>
     {t ? (
       <>

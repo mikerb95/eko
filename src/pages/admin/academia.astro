@@ -14,7 +14,7 @@ import { MODULOS_ACADEMIA } from '../../lib/academia/reglas'
 import { COLOR } from '../../lib/academia/ui'
 import { SITE_URL } from '../../lib/site'
 import { gruposMaterial, opiniones as leerOpiniones, type GrupoMaterial, type OpinionTaller } from '../../lib/talleres/datos'
-import { tallerDe } from '../../lib/talleres'
+import { nombreTaller, tallerDe } from '../../lib/talleres'
 import { camposOpinion } from '../../lib/talleres/opinion'
 import { fechaLarga } from '../../lib/academia/ui'
 
@@ -123,7 +123,7 @@ const catalogos = { modulos: MODULOS_ACADEMIA, colores: COLOR, sitio: SITE_URL }
           <header class="dash-head">
             <div>
               <h3><span class="ac-dot"></span>{o.nombre}</h3>
-              <p>{MODULOS_ACADEMIA.find((m) => m.id === o.area)?.etiqueta ?? o.area} · Capacitación {o.taller} · {fechaLarga(o.fecha)}{o.correo && <> · <a href={`mailto:${o.correo}`}>{o.correo}</a></>}</p>
+              <p>{MODULOS_ACADEMIA.find((m) => m.id === o.area)?.etiqueta ?? o.area} · {tallerDe(o.taller) ? nombreTaller(tallerDe(o.taller)!) : `Capacitación ${o.taller}`} · {fechaLarga(o.fecha)}{o.correo && <> · <a href={`mailto:${o.correo}`}>{o.correo}</a></>}</p>
             </div>
             {o.respuestas.duda && <span class={`pill ${o.resolucion ? 'forest' : 'warn'}`}>{o.resolucion ? 'Duda resuelta' : 'Duda pendiente'}</span>}
           </header>
@@ -154,7 +154,7 @@ const catalogos = { modulos: MODULOS_ACADEMIA, colores: COLOR, sitio: SITE_URL }
       {material.map((g) => (
         <article class="dash-card ac-mat">
           <div>
-            <h3>Capacitación {g.taller}{tallerDe(g.taller) && `: ${tallerDe(g.taller)!.titulo}`}</h3>
+            <h3>{tallerDe(g.taller) ? `${nombreTaller(tallerDe(g.taller)!)}: ${tallerDe(g.taller)!.titulo}` : `Capacitación ${g.taller}`}</h3>
             <p class="muted">{fechaLarga(g.fecha)} · {g.registrados} registrados · {g.enviados} correos enviados · {g.pendientes} pendientes</p>
             <p class="muted" data-mat-meta></p>
           </div>

@@ -8,7 +8,7 @@ import { UserError } from '../apiError.ts'
 import { enviarRecursos } from '../email.ts'
 import { SITE_URL } from '../site.ts'
 import { marcarMaterial, pendientesMaterial } from './datos.ts'
-import { tallerDe } from './index.ts'
+import { nombreTaller, tallerDe } from './index.ts'
 import { areaRecursos, rutaRecursos } from './recursos.ts'
 
 /** Resend admite 2 envíos por segundo en el plan gratuito: se deja holgura. */
@@ -32,7 +32,7 @@ export async function enviarMaterial(taller: number, fecha: string): Promise<Res
     const r = await enviarRecursos({
       to: a.correo,
       nombre: a.nombre,
-      capacitacion: `Capacitación ${t.n}: ${t.titulo}`,
+      capacitacion: `${nombreTaller(t)}: ${t.titulo}`,
       area: area?.nombre ?? 'su área',
       // Siempre el dominio público: es lo que la persona abre desde su correo.
       url: `${SITE_URL}${area ? rutaRecursos(area.id) : '/academia/recursos'}`,

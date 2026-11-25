@@ -58,6 +58,8 @@ export interface VersionDemo {
 export interface Demo {
   id: string
   documentoTitulo: string
+  /** Cómo se nombra el documento en el botón "Ver ..." (por omisión, "el auto"). */
+  nombreDoc?: string
   documento: string
   /** true mientras el documento sea de ejemplo y no uno real de Ekosolv. */
   provisional?: boolean
@@ -214,6 +216,11 @@ export interface PuntoTecnico {
 
 export interface Taller {
   n: number
+  /**
+   * Nombre en pantalla cuando no es una de las cuatro del programa (un
+   * refuerzo, por ejemplo). Sin él se muestra "Capacitación <n>".
+   */
+  nombre?: string
   titulo: string
   subtitulo: string
   /** Línea de autoría bajo el subtítulo de la portada. */

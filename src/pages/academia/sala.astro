@@ -19,7 +19,7 @@ import { anotar } from '../../lib/bitacora'
 import { clientIp } from '../../lib/rateLimit'
 import { AREAS_ACADEMIA } from '../../lib/academia/reglas'
 import { salaActual } from '../../lib/talleres/sala'
-import { TALLERES } from '../../lib/talleres'
+import { TALLERES, nombreTaller } from '../../lib/talleres'
 import type { PasoGuiado } from '../../lib/talleres/tipos'
 import { SITE_URL } from '../../lib/site'
 import Maqueta from '../../components/taller/Maqueta.astro'
@@ -129,7 +129,7 @@ const maquetas = [
     </section>
   ) : (
     <section class="sl">
-      <p class="ac-kicker">{t ? `Capacitación ${t.n} · ${t.titulo}` : 'Sala de la capacitación'}</p>
+      <p class="ac-kicker">{t ? `${nombreTaller(t)} · ${t.titulo}` : 'Sala de la capacitación'}</p>
       <h1>Antes de empezar, ¿quién es usted?</h1>
       <p class="sl-sub">
         {estado

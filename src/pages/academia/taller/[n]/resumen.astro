@@ -5,7 +5,7 @@
 // ningún QR debe llevar a un login. Solo tiene contenido de la capacitación.
 export const prerender = false
 import '../../../../styles/global.css'
-import { tallerDe } from '../../../../lib/talleres'
+import { nombreTaller, tallerDe } from '../../../../lib/talleres'
 
 const t = tallerDe(Astro.params.n)
 if (!t) return new Response('Esta capacitación no existe.', { status: 404 })
@@ -17,7 +17,7 @@ if (!t) return new Response('Esta capacitación no existe.', { status: 404 })
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <meta name="robots" content="noindex, nofollow, noarchive" />
-    <title>{`Tarjeta resumen · Capacitación ${t.n} · Ekosolv`}</title>
+    <title>{`Tarjeta resumen · ${nombreTaller(t)} · Ekosolv`}</title>
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,400..700&family=Geist:wght@300..700&family=Geist+Mono:wght@400..500&display=swap" rel="stylesheet" />
@@ -61,7 +61,7 @@ if (!t) return new Response('Esta capacitación no existe.', { status: 404 })
     <article class="hoja">
       <header>
         <div>
-          <p class="kicker">Tarjeta resumen · Capacitación {t.n} de 4</p>
+          <p class="kicker">Tarjeta resumen · {t.nombre ?? `Capacitación ${t.n} de 4`}</p>
           <h1>{t.titulo}</h1>
         </div>
         <img src="/brand/ekosolv-horizontal.png" alt="EKOSOLV" width="249" height="72" />

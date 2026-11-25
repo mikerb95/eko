@@ -792,7 +792,7 @@ const constructor: Hook = {
     const alternarDoc = () => {
       const abierto = doc?.classList.toggle('abierto')
       verDoc?.setAttribute('aria-expanded', String(!!abierto))
-      if (verDoc) verDoc.textContent = abierto ? 'Cerrar el auto' : 'Ver el auto'
+      if (verDoc) verDoc.textContent = `${abierto ? 'Cerrar' : 'Ver'} ${verDoc.dataset.nombreDoc || 'el auto'}`
     }
     btn.addEventListener('click', pedir)
     verDoc?.addEventListener('click', alternarDoc)

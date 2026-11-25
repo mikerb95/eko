@@ -55,7 +55,7 @@ const mensajes = (d.mensajes ?? []) as { de: string; texto: string }[]
       })}
       <div class="acciones">
         <button type="button" class="tl-btn" data-pedir>{ctx.admin ? 'Preguntarle a Claude' : 'Ver la respuesta guardada'}</button>
-        <button type="button" class="tl-btn sec" data-ver-doc aria-expanded="false">Ver el auto</button>
+        <button type="button" class="tl-btn sec" data-ver-doc data-nombre-doc={demo.nombreDoc ?? 'el auto'} aria-expanded="false">Ver {demo.nombreDoc ?? 'el auto'}</button>
       </div>
     </div>
     <div class="respuesta" aria-live="polite">

@@ -4,7 +4,7 @@
 // página de destino sigue pidiendo su propio acceso. Al crear una página nueva
 // de la academia, el panel o las capacitaciones, agregarla aquí.
 import Layout from '../layouts/Layout.astro'
-import { TALLERES } from '../lib/talleres'
+import { TALLERES, nombreTaller } from '../lib/talleres'
 
 type Acceso = 'Pública' | 'Admin' | 'Cuenta academia' | 'Sesión'
 interface Ruta { path: string; texto: string; acceso: Acceso; enlace?: boolean }
@@ -25,7 +25,7 @@ const grupos: Grupo[] = [
     ],
   },
   ...numeros.map((n): Grupo => ({
-    titulo: `Capacitación ${n}: ${TALLERES[n].titulo}`,
+    titulo: `${nombreTaller(TALLERES[n])}: ${TALLERES[n].titulo}`,
     rutas: [
       { path: `/academia/taller/${n}`, texto: 'La presentación que se proyecta.', acceso: 'Admin' },
       { path: `/academia/taller/${n}/presentador`, texto: 'Vista de presentador: notas, cronómetro, escena siguiente y estado de la sala.', acceso: 'Admin' },

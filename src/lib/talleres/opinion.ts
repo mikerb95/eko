@@ -69,7 +69,9 @@ const POR_AREA: Record<string, Partial<Sugerencias>> = {
 /** Campos del formulario para un área y una capacitación, en orden. */
 export function camposOpinion(area: string, taller: number): CampoOpinion[] {
   const s = { ...GENERAL, ...POR_AREA[area] }
-  const hayOtra = taller < TOTAL_CAPACITACIONES
+  // Solo la última del programa no tiene siguiente. Las presentaciones aparte
+  // (n mayor que 4, como el refuerzo de la 1) sí la tienen.
+  const hayOtra = taller !== TOTAL_CAPACITACIONES
   return [
     { id: 'duda', pregunta: '¿Qué duda le quedó sin resolver?', sugerencia: s.duda },
     { id: 'usar', pregunta: '¿Qué de lo que vio hoy va a poner en práctica en su trabajo?', sugerencia: s.usar },

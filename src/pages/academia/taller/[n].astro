@@ -14,7 +14,7 @@ import '../../../styles/taller2.css'
 import Escena from '../../../components/taller/Escena.astro'
 import Clawd from '../../../components/taller/Clawd.astro'
 import { TIPOS_OSCUROS, type Contexto, type Diagnostico } from '../../../components/taller/tipos'
-import { tallerDe } from '../../../lib/talleres'
+import { nombreTaller, tallerDe } from '../../../lib/talleres'
 import { enCurso, leerEstado } from '../../../lib/talleres/datos'
 import { cuentaDe } from '../../../lib/academia/datos'
 import { listarRespuestas } from '../../../lib/diagnostico/datos'
@@ -99,7 +99,7 @@ const datos = {
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <meta name="robots" content="noindex, nofollow, noarchive" />
     <link rel="icon" href="/favicon.ico" sizes="any" />
-    <title>{`Capacitación ${t.n} · ${t.titulo} · Ekosolv`}</title>
+    <title>{`${nombreTaller(t)} · ${t.titulo} · Ekosolv`}</title>
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,400..700&family=Geist:wght@300..700&family=Geist+Mono:wght@400..500&display=swap" rel="stylesheet" />
@@ -129,7 +129,7 @@ const datos = {
       <>
         <header class="tl-barra">
           <img src="/brand/ekosolv-horizontal.png" alt="EKOSOLV" width="249" height="72" />
-          <span class="tl-barra-tit">Capacitación {t.n} · {t.titulo}</span>
+          <span class="tl-barra-tit">{nombreTaller(t)} · {t.titulo}</span>
           {seguir ? <span class="tl-barra-nota">La presentación sigue a quien dicta</span> : <a href="/academia">Volver a la academia</a>}
         </header>
         <div class="tl-escenario" data-taller-raiz>
@@ -151,7 +151,7 @@ const datos = {
                 <span class="tl-espera-luz l2" aria-hidden="true" />
                 <header class="tl-espera-top">
                   <img src="/brand/ekosolv-horizontal-white.png" alt="EKOSOLV" width="249" height="72" />
-                  <span>Capacitación {t.n}</span>
+                  <span>{nombreTaller(t)}</span>
                 </header>
                 <div class="tl-espera-cuerpo">
                   <div class="tl-espera-centro">
