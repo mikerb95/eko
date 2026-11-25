@@ -5,7 +5,7 @@
  * src/lib/talleres/turnos.ts). El celular muestra los pasos, la petición de
  * ejemplo de su área y el botón para marcar el reto como hecho.
  *
- * Las skills de cada área se descargan de /academia/skills/<id>.zip (fuente
+ * Las skills de cada área se descargan de /skills/<id>.zip (archivos en public/skills; fuente
  * en docs/skills/<id>/SKILL.md). Módulo PURO.
  */
 import type { Reto } from './tipos.ts'
@@ -20,7 +20,7 @@ export const SKILL_AREA: Record<string, { id: string; nombre: string; para: stri
   finanzas: { id: 'comparativo-balances-ekosolv', nombre: 'Comparativo de balances', para: 'Compara dos periodos y explica las variaciones que pasan del umbral.' },
 }
 
-export const rutaSkill = (area: string) => (SKILL_AREA[area] ? `/academia/skills/${SKILL_AREA[area]!.id}.zip` : '')
+export const rutaSkill = (area: string) => (SKILL_AREA[area] ? `/skills/${SKILL_AREA[area]!.id}.zip` : '')
 
 export const RETOS_TALLER2: Reto[] = [
   {

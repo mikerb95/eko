@@ -53,7 +53,7 @@ test('capacitación 2: cada reto tiene pasos y petición para las seis áreas, y
     assert.deepEqual(Object.keys(r.peticion).sort(), [...AREA_IDS].sort(), `${r.id}: áreas`)
     assert.ok(!/[–—]/.test(JSON.stringify(r)), `${r.id}: guion largo`)
   }
-  for (const a of AREA_IDS) assert.match(rutaSkill(a), /^\/academia\/skills\/[a-z-]+\.zip$/, a)
+  for (const a of AREA_IDS) assert.match(rutaSkill(a), /^\/skills\/[a-z-]+\.zip$/, a)
   assert.equal(Object.keys(SKILL_AREA).length, AREA_IDS.length)
   const carrera = TALLER_2.carreras![0]!
   for (const m of ['opus', 'sonnet', 'haiku'] as const) assert.ok(carrera.respaldos[m].length > 100, m)
