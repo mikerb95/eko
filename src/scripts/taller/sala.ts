@@ -806,7 +806,7 @@ function montarTurno(raiz: HTMLElement): { poner(a: { titulo: string; texto: str
         void caja.offsetWidth
         caja.classList.add('nuevo')
         try {
-          navigator.vibrate?.([180, 80, 180])
+          if ((navigator as any).userActivation?.hasBeenActive) navigator.vibrate?.([180, 80, 180])
         } catch {}
       }
       tono = a.tono

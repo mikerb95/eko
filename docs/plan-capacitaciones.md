@@ -53,6 +53,33 @@
 
 Crear `src/lib/talleres/tallerN.ts` con la misma forma (bloques, escenas, interacciones, demos, `repaso` apuntando a preguntas de la 1) y sumarlo en `index.ts`. Si una escena necesita un tipo nuevo, agregar su marcado en `src/components/taller/` y su hook en `escenas.ts`.
 
+
+## Capacitación 2: Claude a trabajar (Mike, 2026-11-25)
+
+`src/lib/talleres/taller2.ts` (20 escenas, 240 min). Una hora de teoría y el resto práctica con casos reales que cada persona trae ese día.
+
+| Bloque | Min | Escenas |
+|---|---|---|
+| Apertura | 8 | portada, sala, repaso (3 preguntas de la evaluación de la 1) |
+| Tres modelos | 14 | `modelos` (Opus, Sonnet, Haiku con medidas animadas), `carrera` (la misma petición a los tres a la vez, en vivo), votación "¿a cuál se lo mandaría?" |
+| Skills, conectores y plugins | 26 | `orbita` (las cuatro piezas), `skill` (SKILL.md por dentro, cómo la elige, sin y con), `enchufe` (sin conector usted es el cable; MCP; permisos), `plugin` (la caja), votación de clasificar |
+| Tareas automatizadas | 12 | `reloj` (tarea programada de Cowork, corre en la nube), `flujo` (regla de Zoho contra Claude) |
+| Práctica | 165 | `consigna`, `retos` (80), descanso (10), `retos` (70) |
+| Cierre | 15 | `muestra` (avance del grupo), sigue, cierre |
+
+- **Carrera en vivo** (`correrModelo` en motorIA.ts): Opus 5.5, Sonnet 5.5 y Haiku 5.5 con esfuerzo bajo, cada uno suma su costo real al tope diario (unos 3 centavos de dólar por carrera). Se lanza con el botón del proyector o "Correr la carrera" del presentador (orden `correr`). Si un modelo falla, sale su respuesta guardada con tiempo de referencia, marcada como tal.
+- **Retos** (`retos2.ts`): cinco (modelo, usar la skill de su área, crear una skill, skill + conector Zoho, tarea programada), cada uno con pasos, petición de ejemplo por área y plan B. El celular los muestra en las escenas `consigna` y `retos`, con el caso que trajo (una línea) y "Marcar como hecho" (tabla `ac_taller_avance`).
+- **Skills de área** listas para instalar: fuente en `docs/skills/<id>/SKILL.md`, descarga pública en `/skills/<id>.zip` (`public/skills`). Si se edita un SKILL.md, volver a generar el zip: `cd docs/skills && zip -qr ../../public/skills/<id>.zip <id>`.
+- **Turnos de acompañamiento** (15 min por persona, `turnos.ts`, tabla `ac_taller_turnos`): en el presentador, "Armar la fila" (registrados de hoy en orden de llegada; se puede volver a tocar para sumar a los que lleguen tarde), Empezar, Subir, Al final, Terminar y seguir. El proyector muestra a quién se acompaña, el reloj, quién sigue y el avance de cada reto. El celular muestra su lugar, "Le sigue a usted" y "Es su turno" (vibra si la persona ya tocó la pantalla).
+
+### Pendientes de la capacitación 2
+
+- Probar la carrera con IA real en producción (en local sale la respuesta guardada).
+- Confirmar que el plan Team de Ekosolv tenga activadas Skills y Cowork (tareas programadas y plugins) para todos.
+- Confirmar si el plan de Zoho incluye Zoho Flow (lo dice la nota de la escena `flujo`) y si el correo es Zoho Mail o Gmail.
+- Probar en producción el flujo de turnos con celulares reales y desplegar.
+- Probar cada skill de área con un caso real antes del sábado y ajustar el SKILL.md si hace falta.
+
 ## Pendientes
 
 - Hojas impresas por área (`/academia/taller/1/entregables`) y banco de recursos público (`/academia/recursos/<área>`, destino de su QR): ver `docs/plan-recursos.md`. Falta desplegar antes de imprimir.

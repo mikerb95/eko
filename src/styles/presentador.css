@@ -169,3 +169,8 @@
 .pr-turno-fila .acc button { border: 1px solid var(--pr-linea); background: var(--pr-sup); color: var(--pr-tinta); border-radius: 8px; padding: 4px 8px; font: 500 12px/1 var(--font-sans); cursor: pointer; }
 .pr-turno-fila .acc button:hover { background: var(--pr-sup-hover); }
 .pr-turno-fila .acc button.ya { background: var(--pr-acento-btn); border-color: var(--pr-acento-btn); color: #fff; }
+.pr-turno-fila li { grid-template-columns: 22px minmax(0, 1fr); }
+.pr-turno-fila .acc { grid-column: 2; }
+.pr-turno-fila .acc:empty { display: none; }
+.pr-turno-fila .q b { font: 600 15px/1.3 var(--font-sans); }
+.pr-turno-fila .q small { font-size: 12.5px; line-height: 1.35; display: block; }
