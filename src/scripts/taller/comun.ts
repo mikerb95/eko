@@ -106,7 +106,7 @@ export async function enviar<T = any>(cuerpo: Record<string, unknown>, ms = 15_0
 export type Mensaje =
   | { tipo: 'ir'; i: number; paso: number }
   | { tipo: 'hola' }
-  | { tipo: 'accion'; nombre: 'pedir' | 'generar'; id?: string }
+  | { tipo: 'accion'; nombre: 'pedir' | 'generar' | 'correr'; id?: string }
 
 /**
  * Aviso "Empezamos en 00:00". Lo pone quien dicta y viaja por el servidor, así

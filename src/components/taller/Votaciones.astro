@@ -35,7 +35,7 @@ const evalPre = t.evaluacion ? interaccionDe(t, t.evaluacion.pre) : null
 )}
 
 {(e.tipo === 'voto' || e.tipo === 'repaso') && (
-  <div class:list={['votos', { dos: preguntas.length === 2 }]}>
+  <div class:list={['votos', `n${preguntas.length}`, { dos: preguntas.length === 2 }]}>
     {preguntas.map((p, k) => (
       <div class="voto revelada" data-pregunta={p.id} data-paso-revela={k + 1} data-correcta={p.correcta}>
         <h3>{p.enunciado}</h3>

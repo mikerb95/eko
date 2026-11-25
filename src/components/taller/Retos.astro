@@ -1,0 +1,96 @@
+---
+// Escenas de la práctica con casos reales (capacitación 2): la consigna con
+// la ruta de los cinco retos, el tablero que se proyecta mientras trabajan
+// (a quién acompaña quien dicta, quién sigue y cuántos llevan cada reto) y la
+// muestra final del avance del grupo. Los datos llegan por la API
+// (?que=turnos, solo admin); el motor está en escenas.ts.
+import type { Escena, Taller } from '../../lib/talleres/tipos'
+import type { Contexto } from './tipos'
+import { MINUTOS_TURNO } from '../../lib/talleres/retos2'
+
+interface Props {
+  e: Escena
+  t: Taller
+  ctx: Contexto
+}
+const { e, t, ctx } = Astro.props
+const retos = t.retos ?? []
+const COLORES = ['#124E7D', '#179C91', '#00AA9F', '#B8926F', '#2E8B57']
+---
+
+{e.tipo === 'consigna' && (
+  <div class="cns">
+    <ol class="cns-ruta">
+      {retos.map((r, k) => (
+        <li style={`--c:${COLORES[k % COLORES.length]}`}>
+          <span class="cns-n">{String(k + 1).padStart(2, '0')}</span>
+          <div>
+            <small>{r.concepto}</small>
+            <b>{r.titulo}</b>
+          </div>
+        </li>
+      ))}
+    </ol>
+    <div class="cns-lado">
+      <div class="cns-turno">
+        <svg viewBox="0 0 120 120" aria-hidden="true"><circle cx="60" cy="60" r="52" class="fondo" /><circle cx="60" cy="60" r="52" class="barra" pathLength="100" data-anillo /></svg>
+        <p><b>{MINUTOS_TURNO}</b><span>minutos con cada uno</span></p>
+      </div>
+      <p class="cns-txt">Su turno le llega al celular. Mientras tanto, siga con los retos.</p>
+      <div class="cns-qr" set:html={ctx.qrSala} role="img" aria-label={`Código QR de ${ctx.urlSala}`} />
+    </div>
+  </div>
+)}
+
+{e.tipo === 'retos' && (
+  <div class="rts" data-retos>
+    <section class="rts-ahora" data-ahora>
+      <p class="rts-rot">Acompañando ahora</p>
+      <div class="rts-quien">
+        <div class="rts-anillo" aria-hidden="true">
+          <svg viewBox="0 0 120 120"><circle cx="60" cy="60" r="52" class="fondo" /><circle cx="60" cy="60" r="52" class="barra" pathLength="100" data-turno-anillo /></svg>
+          <b data-turno-reloj>{MINUTOS_TURNO}:00</b>
+        </div>
+        <div class="rts-datos">
+          <h3 data-turno-nombre>Todavía no empieza</h3>
+          <p class="rts-area" data-turno-area></p>
+          <p class="rts-caso" data-turno-caso>Quien dicta arma la fila y empieza el primer turno desde el presentador.</p>
+        </div>
+      </div>
+      <p class="rts-rot">Siguen</p>
+      <ol class="rts-fila" data-fila-sig></ol>
+    </section>
+    <section class="rts-avance">
+      <p class="rts-rot">Avance del grupo <span data-personas></span></p>
+      <ul class="rts-barras">
+        {retos.map((r, k) => (
+          <li style={`--c:${COLORES[k % COLORES.length]}`} data-reto={r.id}>
+            <span class="rts-n">{String(k + 1).padStart(2, '0')}</span>
+            <span class="rts-tit">{r.concepto}</span>
+            <span class="rts-riel"><i /></span>
+            <b data-n>0</b>
+          </li>
+        ))}
+      </ul>
+      <p class="rts-cuenta">Quedan <b data-cuenta-regresiva={e.minutos * 60}>{e.minutos}:00</b> de esta parte</p>
+    </section>
+  </div>
+)}
+
+{e.tipo === 'muestra' && (
+  <div class="mst" data-muestra>
+    <div class="mst-total">
+      <b data-total>0</b>
+      <span>retos completados hoy por el grupo</span>
+    </div>
+    <ul class="mst-barras">
+      {retos.map((r, k) => (
+        <li style={`--c:${COLORES[k % COLORES.length]}`} data-reto={r.id}>
+          <span class="mst-col"><i data-col /></span>
+          <b data-n>0</b>
+          <small>{r.concepto}</small>
+        </li>
+      ))}
+    </ul>
+  </div>
+)}

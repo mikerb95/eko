@@ -9,6 +9,7 @@ import '../../../../styles/global.css'
 import '../../../../styles/presentador.css'
 import { tallerDe } from '../../../../lib/talleres'
 import { AREAS } from '../../../../lib/diagnostico/preguntas'
+import { MINUTOS_TURNO } from '../../../../lib/talleres/retos2'
 
 const t = tallerDe(Astro.params.n)
 if (!t) return new Response('Esta capacitación no existe.', { status: 404 })
@@ -19,6 +20,9 @@ const datos = {
   titulo: t.titulo,
   bloques: t.bloques,
   areas: AREAS.map((a) => ({ id: a.id, etiqueta: a.etiqueta })),
+  // Práctica con casos reales (capacitación 2): retos y minutos por turno.
+  retos: (t.retos ?? []).map((r) => ({ id: r.id, concepto: r.concepto })),
+  minutosTurno: MINUTOS_TURNO,
   escenas: t.escenas.map((e) => ({
     id: e.id,
     tipo: e.tipo,
@@ -90,10 +94,29 @@ const datos = {
           <button type="button" class="pr-btn" data-siguiente>Siguiente →</button>
           <button type="button" class="pr-btn ia" data-pedir hidden>Preguntarle a Claude</button>
           <button type="button" class="pr-btn ia" data-generar hidden>Elegir el siguiente token</button>
+          <button type="button" class="pr-btn ia" data-correr hidden>Correr la carrera</button>
         </div>
       </section>
 
       <aside class="pr-lado">
+        {!!t.retos?.length && (
+          <section class="pr-caja pr-turnos" data-turnos aria-live="polite">
+            <span>Acompañamiento · {MINUTOS_TURNO} min por persona</span>
+            <div class="pr-turno-ahora" data-turno-ahora hidden>
+              <p class="pr-turno-quien"><b data-turno-nombre></b><small data-turno-area></small></p>
+              <p class="pr-turno-caso" data-turno-caso></p>
+              <p class="pr-turno-reloj"><b data-turno-reloj>0:00</b><small data-turno-retos></small></p>
+              <div class="pr-turno-acc">
+                <button type="button" class="pr-btn" data-turno-seguir>Terminar y seguir</button>
+                <button type="button" class="pr-btn sec" data-turno-terminar>Terminar</button>
+              </div>
+            </div>
+            <ol class="pr-turno-fila" data-turno-fila></ol>
+            <button type="button" class="pr-btn sec" data-turnos-armar>Armar o actualizar la fila</button>
+            <p class="pr-espera-txt">Suma a los registrados de hoy en el orden en que llegaron. A cada uno le llega al celular su turno y el aviso "Le sigue a usted".</p>
+            <p class="pr-espera-error" data-turnos-error role="alert" hidden></p>
+          </section>
+        )}
         <section class="pr-caja pr-espera" data-espera>
           <span>Aviso de inicio</span>
           <b data-espera-resta>apagado</b>

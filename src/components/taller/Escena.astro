@@ -13,6 +13,8 @@ import Pedir from './Pedir.astro'
 import Cierre from './Cierre.astro'
 import Conectar from './Conectar.astro'
 import Clawd from './Clawd.astro'
+import Piezas from './Piezas.astro'
+import Retos from './Retos.astro'
 
 interface Props {
   e: Escena
@@ -29,6 +31,8 @@ const grupo = (() => {
   if (['evaluacion', 'voto', 'verdad', 'semaforo', 'comparacion', 'repaso'].includes(e.tipo)) return 'votaciones'
   if (['metodo', 'constructor', 'iterar'].includes(e.tipo)) return 'pedir'
   if (e.tipo === 'conectar') return 'conectar'
+  if (['modelos', 'carrera', 'orbita', 'skill', 'enchufe', 'plugin', 'reloj', 'flujo'].includes(e.tipo)) return 'piezas'
+  if (['consigna', 'retos', 'muestra'].includes(e.tipo)) return 'retos'
   return 'cierre'
 })()
 
@@ -78,6 +82,8 @@ const papel = PAPELES.get(e.tipo)
     {grupo === 'pedir' && <Pedir e={e} t={t} ctx={ctx} />}
     {grupo === 'cierre' && <Cierre e={e} t={t} ctx={ctx} />}
     {grupo === 'conectar' && <Conectar e={e} />}
+    {grupo === 'piezas' && <Piezas e={e} t={t} />}
+    {grupo === 'retos' && <Retos e={e} t={t} ctx={ctx} />}
   </div>
   {papel && <Clawd accesorio={papel.accesorio} lugar={papel.lugar} frases={e.datos?.clawd} />}
 </section>

@@ -1,0 +1,344 @@
+---
+// Escenas de la capacitación 2 (teoría): los tres modelos, la carrera en
+// vivo, el mapa de las cuatro piezas, la skill por dentro, el conector como
+// enchufe, el plugin como caja, la tarea programada y la automatización de
+// Zoho. El marcado es el estado final; el motor (escenas.ts) anima hacia él.
+// Estilos en src/styles/taller2.css.
+import type { Escena, Taller } from '../../lib/talleres/tipos'
+
+interface Props {
+  e: Escena
+  t: Taller
+}
+const { e, t } = Astro.props
+const d = e.datos ?? {}
+const COLOR_MODELO: Record<string, string> = { opus: '#124E7D', sonnet: '#179C91', haiku: '#B8926F' }
+const carrera = e.tipo === 'carrera' ? t.carreras?.find((c) => c.id === d.carrera) : null
+const MODELOS_ORDEN = ['haiku', 'sonnet', 'opus'] as const
+const NOMBRE: Record<string, string> = { opus: 'Opus', sonnet: 'Sonnet', haiku: 'Haiku' }
+
+// Órbita: posiciones de las cuatro piezas alrededor de Claude (en % del escenario).
+const POS_ORBITA = [
+  { x: 18, y: 26 },
+  { x: 82, y: 26 },
+  { x: 18, y: 78 },
+  { x: 82, y: 78 },
+]
+const COLOR_PIEZA: Record<string, string> = { skill: '#179C91', conector: '#124E7D', plugin: '#B8926F', tarea: '#00AA9F', comando: '#6B7580' }
+
+// Enchufe: geometría del diagrama (viewBox 1400 x 520).
+const sistemas = (d.sistemas ?? []) as { id: string; nombre: string; color: string; estado: string }[]
+const CLAUDE = { x: 700, y: 260 }
+const USTED = { x: 330, y: 430 }
+const ySis = (k: number) => 70 + k * 127
+const XSIS = 1170
+---
+
+{e.tipo === 'modelos' && (
+  <div class="mdl">
+    {(d.modelos as any[]).map((m, k) => (
+      <article class="mdl-card" style={`--c:${COLOR_MODELO[m.id]};--vel:${m.velocidad}`} data-paso={k + 1} data-modelo={m.id}>
+        <div class="mdl-cab" aria-hidden="true">
+          <svg viewBox="0 0 120 120" class="mdl-glifo">
+            {m.id === 'opus' && (
+              <g data-glifo>
+                <circle cx="60" cy="60" r="46" />
+                <circle cx="60" cy="60" r="32" />
+                <circle cx="60" cy="60" r="18" />
+                <circle cx="60" cy="60" r="6" class="lleno" />
+              </g>
+            )}
+            {m.id === 'sonnet' && (
+              <g data-glifo>
+                <path d="M14 60 Q37 22 60 60 T106 60" />
+                <path d="M14 76 Q37 38 60 76 T106 76" opacity=".5" />
+                <circle cx="60" cy="60" r="7" class="lleno" />
+              </g>
+            )}
+            {m.id === 'haiku' && (
+              <g data-glifo>
+                <path d="M68 10 L34 66 H58 L50 110 L88 50 H64 Z" class="lleno" />
+              </g>
+            )}
+          </svg>
+          <span class="mdl-estela" aria-hidden="true"><i /><i /><i /></span>
+        </div>
+        <p class="mdl-apodo">{m.apodo}</p>
+        <h3>{m.nombre}</h3>
+        <dl class="mdl-medidas">
+          {[['Capacidad', m.capacidad], ['Velocidad', m.velocidad], ['Gasta del límite', m.consumo]].map(([et, v]) => (
+            <div>
+              <dt>{et}</dt>
+              <dd aria-label={`${v} de 5`}>{[1, 2, 3, 4, 5].map((n) => <i class:list={{ on: n <= (v as number) }} />)}</dd>
+            </div>
+          ))}
+        </dl>
+        <p class="mdl-para">{m.para}</p>
+        <p class="mdl-ej"><span class="tk">{m.ejemplo}</span></p>
+      </article>
+    ))}
+  </div>
+)}
+
+{e.tipo === 'carrera' && carrera && (
+  <div class="car" data-carrera={carrera.id}>
+    <div class="car-top">
+      <details class="car-peticion">
+        <summary>Ver la petición</summary>
+        <pre>{carrera.instruccion}</pre>
+      </details>
+      <p class="car-resumen">Correo al gestor, tres riesgos y qué hacer esta semana. <b>Máximo 220 palabras.</b></p>
+      <button type="button" class="tl-btn car-btn" data-correr>Correr la carrera</button>
+    </div>
+    <div class="car-carriles">
+      {MODELOS_ORDEN.map((m) => (
+        <section class="car-carril" style={`--c:${COLOR_MODELO[m]}`} data-carril={m} data-respaldo={carrera.respaldos[m]} tabindex="0" aria-label={`Respuesta de ${NOMBRE[m]}`}>
+          <header>
+            <h3>{NOMBRE[m]}</h3>
+            <span class="car-puesto" data-puesto aria-hidden="true"></span>
+            <b class="car-tiempo" data-tiempo>0,0 s</b>
+          </header>
+          <div class="car-pista" aria-hidden="true"><i data-avance /><span class="car-fichas"><span class="tk">tok</span><span class="tk t1">en</span><span class="tk t2">s</span></span></div>
+          <p class="car-fuente" data-fuente>Esperando la salida</p>
+          <div class="car-texto" data-texto></div>
+          <p class="car-palabras" data-palabras></p>
+        </section>
+      ))}
+    </div>
+    <p class="car-leccion" data-paso="1"><span class="pt" />Rápido no es peor y lento no es mejor: <b>se elige por tarea</b>. Toque una respuesta para leerla completa.</p>
+  </div>
+)}
+
+{e.tipo === 'orbita' && (
+  <div class="orb">
+    <svg class="orb-anillos" viewBox="0 0 1000 560" aria-hidden="true" preserveAspectRatio="none">
+      <ellipse cx="500" cy="290" rx="330" ry="210" class="orb-ruta" data-ruta />
+      <ellipse cx="500" cy="290" rx="190" ry="120" class="orb-ruta fina" />
+      {POS_ORBITA.map((p, k) => (
+        <line x1="500" y1="290" x2={p.x * 10} y2={p.y * 5.6} class="orb-rayo" data-paso={k + 1} data-rayo pathLength="1" />
+      ))}
+    </svg>
+    <div class="orb-centro" aria-hidden="true">
+      <span class="orb-pulso" />
+      <span class="orb-pulso p2" />
+      <b>Claude</b>
+    </div>
+    {(d.piezas as any[]).map((p, k) => (
+      <div class="orb-pieza" style={`--x:${POS_ORBITA[k]!.x};--y:${POS_ORBITA[k]!.y};--c:${COLOR_PIEZA[p.id]}`} data-paso={k + 1} data-pieza={p.id}>
+        <span class="orb-icono" aria-hidden="true">
+          <svg viewBox="0 0 48 48">
+            {p.id === 'skill' && <g><rect x="10" y="6" width="28" height="36" rx="4" /><path d="M16 16h16M16 23h16M16 30h10" /></g>}
+            {p.id === 'conector' && <g><path d="M18 6v10M30 6v10" /><rect x="12" y="16" width="24" height="12" rx="4" /><path d="M24 28v14" /></g>}
+            {p.id === 'plugin' && <g><path d="M6 16l18-9 18 9-18 9z" /><path d="M6 16v17l18 9 18-9V16" /><path d="M24 25v17" /></g>}
+            {p.id === 'tarea' && <g><circle cx="24" cy="24" r="17" /><path d="M24 13v11l8 5" /></g>}
+          </svg>
+        </span>
+        <div>
+          <p class="orb-imagen">{p.imagen}</p>
+          <h3>{p.nombre}</h3>
+          <p class="orb-texto">{p.texto}</p>
+        </div>
+      </div>
+    ))}
+  </div>
+)}
+
+{e.tipo === 'skill' && (
+  <div class="skl">
+    <div class="skl-col" data-paso="1">
+      <p class="skl-rotulo">01 · Por dentro</p>
+      <div class="skl-archivo">
+        <p class="skl-ruta"><span class="skl-carpeta" aria-hidden="true" />{d.archivo.nombre}/<b>SKILL.md</b></p>
+        <div class="skl-front">
+          <p><span class="k">name:</span> {d.archivo.nombre}</p>
+          <p class="desc" data-desc><span class="k">description:</span> {d.archivo.descripcion}</p>
+        </div>
+        <ol class="skl-cuerpo">
+          {(d.archivo.cuerpo as string[]).map((l) => <li>{l.replace(/^\d+\.\s*/, '')}</li>)}
+        </ol>
+      </div>
+    </div>
+    <div class="skl-col" data-paso="2">
+      <p class="skl-rotulo">02 · Cómo la elige</p>
+      <p class="skl-pide"><span class="skl-quien">Usted</span><span class="tk">{d.peticion}</span></p>
+      <ul class="skl-lista" data-lista>
+        {(d.lista as { nombre: string; descripcion: string }[]).map((s) => (
+          <li class:list={{ elegida: s.nombre === d.archivo.nombre }} data-skill={s.nombre}>
+            <b>{s.nombre}</b>
+            <span>{s.descripcion}</span>
+          </li>
+        ))}
+        <span class="skl-escaner" data-escaner aria-hidden="true" />
+      </ul>
+      <p class="skl-nota">Claude lee solo las descripciones. Abre completa la que encaja.</p>
+    </div>
+    <div class="skl-col" data-paso="3">
+      <p class="skl-rotulo">03 · Sin y con</p>
+      <div class="skl-sin">
+        <span class="sello">Sin skill</span>
+        <p>{d.sin}</p>
+      </div>
+      <div class="skl-con">
+        <span class="sello ok">Con skill</span>
+        <table>
+          <thead><tr><th>Obligación</th><th>Art.</th><th>Plazo</th><th>Resp.</th></tr></thead>
+          <tbody>
+            {(d.con as string[][]).map((f) => (
+              <tr data-fila>{f.map((c) => <td class:list={{ falta: c === 'no aparece' }}>{c}</td>)}</tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+)}
+
+{e.tipo === 'enchufe' && (
+  <div class="enc">
+    <svg viewBox="0 0 1400 520" class="enc-svg" role="img" aria-label="Claude conectado a Zoho, el correo, Canva y Drive">
+      {/* Paso 1: sin conector, usted es el cable. */}
+      <g class="enc-manual" data-paso="1" data-manual>
+        {sistemas.map((s, k) => <line x1={XSIS - 120} y1={ySis(k) + 34} x2={USTED.x + 60} y2={USTED.y} class="enc-a-mano" />)}
+        <line x1={USTED.x + 40} y1={USTED.y - 30} x2={CLAUDE.x - 90} y2={CLAUDE.y + 30} class="enc-a-mano" />
+        <g data-copia>
+          <rect x="-58" y="-20" width="116" height="40" rx="10" class="enc-copia" />
+          <text x="0" y="7" text-anchor="middle" class="enc-copia-txt">copiar · pegar</text>
+        </g>
+      </g>
+      {/* Paso 2: los cables directos con datos que van y vienen. */}
+      {sistemas.map((s, k) => (
+        <g data-paso="2" data-cable={k}>
+          <line x1={CLAUDE.x + 95} y1={CLAUDE.y} x2={XSIS - 120} y2={ySis(k) + 34} class="enc-cable" pathLength="1" style={`--c:${s.color}`} />
+          <circle r="9" cx={CLAUDE.x + 95} cy={CLAUDE.y} class="enc-dato" style={`--c:${s.color}`} data-dato data-x1={CLAUDE.x + 95} data-y1={CLAUDE.y} data-x2={XSIS - 120} data-y2={ySis(k) + 34} />
+        </g>
+      ))}
+      {/* Usted */}
+      <g transform={`translate(${USTED.x} ${USTED.y})`} class="enc-usted">
+        <circle r="40" />
+        <circle cy="-10" r="12" class="cara" />
+        <path d="M-20 22 Q0 0 20 22" class="cara" />
+        <text y="74" text-anchor="middle">Usted</text>
+      </g>
+      {/* Claude */}
+      <g transform={`translate(${CLAUDE.x} ${CLAUDE.y})`} class="enc-claude">
+        <circle r="88" class="halo" />
+        <circle r="70" />
+        <text y="10" text-anchor="middle">Claude</text>
+        {/* Paso 3: el mismo enchufe (MCP) en todos los puertos. */}
+        <g data-paso="3" class="enc-mcp">
+          <rect x="-44" y="84" width="88" height="34" rx="9" />
+          <text y="108" text-anchor="middle">MCP</text>
+        </g>
+      </g>
+      {/* Sistemas */}
+      {sistemas.map((s, k) => (
+        <g transform={`translate(${XSIS - 120} ${ySis(k)})`} class="enc-sis" style={`--c:${s.color}`} data-sis={s.id}>
+          <rect width="340" height="68" rx="16" />
+          <g data-paso="3" class="enc-ficha"><rect x="-16" y="22" width="22" height="24" rx="5" /></g>
+          <circle cx="34" cy="34" r="10" class="punto" />
+          <text x="56" y="31" class="nom">{s.nombre}</text>
+          <text x="56" y="54" class="est">{s.estado}</text>
+        </g>
+      ))}
+    </svg>
+    <div class="enc-pie">
+      <p class="enc-paso1" data-paso="1"><span class="pt" style="--c:#B4442F" />Sin conector, <b>usted es el cable</b>: lento y Claude solo ve lo que le pegó.</p>
+      <div class="enc-permisos" data-paso="3">
+        <span class="enc-perm leer"><i aria-hidden="true" />Leer · pide permiso</span>
+        <span class="enc-perm escribir"><i aria-hidden="true" />Escribir · Always ask o bloqueado</span>
+        <span class="enc-sin">Sin conector: Siigo, DIAN, VITAL → Excel o Claude in Chrome</span>
+      </div>
+    </div>
+  </div>
+)}
+
+{e.tipo === 'plugin' && (
+  <div class="plg">
+    <div class="plg-caja" aria-hidden="true">
+      <svg viewBox="0 0 320 300">
+        <g class="plg-tapa" data-tapa><path d="M40 96 L160 40 L280 96 L160 152 Z" /></g>
+        <path d="M40 96 V214 L160 270 V152 Z" class="lado a" />
+        <path d="M280 96 V214 L160 270 V152 Z" class="lado b" />
+        <path d="M160 152 V270" class="arista" />
+      </svg>
+      <p class="plg-nombre">{d.nombre}</p>
+    </div>
+    <ul class="plg-items">
+      {(d.contenido as { tipo: string; nombre: string }[]).map((x, k) => (
+        <li class={`plg-item ${x.tipo}`} style={`--c:${COLOR_PIEZA[x.tipo]};--k:${k}`} data-paso="1" data-item>
+          <small>{x.tipo === 'comando' ? 'Comando' : x.tipo === 'skill' ? 'Skill' : 'Conector'}</small>
+          <b>{x.nombre}</b>
+          {x.tipo === 'conector' && <span class="plg-conectar" data-paso="2">Conectar con su usuario</span>}
+        </li>
+      ))}
+    </ul>
+    <p class="plg-ojo" data-paso="2"><span class="pt" style="--c:#C98A16" />Instalar el plugin <b>no inicia sesión</b> en sus conectores: cada uno se conecta aparte, con su usuario.</p>
+  </div>
+)}
+
+{e.tipo === 'reloj' && (
+  <div class="rlj">
+    <div class="rlj-izq">
+      <svg viewBox="0 0 300 300" class="rlj-reloj" aria-hidden="true">
+        <circle cx="150" cy="150" r="132" class="cara" />
+        {Array.from({ length: 12 }, (_, k) => (
+          <line x1="150" y1="28" x2="150" y2={k % 3 ? 40 : 50} transform={`rotate(${k * 30} 150 150)`} class="marca" />
+        ))}
+        <g data-horario style="--g:210"><line x1="150" y1="150" x2="150" y2="84" class="aguja h" /></g>
+        <g data-minutero style="--g:0"><line x1="150" y1="150" x2="150" y2="46" class="aguja m" /></g>
+        <circle cx="150" cy="150" r="9" class="eje" />
+      </svg>
+      <ol class="rlj-semana" aria-label="Semana">
+        {['L', 'M', 'M', 'J', 'V', 'S', 'D'].map((x, k) => <li class:list={{ hoy: k === 0 }}>{x}</li>)}
+      </ol>
+      <p class="rlj-cuando"><span class="tk">{d.tarea.cuando}</span></p>
+    </div>
+    <div class="rlj-der">
+      <div class="rlj-instr" data-paso="1">
+        <p class="rlj-rot">01 · Instrucción y horario <span class="tk t1">/schedule</span></p>
+        <p class="rlj-txt" data-instr>{d.tarea.instruccion}</p>
+      </div>
+      <div class="rlj-nube" data-paso="2">
+        <p class="rlj-rot">02 · Corre sola, en la nube <span class="rlj-pc"><i aria-hidden="true" />PC apagado</span></p>
+        <ol class="rlj-tubo">
+          {(d.tarea.pasos as string[]).map((p) => <li data-etapa>{p}</li>)}
+        </ol>
+      </div>
+      <div class="rlj-res" data-paso="3">
+        <p class="rlj-rot">03 · Lunes 7:00 a. m. · lo que le llega</p>
+        <table>
+          <thead><tr><th>Cliente</th><th>Días sin respuesta</th><th>Valor</th><th>Correo</th></tr></thead>
+          <tbody>
+            {(d.resultado as any[]).map((r) => (
+              <tr data-fila><td>{r.cliente}</td><td>{r.dias}</td><td>{r.valor}</td><td><span class="tk t1">Borrador listo</span></td></tr>
+            ))}
+          </tbody>
+        </table>
+        <p class="rlj-ojo"><span class="pt" style="--c:#C98A16" />Si el conector está en <b>Always ask</b>, la tarea se queda esperando su permiso.</p>
+      </div>
+    </div>
+  </div>
+)}
+
+{e.tipo === 'flujo' && (
+  <div class="flj">
+    <div class="flj-zoho" data-paso="1">
+      <p class="flj-rot"><span class="flj-z" aria-hidden="true">Z</span>Regla de flujo de trabajo en Zoho</p>
+      <ol class="flj-cadena">
+        <li><small>Cuando</small><b>{d.zoho.evento}</b></li>
+        <li><small>Si</small><b>{d.zoho.condicion}</b></li>
+        <li><small>Entonces</small><b>{d.zoho.accion}</b></li>
+        <span class="flj-pulso" data-pulso aria-hidden="true" />
+      </ol>
+    </div>
+    <table class="flj-tabla" data-paso="2">
+      <thead><tr><th></th><th><span class="flj-z" aria-hidden="true">Z</span>Zoho</th><th><span class="flj-c" aria-hidden="true" />Claude</th></tr></thead>
+      <tbody>
+        {(d.comparacion as any[]).map((f) => (
+          <tr data-fila><th>{f.tema}</th><td>{f.zoho}</td><td>{f.claude}</td></tr>
+        ))}
+      </tbody>
+    </table>
+    <p class="flj-mejor" data-paso="2"><span class="pt" />Lo mejor: <b>combinarlas</b>. Zoho marca la Quote como fría; la tarea de Claude del lunes redacta el seguimiento.</p>
+  </div>
+)}

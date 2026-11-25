@@ -848,6 +848,396 @@ const conectar: Hook = {
   },
 }
 
+
+// ---------- Capacitación 2 ----------
+
+/** Fichas que se encienden una tras otra al revelar (filas, pasos, ítems). */
+function escalonar(els: Element[], desde: gsap.TweenVars = { y: 18, autoAlpha: 0 }, retraso = 0.1) {
+  if (reducido() || !els.length) return
+  gsap.fromTo(els, desde, { x: 0, y: 0, scale: 1, rotate: 0, autoAlpha: 1, duration: 0.55, stagger: 0.09, delay: retraso, ease: CURVA, clearProps: 'transform,opacity,visibility' })
+}
+
+/** Opus, Sonnet y Haiku: el glifo entra y las medidas se llenan una por una. */
+const modelos: Hook = {
+  paso(el, paso, previo) {
+    if (reducido() || previo < 0) return
+    for (const card of reveladosAhora(el, paso, previo)) {
+      const glifo = $(card, '[data-glifo]')
+      if (glifo) gsap.fromTo(glifo, { scale: 0.4, rotate: card.dataset.modelo === 'opus' ? -90 : 0, autoAlpha: 0 }, { scale: 1, rotate: 0, autoAlpha: 1, duration: 0.9, delay: 0.15, ease: 'back.out(1.8)', clearProps: 'all' })
+      gsap.fromTo($$(card, '.mdl-medidas i.on'), { scaleX: 0, transformOrigin: 'left' }, { scaleX: 1, duration: 0.3, stagger: 0.05, delay: 0.35, ease: 'power2.out', clearProps: 'transform' })
+    }
+  },
+}
+
+/**
+ * Carrera: la misma petición sale a la vez para los tres modelos. Cada carril
+ * lleva su reloj; al llegar la respuesta se detiene, recibe su puesto y la
+ * respuesta se escribe. Sin cuenta de admin (repaso fuera de la sesión) se
+ * muestran las respuestas guardadas con tiempos de ejemplo.
+ */
+const ESPERA_GUARDADA: Record<string, number> = { haiku: 1800, sonnet: 4200, opus: 7600 }
+const carrera: Hook = {
+  entrar(el, api) {
+    const btn = $<HTMLButtonElement>(el, '[data-correr]')
+    const carriles = $$(el, '[data-carril]')
+    const id = $(el, '[data-carrera]')?.dataset.carrera ?? ''
+    let corrida = 0
+    let llegados = 0
+    const seg = (ms: number) => `${(ms / 1000).toFixed(1).replace('.', ',')} s`
+    const reiniciar = () => {
+      llegados = 0
+      for (const c of carriles) {
+        c.classList.remove('corriendo', 'abierto')
+        $(c, '[data-tiempo]')!.textContent = seg(0)
+        $(c, '[data-puesto]')!.classList.remove('on')
+        $(c, '[data-fuente]')!.className = 'car-fuente'
+        $(c, '[data-fuente]')!.textContent = 'Esperando la salida'
+        $(c, '[data-texto]')!.innerHTML = ''
+        $(c, '[data-palabras]')!.textContent = ''
+        c.style.setProperty('--p', '0')
+      }
+    }
+    const llegar = (c: HTMLElement, r: { texto: string; fuente: string; ms?: number }, ms: number) => {
+      llegados++
+      c.classList.remove('corriendo')
+      c.style.setProperty('--p', '1')
+      $(c, '[data-tiempo]')!.textContent = seg(r.fuente === 'vivo' && r.ms ? r.ms : ms)
+      const puesto = $(c, '[data-puesto]')!
+      puesto.textContent = `${llegados}°`
+      puesto.classList.add('on')
+      sellar([puesto])
+      const f = $(c, '[data-fuente]')!
+      f.className = `car-fuente ${r.fuente}`
+      f.textContent = r.fuente === 'vivo' ? 'En vivo · Claude' : 'Respuesta guardada'
+      escribir($(c, '[data-texto]')!, aHtml(r.texto))
+      $(c, '[data-palabras]')!.textContent = `${r.texto.split(/\s+/).filter(Boolean).length} palabras`
+    }
+    const correr = () => {
+      const esta = ++corrida
+      reiniciar()
+      if (btn) btn.disabled = true
+      const inicio = performance.now()
+      let pendientes = carriles.length
+      for (const c of carriles) {
+        const m = c.dataset.carril!
+        c.classList.add('corriendo')
+        const reloj = $(c, '[data-tiempo]')!
+        let vivo = true
+        const tic = () => {
+          if (!vivo || esta !== corrida) return
+          const ms = performance.now() - inicio
+          reloj.textContent = seg(ms)
+          // La pista avanza sin llegar al final hasta que haya respuesta.
+          c.style.setProperty('--p', String(Math.min(0.92, 1 - Math.exp(-ms / 9000))))
+          requestAnimationFrame(tic)
+        }
+        requestAnimationFrame(tic)
+        const fin = (r: { texto: string; fuente: string; ms?: number }) => {
+          vivo = false
+          if (esta !== corrida) return
+          llegar(c, r, performance.now() - inicio)
+          if (--pendientes === 0 && btn) {
+            btn.disabled = false
+            btn.textContent = 'Correr otra vez'
+          }
+        }
+        const guardada = { texto: c.dataset.respaldo ?? '', fuente: 'guardada' }
+        if (!api.admin) {
+          setTimeout(() => fin(guardada), reducido() ? 0 : ESPERA_GUARDADA[m] ?? 3000)
+          continue
+        }
+        enviar<{ texto: string; fuente: string; ms: number }>({ accion: 'carrera', taller: api.n, carrera: id, modelo: m }, 60_000)
+          .then(fin)
+          .catch(() => fin(guardada))
+      }
+    }
+    const abrir = (ev: Event) => {
+      const c = (ev.target as HTMLElement).closest<HTMLElement>('[data-carril]')
+      if (!c || !$(c, '[data-texto]')!.textContent) return
+      const ya = c.classList.contains('abierto')
+      carriles.forEach((x) => x.classList.remove('abierto'))
+      if (!ya) c.classList.add('abierto')
+    }
+    const teclaCarril = (ev: KeyboardEvent) => {
+      if (ev.key === 'Enter') abrir(ev)
+    }
+    btn?.addEventListener('click', correr)
+    el.addEventListener('click', abrir)
+    el.addEventListener('keydown', teclaCarril)
+    api.al('correr', correr)
+    api.limpiar(() => {
+      corrida++
+      btn?.removeEventListener('click', correr)
+      el.removeEventListener('click', abrir)
+      el.removeEventListener('keydown', teclaCarril)
+      carriles.forEach((x) => x.classList.remove('abierto', 'corriendo'))
+      if (btn) btn.disabled = false
+    })
+  },
+}
+
+/** Las cuatro piezas aparecen en órbita alrededor de Claude, cada una con su rayo. */
+const orbita: Hook = {
+  paso(el, paso, previo) {
+    if (reducido() || previo < 0) return
+    for (const x of reveladosAhora(el, paso, previo)) {
+      if (x.matches('[data-rayo]')) gsap.fromTo(x, { strokeDashoffset: 1 }, { strokeDashoffset: 0, duration: 0.7, ease: CURVA })
+      if (x.matches('[data-pieza]')) {
+        gsap.fromTo(x, { scale: 0.6, autoAlpha: 0 }, { scale: 1, autoAlpha: 1, duration: 0.6, delay: 0.35, ease: 'back.out(1.8)', clearProps: 'scale,opacity,visibility' })
+        gsap.fromTo($(x, '.orb-icono svg'), { rotate: -25 }, { rotate: 0, duration: 0.8, delay: 0.4, ease: 'elastic.out(1, .5)', clearProps: 'transform' })
+      }
+    }
+    if (paso > previo) gsap.fromTo($(el, '.orb-centro'), { scale: 1 }, { scale: 1.06, duration: 0.18, yoyo: true, repeat: 1 })
+  },
+}
+
+/** Skill: el escáner recorre las descripciones, se detiene en la que encaja y la abre. */
+const skill: Hook = {
+  paso(el, paso, previo) {
+    const items = $$(el, '[data-skill]')
+    const elegida = items.find((x) => x.classList.contains('elegida'))
+    const esc = $(el, '[data-escaner]')
+    const desc = $(el, '[data-desc]')
+    if (paso < 2) {
+      elegida?.classList.remove('on')
+      desc?.classList.remove('brilla')
+      if (esc) gsap.set(esc, { autoAlpha: 0 })
+      return
+    }
+    if (previo >= 2 || previo < 0 || reducido() || !esc || !elegida) {
+      elegida?.classList.add('on')
+      desc?.classList.add('brilla')
+    } else {
+      elegida.classList.remove('on')
+      const tl = gsap.timeline({ delay: 0.5 })
+      tl.set(esc, { autoAlpha: 1, y: items[0]!.offsetTop, height: items[0]!.offsetHeight })
+      for (const it of items) tl.to(esc, { y: it.offsetTop, height: it.offsetHeight, duration: 0.32, ease: 'power2.inOut' })
+      const k = items.indexOf(elegida)
+      tl.to(esc, { y: elegida.offsetTop, height: elegida.offsetHeight, duration: 0.5, ease: 'power3.inOut' })
+      tl.add(() => {
+        elegida.classList.add('on')
+        desc?.classList.add('brilla')
+      })
+      tl.to(esc, { autoAlpha: 0, duration: 0.4 })
+      if (k < 0) tl.kill()
+    }
+    if (paso >= 3 && previo === 2) {
+      escalonar($$(el, '[data-fila]'), { x: 30, autoAlpha: 0 }, 0.5)
+      if (!reducido()) gsap.fromTo($(el, '.skl-sin'), { filter: 'grayscale(0)' }, { filter: 'grayscale(1)', opacity: 0.7, duration: 0.8, delay: 0.3 })
+    }
+  },
+}
+
+/**
+ * Conector: sin conector, el "copiar y pegar" viaja despacio de su mano a
+ * Claude; con conector, los datos van y vienen por cada cable.
+ */
+const enchufe: Hook = {
+  entrar(el, api) {
+    ;(el as any)._bucles = [] as gsap.core.Animation[]
+    api.limpiar(() => ((el as any)._bucles as gsap.core.Animation[]).forEach((t) => t.kill()))
+  },
+  paso(el, paso, previo) {
+    const bucles = ((el as any)._bucles ??= []) as gsap.core.Animation[]
+    bucles.splice(0).forEach((t) => t.kill())
+    if (paso >= 2 && previo < 2 && previo >= 0 && !reducido()) gsap.fromTo($$(el, '.enc-cable'), { strokeDashoffset: 1 }, { strokeDashoffset: 0, duration: 0.8, stagger: 0.12, ease: CURVA })
+    if (reducido()) return
+    if (paso === 1) {
+      const copia = $(el, '[data-copia]')
+      if (copia) bucles.push(gsap.fromTo(copia, { x: 1050, y: 160, autoAlpha: 0 }, { keyframes: [{ x: 1050, y: 160, autoAlpha: 1, duration: 0.3 }, { x: 390, y: 400, duration: 2.2, ease: 'power1.inOut' }, { x: 600, y: 300, duration: 1.4, ease: 'power1.inOut' }, { autoAlpha: 0, duration: 0.3 }], repeat: -1, repeatDelay: 0.4 }))
+    }
+    if (paso >= 2) {
+      $$<SVGCircleElement>(el, '[data-dato]').forEach((c, k) => {
+        const { x1, y1, x2, y2 } = c.dataset
+        bucles.push(gsap.fromTo(c, { attr: { cx: Number(x1), cy: Number(y1) } }, { attr: { cx: Number(x2), cy: Number(y2) }, duration: 1.1, delay: k * 0.25, repeat: -1, yoyo: true, ease: 'power1.inOut' }))
+      })
+    }
+    if (paso >= 3 && previo === 2) sellar($$(el, '.enc-mcp, .enc-ficha'))
+  },
+}
+
+/** Plugin: la caja se abre y salen las piezas que trae. */
+const plugin: Hook = {
+  paso(el, paso, previo) {
+    const tapa = $(el, '[data-tapa] path')
+    if (!tapa) return
+    const abierta = { rotate: -24, x: -26, y: -54 }
+    if (paso === 0) return void gsap.set(tapa, { rotate: 0, x: 0, y: 0 })
+    if (previo < 1 && previo >= 0 && !reducido()) {
+      gsap.to(tapa, { ...abierta, duration: 0.7, ease: 'back.out(1.6)' })
+      gsap.fromTo($$(el, '[data-item]'), { x: -260, y: 40, scale: 0.4, autoAlpha: 0 }, { x: 0, y: 0, scale: 1, autoAlpha: 1, duration: 0.8, stagger: 0.14, delay: 0.35, ease: 'back.out(1.4)', clearProps: 'transform,opacity,visibility' })
+    } else gsap.set(tapa, abierta)
+  },
+}
+
+/** Reloj: las agujas giran hasta el lunes a las 7 y el tubo de trabajo se enciende en orden. */
+const reloj: Hook = {
+  entrar(el, api) {
+    const h = $(el, '[data-horario]')
+    const m = $(el, '[data-minutero]')
+    if (h && m && !reducido()) {
+      gsap.fromTo(m, { '--g': -1440 }, { '--g': 0, duration: 2.6, ease: 'power3.out' })
+      gsap.fromTo(h, { '--g': 90 }, { '--g': 210, duration: 2.6, ease: 'power3.out' })
+    }
+    let k = 0
+    api.cada(() => {
+      const etapas = $$(el, '[data-etapa]')
+      const activo = !$(el, '.rlj-nube')?.classList.contains('pend')
+      etapas.forEach((x, j) => x.classList.toggle('on', activo && j === k % etapas.length))
+      if (activo) k++
+    }, 800)
+  },
+  paso(el, paso, previo) {
+    if (previo < 0 || reducido()) return
+    if (paso === 1 && previo === 0) {
+      const txt = $(el, '[data-instr]')
+      if (txt) escribir(txt, txt.innerHTML)
+    }
+    if (paso === 3 && previo === 2) escalonar($$(el, '.rlj-res [data-fila]'), { x: 40, autoAlpha: 0 }, 0.3)
+  },
+}
+
+/** Flujo de Zoho: un pulso recorre cuando, si y entonces. */
+const flujo: Hook = {
+  entrar(el, api) {
+    const pulso = $(el, '[data-pulso]')
+    const cadena = $(el, '.flj-cadena')
+    if (!pulso || !cadena || reducido()) return
+    const tl = gsap.timeline({ repeat: -1, repeatDelay: 0.6, paused: true })
+    const ancho = () => cadena.offsetWidth
+    tl.fromTo(pulso, { x: 0, autoAlpha: 0 }, { autoAlpha: 1, duration: 0.2 })
+      .to(pulso, { x: () => ancho() - 18, duration: 2.4, ease: 'power1.inOut' })
+      .to(pulso, { autoAlpha: 0, duration: 0.3 })
+    ;(el as any)._pulso = tl
+    api.limpiar(() => tl.kill())
+  },
+  paso(el, paso, previo) {
+    const tl = (el as any)._pulso as gsap.core.Timeline | undefined
+    if (paso >= 1) tl?.play()
+    else tl?.pause(0)
+    if (paso === 2 && previo === 1) escalonar($$(el, '.flj-tabla [data-fila]'), { x: 30, autoAlpha: 0 }, 0.3)
+  },
+}
+
+/** Consigna: el anillo de 15 minutos se llena y la ruta de retos entra en orden. */
+const consigna: Hook = {
+  entrar(el) {
+    const anillo = $<SVGCircleElement>(el, '[data-anillo]')
+    if (anillo) {
+      if (reducido()) anillo.style.strokeDasharray = '100 100'
+      else gsap.fromTo(anillo, { strokeDasharray: '0 100' }, { strokeDasharray: '100 100', duration: 2.2, delay: 0.4, ease: 'power2.inOut' })
+    }
+    escalonar($$(el, '.cns-ruta li'), { x: -40, autoAlpha: 0 }, 0.3)
+  },
+}
+
+interface TurnoTablero {
+  id: number
+  nombre: string
+  area: string
+  caso: string
+  estado: 'espera' | 'ahora' | 'hecho'
+  lleva: number
+  retos: string[]
+}
+
+/**
+ * Tablero de la práctica: a quién acompaña quien dicta (con el reloj de 15
+ * minutos), quién sigue y cuántos llevan cada reto. Los datos son solo para
+ * admin (llevan nombres): en un PC vinculado se ve el aviso.
+ */
+const retos: Hook = {
+  entrar(el, api) {
+    regresiva(el, api)
+    const ahora = $(el, '[data-ahora]')!
+    const anillo = $<SVGCircleElement>(el, '[data-turno-anillo]')
+    const relojTurno = $(el, '[data-turno-reloj]')!
+    const sig = $(el, '[data-fila-sig]')!
+    let minutos = 15
+    let actual: { id: number; desde: number } | null = null
+    let ultimoId = 0
+    const pintarReloj = () => {
+      if (!actual) {
+        relojTurno.textContent = `${minutos}:00`
+        anillo?.style.setProperty('stroke-dasharray', '0 100')
+        ahora.classList.remove('pasado')
+        return
+      }
+      const pasa = Date.now() - actual.desde
+      const resta = minutos * 60_000 - pasa
+      const s = Math.floor(Math.abs(resta) / 1000)
+      relojTurno.textContent = `${resta < 0 ? '+' : ''}${Math.floor(s / 60)}:${String(s % 60).padStart(2, '0')}`
+      anillo?.style.setProperty('stroke-dasharray', `${Math.min(100, (pasa / (minutos * 60_000)) * 100).toFixed(1)} 100`)
+      ahora.classList.toggle('pasado', resta < 0)
+    }
+    api.cada(pintarReloj, 1000)
+    if (!api.admin) {
+      $(el, '[data-turno-nombre]')!.textContent = 'Los turnos se ven en la pantalla grande'
+      $(el, '[data-turno-caso]')!.textContent = 'Su turno le llega al celular.'
+      return
+    }
+    const pintar = (r: { minutos: number; turnos: TurnoTablero[]; retos: Record<string, number>; personas: number }) => {
+      minutos = r.minutos
+      const enCurso = r.turnos.find((x) => x.estado === 'ahora')
+      actual = enCurso ? { id: enCurso.id, desde: Date.now() - enCurso.lleva } : null
+      $(el, '[data-turno-nombre]')!.textContent = enCurso ? enCurso.nombre : r.turnos.length ? 'Entre un turno y otro' : 'Todavía no empieza'
+      $(el, '[data-turno-area]')!.textContent = enCurso ? enCurso.area : ''
+      $(el, '[data-turno-caso]')!.textContent = enCurso ? enCurso.caso || 'Todavía no escribió su caso en el celular.' : r.turnos.length ? 'Quien dicta llama al siguiente.' : 'Quien dicta arma la fila y empieza el primer turno desde el presentador.'
+      if (enCurso && enCurso.id !== ultimoId && !reducido()) gsap.fromTo($(el, '.rts-quien'), { y: 24, autoAlpha: 0 }, { y: 0, autoAlpha: 1, duration: 0.6, ease: CURVA, clearProps: 'transform,opacity,visibility' })
+      ultimoId = enCurso?.id ?? 0
+      const espera = r.turnos.filter((x) => x.estado === 'espera').slice(0, 3)
+      sig.replaceChildren(
+        ...(espera.length
+          ? espera.map((x, k) => {
+              const li = document.createElement('li')
+              const n = document.createElement('span')
+              n.className = 'n'
+              n.textContent = String(k + 1)
+              const b = document.createElement('b')
+              b.textContent = x.nombre
+              const sm = document.createElement('small')
+              sm.textContent = x.area
+              li.append(n, b, sm)
+              return li
+            })
+          : [Object.assign(document.createElement('li'), { className: 'vacio', textContent: r.turnos.length ? 'Nadie más en la fila.' : 'La fila aparece aquí.' })]),
+      )
+      const total = Math.max(1, r.personas, r.turnos.length)
+      const p = $(el, '[data-personas]')
+      if (p) p.textContent = r.personas ? `· ${r.personas} ${r.personas === 1 ? 'persona' : 'personas'} trabajando` : ''
+      for (const li of $$(el, '[data-reto]')) {
+        const n = r.retos[li.dataset.reto!] ?? 0
+        li.style.setProperty('--v', String(n / total))
+        $(li, '[data-n]')!.textContent = String(n)
+      }
+      pintarReloj()
+    }
+    api.sondear(() => {
+      consultar({ que: 'turnos', n: api.n }).then(pintar).catch(() => {})
+    }, 3000)
+  },
+}
+
+/** Muestra: el total de retos hechos rueda y las columnas crecen. */
+const muestra: Hook = {
+  entrar(el, api) {
+    if (!api.admin) return
+    consultar<{ retos: Record<string, number> }>({ que: 'turnos', n: api.n })
+      .then((r) => {
+        const valores = Object.values(r.retos)
+        const max = Math.max(1, ...valores)
+        contar($(el, '[data-total]')!, valores.reduce((a, b) => a + b, 0))
+        $$(el, '[data-reto]').forEach((li, k) => {
+          const n = r.retos[li.dataset.reto!] ?? 0
+          li.style.setProperty('--v', String(n / max))
+          contar($(li, '[data-n]')!, n)
+          if (!reducido()) gsap.fromTo($(li, '[data-col]'), { scaleY: 0 }, { scaleY: 1, duration: 1, delay: 0.2 + k * 0.1, ease: 'expo.out', clearProps: 'transform' })
+        })
+      })
+      .catch(() => {})
+  },
+}
+
 export const HOOKS: Record<string, Hook> = {
   portada,
   sala,
@@ -871,4 +1261,15 @@ export const HOOKS: Record<string, Hook> = {
   practica: cuenta,
   constructor,
   conectar,
+  modelos,
+  carrera,
+  orbita,
+  skill,
+  enchufe,
+  plugin,
+  reloj,
+  flujo,
+  consigna,
+  retos,
+  muestra,
 }

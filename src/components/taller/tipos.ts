@@ -26,6 +26,9 @@ export const COLOR_BLOQUE: Record<string, string> = {
   seguridad: '#B4442F',
   conectar: '#124E7D',
   cierre: '#00AA9F',
+  modelos: '#124E7D',
+  piezas: '#179C91',
+  automatizar: '#B8926F',
 }
 
 export const TIPOS_OSCUROS = new Set(['portada', 'descanso', 'cierre'])
