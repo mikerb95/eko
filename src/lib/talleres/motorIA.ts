@@ -14,7 +14,7 @@ import Anthropic from '@anthropic-ai/sdk'
 import { asegurarEsquema, cliente } from '../db'
 import { costoUsd, MODELO, sumarUso, USO_CERO } from '../asesor/costo'
 import { crearTopeDiario, topeDesde } from '../asesor/presupuesto'
-import type { Taller } from './tipos'
+import type { ModeloClaude, Taller } from './tipos'
 
 function env(key: string): string {
   return (import.meta.env as any)?.[key] || (process.env as any)?.[key] || ''
@@ -148,5 +148,66 @@ export async function responderPregunta(t: Taller, escenaId: string, area: strin
   } catch (err) {
     console.error('[taller-ia/pregunta]', err instanceof Error ? err.message : err)
     return sinIA
+  }
+}
+
+// ---------- Carrera entre modelos (capacitación 2, escena `carrera`) ----------
+//
+// La misma petición, guardada en el contenido, sale para Opus, Sonnet y Haiku.
+// El proyector lanza las tres a la vez y muestra cuánto tardó cada una (medido
+// aquí, en el servidor). Esfuerzo bajo en los tres para que la diferencia sea
+// la del modelo y no la del razonamiento. Cada corrida suma al mismo tope
+// diario con la tarifa de su modelo (verificada el 2026-11-25, USD por millón
+// de tokens): la carrera completa cuesta del orden de 3 centavos de dólar.
+
+export const MODELOS_CARRERA: Record<ModeloClaude, { id: string; entrada: number; salida: number }> = {
+  opus: { id: 'claude-opus-5-5', entrada: 4, salida: 20 },
+  sonnet: { id: 'claude-sonnet-5-5', entrada: 2, salida: 10 },
+  haiku: { id: 'claude-haiku-5-5', entrada: 0.1, salida: 0.5 },
+}
+
+export const esModeloCarrera = (v: unknown): v is ModeloClaude => typeof v === 'string' && v in MODELOS_CARRERA
+
+export interface RespuestaCarrera extends RespuestaDemo {
+  /** Milisegundos que tardó el modelo (0 si es la respuesta guardada). */
+  ms: number
+}
+
+export async function correrModelo(t: Taller, carrera: unknown, modelo: unknown): Promise<RespuestaCarrera | null> {
+  const c = t.carreras?.find((x) => x.id === carrera)
+  if (!c || !esModeloCarrera(modelo)) return null
+  const guardada: RespuestaCarrera = { texto: c.respaldos[modelo], fuente: 'guardada', ms: 0 }
+  if (simulado()) return guardada
+  const clave = env('ANTHROPIC_API_KEY')
+  if (!clave) return guardada
+  const m = MODELOS_CARRERA[modelo]
+  try {
+    if ((await tope.presupuestoRestante()) <= 0) return guardada
+    const api = new Anthropic({ apiKey: clave, maxRetries: 0, timeout: 45_000 })
+    const inicio = Date.now()
+    const r = await api.messages.create({
+      model: m.id,
+      max_tokens: 1500,
+      output_config: { effort: 'low' },
+      system: SYSTEM,
+      messages: [{ role: 'user', content: c.instruccion }],
+    })
+    const ms = Date.now() - inicio
+    const u = sumarUso(USO_CERO, r.usage)
+    const costo = (u.entrada * m.entrada + u.salida * m.salida + u.cacheLectura * m.entrada * 0.1 + u.cacheEscritura * m.entrada * 1.25) / 1_000_000
+    await tope.sumarGasto(costo).catch((err) => {
+      console.error('[taller-ia/gasto]', err instanceof Error ? err.message : err)
+    })
+    // Si el modelo declina, sale la respuesta guardada (no hay nada útil que mostrar).
+    if (r.stop_reason === 'refusal') return guardada
+    const texto = r.content
+      .filter((b): b is Anthropic.TextBlock => b.type === 'text')
+      .map((b) => b.text)
+      .join('\n')
+      .trim()
+    return texto ? { texto, fuente: 'vivo', ms } : guardada
+  } catch (err) {
+    console.error('[taller-ia/carrera]', modelo, err instanceof Error ? err.message : err)
+    return guardada
   }
 }

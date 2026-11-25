@@ -5,6 +5,7 @@
 import { asegurarEsquema, cliente } from '../db.ts'
 import type { Taller } from './tipos.ts'
 import { claveNombre, type FilaVoto, type RegistroSala } from './reglas.ts'
+import type { Turno, EstadoTurno } from './turnos.ts'
 
 const ahora = () => new Date().toISOString()
 const str = (v: unknown) => (v == null ? '' : String(v))
@@ -574,4 +575,138 @@ export async function marcarMaterial(taller: number, fecha: string, correo: stri
     sql: `UPDATE ac_taller_asistentes SET recursos_at = ? WHERE taller = ? AND fecha = ? AND lower(correo) = lower(?)`,
     args: [ahora(), taller, fecha, correo],
   })
+}
+
+// ---------- Práctica con casos reales: turnos y avance (capacitación 2) ----------
+
+
+export interface TurnoFila extends Turno {
+  nombre: string
+  area: string
+  caso: string
+  retos: string[]
+}
+
+const leerRetos = (v: unknown): string[] => {
+  try {
+    const a = JSON.parse(str(v) || '[]')
+    return Array.isArray(a) ? a.filter((x): x is string => typeof x === 'string') : []
+  } catch {
+    return []
+  }
+}
+
+/** La fila de acompañamiento de hoy, con nombre, área, caso y retos hechos de cada persona. */
+export async function turnosDeHoy(taller: number, hoy: string): Promise<TurnoFila[]> {
+  const c = await db()
+  const r = await c.execute({
+    sql: `SELECT t.id, t.asistente_id, t.orden, t.estado, t.inicio, a.nombre, a.apellido, a.area, v.caso, v.retos
+          FROM ac_taller_turnos t JOIN ac_taller_asistentes a ON a.id = t.asistente_id
+          LEFT JOIN ac_taller_avance v ON v.taller = t.taller AND v.fecha = t.fecha AND v.asistente_id = t.asistente_id
+          WHERE t.taller = ? AND t.fecha = ? ORDER BY t.orden, t.id`,
+    args: [taller, hoy],
+  })
+  return r.rows.map((x: any) => ({
+    id: num(x.id),
+    asistente_id: num(x.asistente_id),
+    orden: num(x.orden),
+    estado: (['espera', 'ahora', 'hecho'].includes(str(x.estado)) ? str(x.estado) : 'espera') as EstadoTurno,
+    inicio: num(x.inicio),
+    nombre: `${str(x.nombre)} ${str(x.apellido)}`.trim(),
+    area: str(x.area),
+    caso: str(x.caso),
+    retos: leerRetos(x.retos),
+  }))
+}
+
+/** Solo los turnos (sin nombres): lo que necesita el celular para calcular su lugar. */
+export async function filaDeHoy(taller: number, hoy: string): Promise<Turno[]> {
+  const c = await db()
+  const r = await c.execute({ sql: 'SELECT id, asistente_id, orden, estado, inicio FROM ac_taller_turnos WHERE taller = ? AND fecha = ?', args: [taller, hoy] })
+  return r.rows.map((x: any) => ({ id: num(x.id), asistente_id: num(x.asistente_id), orden: num(x.orden), estado: str(x.estado) as EstadoTurno, inicio: num(x.inicio) }))
+}
+
+/**
+ * Arma la fila con los registrados de hoy que todavía no están, en el orden
+ * en que se registraron, al final de la fila. Sirve también para sumar a
+ * quien llegó tarde. Devuelve cuántos agregó.
+ */
+export async function armarTurnos(taller: number, hoy: string): Promise<number> {
+  const c = await db()
+  const max = num((await c.execute({ sql: 'SELECT COALESCE(MAX(orden), 0) AS m FROM ac_taller_turnos WHERE taller = ? AND fecha = ?', args: [taller, hoy] })).rows[0]?.m)
+  const faltan = await c.execute({
+    sql: `SELECT id FROM ac_taller_asistentes WHERE taller = ? AND fecha = ?
+          AND id NOT IN (SELECT asistente_id FROM ac_taller_turnos WHERE taller = ? AND fecha = ?) ORDER BY id`,
+    args: [taller, hoy, taller, hoy],
+  })
+  let orden = max
+  for (const x of faltan.rows as any[]) {
+    orden++
+    await c.execute({
+      sql: `INSERT INTO ac_taller_turnos (taller, fecha, asistente_id, orden, estado, inicio, updated_at) VALUES (?, ?, ?, ?, 'espera', '', ?) ON CONFLICT DO NOTHING`,
+      args: [taller, hoy, num(x.id), orden, ahora()],
+    })
+  }
+  return faltan.rows.length
+}
+
+/**
+ * Mueve un turno:
+ * - `empezar`: el que estaba en curso queda hecho y este pasa a "ahora".
+ * - `terminar`: queda hecho.
+ * - `final`: vuelve a la fila, de último (para quien no estaba o pidió más tiempo).
+ * - `subir`: cambia de lugar con el anterior que espera.
+ */
+export async function moverTurno(taller: number, hoy: string, id: number, op: 'empezar' | 'terminar' | 'final' | 'subir'): Promise<boolean> {
+  const c = await db()
+  const fila = await filaDeHoy(taller, hoy)
+  const t = fila.find((x) => x.id === id)
+  if (!t) return false
+  const ya = ahora()
+  if (op === 'empezar') {
+    await c.execute({ sql: `UPDATE ac_taller_turnos SET estado = 'hecho', updated_at = ? WHERE taller = ? AND fecha = ? AND estado = 'ahora' AND id <> ?`, args: [ya, taller, hoy, id] })
+    await c.execute({ sql: `UPDATE ac_taller_turnos SET estado = 'ahora', inicio = ?, updated_at = ? WHERE id = ?`, args: [String(Date.now()), ya, id] })
+  } else if (op === 'terminar') {
+    await c.execute({ sql: `UPDATE ac_taller_turnos SET estado = 'hecho', updated_at = ? WHERE id = ?`, args: [ya, id] })
+  } else if (op === 'final') {
+    const max = Math.max(0, ...fila.map((x) => x.orden))
+    await c.execute({ sql: `UPDATE ac_taller_turnos SET estado = 'espera', inicio = '', orden = ?, updated_at = ? WHERE id = ?`, args: [max + 1, ya, id] })
+  } else {
+    const antes = fila
+      .filter((x) => x.estado === 'espera' && (x.orden < t.orden || (x.orden === t.orden && x.id < t.id)))
+      .sort((a, b) => b.orden - a.orden || b.id - a.id)[0]
+    if (!antes) return true
+    await c.execute({ sql: 'UPDATE ac_taller_turnos SET orden = ?, updated_at = ? WHERE id = ?', args: [antes.orden, ya, t.id] })
+    await c.execute({ sql: 'UPDATE ac_taller_turnos SET orden = ?, updated_at = ? WHERE id = ?', args: [t.orden, ya, antes.id] })
+  }
+  return true
+}
+
+export async function avanceDe(taller: number, hoy: string, asistente_id: number): Promise<{ caso: string; retos: string[] }> {
+  const c = await db()
+  const r = await c.execute({ sql: 'SELECT caso, retos FROM ac_taller_avance WHERE taller = ? AND fecha = ? AND asistente_id = ?', args: [taller, hoy, asistente_id] })
+  const x: any = r.rows[0]
+  return { caso: str(x?.caso), retos: leerRetos(x?.retos) }
+}
+
+export async function avancesDeHoy(taller: number, hoy: string): Promise<{ asistente_id: number; caso: string; retos: string[] }[]> {
+  const c = await db()
+  const r = await c.execute({ sql: 'SELECT asistente_id, caso, retos FROM ac_taller_avance WHERE taller = ? AND fecha = ?', args: [taller, hoy] })
+  return r.rows.map((x: any) => ({ asistente_id: num(x.asistente_id), caso: str(x.caso), retos: leerRetos(x.retos) }))
+}
+
+/** Guarda el caso o marca o desmarca un reto. */
+export async function guardarAvance(taller: number, hoy: string, asistente_id: number, cambio: { caso?: string; reto?: string; hecho?: boolean }): Promise<{ caso: string; retos: string[] }> {
+  const c = await db()
+  const previo = await avanceDe(taller, hoy, asistente_id)
+  const caso = cambio.caso ?? previo.caso
+  const retos = new Set(previo.retos)
+  if (cambio.reto) cambio.hecho ? retos.add(cambio.reto) : retos.delete(cambio.reto)
+  const lista = [...retos]
+  await c.execute({
+    sql: `INSERT INTO ac_taller_avance (taller, fecha, asistente_id, caso, retos, updated_at) VALUES (?, ?, ?, ?, ?, ?)
+          ON CONFLICT (taller, fecha, asistente_id) DO UPDATE SET caso = excluded.caso, retos = excluded.retos, updated_at = excluded.updated_at`,
+    args: [taller, hoy, asistente_id, caso, JSON.stringify(lista), ahora()],
+  })
+  return { caso, retos: lista }
 }

@@ -684,6 +684,33 @@ export const TABLAS: readonly string[] = [
     updated_at TEXT NOT NULL
   )`,
 
+  // Práctica con casos reales (capacitación 2, src/lib/talleres/turnos.ts):
+  // fila de acompañamiento de quien dicta (15 min por persona). estado es
+  // espera | ahora | hecho; inicio es la marca (ms) de cuando empezó.
+  `CREATE TABLE IF NOT EXISTS ac_taller_turnos (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    taller INTEGER NOT NULL,
+    fecha TEXT NOT NULL,
+    asistente_id INTEGER NOT NULL,
+    orden INTEGER NOT NULL,
+    estado TEXT NOT NULL DEFAULT 'espera',
+    inicio TEXT NOT NULL DEFAULT '',
+    updated_at TEXT NOT NULL,
+    UNIQUE (taller, fecha, asistente_id)
+  )`,
+
+  // Avance de cada persona en la práctica: el caso que trajo (una línea) y
+  // los retos que marcó como hechos (JSON con los ids de retos2.ts).
+  `CREATE TABLE IF NOT EXISTS ac_taller_avance (
+    taller INTEGER NOT NULL,
+    fecha TEXT NOT NULL,
+    asistente_id INTEGER NOT NULL,
+    caso TEXT NOT NULL DEFAULT '',
+    retos TEXT NOT NULL DEFAULT '[]',
+    updated_at TEXT NOT NULL,
+    PRIMARY KEY (taller, fecha, asistente_id)
+  )`,
+
   `CREATE TABLE IF NOT EXISTS ac_certificados (
     codigo TEXT PRIMARY KEY,
     usuario_id INTEGER NOT NULL,
@@ -773,6 +800,7 @@ export const TABLAS_ESPERADAS: readonly string[] = [
   'ac_progreso',
   'ac_sesiones',
   'ac_taller_asistentes',
+  'ac_taller_avance',
   'ac_taller_codigos_pc',
   'ac_taller_estado',
   'ac_taller_opiniones',
@@ -780,6 +808,7 @@ export const TABLAS_ESPERADAS: readonly string[] = [
   'ac_taller_preguntas',
   'ac_taller_respuestas',
   'ac_taller_sala',
+  'ac_taller_turnos',
   'actos',
   'actos_archivos',
   'ajustes',

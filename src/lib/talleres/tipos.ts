@@ -94,6 +94,18 @@ export type TipoEscena =
   | 'cierre'
   | 'repaso'
   | 'conectar'
+  // Capacitación 2 (skills, conectores, plugins, tareas y modelos).
+  | 'modelos'
+  | 'carrera'
+  | 'orbita'
+  | 'skill'
+  | 'enchufe'
+  | 'plugin'
+  | 'reloj'
+  | 'flujo'
+  | 'consigna'
+  | 'retos'
+  | 'muestra'
 
 /**
  * Un paso de una práctica guiada (escena `conectar`): lo que se hace y el
@@ -158,6 +170,42 @@ export interface Escena {
   datos?: Record<string, any>
 }
 
+/** Los modelos de Claude que se comparan en la capacitación 2. */
+export type ModeloClaude = 'opus' | 'sonnet' | 'haiku'
+
+/**
+ * Carrera en vivo (escena `carrera`): la misma petición sale a la vez para
+ * Opus, Sonnet y Haiku, y el proyector muestra cuánto tarda y qué responde
+ * cada uno. Si un modelo no responde, sale su respuesta guardada.
+ */
+export interface Carrera {
+  id: string
+  /** Petición completa que se le envía a los tres modelos. */
+  instruccion: string
+  /** Respuesta guardada de cada modelo. */
+  respaldos: Record<ModeloClaude, string>
+}
+
+/**
+ * Un reto de la práctica con casos reales (capacitación 2). La persona lo
+ * hace en su PC con el caso que trajo, a su ritmo, y lo marca como hecho en
+ * el celular.
+ */
+export interface Reto {
+  id: string
+  /** Concepto que practica (Modelo, Skill, Conector...). */
+  concepto: string
+  titulo: string
+  /** Para qué sirve, en una frase. */
+  meta: string
+  /** Pasos en su PC. */
+  pasos: string[]
+  /** Petición de ejemplo por área (la persona la adapta a su caso). */
+  peticion: Record<string, string>
+  /** Si no puede hacerlo en Claude Desktop o Cowork, qué hace. */
+  planB?: string
+}
+
 /** Viñeta técnica de la vista de presentador: término opcional en negrilla y su explicación. */
 export interface PuntoTecnico {
   termino?: string
@@ -183,6 +231,10 @@ export interface Taller {
   repaso?: { taller: number; interaccion: string; preguntas: string[] }
   /** Celular por escena (id de escena → idea y ejemplos por área). */
   celular?: Record<string, GuiaCelular>
+  /** Carreras en vivo entre modelos (escena `carrera`). */
+  carreras?: Carrera[]
+  /** Retos de la práctica con casos reales (escenas `consigna`, `retos` y `muestra`). */
+  retos?: Reto[]
   /** Tarjeta resumen descargable. */
   resumen: {
     ideas: { titulo: string; texto: string }[]

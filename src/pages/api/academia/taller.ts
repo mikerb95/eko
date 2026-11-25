@@ -5,7 +5,10 @@ import { nombreModulo } from '../../../lib/academia/reglas'
 import { tallerDe } from '../../../lib/talleres'
 import { compararEvaluacion, contarVotos, interaccionDe } from '../../../lib/talleres/reglas'
 import { asistentesDeHoy, avisoPublico, enEscena, enSala, fijarAviso, fijarEstado, fijarOrden, leerEstado, guardarRespuestaIA, marcarRespondida, preguntaSala, preguntasPendientes, respuestas, sesionesDeHoy } from '../../../lib/talleres/datos'
-import { preguntarDemo, responderPregunta } from '../../../lib/talleres/motorIA'
+import { correrModelo, preguntarDemo, responderPregunta } from '../../../lib/talleres/motorIA'
+import { armarTurnos, avancesDeHoy, moverTurno, turnosDeHoy } from '../../../lib/talleres/datos'
+import { conteoRetos } from '../../../lib/talleres/turnos'
+import { MINUTOS_TURNO } from '../../../lib/talleres/retos2'
 import { anotar } from '../../../lib/bitacora'
 
 // Capacitaciones en vivo (/academia/taller/<n>). El middleware ya exige
@@ -19,7 +22,8 @@ import { anotar } from '../../../lib/bitacora'
 // GET ?que=aviso&n         → aviso "Empezamos en 00:00" (proyector de quien dicta)
 // GET ?que=estado&n        → escena, paso, cuánto lleva la escena, último botón y aviso: así se siguen
 //                            proyector y presentador aunque estén en equipos distintos
-// POST {accion}            → estado | orden | aviso | ia | respuesta_ia | respondida
+// GET ?que=turnos&n        → fila de acompañamiento y avance de los retos (capacitación 2)
+// POST {accion}            → estado | orden | aviso | ia | carrera | turnos | turno | respuesta_ia | respondida
 
 export const prerender = false
 
@@ -54,6 +58,21 @@ export const GET: APIRoute = async ({ url, locals }) => {
       if (!esAdmin(locals)) return json({ error: 'Solo administradores' }, 403)
       const e = await leerEstado(t.n)
       return json({ escena: e?.escena ?? '', paso: e?.paso ?? 0, mov: e?.mov ?? 0, enEscena: enEscena(e), orden: e?.orden ?? null, aviso: avisoPublico(e) })
+    }
+
+    // Práctica con casos reales: fila de acompañamiento (presentador y
+    // proyector) y cuántos hicieron cada reto. Solo admin: lleva nombres.
+    if (que === 'turnos') {
+      if (!esAdmin(locals)) return json({ error: 'Solo administradores' }, 403)
+      const hoy = hoyEnBogota()
+      const [fila, avances] = await Promise.all([turnosDeHoy(t.n, hoy), avancesDeHoy(t.n, hoy)])
+      const ahora = Date.now()
+      return json({
+        minutos: MINUTOS_TURNO,
+        turnos: fila.map((x) => ({ ...x, area: nombreModulo(x.area), lleva: x.estado === 'ahora' && x.inicio ? ahora - x.inicio : 0 })),
+        retos: conteoRetos((t.retos ?? []).map((r) => r.id), avances),
+        personas: avances.length,
+      })
     }
 
     if (que === 'panel') {
@@ -110,7 +129,7 @@ export const POST: APIRoute = async ({ request, locals }) => {
         if (!esAdmin(locals)) return json({ error: 'Solo quien dicta mueve la presentación' }, 403)
         const nombre = String(b.nombre ?? '')
         const id = String(b.id ?? '').slice(0, 40)
-        if (!['pedir', 'generar'].includes(nombre) || !id) return json({ error: 'Orden inválida' }, 400)
+        if (!['pedir', 'generar', 'correr'].includes(nombre) || !id) return json({ error: 'Orden inválida' }, 400)
         await fijarOrden(t.n, { id, nombre })
         return json({ ok: true })
       }
@@ -133,6 +152,32 @@ export const POST: APIRoute = async ({ request, locals }) => {
         const r = await preguntarDemo(t, b.demo, b.version)
         if (!r) return json({ error: 'Esa versión de la demo no existe' }, 400)
         return json(r)
+      }
+
+      // Carrera entre modelos: el proyector pide los tres a la vez, uno por llamada.
+      case 'carrera': {
+        if (!esAdmin(locals)) return json({ error: 'Solo quien dicta usa la demo en vivo' }, 403)
+        const r = await correrModelo(t, b.carrera, b.modelo)
+        if (!r) return json({ error: 'Esa carrera no existe' }, 400)
+        return json(r)
+      }
+
+      // Fila de acompañamiento: suma a los registrados de hoy que falten.
+      case 'turnos': {
+        if (!esAdmin(locals)) return json({ error: 'Solo administradores' }, 403)
+        const agregados = await armarTurnos(t.n, hoyEnBogota())
+        return json({ ok: true, agregados })
+      }
+
+      case 'turno': {
+        if (!esAdmin(locals)) return json({ error: 'Solo administradores' }, 403)
+        const id = Number(b.id)
+        const op = String(b.op ?? '')
+        if (!Number.isInteger(id) || id <= 0 || !['empezar', 'terminar', 'final', 'subir'].includes(op)) return json({ error: 'Turno inválido' }, 400)
+        const ok = await moverTurno(t.n, hoyEnBogota(), id, op as 'empezar')
+        if (!ok) return json({ error: 'Ese turno no existe' }, 404)
+        await anotar('turno', { quien: String(locals.username ?? ''), taller: t.n, detalle: { id, op } })
+        return json({ ok: true })
       }
 
       // Respuesta preparada por la IA para una pregunta de la sala. Se guarda la
