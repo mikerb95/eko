@@ -159,11 +159,11 @@ export const REFUERZO_1: Taller = {
       tipo: 'voto',
       titulo: '¿Se sube o no se sube? Casos nuevos',
       preguntas: [
-        { id: 'q1', enunciado: 'En la cuenta de Ekosolv: el Excel de facturación del mes, con el NIT y los valores de cada cliente.', opciones: OPCIONES_SEMAFORO(), correcta: 'si', explicacion: 'Documento de trabajo: en la cuenta de la empresa se pega completo.' },
-        { id: 'q2', enunciado: 'En la cuenta de Ekosolv: la hoja de vida de un candidato, para compararla con el perfil del cargo.', opciones: OPCIONES_SEMAFORO(), correcta: 'si', explicacion: 'Datos personales de trabajo: en la cuenta de la empresa se pega completa, solo para esa tarea.' },
-        { id: 'q3', enunciado: 'En la cuenta de Ekosolv: el reporte de un accidente con el diagnóstico del trabajador, para escribir la lección aprendida.', opciones: OPCIONES_SEMAFORO(), correcta: 'anon', explicacion: 'Dato de salud: para la lección basta lo que pasó, sin nombre ni diagnóstico.' },
-        { id: 'q4', enunciado: 'La foto del certificado de un cliente, en la IA personal del celular, porque está en la calle.', opciones: OPCIONES_SEMAFORO(), correcta: 'no', explicacion: 'Lo que cambia es la cuenta, no el documento: espere a estar en la de Ekosolv.' },
-        { id: 'q5', enunciado: 'El código que le llegó al celular para entrar al portal de la DIAN o al banco.', opciones: OPCIONES_SEMAFORO(), correcta: 'no', explicacion: 'Códigos, claves y contraseñas, nunca, en ninguna IA.' },
+        { id: 'q1', enunciado: 'Cuenta de Ekosolv: el Excel de facturación del mes, con NIT y valores.', opciones: OPCIONES_SEMAFORO(), correcta: 'si', explicacion: 'Documento de trabajo: se pega completo.' },
+        { id: 'q2', enunciado: 'Cuenta de Ekosolv: la hoja de vida de un candidato, para compararla con el cargo.', opciones: OPCIONES_SEMAFORO(), correcta: 'si', explicacion: 'Dato personal de trabajo: completa, solo para esa tarea.' },
+        { id: 'q3', enunciado: 'Cuenta de Ekosolv: un reporte de accidente con el diagnóstico, para la lección aprendida.', opciones: OPCIONES_SEMAFORO(), correcta: 'anon', explicacion: 'Salud: basta lo que pasó, sin nombre ni diagnóstico.' },
+        { id: 'q4', enunciado: 'La foto del certificado de un cliente, en la IA personal del celular.', opciones: OPCIONES_SEMAFORO(), correcta: 'no', explicacion: 'Cuenta personal: espere a estar en la de Ekosolv.' },
+        { id: 'q5', enunciado: 'El código que le llegó para entrar a la DIAN o al banco.', opciones: OPCIONES_SEMAFORO(), correcta: 'no', explicacion: 'Códigos y claves, nunca, en ninguna IA.' },
       ],
     },
   ],
@@ -305,6 +305,9 @@ export const REFUERZO_1: Taller = {
       ],
       datos: {
         frase: 'El certificado de disposición final del lote 4471 reporta',
+        // Lo que la IA sigue escribiendo, con la misma seguridad (paso 1).
+        sigue: '... de luminarias, entregados al gestor el 14 de marzo.',
+        sello: 'Nadie le dio el certificado',
         opciones: [
           { w: '320 kg', p: 0.19 },
           { w: '280 kg', p: 0.18 },

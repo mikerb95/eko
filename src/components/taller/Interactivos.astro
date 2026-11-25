@@ -55,7 +55,7 @@ const nDatos = segmentos.filter((s) => s.dato).length
       {e.tipo === 'inventa' && (
         <>
           <p class="frase-grande" data-paso="1" data-inventa-sigue>
-            ... de 2019, que obliga a todo generador a reportar cada mes. <span class="sello">No existe</span>
+            {d.sigue ?? '... de 2019, que obliga a todo generador a reportar cada mes.'} <span class="sello">{d.sello ?? 'No existe'}</span>
           </p>
           <div class="donde" data-paso="2">
             <span>Números de normas y artículos</span>
