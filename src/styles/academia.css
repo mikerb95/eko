@@ -435,3 +435,41 @@
 @media (prefers-reduced-motion: reduce) {
   .sl-espera-kicker i::after, .sl-espera.cero .sl-espera-reloj { animation: none; }
 }
+
+/* ---------- Sala: práctica con casos reales (capacitación 2) ---------- */
+.sl-turno { display: grid; gap: 4px; padding: 14px 16px; border-radius: 18px; background: #fff; box-shadow: 0 10px 24px -18px rgba(14, 28, 38, .5); }
+.sl-turno-tit { font: 600 18px/1.2 var(--font-display); margin: 0; display: flex; align-items: center; gap: 10px; }
+.sl-turno-tit::before { content: ''; width: 10px; height: 10px; border-radius: 50%; background: var(--forest, #179C91); flex: none; }
+.sl-turno-txt { margin: 0; font-size: 14.5px; color: #4a5560; }
+.sl-turno[data-tono="sigue"] { background: color-mix(in oklab, #C98A16 14%, #fff); }
+.sl-turno[data-tono="sigue"] .sl-turno-tit::before { background: #C98A16; animation: sl-latido 1.2s ease-in-out infinite; }
+.sl-turno[data-tono="ahora"] { background: var(--deep, #124E7D); color: #fff; }
+.sl-turno[data-tono="ahora"] .sl-turno-txt { color: #d7e6f2; }
+.sl-turno[data-tono="ahora"] .sl-turno-tit::before { background: #6fd2c9; animation: sl-latido 1.2s ease-in-out infinite; }
+.sl-turno[data-tono="hecho"] .sl-turno-tit::before { background: #2E8B57; }
+.sl-turno.nuevo { animation: sl-ej-llega .9s cubic-bezier(.2, .8, .2, 1); }
+.sl-retos { display: flex; flex-direction: column; gap: 12px; }
+.sl-caso { gap: 8px; }
+.sl-retos-prog { margin: 4px 0 0; font: 500 13px/1 var(--font-mono); letter-spacing: .06em; text-transform: uppercase; color: #5d6772; }
+.sl-reto { background: #fff; border-radius: 18px; padding: 4px 16px; box-shadow: 0 8px 20px -18px rgba(14, 28, 38, .5); }
+.sl-reto[open] { padding-bottom: 16px; }
+.sl-reto summary { list-style: none; display: flex; gap: 12px; align-items: center; padding: 12px 0; cursor: pointer; }
+.sl-reto summary::-webkit-details-marker { display: none; }
+.sl-reto-n { width: 36px; height: 36px; border-radius: 10px; display: grid; place-items: center; background: color-mix(in oklab, #179C91 14%, #fff); color: #0d6b63; font: 600 13px/1 var(--font-mono); flex: none; }
+.sl-reto.hecho .sl-reto-n { background: #2E8B57; color: #fff; }
+.sl-reto-tit { display: grid; gap: 2px; }
+.sl-reto-tit small { font: 500 11px/1 var(--font-mono); letter-spacing: .08em; text-transform: uppercase; color: #179C91; }
+.sl-reto-tit b { font: 600 16px/1.25 var(--font-display); }
+.sl-reto.hecho .sl-reto-tit b { color: #5d6772; }
+.sl-reto-meta { margin: 0 0 10px; font-size: 14.5px; color: #4a5560; }
+.sl-reto ol { margin: 0 0 12px; padding-left: 1.2em; display: grid; gap: 8px; font-size: 15px; line-height: 1.4; }
+.sl-reto-skill { display: grid; gap: 6px; margin-bottom: 12px; }
+.sl-reto-skill .sl-nota { word-break: break-all; }
+.sl-reto-pet { display: grid; gap: 8px; padding: 12px; border-radius: 14px; background: #F4F1EC; margin-bottom: 12px; }
+.sl-reto-pet small { font: 500 11px/1.2 var(--font-mono); letter-spacing: .06em; text-transform: uppercase; color: #5d6772; }
+.sl-reto-pet pre { margin: 0; white-space: pre-wrap; font: 400 13.5px/1.45 var(--font-mono); }
+.sl-reto-pet .ac-btn { justify-self: start; }
+.sl-reto-planb { margin: 0 0 12px; font-size: 14px; color: #4a5560; }
+.sl-reto-marca { width: 100%; }
+.sl-reto-marca[aria-pressed="true"] { background: #2E8B57; }
+@media (prefers-reduced-motion: reduce) { .sl-turno.nuevo, .sl-turno .sl-turno-tit::before { animation: none !important; } }

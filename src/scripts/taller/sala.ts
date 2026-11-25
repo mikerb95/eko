@@ -57,6 +57,17 @@ interface Estado {
   opinion?: 'pendiente' | 'enviada' | null
   /** Aviso "Empezamos en 00:00" que puso quien dicta. */
   aviso?: AvisoRed | null
+  /** Práctica con casos reales (capacitación 2): retos de su área, los hechos y su caso. */
+  retos?: RetosSala | null
+  /** Su lugar en la fila de acompañamiento. */
+  turno?: { aviso: { titulo: string; texto: string; tono: string } | null } | null
+}
+
+interface RetosSala {
+  items: { id: string; concepto: string; titulo: string; meta: string; pasos: string[]; peticion: string; planB: string }[]
+  hechos: string[]
+  caso: string
+  skill: { id: string; nombre: string; para: string; url: string } | null
 }
 
 /** Paso de una práctica guiada (escena conectar), con su maqueta animada. */
@@ -219,6 +230,7 @@ function montar(raiz: HTMLElement) {
   montarDuda(duda)
   const zonaPC = $('[data-sl-pc-zona]')
   const pc = montarPC(raiz)
+  const turno = montarTurno(raiz)
   const avisoInicio = montarEspera(raiz)
 
   const pintarEjemplo = (e: Estado['ejemplo']) => {
@@ -436,6 +448,150 @@ function montar(raiz: HTMLElement) {
     lista.replaceChildren(caja)
   }
 
+  // Práctica con casos reales: su caso, la skill de su área y los retos.
+  const pintarRetos = (r: RetosSala) => {
+    titulo.textContent = 'Sus retos de hoy'
+    sub.textContent = 'Trabaje con el caso que trajo, a su ritmo. Marque cada reto al terminarlo.'
+    const hechos = new Set(r.hechos)
+    const caja = document.createElement('div')
+    caja.className = 'sl-retos'
+
+    const caso = document.createElement('form')
+    caso.className = 'sl-form sl-caso'
+    caso.innerHTML = `<label><span>¿Qué caso trajo? (una línea)</span><input name="caso" maxlength="200" autocomplete="off" placeholder="Ej.: auto de la CAR para la planta de Funza" /></label><button type="submit" class="ac-btn ac-btn-sec">Guardar</button><p class="sl-estado" role="status"></p>`
+    const inCaso = caso.querySelector('input')!
+    inCaso.value = r.caso
+    const estCaso = caso.querySelector<HTMLElement>('.sl-estado')!
+    caso.addEventListener('submit', async (ev) => {
+      ev.preventDefault()
+      try {
+        await enviar({ accion: 'caso', texto: inCaso.value })
+        estCaso.textContent = 'Guardado: quien dicta lo verá en su turno.'
+        estCaso.className = 'sl-estado ok'
+      } catch (err) {
+        estCaso.textContent = err instanceof Error ? err.message : 'No se pudo guardar.'
+        estCaso.className = 'sl-estado error'
+      }
+    })
+    caja.append(caso)
+
+    const progreso = document.createElement('p')
+    progreso.className = 'sl-retos-prog'
+    const contar = () => (progreso.textContent = `${hechos.size} de ${r.items.length} retos hechos`)
+    contar()
+    caja.append(progreso)
+
+    r.items.forEach((x, k) => {
+      const det = document.createElement('details')
+      det.className = 'sl-reto'
+      det.open = !hechos.has(x.id) && [...r.items].findIndex((y) => !hechos.has(y.id)) === k
+      det.classList.toggle('hecho', hechos.has(x.id))
+      const sum = document.createElement('summary')
+      const n = document.createElement('span')
+      n.className = 'sl-reto-n'
+      n.textContent = String(k + 1).padStart(2, '0')
+      const tt = document.createElement('span')
+      tt.className = 'sl-reto-tit'
+      const small = document.createElement('small')
+      small.textContent = x.concepto
+      const b = document.createElement('b')
+      b.textContent = x.titulo
+      tt.append(small, b)
+      sum.append(n, tt)
+      const meta = document.createElement('p')
+      meta.className = 'sl-reto-meta'
+      meta.textContent = x.meta
+      const ol = document.createElement('ol')
+      for (const p of x.pasos) {
+        const li = document.createElement('li')
+        li.textContent = p
+        ol.append(li)
+      }
+      det.append(sum, meta, ol)
+      if (x.id === 'usar-skill' && r.skill) {
+        const sk = document.createElement('div')
+        sk.className = 'sl-reto-skill'
+        const a = document.createElement('a')
+        a.className = 'ac-btn'
+        a.href = r.skill.url
+        a.setAttribute('download', '')
+        a.textContent = `Descargar la skill: ${r.skill.nombre}`
+        const pp = document.createElement('p')
+        pp.className = 'sl-nota'
+        pp.textContent = `${r.skill.para} En su PC: ${location.host}${r.skill.url}`
+        sk.append(a, pp)
+        det.append(sk)
+      }
+      if (x.peticion) {
+        const pet = document.createElement('div')
+        pet.className = 'sl-reto-pet'
+        const et = document.createElement('small')
+        et.textContent = 'Ejemplo para su área (adáptelo a su caso)'
+        const pre = document.createElement('pre')
+        pre.textContent = x.peticion
+        const cp = document.createElement('button')
+        cp.type = 'button'
+        cp.className = 'ac-btn ac-btn-sec'
+        cp.textContent = 'Copiar'
+        cp.addEventListener('click', async () => {
+          try {
+            await navigator.clipboard.writeText(x.peticion)
+            cp.textContent = 'Copiada'
+          } catch {
+            cp.textContent = 'Selecciónela y copie'
+          }
+          setTimeout(() => (cp.textContent = 'Copiar'), 1800)
+        })
+        pet.append(et, pre, cp)
+        det.append(pet)
+      }
+      if (x.planB) {
+        const pb = document.createElement('p')
+        pb.className = 'sl-reto-planb'
+        const bb = document.createElement('b')
+        bb.textContent = 'Si no le funciona: '
+        pb.append(bb, x.planB)
+        det.append(pb)
+      }
+      const marca = document.createElement('button')
+      marca.type = 'button'
+      marca.className = 'ac-btn sl-reto-marca'
+      const pintarMarca = () => {
+        const si = hechos.has(x.id)
+        marca.textContent = si ? 'Hecho · tocar para desmarcar' : 'Marcar como hecho'
+        marca.setAttribute('aria-pressed', String(si))
+        det.classList.toggle('hecho', si)
+      }
+      pintarMarca()
+      marca.addEventListener('click', async () => {
+        const si = !hechos.has(x.id)
+        marca.disabled = true
+        try {
+          const res = (await enviar({ accion: 'reto', reto: x.id, hecho: si })) as { hechos: string[] }
+          hechos.clear()
+          res.hechos.forEach((h) => hechos.add(h))
+          pintarMarca()
+          contar()
+          if (si) {
+            det.open = false
+            const sig = det.nextElementSibling as HTMLDetailsElement | null
+            if (sig?.matches('details') && !sig.classList.contains('hecho')) {
+              sig.open = true
+              sig.scrollIntoView({ behavior: 'smooth', block: 'start' })
+            }
+          }
+        } catch (err) {
+          decir(err instanceof Error ? err.message : 'No se pudo guardar. Intente de nuevo.', 'error')
+        } finally {
+          marca.disabled = false
+        }
+      })
+      det.append(marca)
+      caja.append(det)
+    })
+    lista.replaceChildren(caja)
+  }
+
   const espera = (texto: string) => {
     const p = document.createElement('p')
     p.className = 'sl-espera'
@@ -465,6 +621,7 @@ function montar(raiz: HTMLElement) {
       lista.replaceChildren()
       pintarEjemplo(null)
       pintarHerramientas(null)
+      turno?.poner(null)
       duda.hidden = true
       zonaPC.hidden = true
       decir('')
@@ -487,7 +644,8 @@ function montar(raiz: HTMLElement) {
     duda.hidden = (e.numero ?? 0) < DUDAS_DESDE
     pintarEjemplo(e.ejemplo ?? null)
     pintarHerramientas(e.herramientas ?? null)
-    const id = e.interaccion?.id ?? (e.practica ? 'practica' : e.guia ? `guia:${e.escena}:${e.guia.paso}` : `escena:${e.escena}`)
+    turno?.poner(e.turno?.aviso ?? null)
+    const id = e.interaccion?.id ?? (e.practica ? 'practica' : e.guia ? `guia:${e.escena}:${e.guia.paso}` : e.retos ? 'retos' : `escena:${e.escena}`)
     if (id === abierta) return
     abierta = id
     kicker.textContent = e.kicker ?? ''
@@ -495,6 +653,7 @@ function montar(raiz: HTMLElement) {
     if (e.interaccion) pintarPreguntas(e)
     else if (e.guia) pintarGuia(e.guia)
     else if (e.practica) pintarPractica(e.practica)
+    else if (e.retos) pintarRetos(e.retos)
     else {
       // Sin nada que votar: la idea de la escena y, debajo, el ejemplo del área.
       titulo.textContent = e.escena || 'Mire la pantalla'
@@ -502,7 +661,7 @@ function montar(raiz: HTMLElement) {
       if (e.idea) lista.replaceChildren()
       else espera('Mire la pantalla. Cuando haya una pregunta, aparece aquí.')
     }
-    sub.classList.toggle('idea', !e.interaccion && !e.practica && !e.guia && !!e.idea)
+    sub.classList.toggle('idea', !e.interaccion && !e.practica && !e.guia && !e.retos && !!e.idea)
   }
 
   refrescar()
@@ -618,6 +777,39 @@ function montarPC(raiz: HTMLElement): { vigente(actual: string | null): void } |
       vence.textContent = 'Listo: su PC ya quedó abierto con este código.'
       abrir.textContent = 'Abrir en otro PC'
       abrir.hidden = false
+    },
+  }
+}
+
+/**
+ * Aviso del turno de acompañamiento arriba de la sala (capacitación 2). Cuando
+ * cambia a "Le sigue a usted" o "Es su turno", destella y vibra el celular.
+ */
+function montarTurno(raiz: HTMLElement): { poner(a: { titulo: string; texto: string; tono: string } | null): void } | null {
+  const caja = raiz.querySelector<HTMLElement>('[data-sl-turno]')
+  if (!caja) return null
+  const tit = caja.querySelector<HTMLElement>('[data-sl-turno-tit]')!
+  const txt = caja.querySelector<HTMLElement>('[data-sl-turno-txt]')!
+  let tono = ''
+  return {
+    poner(a) {
+      caja.hidden = !a
+      if (!a) {
+        tono = ''
+        return
+      }
+      tit.textContent = a.titulo
+      txt.textContent = a.texto
+      caja.dataset.tono = a.tono
+      if (a.tono !== tono && (a.tono === 'sigue' || a.tono === 'ahora')) {
+        caja.classList.remove('nuevo')
+        void caja.offsetWidth
+        caja.classList.add('nuevo')
+        try {
+          navigator.vibrate?.([180, 80, 180])
+        } catch {}
+      }
+      tono = a.tono
     },
   }
 }
