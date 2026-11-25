@@ -141,10 +141,25 @@ const waBase = `https://wa.me/${numero}`
   const MAX_PREGUNTAS = 30
   const CLAVE = 'asesor:v1'
 
-  const raiz = document.querySelector<HTMLElement>('[data-asesor]')
-  if (raiz) iniciar(raiz)
+  // El sitio usa ClientRouter: cada navegación cambia el body y trae una
+  // burbuja nueva sin eventos, y este script no vuelve a correr solo. Por eso
+  // se engancha en cada astro:page-load (también dispara en la carga inicial)
+  // y lo de la página anterior se suelta en astro:before-swap.
+  let soltar: AbortController | null = null
+  document.addEventListener('astro:page-load', () => {
+    const raiz = document.querySelector<HTMLElement>('[data-asesor]')
+    if (!raiz || raiz.dataset.listo) return
+    raiz.dataset.listo = '1'
+    soltar?.abort()
+    soltar = new AbortController()
+    iniciar(raiz, soltar.signal)
+  })
+  document.addEventListener('astro:before-swap', () => {
+    soltar?.abort()
+    soltar = null
+  })
 
-  function iniciar(raiz: HTMLElement) {
+  function iniciar(raiz: HTMLElement, signal: AbortSignal) {
     const lang = raiz.dataset.lang === 'en' ? 'en' : 'es'
     const T = JSON.parse(raiz.dataset.textos || '{}')
     const waBase = raiz.dataset.wa || ''
@@ -367,7 +382,11 @@ const waBase = `https://wa.me/${numero}`
         globo.removeAttribute('data-saliendo')
       }, 220)
     }
-    setTimeout(mostrarGlobo, 6000)
+    const relojInicial = setTimeout(mostrarGlobo, 6000)
+    signal.addEventListener('abort', () => {
+      clearTimeout(relojInicial)
+      if (globoReloj !== null) clearTimeout(globoReloj)
+    })
     globo.addEventListener('pointerenter', () => {
       if (globoReloj !== null) clearTimeout(globoReloj)
     })
@@ -392,7 +411,7 @@ const waBase = `https://wa.me/${numero}`
     $<HTMLButtonElement>('[data-asesor-cerrar]').addEventListener('click', cerrar)
     document.addEventListener('keydown', (e) => {
       if (e.key === 'Escape' && !panel.hidden) cerrar()
-    })
+    }, { signal })
     form.addEventListener('submit', (e) => {
       e.preventDefault()
       preguntar(input.value)

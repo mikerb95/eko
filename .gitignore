@@ -6,6 +6,7 @@ dist/
 data/*.db
 data/*.db-*
 data/taller/
+data/finanzas/
 # generated types
 .astro/
 

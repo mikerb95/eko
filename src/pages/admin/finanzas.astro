@@ -1,0 +1,200 @@
+---
+// Finanzas: calendario tributario vigilado, expediente por obligación,
+// control antes de pagar, lectura de documentos con IA y resúmenes.
+// La ven finanzas (prepara), gerencia (aprueba) y admin. El sistema NO entra
+// a portales ni hace pagos: prepara, verifica y avisa.
+// Todo se carga en el servidor; public/admin/finanzas.js pinta y envía los
+// cambios a /api/admin/finanzas, que devuelve el estado completo.
+export const prerender = false
+import AdminLayout from '../../layouts/AdminLayout.astro'
+import { ico } from '../../lib/admin/iconos'
+import { cargarEstado } from '../../lib/finanzas/acciones'
+
+const role = String(Astro.locals.role || '')
+if (!['admin', 'finanzas', 'gerencia'].includes(role)) return Astro.redirect('/admin')
+const usuario = String(Astro.locals.username || '')
+const sesion = { usuario, nombre: String(Astro.locals.user || usuario), rol: role }
+
+let errorCarga = ''
+let estado: Awaited<ReturnType<typeof cargarEstado>> | null = null
+try {
+  estado = await cargarEstado(sesion)
+} catch (e: any) {
+  console.error('[admin/finanzas] carga', e?.stack || e)
+  errorCarga = 'No se pudo cargar la información de Finanzas.'
+}
+const abiertas = estado ? estado.obligaciones.filter((o) => o.nivel !== 'cerrada') : []
+const cuentas = {
+  finanzas: abiertas.length,
+  finanzasAvisos: abiertas.filter((o) => o.nivel === 'urgente' || o.nivel === 'vencida').length,
+}
+const porAprobar = estado ? estado.pagos.filter((p) => p.estado === 'por_aprobar').length : 0
+---
+
+<AdminLayout titulo="Finanzas · EKOSOLV" activo="finanzas" css={['/admin/cumplimiento.css', '/admin/finanzas.css']} cuentas={cuentas}>
+  <Fragment slot="avisos">
+    {errorCarga && <div class="banner-error">{errorCarga}</div>}
+  </Fragment>
+
+  <div class="panel-head">
+    <div>
+      <h2>Finanzas</h2>
+      <p class="panel-sub">Calendario tributario, expedientes y control antes de pagar. El panel prepara, verifica y avisa; la persona paga en el portal y Gerencia aprueba.</p>
+    </div>
+    <button class="btn-primary" type="button" id="nueva-obligacion" hidden>+ Nueva obligación</button>
+  </div>
+
+  <div id="fin-avisos-config"></div>
+
+  <nav class="subtabs" aria-label="Secciones de Finanzas">
+    <button class="subtab is-active" data-tab="calendario">Calendario <span class="count" data-cuenta="calendario">{abiertas.length}</span></button>
+    <button class="subtab" data-tab="pagos">Pagos <span class="count" data-cuenta="pagos">{porAprobar}</span></button>
+    <button class="subtab" data-tab="documentos">Documentos</button>
+    <button class="subtab" data-tab="resumenes">Resúmenes</button>
+    <button class="subtab" data-tab="ajustes">Ajustes</button>
+  </nav>
+
+  <!-- CALENDARIO -->
+  <section id="panel-calendario" class="panel is-active">
+    <div class="kpi-grid" id="fin-kpis"></div>
+    <div class="toolbar">
+      <label class="buscar"><Fragment set:html={ico('buscar')} /><input type="search" id="ob-q" placeholder="Buscar por impuesto, periodo o entidad" aria-label="Buscar obligaciones" /></label>
+      <div class="chips" id="ob-chips"></div>
+    </div>
+    <div id="ob-list"></div>
+  </section>
+
+  <!-- PAGOS -->
+  <section id="panel-pagos" class="panel">
+    <p class="fin-intro">Cada pago pasa por el control antes de pagar: que no esté pagado ya, que el valor sea el del borrador, que la entidad, la referencia y la cuenta estén autorizadas, y que Gerencia dé el visto bueno. Quien prepara no aprueba.</p>
+    <div class="chips" id="pago-chips"></div>
+    <div id="pago-list"></div>
+  </section>
+
+  <!-- DOCUMENTOS -->
+  <section id="panel-documentos" class="panel">
+    <article class="dash-card fin-subir">
+      <header class="dash-head">
+        <div><h3>Leer un documento</h3><p>Declaración, recibo de pago, comprobante o requerimiento de la DIAN o de Hacienda. El sistema extrae los datos, los compara con lo esperado y marca las diferencias. En un requerimiento calcula el plazo y crea la alerta.</p></div>
+      </header>
+      <form id="doc-form" class="fin-doc-form">
+        <label>Archivo (PDF, PNG o JPG, hasta 4 MB)<input type="file" name="archivo" accept="application/pdf,image/png,image/jpeg" required /></label>
+        <label>Obligación relacionada (opcional)<select name="obligacion_id"></select></label>
+        <button type="submit" class="btn-primary"><span class="t">Leer documento</span></button>
+        <p class="form-error" id="doc-err"></p>
+      </form>
+      <p class="muted fin-nota" id="doc-ia"></p>
+    </article>
+    <div id="doc-list"></div>
+  </section>
+
+  <!-- RESÚMENES -->
+  <section id="panel-resumenes" class="panel">
+    <div class="dash-grid">
+      <article class="dash-card">
+        <header class="dash-head">
+          <div><h3>Resumen del lunes</h3><p>Cada lunes a las 7:00 a. m.: lo que vence en las dos semanas siguientes y lo atrasado. Llega a Finanzas y a Gerencia.</p></div>
+          <button type="button" class="btn-ghost btn-sm" data-resumen="semanal">Enviar ahora</button>
+        </header>
+        <div id="res-semanal"></div>
+      </article>
+      <article class="dash-card">
+        <header class="dash-head">
+          <div><h3>Resumen del mes</h3><p>El día 1: cómo cerraron las obligaciones del mes anterior y las cifras de Zoho Books (facturación, recaudo y cartera).</p></div>
+          <button type="button" class="btn-ghost btn-sm" data-resumen="mensual">Enviar ahora</button>
+        </header>
+        <div id="res-mensual"></div>
+      </article>
+    </div>
+    <article class="dash-card">
+      <header class="dash-head"><div><h3>Avisos enviados</h3><p>Avisos de vencimiento a 15, 7, 3 y 1 día hábil, y resúmenes. Los marcados con Gerencia son los escalados.</p></div></header>
+      <div id="res-avisos"></div>
+    </article>
+    <article class="dash-card fin-bitacora">
+      <header class="dash-head"><div><h3>Bitácora</h3><p>Quién hizo qué y cuándo.</p></div></header>
+      <div id="res-bitacora"></div>
+    </article>
+  </section>
+
+  <!-- AJUSTES -->
+  <section id="panel-ajustes" class="panel">
+    <div class="dash-grid">
+      <article class="dash-card">
+        <header class="dash-head"><div><h3>Ekosolv ante la DIAN y Hacienda</h3><p>Con el NIT y las responsabilidades del RUT se arma el calendario.</p></div></header>
+        <form id="config-form" class="fin-form"></form>
+      </article>
+      <div class="fin-columna">
+        <article class="dash-card">
+          <header class="dash-head"><div><h3>Cargar el calendario</h3><p>Agrega las obligaciones de un año según los ajustes. Las fechas que ya pasaron no se cargan y las que ya existen no se tocan.</p></div></header>
+          <form id="sembrar-form" class="fin-form fin-sembrar"></form>
+          <div id="faltantes"></div>
+        </article>
+        <article class="dash-card">
+          <header class="dash-head"><div><h3>Quién recibe los avisos</h3><p>Ya llegan al correo de cada usuario de Finanzas y de Gerencia. Aquí puede cambiar un correo, quitar a alguien de los avisos o agregar otros.</p></div></header>
+          <div id="destinos"></div>
+        </article>
+      </div>
+    </div>
+    <div class="dash-grid">
+      <article class="dash-card">
+        <header class="dash-head"><div><h3>Cuentas de origen autorizadas</h3><p>Desde dónde se pueden pagar impuestos. Solo se guardan los últimos 4 dígitos. Las cambia Gerencia.</p></div>
+          <button type="button" class="btn-ghost btn-sm" id="nueva-cuenta" hidden>+ Cuenta</button></header>
+        <div id="cuentas"></div>
+      </article>
+      <article class="dash-card">
+        <header class="dash-head"><div><h3>Entidades autorizadas</h3><p>A quién se paga y con qué referencia. Las cambia Gerencia.</p></div>
+          <button type="button" class="btn-ghost btn-sm" id="nueva-entidad" hidden>+ Entidad</button></header>
+        <div id="entidades"></div>
+      </article>
+    </div>
+  </section>
+
+  <Fragment slot="fuera">
+    <!-- EXPEDIENTE -->
+    <div class="drawer" id="ob-drawer" hidden>
+      <div class="drawer-bg" data-close></div>
+      <div class="drawer-panel drawer-ancho">
+        <div class="drawer-head">
+          <div><p class="drawer-kicker" id="ob-kicker">Obligación</p><h3 id="ob-titulo">Obligación</h3><p class="fin-sub" id="ob-sub"></p></div>
+          <button class="x" data-close aria-label="Cerrar">×</button>
+        </div>
+        <div class="drawer-body" id="ob-cuerpo"></div>
+      </div>
+    </div>
+
+    <!-- PAGO -->
+    <div class="drawer" id="pago-drawer" hidden>
+      <div class="drawer-bg" data-close></div>
+      <div class="drawer-panel drawer-ancho">
+        <div class="drawer-head">
+          <div><p class="drawer-kicker">Control antes de pagar</p><h3 id="pago-titulo">Pago</h3><p class="fin-sub" id="pago-sub"></p></div>
+          <button class="x" data-close aria-label="Cerrar">×</button>
+        </div>
+        <div class="drawer-body" id="pago-cuerpo"></div>
+      </div>
+    </div>
+
+    <!-- NUEVA OBLIGACIÓN -->
+    <div class="drawer" id="nueva-drawer" hidden>
+      <div class="drawer-bg" data-close></div>
+      <div class="drawer-panel">
+        <div class="drawer-head"><div><p class="drawer-kicker">Calendario</p><h3>Nueva obligación</h3></div><button class="x" data-close aria-label="Cerrar">×</button></div>
+        <form id="nueva-form" class="drawer-body fin-form"></form>
+      </div>
+    </div>
+
+    <!-- CUENTA / ENTIDAD -->
+    <div class="drawer" id="aut-drawer" hidden>
+      <div class="drawer-bg" data-close></div>
+      <div class="drawer-panel">
+        <div class="drawer-head"><div><p class="drawer-kicker">Lista autorizada</p><h3 id="aut-titulo">Cuenta</h3></div><button class="x" data-close aria-label="Cerrar">×</button></div>
+        <form id="aut-form" class="drawer-body fin-form"></form>
+      </div>
+    </div>
+
+    <script is:inline define:vars={{ estado }}>
+      window.__FIN__ = estado
+    </script>
+    <script src="/admin/finanzas.js" type="module"></script>
+  </Fragment>
+</AdminLayout>
