@@ -57,12 +57,17 @@ export interface Ficha extends Empleado {
   updated_at: string
 }
 
+/**
+ * Una persona del equipo. Con cuenta del panel, `usuario_id` es users.id;
+ * sin cuenta, es negativo y la persona solo existe en th_empleados.
+ */
 export interface Persona {
   usuario_id: number
   nombre: string
   username: string
   rol: string
   cuentaActiva: boolean
+  sinCuenta: boolean
   ficha: Ficha | null
 }
 
@@ -301,15 +306,28 @@ export async function leerEstado(db: Client, hoy: string): Promise<EstadoTalento
     leerAjustes(db),
   ])
   const porUsuario = new Map(fichas.rows.map((r: any) => [num(r.usuario_id), aFicha(r)]))
-  const personas: Persona[] = usuarios.rows.map((u: any) => ({
+  const conCuenta: Persona[] = usuarios.rows.map((u: any) => ({
     usuario_id: num(u.id),
     nombre: str(u.name) || str(u.username),
     username: str(u.username),
     rol: str(u.role),
     cuentaActiva: num(u.active) === 1,
+    sinCuenta: false,
     ficha: porUsuario.get(num(u.id)) ?? null,
   }))
-  // Lo que cuelga de una cuenta borrada no se muestra.
+  const sinCuenta: Persona[] = fichas.rows
+    .filter((r: any) => num(r.usuario_id) < 0)
+    .map((r: any) => ({
+      usuario_id: num(r.usuario_id),
+      nombre: str(r.nombre) || 'Sin nombre',
+      username: '',
+      rol: '',
+      cuentaActiva: false,
+      sinCuenta: true,
+      ficha: porUsuario.get(num(r.usuario_id)) ?? null,
+    }))
+  const personas = [...conCuenta, ...sinCuenta].sort((a, b) => a.nombre.localeCompare(b.nombre, 'es', { sensitivity: 'base' }))
+  // Lo que cuelga de una cuenta o de un empleado borrado no se muestra.
   const existe = new Set(personas.map((p) => p.usuario_id))
   const deAlguien = <T extends { usuario_id: number }>(filas: T[]) => filas.filter((f) => existe.has(f.usuario_id))
 
@@ -416,17 +434,35 @@ function idValido(v: unknown, campo = 'id'): number {
   return n
 }
 
-async function usuarioExiste(db: Client, id: number): Promise<void> {
-  const r = await db.execute({ sql: 'SELECT 1 FROM users WHERE id = ?', args: [id] })
-  if (!r.rows.length) throw new UserError('Esa persona no tiene cuenta en el panel')
+/** Id de persona: positivo (cuenta del panel) o negativo (empleado sin cuenta). */
+function idPersona(v: unknown): number {
+  const n = Number(v)
+  if (!Number.isInteger(n) || n === 0) throw new UserError('Persona inválida')
+  return n
+}
+
+/** La persona existe: como cuenta en users o, sin cuenta, como ficha propia. */
+async function personaExiste(db: Client, id: number): Promise<void> {
+  const r = id > 0
+    ? await db.execute({ sql: 'SELECT 1 FROM users WHERE id = ?', args: [id] })
+    : await db.execute({ sql: 'SELECT 1 FROM th_empleados WHERE usuario_id = ?', args: [id] })
+  if (!r.rows.length) throw new UserError('Esa persona ya no está en el panel')
 }
 
 // ---------- Escrituras ----------
 
-export async function guardarFicha(b: any): Promise<void> {
+/**
+ * Guarda la ficha y devuelve el usuario_id. Sin `usuario_id` crea un empleado
+ * sin cuenta del panel: lleva su propio nombre y un id negativo, que nunca
+ * choca con los de users.
+ */
+export async function guardarFicha(b: any): Promise<number> {
   const db = cliente()
-  const usuario_id = idValido(b.usuario_id, 'Persona')
-  await usuarioExiste(db, usuario_id)
+  const nuevo = b.usuario_id === '' || b.usuario_id == null
+  const usuario_id = nuevo ? 0 : idPersona(b.usuario_id)
+  if (usuario_id) await personaExiste(db, usuario_id)
+  const nombre = usuario_id > 0 ? '' : texto(b.nombre, 120)
+  if (usuario_id <= 0 && !nombre) throw new UserError('Escriba el nombre completo del empleado')
   const tipo_contrato = catalogo(b.tipo_contrato, TIPOS_CONTRATO, 'El tipo de contrato', true)
   const fecha_ingreso = fechaOpcional(b.fecha_ingreso, 'ingreso')
   const fecha_fin_contrato = fechaOpcional(b.fecha_fin_contrato, 'fin del contrato')
@@ -449,6 +485,7 @@ export async function guardarFicha(b: any): Promise<void> {
   }
   const ts = ahora()
   const campos = {
+    nombre,
     documento: texto(b.documento, 30),
     cargo_id,
     area: catalogo(b.area, AREAS_EMPRESA, 'El área', true),
@@ -472,12 +509,44 @@ export async function guardarFicha(b: any): Promise<void> {
     notas: texto(b.notas, 2000),
   }
   const cols = Object.keys(campos)
+  if (nuevo) {
+    // El id sale en la misma sentencia (el menor que haya, menos uno), y sin
+    // ON CONFLICT: si dos altas chocaran, la segunda falla en vez de pisar.
+    const r = await db.execute({
+      sql: `INSERT INTO th_empleados (usuario_id, ${cols.join(', ')}, created_at, updated_at)
+            SELECT MIN(COALESCE(MIN(usuario_id), 0), 0) - 1, ${cols.map(() => '?').join(', ')}, ?, ? FROM th_empleados
+            RETURNING usuario_id`,
+      args: [...Object.values(campos), ts, ts] as any[],
+    })
+    return num((r.rows[0] as any)?.usuario_id)
+  }
   await db.execute({
     sql: `INSERT INTO th_empleados (usuario_id, ${cols.join(', ')}, created_at, updated_at)
           VALUES (?, ${cols.map(() => '?').join(', ')}, ?, ?)
           ON CONFLICT(usuario_id) DO UPDATE SET ${cols.map((c) => `${c} = excluded.${c}`).join(', ')}, updated_at = excluded.updated_at`,
     args: [usuario_id, ...Object.values(campos), ts, ts] as any[],
   })
+  return usuario_id
+}
+
+/**
+ * Borra un empleado sin cuenta. Si ya tiene historial (documentos, novedades,
+ * formación o evaluaciones) no se borra: se le pone fecha de retiro, igual
+ * que a las cuentas, para no perder nada.
+ */
+export async function eliminarEmpleadoSinCuenta(idRaw: unknown): Promise<void> {
+  const id = idPersona(idRaw)
+  if (id > 0) throw new UserError('Las personas con cuenta se gestionan en Usuarios')
+  const db = cliente()
+  const r = await db.execute({
+    sql: `SELECT (SELECT COUNT(*) FROM th_documentos WHERE usuario_id = ?)
+               + (SELECT COUNT(*) FROM th_novedades WHERE usuario_id = ?)
+               + (SELECT COUNT(*) FROM th_formaciones WHERE usuario_id = ?)
+               + (SELECT COUNT(*) FROM th_evaluaciones WHERE usuario_id = ?) AS n`,
+    args: [id, id, id, id],
+  })
+  if (num((r.rows[0] as any)?.n) > 0) throw new UserError('Esta persona ya tiene historial. En vez de borrarla, póngale fecha de retiro en la ficha.')
+  await db.execute({ sql: 'DELETE FROM th_empleados WHERE usuario_id = ?', args: [id] })
 }
 
 function criteriosValidos(v: unknown): Criterio[] {
@@ -532,8 +601,8 @@ export async function eliminarCargo(idRaw: unknown): Promise<void> {
 
 export async function guardarDocumento(b: any): Promise<void> {
   const db = cliente()
-  const usuario_id = idValido(b.usuario_id, 'Persona')
-  await usuarioExiste(db, usuario_id)
+  const usuario_id = idPersona(b.usuario_id)
+  await personaExiste(db, usuario_id)
   const tipo = catalogo(b.tipo, TIPOS_DOCUMENTO, 'El tipo de documento')
   const fecha_expedicion = fechaOpcional(b.fecha_expedicion, 'expedición')
   const fecha_vencimiento = fechaOpcional(b.fecha_vencimiento, 'vencimiento')
@@ -562,8 +631,8 @@ const DECIDIDOS = ['aprobada', 'rechazada', 'cancelada']
 
 export async function guardarNovedad(b: any, quien: string): Promise<void> {
   const db = cliente()
-  const usuario_id = idValido(b.usuario_id, 'Persona')
-  await usuarioExiste(db, usuario_id)
+  const usuario_id = idPersona(b.usuario_id)
+  await personaExiste(db, usuario_id)
   const tipo = catalogo(b.tipo, TIPOS_NOVEDAD, 'El tipo de novedad')
   const estado = catalogo(b.estado || 'solicitada', ESTADOS_NOVEDAD, 'El estado')
   const desde = fechaObligatoria(b.desde, 'inicio')
@@ -688,11 +757,15 @@ export async function registrarFormaciones(b: any): Promise<number> {
   const fecha = fechaObligatoria(b.fecha, 'realización')
   const vigencia = num((c.rows[0] as any).vigencia_meses)
   const vence_el = vigencia > 0 ? masMeses(fecha, vigencia) : ''
-  const ids = [...new Set((Array.isArray(b.usuario_ids) ? b.usuario_ids : []).map((v: unknown) => idValido(v, 'Persona')))] as number[]
+  const ids = [...new Set((Array.isArray(b.usuario_ids) ? b.usuario_ids : []).map(idPersona))] as number[]
   if (!ids.length) throw new UserError('Elija al menos una persona')
   if (ids.length > 200) throw new UserError('Demasiadas personas en un solo registro')
-  const existentes = await db.execute({ sql: `SELECT id FROM users WHERE id IN (${ids.map(() => '?').join(',')})`, args: ids })
-  if (existentes.rows.length !== ids.length) throw new UserError('Alguna de las personas ya no tiene cuenta en el panel')
+  const marcas = ids.map(() => '?').join(',')
+  const existentes = await db.execute({
+    sql: `SELECT id FROM users WHERE id IN (${marcas}) UNION SELECT usuario_id FROM th_empleados WHERE usuario_id < 0 AND usuario_id IN (${marcas})`,
+    args: [...ids, ...ids],
+  })
+  if (existentes.rows.length !== ids.length) throw new UserError('Alguna de las personas ya no está en el panel')
   // No se duplica la misma asistencia (persona, curso, fecha).
   const ya = await db.execute({
     sql: `SELECT usuario_id FROM th_formaciones WHERE curso_id = ? AND fecha = ? AND usuario_id IN (${ids.map(() => '?').join(',')})`,
@@ -721,8 +794,8 @@ export async function eliminarFormacion(id: unknown): Promise<void> {
 
 export async function guardarEvaluacion(b: any, quien: string): Promise<number> {
   const db = cliente()
-  const usuario_id = idValido(b.usuario_id, 'Persona')
-  await usuarioExiste(db, usuario_id)
+  const usuario_id = idPersona(b.usuario_id)
+  await personaExiste(db, usuario_id)
   const fecha = fechaObligatoria(b.fecha, 'la evaluación')
   const estado = b.estado === 'cerrada' ? 'cerrada' : 'borrador'
   const calificaciones: Calificacion[] = (Array.isArray(b.calificaciones) ? b.calificaciones : []).slice(0, 15).map((c: any) => {

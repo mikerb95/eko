@@ -50,3 +50,6 @@ docs/plan-asistente.md
 # Playwright
 test-results/
 playwright-report/
+
+# Documentos de clientes (RUT, declaraciones): datos personales, el repo es público.
+docs/*.pdf

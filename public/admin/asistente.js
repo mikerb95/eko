@@ -103,7 +103,11 @@ function nuevoTurno(pregunta) {
   hilo.append(t.nodo)
   // Con la conversación en marcha la caja baja debajo del hilo: la respuesta
   // suele cerrar con una pregunta y se contesta justo ahí, como en un chat.
-  seccion.classList.add('is-chat')
+  if (!seccion.classList.contains('is-chat')) {
+    seccion.classList.add('is-chat')
+    caja.placeholder = 'Escriba aquí para seguir la conversación…'
+    sugerir()
+  }
   form.scrollIntoView({ block: 'nearest' })
   return t
 }
@@ -326,8 +330,71 @@ document.addEventListener('click', (e) => {
   if (!form.contains(e.target)) ocultarResultados()
 })
 
-for (const b of document.querySelectorAll('[data-atajo]')) {
-  b.addEventListener('click', () => preguntar(b.dataset.atajo))
+// ── Sugerencias que se escriben solas ───────────────────────────────────
+//
+// Con la caja vacía y sin conversación, un ejemplo de pregunta se escribe
+// letra por letra, se queda 2 s con el cursor parpadeando, se borra y entra
+// el siguiente. Es un adorno encima del textarea (aria-hidden): no es su
+// valor ni su placeholder, así que no estorba al escribir ni al lector de
+// pantalla. Un setTimeout por letra y nada corre con la pestaña oculta.
+
+const sug = $('#asis-sugerencia')
+const sugTxt = sug && $('.asis-sug-txt', sug)
+const ejemplos = (ASIS.atajos || []).filter(Boolean)
+const quieto = matchMedia('(prefers-reduced-motion: reduce)').matches
+let sugTimer = null
+let sugI = 0
+
+const pausa = (ms) => new Promise((r) => { sugTimer = setTimeout(r, ms) })
+const sugVisible = () => !caja.value && !seccion.classList.contains('is-chat') && !document.hidden
+
+function pintarSug(txt) {
+  sugTxt.textContent = txt
+  // En pantallas angostas el ejemplo no cabe: que siempre se vea el final.
+  sug.scrollLeft = sug.scrollWidth
+}
+
+async function cicloSug() {
+  while (sugVisible()) {
+    const frase = ejemplos[sugI++ % ejemplos.length]
+    if (quieto) {
+      pintarSug(frase)
+      await pausa(4000)
+      continue
+    }
+    sug.classList.add('is-escribiendo')
+    for (let n = 1; n <= frase.length; n++) {
+      if (!sugVisible()) return
+      pintarSug(frase.slice(0, n))
+      // Un poco irregular, como alguien que escribe; más lento tras un signo.
+      await pausa(/[,.?:]/.test(frase[n - 1]) ? 180 : 38 + Math.random() * 40)
+    }
+    sug.classList.remove('is-escribiendo')
+    await pausa(2000)
+    if (!sugVisible()) return
+    sug.classList.add('is-escribiendo')
+    for (let n = frase.length - 1; n >= 0; n--) {
+      if (!sugVisible()) return
+      pintarSug(frase.slice(0, n))
+      await pausa(16)
+    }
+    sug.classList.remove('is-escribiendo')
+    await pausa(450)
+  }
+}
+
+function sugerir() {
+  if (!sug || !ejemplos.length) return
+  clearTimeout(sugTimer)
+  sug.classList.remove('is-escribiendo')
+  const ver = sugVisible()
+  sug.hidden = !ver
+  if (ver) cicloSug()
+}
+
+if (sug) {
+  caja.addEventListener('input', () => { if (caja.value) { clearTimeout(sugTimer); sug.hidden = true } else sugerir() })
+  document.addEventListener('visibilitychange', sugerir)
 }
 
 // ── Conversación abierta desde ?c= ──────────────────────────────────────
@@ -394,3 +461,5 @@ if (fTopes && ASIS.esAdmin) {
   mes.addEventListener('change', cargarConsumo)
   document.querySelector('.tab[data-tab="ia"]')?.addEventListener('click', () => { cargarTopes(); cargarConsumo() }, { once: true })
 }
+
+sugerir()

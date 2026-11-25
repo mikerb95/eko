@@ -9,6 +9,7 @@ import {
   eliminarCargo,
   eliminarCurso,
   eliminarDocumento,
+  eliminarEmpleadoSinCuenta,
   eliminarEvaluacion,
   eliminarFormacion,
   eliminarNovedad,
@@ -45,6 +46,7 @@ type Accion = (b: any, quien: string) => Promise<unknown>
 
 const ACCIONES: Record<string, Accion> = {
   guardar_ficha: (b) => guardarFicha(b),
+  eliminar_empleado: (b) => eliminarEmpleadoSinCuenta(b.usuario_id),
   guardar_cargo: (b) => guardarCargo(b),
   eliminar_cargo: (b) => eliminarCargo(b.id),
   guardar_documento: (b) => guardarDocumento(b),

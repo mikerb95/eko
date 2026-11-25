@@ -355,7 +355,8 @@ export const TABLAS: readonly string[] = [
   )`,
 
   // ── Talento humano (docs/plan-talento-humano.md) ────────────────────────
-  // Todo cuelga de users.id: los empleados son las mismas cuentas del panel.
+  // Todo cuelga de usuario_id: positivo = una cuenta del panel (users.id);
+  // negativo = un empleado sin cuenta, que solo existe aquí (con su nombre).
   // Sin datos de salud: de los exámenes y las incapacidades solo se guardan
   // fechas y el enlace al soporte. El salario es opcional (NULL = no se lleva).
   `CREATE TABLE IF NOT EXISTS th_empleados (
@@ -937,6 +938,9 @@ export const COLUMNAS: readonly (readonly [tabla: string, columna: string])[] = 
   // Correo con el enlace al banco de recursos de su área (docs/plan-recursos.md):
   // cuándo se le envió. Vacío = pendiente.
   ['ac_taller_asistentes', 'recursos_at'],
+  // Nombre del empleado sin cuenta del panel (usuario_id negativo). Con cuenta
+  // queda vacío: el nombre sale de users.
+  ['th_empleados', 'nombre'],
 ]
 
 /** Tablas que deben existir al terminar. Sirve para verificar tras migrar. */

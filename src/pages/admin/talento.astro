@@ -128,9 +128,10 @@ const user = Astro.locals.user || ''
     <div class="toolbar">
       <label class="buscar"><Fragment set:html={ico('buscar')} /><input type="search" id="equipo-q" placeholder="Buscar por nombre, cargo, área o jefe" aria-label="Buscar personas" /></label>
       <div class="chips" id="equipo-chips"></div>
+      <button class="btn-primary sp" type="button" id="nuevo-empleado">+ Agregar empleado</button>
     </div>
     <div id="equipo-list"></div>
-    <p class="muted th-nota">Las personas son las cuentas del panel. Para agregar a alguien, créele un usuario en <a href="/admin?tab=usuarios">Usuarios</a> y luego complete su ficha aquí.</p>
+    <p class="muted th-nota">Quienes entran al panel aparecen aquí solos desde <a href="/admin?tab=usuarios">Usuarios</a>. Para el resto del equipo use <b>Agregar empleado</b>: queda con su ficha, sin usuario ni contraseña.</p>
   </section>
 
   <!-- NOVEDADES -->
@@ -228,6 +229,10 @@ const user = Astro.locals.user || ''
         </nav>
         <form id="ficha-form" class="drawer-body" data-pvista="ficha">
           <input type="hidden" name="usuario_id" />
+          <fieldset class="grupo" id="ficha-nombre">
+            <legend>Empleado</legend>
+            <label>Nombre completo<input name="nombre" autocomplete="off" maxlength="120" /><small>No tiene cuenta del panel: no entra con usuario ni contraseña.</small></label>
+          </fieldset>
           <fieldset class="grupo">
             <legend>Cargo y contrato</legend>
             <div class="grid2">
@@ -277,6 +282,7 @@ const user = Astro.locals.user || ''
           </fieldset>
           <div class="drawer-actions">
             <p class="form-error" id="ficha-err"></p>
+            <button type="button" class="btn-ghost danger-txt" id="empleado-borrar" hidden>Eliminar</button>
             <button type="button" class="btn-ghost" data-close>Cerrar</button>
             <button type="submit" class="btn-primary"><span class="t">Guardar ficha</span></button>
           </div>

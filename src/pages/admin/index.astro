@@ -67,6 +67,10 @@ const atajos = [
   ...ATAJOS.recolecciones,
   ...(['admin', 'consultor', 'lectura', 'finanzas'].includes(role) ? ATAJOS.cumplimiento : []),
   ...(['admin', 'operaciones', 'consultor'].includes(role) ? ATAJOS.contactos : []),
+  // Consultas que cualquier rol puede hacer (permisos.ts: todos consultan).
+  '¿Cuál es la orden por confirmar más antigua?',
+  '¿Cuál fue el último artículo publicado en el blog?',
+  '¿Dónde reviso las normativas publicadas?',
 ]
 let asisRecientes: Awaited<ReturnType<typeof listarRecientes>> = []
 let asisInicial: unknown = null
@@ -100,6 +104,8 @@ const asis = {
   proponeAlgo,
   inicial: asisInicial,
   esAdmin: isAdmin,
+  // Ejemplos que se escriben solos dentro de la caja (asistente.js).
+  atajos,
 }
 
 // Alertas de cumplimiento para el número de la barra lateral. Fail-soft: si
@@ -126,50 +132,63 @@ const cuentas = {
 
     <!-- INICIO -->
     <section id="panel-inicio" class="panel is-active">
-      <!-- ASISTENTE -->
-      <section class="asis" aria-labelledby="asis-saludo">
-        <h1 id="asis-saludo" class="asis-saludo">Hola, {nombreCorto}. ¿En qué le ayudo?</h1>
-        <form id="asis-form" class="asis-caja" autocomplete="off">
-          <textarea id="asis-q" name="q" rows="1" maxlength="1000" placeholder={asis.ia ? 'Pregunte o busque algo: una orden, una alerta, un contacto…' : 'Busque una orden, un expediente, un contacto…'} aria-label="Pregunte o busque algo"></textarea>
-          <button type="submit" class="asis-enviar" aria-label="Enviar">
-            <svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true"><path d="M5 12h12M13 6l6 6-6 6" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
-          </button>
-          <div id="asis-resultados" class="asis-resultados" hidden></div>
-        </form>
-        <p class="asis-nota">
-          {asis.ia
-            ? (proponeAlgo
-                ? 'La IA consulta el panel y prepara cambios; nada se guarda sin que usted lo apruebe.'
-                : 'Con su rol, la IA solo consulta: no propone cambios.')
-            : 'El asistente con IA aún no está activo; por ahora la caja solo busca.'}
-        </p>
-        {asis.ia && (
-          <div class="asis-atajos" id="asis-atajos">
-            {atajos.map((a) => <button type="button" class="asis-atajo" data-atajo={a}>{a}</button>)}
-          </div>
-        )}
-        <div id="asis-hilo" class="asis-hilo" aria-live="polite"></div>
+      <!-- ASISTENTE: tarjeta principal del inicio, con las conversaciones
+           recientes al lado. Con conversación abierta (.is-chat) la columna
+           lateral se esconde y el hilo ocupa la tarjeta. -->
+      <section class={`asis${asisRecientes.length ? ' con-recientes' : ''}`} aria-labelledby="asis-saludo">
+        <div class="asis-principal">
+          <p class="asis-kicker">
+            <span class={`asis-estado${asis.ia ? ' is-activo' : ''}`} aria-hidden="true"></span>
+            Asistente IA
+            <span class="asis-kicker-rol">{asis.ia ? (proponeAlgo ? 'Consulta y prepara cambios' : 'Solo consulta') : 'Solo búsqueda'}</span>
+          </p>
+          <h1 id="asis-saludo" class="asis-saludo">Hola, {nombreCorto}. <span>¿En qué le ayudo?</span></h1>
+          <div id="asis-hilo" class="asis-hilo" aria-live="polite"></div>
+          <form id="asis-form" class="asis-caja" autocomplete="off">
+            <div class="asis-campo">
+              <textarea id="asis-q" name="q" rows="1" maxlength="1000" placeholder={asis.ia ? '' : 'Busque una orden, un expediente, un contacto…'} aria-label="Pregunte o busque algo"></textarea>
+              {asis.ia && <span class="asis-sugerencia" id="asis-sugerencia" aria-hidden="true"><span class="asis-sug-txt"></span><i class="asis-cursor"></i></span>}
+            </div>
+            <button type="submit" class="asis-enviar" aria-label="Enviar">
+              <svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true"><path d="M5 12h12M13 6l6 6-6 6" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            </button>
+            <div id="asis-resultados" class="asis-resultados" hidden></div>
+          </form>
+          <p class="asis-nota">
+            {asis.ia
+              ? (proponeAlgo
+                  ? 'La IA consulta el panel y prepara cambios; nada se guarda sin que usted lo apruebe.'
+                  : 'Con su rol, la IA solo consulta: no propone cambios.')
+              : 'El asistente con IA aún no está activo; por ahora la caja solo busca.'}
+          </p>
+        </div>
         {asisRecientes.length > 0 && (
-          <div class="asis-recientes">
+          <aside class="asis-recientes" aria-label="Conversaciones recientes">
             <div class="asis-recientes-head">
-              <span>{verTodas ? 'Conversaciones del equipo' : 'Sus conversaciones recientes'}</span>
-              {isAdmin && <a href={verTodas ? '/admin' : '/admin?todas=1'}>{verTodas ? 'Ver solo las mías' : 'Ver las de todos'}</a>}
+              <span>{verTodas ? 'Conversaciones del equipo' : 'Sus conversaciones'}</span>
+              {isAdmin && <a href={verTodas ? '/admin' : '/admin?todas=1'}>{verTodas ? 'Solo las mías' : 'Ver las de todos'}</a>}
             </div>
             <ul>
               {asisRecientes.map((r) => (
                 <li>
                   <a href={`/admin?c=${r.id}${verTodas ? '&todas=1' : ''}`}>
-                    {r.pendiente && <span class="asis-punto" title="Tiene un cambio esperando su aprobación"></span>}
+                    {r.pendiente
+                      ? <span class="asis-punto" title="Tiene un cambio esperando su aprobación"></span>
+                      : <svg class="asis-rec-ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 5h14v10H9l-4 4z" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round"/></svg>}
                     <span class="asis-rec-q">{r.pregunta}</span>
                     {verTodas && <span class="asis-rec-u">{r.usuario}</span>}
                   </a>
                 </li>
               ))}
             </ul>
-          </div>
+          </aside>
         )}
       </section>
 
+      <div class="inicio-sec">
+        <h2>Resumen de la operación</h2>
+        <p>Toque un indicador para ver la lista filtrada.</p>
+      </div>
       <div id="inicio-kpis" class="kpi-grid"></div>
       <div class="dash-grid">
         <article class="dash-card">
