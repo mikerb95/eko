@@ -1,0 +1,188 @@
+---
+// Cuestionario del diagnóstico de Finanzas. Es la herramienta de Mike durante
+// la reunión de análisis con la persona de Finanzas y la validación con
+// Gerencia: cada pregunta tiene su casilla (validada) y sus notas. Todo se
+// guarda en la base al momento, así se abre igual desde cualquier equipo.
+// Se imprime a PDF desde el navegador; la barra lateral y los botones no salen.
+export const prerender = false
+import AdminLayout from '../../../layouts/AdminLayout.astro'
+import { SECCIONES, NOTA_MAX, leerFinanzas, type EstadoFinanzas } from '../../../lib/diagnostico/finanzas'
+
+if ((Astro.locals.role || '') !== 'admin') return Astro.redirect('/admin')
+
+let estado: EstadoFinanzas = {}
+let errorCarga = ''
+try {
+  estado = await leerFinanzas()
+} catch (e: any) {
+  console.error('[admin/diagnostico/finanzas] carga', e?.stack || e)
+  errorCarga = 'No se pudo cargar lo guardado. No marques nada hasta recargar, o se pierde lo anterior.'
+}
+const marca = (id: string) => estado[id] ?? { h: false, n: '' }
+const total = SECCIONES.reduce((s, x) => s + x.preguntas.length, 0)
+const hechas = SECCIONES.reduce((s, x) => s + x.preguntas.filter((p) => marca(p.id).h).length, 0)
+const hechasDe = (i: number) => SECCIONES[i]!.preguntas.filter((p) => marca(p.id).h).length
+const pct = (a: number, b: number) => (b ? Math.round((a / b) * 100) : 0)
+let n = 0
+---
+
+<AdminLayout titulo="Diagnóstico de Finanzas · Panel Ekosolv" activo="diagnostico" css={['/admin/diagnostico-finanzas.css']}>
+  <Fragment slot="avisos">
+    {errorCarga && <div class="banner-error">{errorCarga}</div>}
+  </Fragment>
+
+  <div class="panel-head df-head">
+    <div>
+      <h2>Diagnóstico de Finanzas</h2>
+      <p class="panel-sub">Cuestionario de la reunión de análisis con Finanzas y la validación con Gerencia. Marca cada punto cuando quede validado y anota la respuesta: se guarda solo.</p>
+      <p class="df-fecha-print">Ekosolv · Diagnóstico del área financiera</p>
+    </div>
+    <div class="df-head-acc">
+      <span class="df-guardado" id="df-guardado" aria-live="polite"></span>
+      <button class="btn-primary btn-sm" type="button" id="df-imprimir">Imprimir o guardar PDF</button>
+    </div>
+  </div>
+
+  <section class="dash-card df-resumen">
+    <div class="df-total">
+      <span class="df-total-num"><b id="df-hechas">{hechas}</b> de {total} validadas</span>
+      <span class="df-barra" aria-hidden="true"><span id="df-barra" style={`width:${pct(hechas, total)}%`}></span></span>
+    </div>
+    <nav class="df-indice" aria-label="Secciones">
+      {SECCIONES.map((s, i) => (
+        <a href={`#s-${s.id}`} class:list={['df-chip', { 'is-completa': hechasDe(i) === s.preguntas.length }]} data-chip={s.id}>
+          <span class="df-chip-n">{i + 1}</span>{s.titulo}
+          <span class="df-chip-c"><b data-cuenta={s.id}>{hechasDe(i)}</b>/{s.preguntas.length}</span>
+        </a>
+      ))}
+    </nav>
+  </section>
+
+  {SECCIONES.map((s, i) => (
+    <section class="dash-card df-sec" id={`s-${s.id}`} data-sec={s.id}>
+      <header class="df-sec-head">
+        <h3><span class="df-sec-n">{i + 1}</span>{s.titulo}</h3>
+        <span class:list={['df-sec-c', { 'is-completa': hechasDe(i) === s.preguntas.length }]} data-cuenta-sec={s.id}>
+          <b data-cuenta={s.id}>{hechasDe(i)}</b> de {s.preguntas.length}
+        </span>
+      </header>
+      {s.intro && <p class="df-sec-intro">{s.intro}</p>}
+      <ol class="df-lista">
+        {s.preguntas.map((p) => {
+          n++
+          const m = marca(p.id)
+          return (
+            <li class:list={['df-preg', { 'is-hecha': m.h }]} data-id={p.id}>
+              <label class="df-check">
+                <input type="checkbox" checked={m.h} />
+                <span class="df-num">{n}</span>
+                <span class="df-texto">{p.texto}</span>
+              </label>
+              {p.pista && <p class="df-pista">{p.pista}</p>}
+              <textarea class="df-nota" rows="1" maxlength={NOTA_MAX} placeholder="Notas" aria-label={`Notas de la pregunta ${n}`}>{m.n}</textarea>
+              <div class:list={['df-nota-print', { 'is-vacia': !m.n }]}>{m.n}</div>
+            </li>
+          )
+        })}
+      </ol>
+    </section>
+  ))}
+
+  <script is:inline>
+    (() => {
+      const estado = document.getElementById('df-guardado')
+      const pendientes = new Map()
+      const timers = new Map()
+      let enVuelo = 0
+
+      const pintarEstado = (t, error) => {
+        estado.textContent = t
+        estado.classList.toggle('is-error', !!error)
+      }
+
+      const datos = (li) => ({
+        id: li.dataset.id,
+        h: li.querySelector('input[type=checkbox]').checked,
+        n: li.querySelector('.df-nota').value,
+      })
+
+      async function guardar(li, keepalive) {
+        const id = li.dataset.id
+        clearTimeout(timers.get(id))
+        timers.delete(id)
+        pendientes.delete(id)
+        enVuelo++
+        pintarEstado('Guardando…')
+        try {
+          const r = await fetch('/api/admin/diagnostico/finanzas', {
+            method: 'POST',
+            headers: { 'content-type': 'application/json' },
+            body: JSON.stringify(datos(li)),
+            keepalive: !!keepalive,
+          })
+          if (!r.ok) throw new Error(String(r.status))
+          enVuelo--
+          if (!enVuelo && !pendientes.size) pintarEstado('Guardado')
+        } catch {
+          enVuelo--
+          pendientes.set(id, li)
+          pintarEstado('No se pudo guardar. Se reintenta con el próximo cambio.', true)
+        }
+      }
+
+      // Si un guardado falló, el siguiente cambio reintenta también los pendientes.
+      const reintentar = () => pendientes.forEach((li) => guardar(li))
+
+      function contar() {
+        let total = 0
+        document.querySelectorAll('[data-sec]').forEach((sec) => {
+          const items = sec.querySelectorAll('.df-preg')
+          const h = sec.querySelectorAll('.df-preg.is-hecha').length
+          total += h
+          const completa = h === items.length
+          document.querySelectorAll(`[data-cuenta="${sec.dataset.sec}"]`).forEach((b) => (b.textContent = h))
+          document.querySelector(`[data-cuenta-sec="${sec.dataset.sec}"]`)?.classList.toggle('is-completa', completa)
+          document.querySelector(`[data-chip="${sec.dataset.sec}"]`)?.classList.toggle('is-completa', completa)
+        })
+        const todas = document.querySelectorAll('.df-preg').length
+        document.getElementById('df-hechas').textContent = total
+        document.getElementById('df-barra').style.width = `${todas ? Math.round((total / todas) * 100) : 0}%`
+      }
+
+      const crecer = (ta) => {
+        ta.style.height = 'auto'
+        ta.style.height = `${ta.scrollHeight + 2}px`
+      }
+
+      document.querySelectorAll('.df-preg').forEach((li) => {
+        const cb = li.querySelector('input[type=checkbox]')
+        const ta = li.querySelector('.df-nota')
+        const espejo = li.querySelector('.df-nota-print')
+        crecer(ta)
+        cb.addEventListener('change', () => {
+          li.classList.toggle('is-hecha', cb.checked)
+          contar()
+          reintentar()
+          guardar(li)
+        })
+        ta.addEventListener('input', () => {
+          crecer(ta)
+          espejo.textContent = ta.value
+          espejo.classList.toggle('is-vacia', !ta.value.trim())
+          pendientes.set(li.dataset.id, li)
+          pintarEstado('Sin guardar…')
+          clearTimeout(timers.get(li.dataset.id))
+          timers.set(li.dataset.id, setTimeout(() => { reintentar(); guardar(li) }, 800))
+        })
+        ta.addEventListener('blur', () => {
+          if (pendientes.has(li.dataset.id)) guardar(li)
+        })
+      })
+
+      // Al cerrar o recargar con notas sin guardar, se envían igual.
+      addEventListener('pagehide', () => pendientes.forEach((li) => guardar(li, true)))
+
+      document.getElementById('df-imprimir').addEventListener('click', () => print())
+    })()
+  </script>
+</AdminLayout>

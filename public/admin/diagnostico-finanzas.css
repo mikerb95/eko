@@ -1,0 +1,120 @@
+/* Cuestionario del diagnóstico de Finanzas (/admin/diagnostico/finanzas).
+   Las secciones se distinguen con número en círculo y tinte verde cuando
+   quedan completas, nunca con franja en el borde. Al imprimir sale solo el
+   cuestionario con las notas escritas. */
+
+.df-head-acc { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; }
+.df-guardado { font-size: 12px; color: var(--mute); min-height: 1em; }
+.df-guardado.is-error { color: var(--danger); font-weight: 500; }
+.df-fecha-print { display: none; }
+
+/* ---------- Resumen e índice ---------- */
+.df-resumen { margin-bottom: 18px; }
+.df-total { display: flex; align-items: center; gap: 14px; margin-bottom: 14px; }
+.df-total-num { font-size: 13px; color: var(--ink-2); white-space: nowrap; }
+.df-total-num b { font-size: 20px; font-weight: 650; color: var(--ink); font-variant-numeric: tabular-nums; }
+.df-barra { flex: 1; height: 8px; border-radius: 99px; background: var(--paper-2); box-shadow: inset 0 0 0 1px var(--line); overflow: hidden; }
+.df-barra span { display: block; height: 100%; background: var(--forest); border-radius: inherit; transition: width 0.25s ease; }
+
+.df-indice { display: flex; flex-wrap: wrap; gap: 6px; }
+.df-chip {
+  display: inline-flex; align-items: center; gap: 7px;
+  padding: 5px 10px 5px 5px; border-radius: 99px;
+  background: var(--paper-2); color: var(--ink-2); font-size: 12.5px; text-decoration: none;
+  border: 1px solid var(--line); transition: background 0.15s;
+}
+.df-chip:hover { background: color-mix(in oklab, var(--deep) 8%, var(--paper)); color: var(--ink); }
+.df-chip-n {
+  display: grid; place-items: center; width: 20px; height: 20px; border-radius: 50%;
+  background: var(--paper); color: var(--mute); font-size: 11px; font-weight: 600;
+}
+.df-chip-c { color: var(--mute); font-size: 11.5px; font-variant-numeric: tabular-nums; }
+.df-chip-c b { font-weight: 600; color: var(--ink-2); }
+.df-chip.is-completa { background: color-mix(in oklab, var(--forest) 12%, var(--paper)); border-color: color-mix(in oklab, var(--forest) 30%, var(--line)); }
+.df-chip.is-completa .df-chip-n { background: var(--forest); color: #fff; }
+
+/* ---------- Secciones ---------- */
+.df-sec { margin-bottom: 14px; scroll-margin-top: 76px; }
+.df-sec-head { display: flex; align-items: center; justify-content: space-between; gap: 12px; }
+.df-sec-head h3 { display: flex; align-items: center; gap: 10px; margin: 0; font-size: 16px; font-weight: 650; letter-spacing: -0.01em; }
+.df-sec-n {
+  display: grid; place-items: center; flex: none; width: 26px; height: 26px; border-radius: 50%;
+  background: color-mix(in oklab, var(--deep) 12%, transparent); color: var(--deep); font-size: 12.5px; font-weight: 650;
+}
+.df-sec-c {
+  flex: none; font-size: 12px; color: var(--mute); padding: 3px 9px; border-radius: 99px;
+  background: var(--paper-2); font-variant-numeric: tabular-nums; white-space: nowrap;
+}
+.df-sec-c b { color: var(--ink); font-weight: 650; }
+.df-sec-c.is-completa { background: color-mix(in oklab, var(--forest) 14%, transparent); color: var(--forest); }
+.df-sec-c.is-completa b { color: var(--forest); }
+.df-sec-intro { margin: 8px 0 0 36px; color: var(--ink-2); font-size: 13px; }
+
+/* ---------- Preguntas ---------- */
+.df-lista { list-style: none; margin: 12px 0 0; padding: 0; display: flex; flex-direction: column; gap: 4px; }
+.df-preg { padding: 10px 12px; border-radius: 10px; transition: background 0.15s; }
+.df-preg:hover { background: var(--paper-2); }
+.df-preg.is-hecha { background: color-mix(in oklab, var(--forest) 7%, var(--paper)); }
+
+.df-check { display: grid; grid-template-columns: 20px 24px minmax(0, 1fr); align-items: start; gap: 4px 8px; cursor: pointer; }
+.df-check input { width: 18px; height: 18px; margin: 1px 0 0; accent-color: var(--forest); cursor: pointer; }
+.df-num { color: var(--mute); font-size: 12px; font-variant-numeric: tabular-nums; padding-top: 2px; text-align: right; }
+.df-texto { font-size: 14px; line-height: 1.5; color: var(--ink); }
+.df-preg.is-hecha .df-texto { color: var(--ink-2); }
+
+.df-pista {
+  margin: 4px 0 0 52px; font-size: 12.5px; line-height: 1.45; color: var(--deep-2);
+  display: flex; gap: 6px;
+}
+.df-pista::before { content: ""; flex: none; width: 6px; height: 6px; margin-top: 6px; border-radius: 50%; background: var(--clay); }
+
+.df-nota {
+  display: block; width: calc(100% - 52px); margin: 8px 0 0 52px; box-sizing: border-box;
+  min-height: 36px; resize: none; overflow: hidden;
+  font: inherit; font-size: 13.5px; line-height: 1.5; color: var(--ink);
+  padding: 7px 10px; border: 1px solid var(--line); border-radius: 8px; background: var(--paper);
+}
+.df-nota::placeholder { color: var(--mute); }
+.df-nota:focus { outline: none; border-color: var(--deep); box-shadow: 0 0 0 3px color-mix(in oklab, var(--deep) 15%, transparent); }
+.df-nota-print { display: none; }
+
+@media (max-width: 560px) {
+  .df-total { flex-wrap: wrap; }
+  .df-barra { flex-basis: 100%; }
+  .df-sec { padding: 14px 12px; }
+  .df-sec-head { align-items: flex-start; }
+  .df-sec-intro { margin-left: 0; }
+  .df-preg { padding: 10px 6px; }
+  .df-check { grid-template-columns: 20px minmax(0, 1fr); }
+  .df-num { display: none; }
+  .df-pista { margin-left: 28px; }
+  .df-nota { width: calc(100% - 28px); margin-left: 28px; font-size: 16px; }
+  .df-head-acc { width: 100%; justify-content: space-between; }
+}
+
+/* ---------- Impresión ---------- */
+@media print {
+  @page { margin: 14mm 14mm 16mm; }
+  html body.crm { background: #fff; font-size: 11pt; }
+  .side, .side-velo, .crm-top, .df-indice, .df-head-acc, .panel-sub, .banner-error { display: none !important; }
+  body.crm .crm-shell { display: block; }
+  body.crm .crm-body, body.crm .crm-main { padding: 0 !important; max-width: none !important; background: #fff; }
+  .df-fecha-print { display: block; margin: 2px 0 0; color: #555; font-size: 10pt; }
+  body.crm .dash-card { box-shadow: none; border: 0; border-radius: 0; padding: 0; background: none; }
+  .df-resumen { margin-bottom: 10px; }
+  .df-total { margin-bottom: 0; }
+  body.crm .df-sec { margin: 0 0 6mm; break-inside: auto; }
+  .df-sec-head { break-after: avoid; border-bottom: 1px solid #ccc; padding-bottom: 4px; }
+  .df-sec-intro { break-after: avoid; }
+  .df-preg { break-inside: avoid; padding: 6px 0; background: none !important; }
+  .df-check input { accent-color: #333; }
+  .df-texto, .df-preg.is-hecha .df-texto { color: #000; font-size: 10.5pt; }
+  .df-pista { color: #444; font-size: 9pt; }
+  .df-nota { display: none; }
+  .df-nota-print {
+    display: block; margin: 4px 0 0 52px; white-space: pre-wrap; font-size: 10pt; line-height: 1.45; color: #000;
+    padding: 4px 8px; border: 1px solid #ddd; border-radius: 6px;
+  }
+  .df-nota-print.is-vacia { min-height: 15mm; }
+  .df-barra { print-color-adjust: exact; -webkit-print-color-adjust: exact; }
+}

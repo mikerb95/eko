@@ -22,6 +22,8 @@ interface Cuentas {
   academia?: number
   academiaRevisar?: number
   propuesta?: number
+  finanzas?: number
+  finanzasAvisos?: number
 }
 interface Props {
   titulo: string
@@ -34,6 +36,8 @@ const { titulo, activo, enPanel = false, css = [], cuentas = {} } = Astro.props
 const user = String(Astro.locals.user || 'admin')
 const role = String(Astro.locals.role || '')
 const isAdmin = role === 'admin'
+// Finanzas (impuestos y pagos): solo estos roles ven la sección.
+const veFinanzas = ['admin', 'finanzas', 'gerencia'].includes(role)
 const rolTexto = ROLE_LABELS[role as Role] ?? role
 const iniciales = user.split(/\s+/).filter(Boolean).slice(0, 2).map((p) => p[0]!.toUpperCase()).join('') || 'A'
 const hoyTexto = new Date().toLocaleDateString('es-CO', { weekday: 'long', day: 'numeric', month: 'long', timeZone: 'America/Bogota' })
@@ -49,6 +53,9 @@ const grupos: { titulo: string; items: Item[] }[] = [
       { id: 'cumplimiento', lbl: 'Cumplimiento', href: '/admin/cumplimiento', n: cuentas.alertas, alerta: cuentas.alertasUrgentes, alertaTitulo: 'Alertas que vencen en 5 días hábiles o menos' },
     ],
   },
+  ...(veFinanzas
+    ? [{ titulo: 'Finanzas', items: [{ id: 'finanzas', lbl: 'Finanzas', href: '/admin/finanzas', n: cuentas.finanzas, alerta: cuentas.finanzasAvisos, alertaTitulo: 'Obligaciones que vencen en 3 días hábiles o menos, o vencidas' }] }]
+    : []),
   {
     titulo: 'Contenido del sitio',
     items: [

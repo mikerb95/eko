@@ -309,7 +309,7 @@ function contarPendientes() {
 /* ---------- Usuarios (solo admin) ---------- */
 const ROLE_LABELS = {
   admin: 'Administrador', operaciones: 'Operaciones', logistica: 'Logística',
-  consultor: 'Consultor', finanzas: 'Finanzas', lectura: 'Solo lectura', participante: 'Participante academia',
+  consultor: 'Consultor', finanzas: 'Finanzas', gerencia: 'Gerencia', lectura: 'Solo lectura', participante: 'Participante academia',
 }
 const uf = $('#user-form')
 

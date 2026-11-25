@@ -738,6 +738,156 @@ export const TABLAS: readonly string[] = [
   )`,
   `CREATE INDEX IF NOT EXISTS bitacora_tipo ON bitacora (tipo, created_at)`,
   `CREATE INDEX IF NOT EXISTS bitacora_taller ON bitacora (taller, created_at)`,
+
+  // ── Finanzas: calendario tributario vigilado y control antes de pagar ────
+  // (src/lib/finanzas/). El sistema NO entra a portales ni guarda claves:
+  // prepara, verifica y avisa. Montos en pesos enteros.
+  //
+  // Ajustes del módulo en clave/valor (NIT, responsabilidades, tope de IA).
+  `CREATE TABLE IF NOT EXISTS fin_config (
+    clave TEXT PRIMARY KEY,
+    valor TEXT NOT NULL DEFAULT '',
+    updated_at TEXT NOT NULL DEFAULT ''
+  )`,
+  // Cada vencimiento. `clave` (p. ej. 'retefuente:2026-11') evita sembrar dos
+  // veces la misma obligación; las manuales y las de requerimientos llevan
+  // una clave propia. `estado` sigue src/lib/finanzas/estados.ts.
+  `CREATE TABLE IF NOT EXISTS fin_obligaciones (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    clave TEXT UNIQUE NOT NULL,
+    tipo TEXT NOT NULL DEFAULT '',
+    concepto TEXT NOT NULL DEFAULT '',
+    entidad TEXT NOT NULL DEFAULT '',
+    periodo TEXT NOT NULL DEFAULT '',
+    formulario TEXT NOT NULL DEFAULT '',
+    vence TEXT NOT NULL DEFAULT '',
+    con_pago INTEGER NOT NULL DEFAULT 1,
+    responsable_id INTEGER,
+    estado TEXT NOT NULL DEFAULT 'pendiente',
+    valor_borrador INTEGER,
+    fuente TEXT NOT NULL DEFAULT '',
+    notas TEXT NOT NULL DEFAULT '',
+    created_at TEXT NOT NULL,
+    updated_at TEXT NOT NULL
+  )`,
+  `CREATE INDEX IF NOT EXISTS fin_obligaciones_vence ON fin_obligaciones (vence)`,
+  // Soportes en Vercel Blob privado (prefijo finanzas/). Nunca se borran solos.
+  `CREATE TABLE IF NOT EXISTS fin_soportes (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    obligacion_id INTEGER NOT NULL,
+    tipo TEXT NOT NULL DEFAULT '',
+    nombre TEXT NOT NULL DEFAULT '',
+    ruta TEXT NOT NULL DEFAULT '',
+    mime TEXT NOT NULL DEFAULT '',
+    tamano INTEGER NOT NULL DEFAULT 0,
+    subido_por TEXT NOT NULL DEFAULT '',
+    created_at TEXT NOT NULL
+  )`,
+  `CREATE INDEX IF NOT EXISTS fin_soportes_obligacion ON fin_soportes (obligacion_id)`,
+  // Bitácora del módulo: cambios de estado, aprobaciones, ajustes.
+  `CREATE TABLE IF NOT EXISTS fin_eventos (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    obligacion_id INTEGER,
+    pago_id INTEGER,
+    accion TEXT NOT NULL DEFAULT '',
+    detalle TEXT NOT NULL DEFAULT '',
+    usuario TEXT NOT NULL DEFAULT '',
+    rol TEXT NOT NULL DEFAULT '',
+    created_at TEXT NOT NULL
+  )`,
+  `CREATE INDEX IF NOT EXISTS fin_eventos_obligacion ON fin_eventos (obligacion_id, created_at)`,
+  // Cuentas de origen autorizadas. Solo los últimos 4 dígitos: el número
+  // completo no hace falta para verificar y no se guarda.
+  `CREATE TABLE IF NOT EXISTS fin_cuentas (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    alias TEXT NOT NULL DEFAULT '',
+    banco TEXT NOT NULL DEFAULT '',
+    tipo TEXT NOT NULL DEFAULT '',
+    ultimos TEXT NOT NULL DEFAULT '',
+    activa INTEGER NOT NULL DEFAULT 1,
+    created_at TEXT NOT NULL,
+    updated_at TEXT NOT NULL
+  )`,
+  // Entidades a las que se paga y cómo se paga a cada una (medio, formulario
+  // de pago, NIT de la entidad para comparar en la pantalla del banco).
+  `CREATE TABLE IF NOT EXISTS fin_entidades (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    codigo TEXT UNIQUE NOT NULL,
+    nombre TEXT NOT NULL DEFAULT '',
+    nit TEXT NOT NULL DEFAULT '',
+    medio TEXT NOT NULL DEFAULT '',
+    formulario_pago TEXT NOT NULL DEFAULT '',
+    activa INTEGER NOT NULL DEFAULT 1,
+    created_at TEXT NOT NULL,
+    updated_at TEXT NOT NULL
+  )`,
+  // Pagos preparados. El control antes de pagar se recalcula siempre; aquí
+  // queda el resultado al aprobar, quién preparó y quién aprobó.
+  `CREATE TABLE IF NOT EXISTS fin_pagos (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    obligacion_id INTEGER NOT NULL,
+    valor INTEGER NOT NULL DEFAULT 0,
+    entidad TEXT NOT NULL DEFAULT '',
+    referencia TEXT NOT NULL DEFAULT '',
+    cuenta_id INTEGER,
+    estado TEXT NOT NULL DEFAULT 'por_aprobar',
+    preparado_por TEXT NOT NULL DEFAULT '',
+    preparado_at TEXT NOT NULL DEFAULT '',
+    aprobado_por TEXT NOT NULL DEFAULT '',
+    aprobado_at TEXT NOT NULL DEFAULT '',
+    motivo_rechazo TEXT NOT NULL DEFAULT '',
+    chequeos TEXT NOT NULL DEFAULT '[]',
+    verificacion TEXT NOT NULL DEFAULT '[]',
+    pagado_at TEXT NOT NULL DEFAULT '',
+    created_at TEXT NOT NULL,
+    updated_at TEXT NOT NULL
+  )`,
+  `CREATE INDEX IF NOT EXISTS fin_pagos_obligacion ON fin_pagos (obligacion_id)`,
+  // Destinatarios de los avisos. usuario_id = correo de un usuario del panel
+  // (activo = 0 lo saca de los avisos); sin usuario_id = correo agregado.
+  `CREATE TABLE IF NOT EXISTS fin_destinatarios (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    grupo TEXT NOT NULL DEFAULT 'finanzas',
+    usuario_id INTEGER,
+    correo TEXT NOT NULL DEFAULT '',
+    activo INTEGER NOT NULL DEFAULT 1,
+    created_at TEXT NOT NULL,
+    updated_at TEXT NOT NULL
+  )`,
+  // Avisos enviados: uno por obligación y umbral (15, 7, 3, 1 días hábiles)
+  // o por resumen (semanal:AAAA-MM-DD, mensual:AAAA-MM). Evita repetir.
+  `CREATE TABLE IF NOT EXISTS fin_avisos (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    clave TEXT UNIQUE NOT NULL,
+    obligacion_id INTEGER,
+    umbral INTEGER,
+    escalado INTEGER NOT NULL DEFAULT 0,
+    destinatarios TEXT NOT NULL DEFAULT '',
+    enviado INTEGER NOT NULL DEFAULT 0,
+    created_at TEXT NOT NULL
+  )`,
+  // Documentos leídos con IA: lo extraído, las diferencias con lo esperado y
+  // lo que costó (para el tope mensual).
+  `CREATE TABLE IF NOT EXISTS fin_documentos (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    obligacion_id INTEGER,
+    tipo TEXT NOT NULL DEFAULT '',
+    nombre TEXT NOT NULL DEFAULT '',
+    ruta TEXT NOT NULL DEFAULT '',
+    mime TEXT NOT NULL DEFAULT '',
+    hash TEXT NOT NULL DEFAULT '',
+    estado TEXT NOT NULL DEFAULT 'pendiente',
+    extraccion TEXT NOT NULL DEFAULT '',
+    diferencias TEXT NOT NULL DEFAULT '[]',
+    error TEXT NOT NULL DEFAULT '',
+    modelo TEXT NOT NULL DEFAULT '',
+    costo_usd REAL NOT NULL DEFAULT 0,
+    mes TEXT NOT NULL DEFAULT '',
+    creada_obligacion_id INTEGER,
+    subido_por TEXT NOT NULL DEFAULT '',
+    created_at TEXT NOT NULL,
+    updated_at TEXT NOT NULL
+  )`,
 ]
 
 /**
@@ -819,6 +969,16 @@ export const TABLAS_ESPERADAS: readonly string[] = [
   'contacts',
   'diagnostico_respuestas',
   'expedientes',
+  'fin_avisos',
+  'fin_config',
+  'fin_cuentas',
+  'fin_destinatarios',
+  'fin_documentos',
+  'fin_entidades',
+  'fin_eventos',
+  'fin_obligaciones',
+  'fin_pagos',
+  'fin_soportes',
   'normativas',
   'order_events',
   'orders',

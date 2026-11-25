@@ -12,6 +12,7 @@ export const ICONOS: Record<string, string> = {
   diagnostico: '<path d="M9 4h6v3H9z"/><path d="M15 5h3v16H6V5h3"/><path d="M9 12h6M9 16h4"/>',
   propuesta: '<path d="M7 3h7l5 5v13H7z"/><path d="M14 3v5h5"/><path d="M10 13h6M10 17h4"/><path d="M3 7v14h4"/>',
   academia: '<path d="M2 9l10-5 10 5-10 5z"/><path d="M6 11v5c1.7 1.6 3.7 2.4 6 2.4s4.3-.8 6-2.4v-5M22 9v6"/>',
+  finanzas: '<rect x="3" y="5" width="18" height="16" rx="2"/><path d="M3 10h18M8 3v4M16 3v4"/><path d="M9 15l2 2 4-4"/>',
   borrar: '<path d="M4 7h16M9 7V4h6v3M6 7l1 13h10l1-13"/>',
   salir: '<path d="M15 4h4v16h-4M10 8l-4 4 4 4M6 12h10"/>',
   buscar: '<circle cx="11" cy="11" r="7"/><path d="M20 20l-4-4"/>',

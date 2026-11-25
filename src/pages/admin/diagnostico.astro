@@ -90,12 +90,15 @@ const barras = (cs: Conteo[], de: number, color: (c: Conteo) => string) =>
       <h2>Diagnóstico de IA por área</h2>
       <p class="panel-sub">La encuesta previa a la capacitación. Define el orden de los talleres, los ejercicios y las fechas.</p>
     </div>
-    {respuestas.length > 0 && (
-      <div class="dx-head-acc">
-        <a class="btn-ghost btn-sm" href="/api/admin/diagnostico?formato=csv" download>Descargar CSV</a>
-        <a class="btn-primary btn-sm" href="/admin/diagnostico/informe">Informe para Gerencia</a>
-      </div>
-    )}
+    <div class="dx-head-acc">
+      <a class="btn-ghost btn-sm" href="/admin/diagnostico/finanzas">Cuestionario de Finanzas</a>
+      {respuestas.length > 0 && (
+        <>
+          <a class="btn-ghost btn-sm" href="/api/admin/diagnostico?formato=csv" download>Descargar CSV</a>
+          <a class="btn-primary btn-sm" href="/admin/diagnostico/informe">Informe para Gerencia</a>
+        </>
+      )}
+    </div>
   </div>
 
   <!-- ENLACE -->

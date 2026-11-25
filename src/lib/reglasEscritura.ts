@@ -27,6 +27,10 @@ export const WRITE_RULES: ReadonlyArray<{ prefix: string; roles: readonly string
   // Academia de IA: lecciones, sábados, entregas y certificados. Las lecturas
   // también se restringen a admin (middleware y endpoint).
   { prefix: '/api/admin/academia', roles: ['admin'] },
+  // Finanzas: calendario tributario, soportes y control antes de pagar. Qué
+  // puede hacer cada uno de estos roles (preparar, aprobar, configurar) lo
+  // decide src/lib/finanzas/permisos.ts; las lecturas también se restringen.
+  { prefix: '/api/admin/finanzas', roles: ['admin', 'finanzas', 'gerencia'] },
   // La sincronización con Zoho escribe en un sistema externo: solo admin.
   { prefix: '/api/admin/zoho', roles: ['admin'] },
   // El asistente: cualquier sesión puede preguntar y decidir sus propuestas.

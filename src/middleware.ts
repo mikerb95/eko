@@ -154,6 +154,15 @@ export const onRequest = defineMiddleware(async (context, next) => {
     })
   }
 
+  // Finanzas (impuestos, cuentas y pagos): solo finanzas, gerencia y admin,
+  // incluso en GET. El endpoint lo vuelve a comprobar.
+  if (pathname.startsWith('/api/admin/finanzas') && !['admin', 'finanzas', 'gerencia'].includes(session.r)) {
+    return new Response(JSON.stringify({ error: 'Tu rol no tiene acceso a Finanzas' }), {
+      status: 403,
+      headers: { 'content-type': 'application/json' },
+    })
+  }
+
   // Renovación deslizante: quien está usando el sitio no pierde la sesión en
   // medio de una capacitación de 4 horas (ver SESSION_RENEW_BELOW_SECONDS).
   if (pathname !== '/api/admin/logout') {

@@ -5,7 +5,7 @@ import { UserError } from './apiError.ts'
 // y roles para autorización en el middleware.
 
 // `participante`: solo entra a la academia de IA (/academia), nunca al panel.
-export const ROLES = ['admin', 'operaciones', 'logistica', 'consultor', 'finanzas', 'lectura', 'participante'] as const
+export const ROLES = ['admin', 'operaciones', 'logistica', 'consultor', 'finanzas', 'gerencia', 'lectura', 'participante'] as const
 export type Role = (typeof ROLES)[number]
 
 export const ROLE_LABELS: Record<Role, string> = {
@@ -14,6 +14,8 @@ export const ROLE_LABELS: Record<Role, string> = {
   logistica: 'Logística',
   consultor: 'Consultor',
   finanzas: 'Finanzas',
+  // Aprueba los pagos de impuestos en /admin/finanzas (quien prepara no aprueba).
+  gerencia: 'Gerencia',
   lectura: 'Solo lectura',
   participante: 'Participante de la academia',
 }

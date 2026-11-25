@@ -1,0 +1,535 @@
+---
+// Presentación de la propuesta de Finanzas para la Gerencia de Ekosolv
+// (calendario tributario vigilado, control antes de pagar y capacitación 1 a 1).
+// Solo admin (la protege el middleware de /admin): muestra valores.
+// Se dicta en una sola pantalla con teclado o clicker; sin sala, QR ni control
+// remoto. Usa el lienzo, la cortina y los estilos de las capacitaciones
+// (src/styles/taller.css, src/scripts/taller/cortina.ts).
+// Contenido alineado con propuesta_finanzas_ekosolv.html. NUNCA mencionar que
+// Ekosolv ya pagó sanciones: es un dato confidencial del gerente.
+export const prerender = false
+import '../../../styles/global.css'
+import '../../../styles/taller.css'
+import '../../../styles/presentacion-finanzas.css'
+
+const BLOQUES = [
+  { id: 'inicio', titulo: 'Calendario tributario bajo control', color: '#179C91' },
+  { id: 'problema', titulo: 'Lo que está en juego', color: '#B4442F' },
+  { id: 'solucion', titulo: 'Cómo funciona', color: '#124E7D' },
+  { id: 'personas', titulo: 'Las personas', color: '#00AA9F' },
+  { id: 'resultado', titulo: 'Resultado e inversión', color: '#B8926F' },
+]
+const color = (b: string) => BLOQUES.find((x) => x.id === b)!.color
+
+// Puntos del año (escena "anio"): fila, meses en que vence y paso en que aparece.
+const MESES = ['Ene', 'Feb', 'Mar', 'Abr', 'May', 'Jun', 'Jul', 'Ago', 'Sep', 'Oct', 'Nov', 'Dic']
+const FILAS = [
+  { n: 'Retención en la fuente', m: [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12], p: 1 },
+  { n: 'Seguridad social (PILA)', m: [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12], p: 1 },
+  { n: 'IVA', m: [1, 3, 5, 7, 9, 11], p: 2 },
+  { n: 'ICA Bogotá', m: [2, 4, 6, 8, 10, 12], p: 2 },
+  { n: 'Renta y exógena', m: [4, 5, 6], p: 3 },
+  { n: 'Cámara, cesantías y prima', m: [1, 2, 3, 6, 12], p: 3 },
+]
+---
+
+<!doctype html>
+<html lang="es">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="robots" content="noindex, nofollow, noarchive" />
+    <link rel="icon" href="/favicon.ico" sizes="any" />
+    <title>Calendario tributario bajo control · Propuesta para Ekosolv</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,400..700&family=Geist:wght@300..700&family=Geist+Mono:wght@400..500&display=swap" rel="stylesheet" />
+  </head>
+  <body class="tl pf">
+    <header class="tl-barra">
+      <img src="/brand/ekosolv-horizontal.png" alt="EKOSOLV" width="249" height="72" />
+      <span class="tl-barra-tit">Propuesta para Finanzas</span>
+      <a href="/admin">Volver al panel</a>
+    </header>
+    <div class="tl-escenario">
+      <div class="tl-lienzo" data-lienzo>
+
+        <!-- 1 · Portada -->
+        <section class="tl-escena oscura pf-portada" data-bloque="inicio" data-min="2" data-pasos="0" data-tipo="portada" style={`--bloque:${color('inicio')}`}>
+          <p class="tl-kicker">Propuesta para Finanzas · Ekosolv</p>
+          <h2 class="tl-titulo">Calendario tributario <span class="acento">bajo control</span></h2>
+          <div class="tl-cuerpo">
+            <p class="sub">Un sistema que vigila cada obligación, revisa cada pago antes de hacerlo y avisa a Gerencia cuando algo se queda sin cerrar. Con una capacitación uno a uno para Finanzas.</p>
+            <p class="firma">Preparado por Mike · codebymike.net</p>
+          </div>
+          <div class="pf-cal" aria-hidden="true">
+            {MESES.map((m) => (
+              <div class="pf-cal-mes">
+                <b>{m}</b>
+                <span>{Array.from({ length: 28 }, (_, d) => <i class={[3, 9, 17, 22].includes(d) ? 'v' : ''} />)}</span>
+              </div>
+            ))}
+          </div>
+        </section>
+
+        <!-- 2 · El año -->
+        <section class="tl-escena pf-anio" data-bloque="problema" data-min="3" data-pasos="4" data-tipo="anio" style={`--bloque:${color('problema')}`}>
+          <p class="tl-kicker">Lo que está en juego</p>
+          <h2 class="tl-titulo">Más de 20 fechas al año, <span class="acento">en la memoria de una persona</span></h2>
+          <div class="tl-cuerpo">
+            <div class="pf-anio-grid">
+              <div class="pf-anio-cab"><span />{MESES.map((m) => <b>{m}</b>)}</div>
+              {FILAS.map((f) => (
+                <div class="pf-anio-fila" data-fila-p={f.p}>
+                  <span class="pf-anio-n">{f.n}</span>
+                  {MESES.map((_, k) => <span class="pf-anio-c">{f.m.includes(k + 1) && <i class="pf-dot" data-dot-p={f.p} />}</span>)}
+                </div>
+              ))}
+            </div>
+            <div class="pf-anio-lado">
+              <p class="pf-big"><span data-cuenta-puntos>0</span></p>
+              <p class="pf-big-txt">vencimientos en el año</p>
+              <p class="pf-alerta-txt">Basta con que <b>una</b> se pase para pagar una sanción.</p>
+            </div>
+          </div>
+        </section>
+
+        <!-- 3 · Lo que cuesta -->
+        <section class="tl-escena pf-costo" data-bloque="problema" data-min="3" data-pasos="3" data-tipo="costo" style={`--bloque:${color('problema')}`}>
+          <p class="tl-kicker">Lo que está en juego</p>
+          <h2 class="tl-titulo">Lo que cuesta <span class="acento">una fecha que se pasa</span></h2>
+          <div class="tl-cuerpo">
+            <div class="pf-costo-g">
+              <div class="pf-costo-min" data-paso="1">
+                <span class="pf-et">Sanción mínima 2026</span>
+                <p class="pf-big">$<span data-rueda="523740">0</span></p>
+                <p>10 UVT, aunque el impuesto sea pequeño o no haya impuesto a cargo.</p>
+              </div>
+              <div class="pf-costo-mes" data-paso="2">
+                <span class="pf-et">Un IVA de $30.000.000 presentado tarde</span>
+                <div class="pf-barras">
+                  <div class="pf-barra" style="--h:.33"><b>$1,5 M</b><i /><span>1 mes</span></div>
+                  <div class="pf-barra" style="--h:.66"><b>$3 M</b><i /><span>2 meses</span></div>
+                  <div class="pf-barra" style="--h:1"><b>$4,5 M</b><i /><span>3 meses</span></div>
+                </div>
+                <p>5% del impuesto por cada mes o fracción, <b>más intereses de mora diarios</b>.</p>
+              </div>
+            </div>
+            <ul class="pf-chips" data-paso="3">
+              <li>Retención declarada sin pago: <b>se da por no presentada</b></li>
+              <li>Retenciones sin consignar: <b>responsabilidad penal</b> del representante legal</li>
+              <li>Cobro coactivo: <b>embargo de cuentas</b></li>
+            </ul>
+            <p class="tl-nota">Artículos 639 y 641 del Estatuto Tributario. UVT 2026: $52.374 (Resolución DIAN 000238 de 2025). Ejemplos ilustrativos.</p>
+          </div>
+        </section>
+
+        <!-- 4 · El momento de pagar -->
+        <section class="tl-escena pf-pagar" data-bloque="problema" data-min="2" data-pasos="3" data-tipo="pagar" style={`--bloque:${color('problema')}`}>
+          <p class="tl-kicker">Lo que está en juego</p>
+          <h2 class="tl-titulo">Y al pagar, <span class="acento">nadie revisa dos veces</span></h2>
+          <div class="tl-cuerpo">
+            <div class="pf-pagar-g">
+              <div class="pf-form">
+                <div class="pf-form-top"><i /><i /><i /><span>Portal de pago</span></div>
+                <label>Concepto<span>Retención en la fuente</span></label>
+                <label>Periodo<span class="err1">Octubre 2026</span></label>
+                <label>Referencia<span class="err2">4910 2244 1187</span></label>
+                <label>Cuenta de origen<span class="err3">Cuenta ···4821</span></label>
+                <button type="button" tabindex="-1">Pagar</button>
+                <span class="pf-cursor" aria-hidden="true" />
+              </div>
+              <ol class="pf-fallas">
+                <li data-paso="1"><b>Pago duplicado</b>El periodo ya estaba pagado. La plata queda retenida meses mientras se tramita la devolución.</li>
+                <li data-paso="2"><b>Referencia equivocada</b>La obligación sigue pendiente y la sanción empieza a correr, con la plata ya fuera.</li>
+                <li data-paso="3"><b>Cuenta equivocada</b>Sale de la cuenta que no era y descuadra el flujo de caja.</li>
+              </ol>
+            </div>
+          </div>
+        </section>
+
+        <!-- 5 · Tres piezas -->
+        <section class="tl-escena oscura pf-piezas" data-bloque="solucion" data-min="2" data-pasos="3" data-tipo="piezas" style={`--bloque:${color('solucion')}`}>
+          <p class="tl-kicker">Cómo funciona</p>
+          <h2 class="tl-titulo">Tres piezas <span class="acento">que trabajan juntas</span></h2>
+          <div class="tl-cuerpo">
+            <div class="pf-ruta">
+              <svg class="pf-ruta-linea" viewBox="0 0 1400 20" preserveAspectRatio="none" aria-hidden="true"><path d="M60 10 H1340" /></svg>
+              <div class="pf-ruta-p" data-paso="1"><i>1</i><b>Diagnóstico</b><p>Una reunión para entender cómo trabaja Finanzas y armar el calendario tributario propio de Ekosolv.</p><span>Semanas 1 y 2</span></div>
+              <div class="pf-ruta-p" data-paso="2"><i>2</i><b>Automatización</b><p>Cinco módulos en el panel: vigilar, documentar, verificar, leer y resumir.</p><span>Semanas 3 a 6</span></div>
+              <div class="pf-ruta-p" data-paso="3"><i>3</i><b>Capacitación 1 a 1</b><p>Excel, Claude y el sistema nuevo, con sus propios archivos.</p><span>5 sesiones de 2 h</span></div>
+            </div>
+          </div>
+        </section>
+
+        <!-- 6 · Calendario vigilado -->
+        <section class="tl-escena pf-vigila" data-bloque="solucion" data-min="3" data-pasos="4" data-tipo="vigila" style={`--bloque:${color('solucion')}`}>
+          <p class="tl-kicker">Módulo 1 · Calendario vigilado</p>
+          <h2 class="tl-titulo">Un calendario <span class="acento">que no se olvida</span></h2>
+          <div class="tl-cuerpo">
+            <div class="pf-tl">
+              <div class="pf-tl-eje">
+                <span class="pf-tl-m" style="--x:0">15 días</span>
+                <span class="pf-tl-m" style="--x:.53">7 días</span>
+                <span class="pf-tl-m" style="--x:.8">3 días</span>
+                <span class="pf-tl-m" style="--x:.93">1 día</span>
+                <span class="pf-tl-m fin" style="--x:1">Vence</span>
+                <span class="pf-tl-hoy" aria-hidden="true" />
+              </div>
+              <div class="pf-avisos">
+                <div class="pf-aviso a1"><span class="pf-aviso-de">Para Finanzas</span><b>Retención de noviembre vence en 15 días hábiles</b><small>Estado: pendiente · Falta borrador</small></div>
+                <div class="pf-aviso a2"><span class="pf-aviso-de">Para Finanzas</span><b>Quedan 7 días hábiles</b><small>Estado: borrador listo · Falta revisión</small></div>
+                <div class="pf-aviso a3 g"><span class="pf-aviso-de">Para Gerencia</span><b>A 3 días y sigue sin cerrarse</b><small>El aviso sube solo, sin que nadie tenga que acordarse</small></div>
+                <div class="pf-aviso a4"><span class="pf-aviso-de">Para Finanzas y Gerencia</span><b>Mañana vence</b><small>Estado: aprobado · Falta pago</small></div>
+                <div class="pf-aviso a5 ok"><span class="pf-aviso-de">Cerrada</span><b>Pagada y presentada, con soporte</b><small>Los avisos se detienen</small></div>
+              </div>
+            </div>
+            <p class="tl-nota">Cada obligación tiene fecha, responsable y estado. Los días se cuentan hábiles, con los festivos de Colombia.</p>
+          </div>
+        </section>
+
+        <!-- 7 · Expediente -->
+        <section class="tl-escena pf-exp" data-bloque="solucion" data-min="2" data-pasos="3" data-tipo="exp" style={`--bloque:${color('solucion')}`}>
+          <p class="tl-kicker">Módulo 2 · Expediente por obligación</p>
+          <h2 class="tl-titulo">Nada se cierra <span class="acento">sin su soporte</span></h2>
+          <div class="tl-cuerpo">
+            <ol class="pf-estados">
+              {[
+                ['Pendiente', ''],
+                ['Borrador listo', 'Borrador'],
+                ['Revisado', 'Formulario'],
+                ['Aprobado', 'Recibo 490'],
+                ['Pagado', 'Comprobante'],
+                ['Presentado', 'Acuse'],
+              ].map(([e, d], k) => (
+                <li style={`--k:${k}`}><i>{k + 1}</i><b>{e}</b>{d && <span class="pf-doc">{d}</span>}</li>
+              ))}
+            </ol>
+            <div class="pf-exp-pie">
+              <p class="pf-candado"><i aria-hidden="true" />Sin el soporte, el estado no avanza.</p>
+              <p>Todo queda en un solo lugar: cualquier persona puede ver en qué va cada obligación y con qué documentos.</p>
+            </div>
+          </div>
+        </section>
+
+        <!-- 8 · Control antes de pagar -->
+        <section class="tl-escena oscura pf-control" data-bloque="solucion" data-min="4" data-pasos="5" data-tipo="control" style={`--bloque:${color('solucion')}`}>
+          <p class="tl-kicker">Módulo 3 · Control antes de pagar</p>
+          <h2 class="tl-titulo">Un segundo par de ojos <span class="acento">antes de cada clic</span></h2>
+          <div class="tl-cuerpo">
+            <div class="pf-control-g">
+              <div class="pf-pago">
+                <span class="pf-et">Pago por aprobar</span>
+                <b class="pf-pago-t">Retención en la fuente · Octubre 2026</b>
+                <dl>
+                  <dt>Valor</dt><dd>$6.184.000</dd>
+                  <dt>Referencia</dt><dd>4910 2244 1187</dd>
+                  <dt>Cuenta de origen</dt><dd>Cuenta ···4821</dd>
+                  <dt>Preparó</dt><dd>Finanzas</dd>
+                </dl>
+                <span class="pf-sello">Listo para pagar</span>
+              </div>
+              <ul class="pf-checks">
+                <li class="c1"><i /><div><b>¿Ya se pagó este periodo?</b><span>No hay pagos previos de octubre</span></div></li>
+                <li class="c2"><i /><div><b>¿El valor es el del borrador aprobado?</b><span>$6.184.000 = $6.184.000</span></div></li>
+                <li class="c3"><i /><div><b>¿Entidad, referencia y cuenta autorizadas?</b><span>Coinciden con las registradas</span></div></li>
+                <li class="c4"><i /><div><b>¿Gerencia dio el visto bueno?</b><span>Quien prepara no es quien aprueba</span></div></li>
+              </ul>
+            </div>
+            <div class="pf-bloqueo">
+              <i aria-hidden="true" />
+              <div><b>Segundo intento del mismo periodo: bloqueado</b><span>Octubre ya se pagó el 10 de noviembre. El sistema avisa antes de que salga la plata.</span></div>
+            </div>
+          </div>
+        </section>
+
+        <!-- 9 · Lista del portal -->
+        <section class="tl-escena pf-portal" data-bloque="solucion" data-min="2" data-pasos="3" data-tipo="portal" style={`--bloque:${color('solucion')}`}>
+          <p class="tl-kicker">Módulo 3 · Control antes de pagar</p>
+          <h2 class="tl-titulo">La lista de <span class="acento">cada pantalla del portal</span></h2>
+          <div class="tl-cuerpo">
+            <div class="pf-portal-g">
+              <div class="pf-nav">
+                <div class="pf-nav-top"><i /><i /><i /><span>Portal de la entidad</span></div>
+                <div class="pf-nav-cuerpo">
+                  <div class="pf-campo f1"><span>Formulario</span><b>490 · Recibo oficial de pago</b></div>
+                  <div class="pf-campo f2"><span>Número del recibo</span><b>4910 2244 1187</b></div>
+                  <div class="pf-campo f3"><span>Valor a pagar</span><b>$6.184.000</b></div>
+                  <div class="pf-campo-btn">Continuar al pago</div>
+                </div>
+              </div>
+              <ol class="pf-lista">
+                <li data-paso="1"><i>1</i>El formulario es el <b>490</b> del periodo correcto.</li>
+                <li data-paso="2"><i>2</i>El número del recibo coincide con el que aprobó Gerencia.</li>
+                <li data-paso="3"><i>3</i>El valor es <b>exactamente</b> el aprobado, antes de oprimir el botón.</li>
+              </ol>
+            </div>
+            <p class="tl-nota">El sistema no entra al portal: la persona lo recorre con la lista al lado y marca cada punto.</p>
+          </div>
+        </section>
+
+        <!-- 10 · Lectura con IA -->
+        <section class="tl-escena pf-lee" data-bloque="solucion" data-min="3" data-pasos="3" data-tipo="lee" style={`--bloque:${color('solucion')}`}>
+          <p class="tl-kicker">Módulo 4 · Lectura de documentos con IA</p>
+          <h2 class="tl-titulo">La IA lee el documento <span class="acento">y lo compara</span></h2>
+          <div class="tl-cuerpo">
+            <div class="pf-lee-g">
+              <div class="pf-papel">
+                <span class="pf-papel-t">Declaración de IVA · Bimestre 5</span>
+                <span class="pf-l" /><span class="pf-l c" /><span class="pf-l" />
+                <span class="pf-hl h1">NIT 900.xxx.xxx</span>
+                <span class="pf-l c" /><span class="pf-hl h2">Periodo 5 · 2026</span>
+                <span class="pf-l" /><span class="pf-hl h3">Total a pagar $12.430.000</span>
+                <span class="pf-l c" /><span class="pf-l" />
+                <span class="pf-escaner" aria-hidden="true" />
+              </div>
+              <div class="pf-tabla">
+                <div class="pf-tabla-c"><span>Dato</span><span>Leído</span><span>Esperado</span></div>
+                <div class="pf-tabla-f r1"><span>NIT</span><span>900.xxx.xxx</span><span class="ok">Coincide</span></div>
+                <div class="pf-tabla-f r2"><span>Periodo</span><span>5 · 2026</span><span class="ok">Coincide</span></div>
+                <div class="pf-tabla-f r3"><span>Total</span><span>$12.430.000</span><span class="dif">Borrador: $12.340.000</span></div>
+                <div class="pf-req">
+                  <b>Requerimiento recibido el 18 de noviembre</b>
+                  <span>Plazo para responder: 15 días hábiles · <b>vence el 10 de diciembre</b></span>
+                  <small>Alerta creada en el calendario</small>
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <!-- 11 · Resúmenes -->
+        <section class="tl-escena pf-res" data-bloque="solucion" data-min="2" data-pasos="2" data-tipo="res" style={`--bloque:${color('solucion')}`}>
+          <p class="tl-kicker">Módulo 5 · Resúmenes</p>
+          <h2 class="tl-titulo">El panorama <span class="acento">sin tener que pedirlo</span></h2>
+          <div class="tl-cuerpo">
+            <div class="pf-res-g">
+              <div class="pf-mail" data-paso="1">
+                <span class="pf-mail-de">Cada lunes · 7:00 a. m.</span>
+                <b>Lo que vence en las próximas dos semanas</b>
+                <ul>
+                  <li><i class="am" />Retención de noviembre · vence en 9 días · borrador listo</li>
+                  <li><i class="am" />PILA de diciembre · vence en 12 días · pendiente</li>
+                  <li><i class="ro" />Requerimiento DIAN · vence en 6 días · sin respuesta</li>
+                  <li><i class="ve" />IVA bimestre 5 · presentado con soporte</li>
+                </ul>
+              </div>
+              <div class="pf-mail" data-paso="2">
+                <span class="pf-mail-de">Cada mes · cifras de Zoho Books</span>
+                <b>Cómo cerró noviembre</b>
+                <div class="pf-mini">
+                  <div><span>Facturación</span><i style="--w:.86" /></div>
+                  <div><span>Recaudo</span><i style="--w:.64" /></div>
+                  <div><span>Cartera vencida</span><i class="ro" style="--w:.28" /></div>
+                </div>
+                <p>12 de 12 obligaciones del mes cerradas a tiempo.</p>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <!-- 12 · Límite -->
+        <section class="tl-escena oscura pf-limite" data-bloque="solucion" data-min="2" data-pasos="2" data-tipo="limite" style={`--bloque:${color('solucion')}`}>
+          <p class="tl-kicker">Cómo funciona</p>
+          <h2 class="tl-titulo">Prepara, verifica y avisa. <span class="acento">Las personas deciden.</span></h2>
+          <div class="tl-cuerpo">
+            <div class="pf-roles">
+              <div><span class="pf-rol-ic s" aria-hidden="true" /><b>El sistema</b><p>Prepara, verifica y avisa.</p></div>
+              <div data-paso="1"><span class="pf-rol-ic f" aria-hidden="true" /><b>Finanzas</b><p>Ejecuta en el portal, con la lista al lado.</p></div>
+              <div data-paso="1"><span class="pf-rol-ic g" aria-hidden="true" /><b>Gerencia</b><p>Aprueba cada pago.</p></div>
+            </div>
+            <div class="pf-no" data-paso="2">
+              <span class="pf-et">Lo que el sistema no hace</span>
+              <ul><li>Entrar a portales</li><li>Guardar contraseñas</li><li>Usar la firma electrónica</li><li>Presentar o pagar</li></ul>
+              <p>Ninguna clave de la empresa queda en manos de un tercero.</p>
+            </div>
+          </div>
+        </section>
+
+        <!-- 13 · Dónde se nota -->
+        <section class="tl-escena pf-impacto" data-bloque="personas" data-min="3" data-pasos="1" data-tipo="impacto" style={`--bloque:${color('personas')}`}>
+          <p class="tl-kicker">Las personas</p>
+          <h2 class="tl-titulo">Dónde <span class="acento">se nota</span></h2>
+          <div class="tl-cuerpo">
+            <div class="pf-imp">
+              {[
+                ['Finanzas', 'Lleva las fechas de memoria y responde sola por todas.', 'El sistema le recuerda, le pide los soportes y le da la lista de cada pago.'],
+                ['Gerencia', 'Se entera de un problema cuando ya pasó.', 'Recibe el aviso a tiempo y aprueba cada pago con los datos a la vista.'],
+                ['Contador y revisor', 'Persiguen documentos por correo.', 'Encuentran cada declaración con su soporte en un solo lugar.'],
+                ['La empresa', 'Expuesta a sanciones, intereses y pagos errados.', 'Fechas cumplidas, pagos verificados y un historial que se puede auditar.'],
+              ].map(([q, a, d]) => (
+                <div class="pf-imp-c"><b>{q}</b><p class="antes"><span>Hoy</span>{a}</p><p class="despues"><span>Con el sistema</span>{d}</p></div>
+              ))}
+            </div>
+          </div>
+        </section>
+
+        <!-- 14 · Curva de Excel -->
+        <section class="tl-escena pf-curva" data-bloque="personas" data-min="3" data-pasos="3" data-tipo="curva" style={`--bloque:${color('personas')}`}>
+          <p class="tl-kicker">Capacitación 1 a 1</p>
+          <h2 class="tl-titulo">Excel <span class="acento">sin la curva de siempre</span></h2>
+          <div class="tl-cuerpo">
+            <div class="pf-curva-g">
+              <svg class="pf-graf" viewBox="0 0 760 420" aria-hidden="true">
+                <line x1="60" y1="370" x2="740" y2="370" class="eje" />
+                <line x1="60" y1="20" x2="60" y2="370" class="eje" />
+                <text x="740" y="405" text-anchor="end">Tiempo</text>
+                <text x="70" y="36">Lo que domina</text>
+                <path class="gris" pathLength="1" d="M60 368 C 260 366, 420 350, 520 260 S 680 120, 740 104" />
+                <path class="verde" pathLength="1" d="M60 368 C 120 300, 170 150, 260 92 S 520 52, 740 46" />
+                <g class="et-gris"><circle cx="520" cy="260" r="7" /><text x="536" y="292">Curso genérico</text></g>
+                <g class="et-verde"><circle cx="260" cy="92" r="7" /><text x="280" y="128">Sus archivos + Claude</text></g>
+              </svg>
+              <ul class="pf-porque" data-paso="3">
+                <li><b>Sus propios archivos</b>Aprende sobre lo que ya usa cada semana, no sobre ejemplos de libro.</li>
+                <li><b>Claude explica cada fórmula</b>En palabras sencillas, las veces que haga falta, sin depender de nadie.</li>
+                <li><b>Plantillas que se quedan</b>Lo que arma en la sesión lo sigue usando al otro día.</li>
+              </ul>
+            </div>
+          </div>
+        </section>
+
+        <!-- 15 · Claude como tutor -->
+        <section class="tl-escena pf-tutor" data-bloque="personas" data-min="3" data-pasos="3" data-tipo="tutor" style={`--bloque:${color('personas')}`}>
+          <p class="tl-kicker">Capacitación 1 a 1</p>
+          <h2 class="tl-titulo">Claude como <span class="acento">tutor de fórmulas</span></h2>
+          <div class="tl-cuerpo">
+            <div class="pf-tutor-g">
+              <div class="pf-xl">
+                <div class="pf-xl-barra"><span>fx</span><code data-escribe="=BUSCARX(A2; Clientes[NIT]; Clientes[Saldo]; &quot;No existe&quot;)"></code></div>
+                <div class="pf-xl-hoja">
+                  {['NIT', 'Cliente', 'Saldo'].map((h) => <b>{h}</b>)}
+                  {[['900.123.456', 'Constructora Andes', '$8.400.000'], ['830.987.654', 'Minera del Valle', '$2.150.000'], ['901.555.020', 'Agro Sabana', '$640.000']].map((r) => r.map((c) => <span>{c}</span>))}
+                </div>
+              </div>
+              <div class="pf-chat">
+                <div class="pf-bur yo" data-paso="2">¿Qué hace esta fórmula?</div>
+                <div class="pf-bur cl" data-paso="2">Busca el NIT de la celda A2 en la tabla de clientes y le trae el saldo. Si el NIT no está, escribe "No existe" en vez de un error.</div>
+                <div class="pf-bur yo" data-paso="3">Quiero sumar la cartera vencida de un cliente, solo de facturas de más de 60 días.</div>
+                <div class="pf-bur cl" data-paso="3"><code>=SUMAR.SI.CONJUNTO(Saldo; NIT; A2; Días; "&gt;60")</code> Suma el saldo cuando el NIT es el de A2 y los días pasan de 60.</div>
+              </div>
+            </div>
+            <p class="tl-nota">Pedir en palabras y recibir la fórmula, o pegar una fórmula y entenderla: así se acorta la curva de aprendizaje.</p>
+          </div>
+        </section>
+
+        <!-- 16 · Cinco sesiones -->
+        <section class="tl-escena pf-ses" data-bloque="personas" data-min="2" data-pasos="0" data-tipo="ses" style={`--bloque:${color('personas')}`}>
+          <p class="tl-kicker">Capacitación 1 a 1</p>
+          <h2 class="tl-titulo">Cinco sesiones, <span class="acento">solo lo de su cargo</span></h2>
+          <div class="tl-cuerpo">
+            <ol class="pf-ses-g">
+              {[
+                ['Excel del día a día', 'BUSCARX, SUMAR.SI.CONJUNTO, tablas, validación y formato condicional sobre sus archivos.'],
+                ['Excel para conciliar', 'Tablas dinámicas, comparativo de balances y extractos bancarios listos para conciliar.'],
+                ['Claude en Finanzas', 'Leer un requerimiento, comparar periodos, revisar cifras y saber qué no pedirle.'],
+                ['Claude con sus herramientas', 'Conectado a Zoho Books y al correo, con instrucciones guardadas para cada mes.'],
+                ['El sistema nuevo', 'Una obligación de principio a fin, el control antes de pagar y qué hacer con cada alerta.'],
+              ].map(([t, d], k) => <li style={`--k:${k}`}><i>{k + 1}</i><b>{t}</b><p>{d}</p></li>)}
+            </ol>
+          </div>
+        </section>
+
+        <!-- 17 · Optimización -->
+        <section class="tl-escena pf-opt" data-bloque="resultado" data-min="3" data-pasos="2" data-tipo="opt" style={`--bloque:${color('resultado')}`}>
+          <p class="tl-kicker">Resultado</p>
+          <h2 class="tl-titulo">Cómo se asegura <span class="acento">que funcione</span></h2>
+          <div class="tl-cuerpo">
+            <div class="pf-opt-g">
+              <div class="pf-ciclo" aria-hidden="true">
+                <span class="pf-orbita" />
+                <b class="q1">Vigilar</b><b class="q2">Verificar</b><b class="q3">Medir</b><b class="q4">Ajustar</b>
+              </div>
+              <div class="pf-ind" data-paso="1">
+                <span class="pf-et">Lo que se mide cada mes</span>
+                <div class="pf-ind-g">
+                  <div><b><span data-rueda="100">0</span>%</b><span>obligaciones cerradas a tiempo</span></div>
+                  <div><b><span data-rueda="100">0</span>%</b><span>pagos verificados antes de salir</span></div>
+                  <div><b><span data-rueda="9">0</span> días</b><span>de anticipación promedio</span></div>
+                </div>
+              </div>
+              <ul class="pf-garantias" data-paso="2">
+                <li>El resumen mensual le muestra a Gerencia si se está cumpliendo.</li>
+                <li>El calendario se actualiza cada año, cuando salen los decretos nuevos.</li>
+                <li>Si una alerta no sirve o falta una obligación, se ajusta con el soporte mensual.</li>
+              </ul>
+            </div>
+            <p class="tl-nota">Las cifras son la meta que se mide, no un resultado garantizado.</p>
+          </div>
+        </section>
+
+        <!-- 18 · Cronograma -->
+        <section class="tl-escena pf-crono" data-bloque="resultado" data-min="2" data-pasos="0" data-tipo="crono" style={`--bloque:${color('resultado')}`}>
+          <p class="tl-kicker">Resultado</p>
+          <h2 class="tl-titulo">Seis semanas, <span class="acento">algo útil desde la tercera</span></h2>
+          <div class="tl-cuerpo">
+            <div class="pf-gantt">
+              <div class="pf-g-cab"><span />{[1, 2, 3, 4, 5, 6].map((s) => <b>Semana {s}</b>)}</div>
+              {[
+                ['Diagnóstico', 1, 2, ''],
+                ['Calendario vigilado', 3, 3, 'hl'],
+                ['Expediente, control y lectura', 4, 5, ''],
+                ['Resúmenes y puesta en marcha', 6, 6, ''],
+                ['Capacitación', 2, 6, 'cap'],
+              ].map(([n, a, b, c], k) => (
+                <div class="pf-g-fila"><span>{n}</span><i class={c as string} style={`--a:${a};--b:${b};--k:${k}`} /></div>
+              ))}
+            </div>
+            <p class="pf-g-nota"><i aria-hidden="true" />Semana 3: el calendario vigilado ya funciona, antes de los vencimientos de enero.</p>
+          </div>
+        </section>
+
+        <!-- 19 · Inversión -->
+        <section class="tl-escena pf-inv" data-bloque="resultado" data-min="3" data-pasos="1" data-tipo="inv" style={`--bloque:${color('resultado')}`}>
+          <p class="tl-kicker">Inversión</p>
+          <h2 class="tl-titulo">Valores <span class="acento">de la propuesta</span></h2>
+          <div class="tl-cuerpo">
+            <div class="pf-inv-g">
+              <div class="pf-inv-t">
+                <div><span>Diagnóstico del área financiera</span><b>$500.000</b></div>
+                <div><span>Construcción de la automatización</span><b>$4.800.000</b></div>
+                <div><span>Operación mensual<small>Servidor, IA, correos, calendario anual y 2 h de soporte</small></span><b>$250.000<small> al mes</small></b></div>
+                <div class="hl"><span>Capacitación con la automatización<small>4 sesiones + la sesión 5 incluida</small></span><b>$800.000</b></div>
+                <div><span>Capacitación sin la automatización<small>Sesiones 1 a 4</small></span><b>$1.000.000</b></div>
+              </div>
+              <div class="pf-inv-s" data-paso="1">
+                <div><b>$<span data-rueda="8300">0</span></b><span>al día cuesta la operación</span></div>
+                <div><b>&lt; ½</b><span>sanción mínima: eso es un mes de operación</span></div>
+                <div><b>≈ 1</b><span>sola sanción grande equivale a toda la construcción</span></div>
+              </div>
+            </div>
+            <p class="tl-nota">Ekosolv paga aparte su suscripción de Claude. No soy responsable de IVA: el valor es el del servicio después de aplicar retenciones, si aplica alguna.</p>
+          </div>
+        </section>
+
+        <!-- 20 · Cierre -->
+        <section class="tl-escena oscura pf-cierre" data-bloque="resultado" data-min="2" data-pasos="0" data-tipo="cierre" style={`--bloque:${color('resultado')}`}>
+          <p class="tl-kicker">Siguiente paso</p>
+          <h2 class="tl-titulo">Empezamos con <span class="acento">una reunión de dos horas</span></h2>
+          <div class="tl-cuerpo">
+            <ol class="pf-next">
+              <li><i>1</i>Reunión de análisis con Finanzas.</li>
+              <li><i>2</i>Calendario tributario de Ekosolv y mapa de tareas.</li>
+              <li><i>3</i>Calendario vigilado funcionando en la semana 3.</li>
+            </ol>
+            <p class="sub">Ninguna fecha vuelve a depender de la memoria de una persona, y ningún pago sale sin que alguien lo haya revisado.</p>
+            <p class="firma">Mike · codebymike.net</p>
+          </div>
+        </section>
+
+        <footer class="tl-pie" data-pie aria-hidden="true">
+          <span>
+            <img class="logo-cla" src="/brand/ekosolv-horizontal.png" alt="" width="249" height="72" />
+            <img class="logo-osc" src="/brand/ekosolv-horizontal-white.png" alt="" width="249" height="72" />
+          </span>
+          <span class="tl-progreso">{BLOQUES.map((b) => <span style="--m:1" data-bloque-barra={b.id}><i /></span>)}</span>
+          <span class="tl-num" data-num>1 / 20</span>
+        </footer>
+      </div>
+    </div>
+    <script type="application/json" id="pf-bloques" set:html={JSON.stringify(BLOQUES)} />
+    <script>
+      import '../../../scripts/presentacion/finanzas'
+    </script>
+  </body>
+</html>
