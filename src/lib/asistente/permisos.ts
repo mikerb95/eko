@@ -54,8 +54,10 @@ export const MATRIZ: Record<Area, { consultan: readonly Role[]; proponen: readon
   zoho_campaigns: { consultan: TODOS, proponen: ZOHO_PROPONEN },
   // Books es dinero: solo admin y finanzas lo ven y proponen en él.
   zoho_books: { consultan: ['admin', 'finanzas'], proponen: ['admin', 'finanzas'] },
-  // Siigo es la contabilidad: la ven quienes entran a Finanzas, y solo lectura.
-  siigo: { consultan: ['admin', 'finanzas', 'gerencia'], proponen: [] },
+  // Siigo es la contabilidad: como Books, solo admin y finanzas, y solo
+  // lectura. Gerencia no está aquí porque no entra al asistente
+  // (/api/admin/asistente en reglasEscritura.ts); ve Siigo en Finanzas.
+  siigo: { consultan: ['admin', 'finanzas'], proponen: [] },
 }
 
 export const puedeConsultar = (rol: string, area: Area) => (MATRIZ[area].consultan as readonly string[]).includes(rol)

@@ -475,7 +475,7 @@ function renderSiigo() {
   $$('#sg-verificar, #sg-balance').forEach((f) => { f.hidden = !conectado || !puedeSiigo() })
   if (!conectado) {
     est.innerHTML = `<div class="fin-aviso info"><span>${E.sesion.rol === 'admin'
-      ? 'Siigo no está conectado en este entorno. Faltan SIIGO_USERNAME y SIIGO_ACCESS_KEY en Vercel (se sacan en Siigo Nube, Alianzas, Mi credencial API).'
+      ? 'Siigo no está conectado en este entorno. Faltan SIIGO_USERNAME y SIIGO_ACCESS_KEY en Vercel. Se generan en Siigo Nube: menú Alianzas, botón Mi credencial API (en versiones recientes, Configuración, Alianzas e integraciones, Credenciales de integración).'
       : 'Siigo todavía no está conectado. Cuando el administrador agregue las credenciales, aquí aparecerán las cuentas por pagar.'}</span></div>`
     sinDatos('Sin conexión con Siigo.')
     return
@@ -503,7 +503,7 @@ function renderSiigo() {
     : '<p class="muted">No hay cuentas por pagar con saldo en Siigo.</p>'
   const c = SG.cifras
   $('#sg-cifras').innerHTML = c
-    ? `<dl class="fin-dl"><dt>Ventas facturadas</dt><dd>${esc(pesos(c.ventas))} <span class="muted">en ${c.facturasVenta} facturas</span></dd><dt>Compras registradas</dt><dd>${esc(pesos(c.compras))} <span class="muted">en ${c.facturasCompra} facturas</span></dd><dt>Pagado a proveedores</dt><dd>${esc(pesos(c.pagadoProveedores))} <span class="muted">en ${c.egresos} egresos</span></dd></dl>${c.truncado ? '<p class="muted fin-nota">Hay más documentos de los que se leen: las cifras pueden estar incompletas.</p>' : ''}`
+    ? `<dl class="fin-dl"><dt>Ventas facturadas</dt><dd>${esc(pesos(c.ventas))} <span class="muted">en ${c.facturasVenta} facturas</span></dd><dt>Facturas de compra</dt><dd>${esc(pesos(c.compras))} <span class="muted">en ${c.facturasCompra} facturas</span></dd><dt>Pagos registrados</dt><dd>${esc(pesos(c.pagos))} <span class="muted">en ${c.egresos} egresos</span></dd></dl><p class="muted fin-nota">Ventas antes de notas crédito. Los pagos son los recibos de pago o egreso del mes, a cualquier tercero.</p>${c.truncado ? '<p class="muted fin-nota">Hay más documentos de los que se leen: las cifras pueden estar incompletas.</p>' : ''}`
     : '<p class="muted">Sin cifras.</p>'
 }
 document.addEventListener('click', (e) => { if (e.target.closest('#sg-consultar')) consultarSiigo() })
@@ -517,7 +517,7 @@ $('#sg-verificar').addEventListener('submit', (e) => {
     try {
       const r = await enviar('siigo_verificar_pago', { nit: soloDigitos(f.nit.value), factura: f.factura.value, valor: soloDigitos(f.valor.value) })
       const v = r.resultado
-      out.innerHTML = `<p class="${v.ok ? 'fin-bien' : 'fin-mal'} fin-sg-veredicto">${v.ok ? `Todo en verde para pagarle a ${esc(v.proveedorNombre)}. Igual compare el valor y la cuenta del proveedor en la pantalla del banco.` : 'No pague todavía: revise lo marcado.'}</p>${chequeosHtml(v.chequeos)}`
+      out.innerHTML = `${v.incompleto ? '<p class="muted fin-nota">Siigo devolvió más documentos de los que se leen: la revisión puede estar incompleta.</p>' : ''}<p class="${v.ok ? 'fin-bien' : 'fin-mal'} fin-sg-veredicto">${v.ok ? `Todo en verde para pagarle a ${esc(v.proveedorNombre)}. Igual compare el valor y la cuenta del proveedor en la pantalla del banco.` : 'No pague todavía: revise lo marcado.'}</p>${chequeosHtml(v.chequeos)}`
     } catch (err) { out.innerHTML = ''; throw err }
   })
 })
@@ -537,7 +537,7 @@ function renderResumenes() {
   const abiertas = E.obligaciones.filter((o) => o.nivel !== 'cerrada' && o.vence)
   const hasta = masDias(E.hoy, 14)
   $('#res-semanal').innerHTML = `<h4 class="fin-h4 mal">Atrasadas</h4>${filasResumen(abiertas.filter((o) => o.vence < E.hoy))}<h4 class="fin-h4">Próximas dos semanas</h4>${filasResumen(abiertas.filter((o) => o.vence >= E.hoy && o.vence <= hasta))}`
-  const fuentes = [E.entorno.siigo && 'Siigo (ventas, compras y pagos a proveedores)', E.entorno.books && 'Zoho Books (facturación, recaudo y cartera)'].filter(Boolean)
+  const fuentes = [E.entorno.siigo && 'Siigo (ventas, compras, egresos y cuentas por pagar)', E.entorno.books && 'Zoho Books (facturación, recaudo y cartera)'].filter(Boolean)
   $('#res-mensual').innerHTML = `<p>${fuentes.length ? `El resumen trae las cifras de ${fuentes.join(' y de ')}.` : 'Siigo y Zoho Books todavía no están conectados: el resumen sale con el estado de las obligaciones y sin cifras.'}</p>`
   const av = E.avisos
   $('#res-avisos').innerHTML = av.length ? `<div class="tabla-wrap"><table class="tabla"><thead><tr><th>Aviso</th><th>Para</th><th>Cuándo</th><th>Envío</th></tr></thead><tbody>${av.map((a) => {

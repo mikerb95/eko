@@ -308,14 +308,24 @@ export function verificarPago(input: {
   cxp: readonly CuentaPorPagar[]
   egresos: readonly Egreso[]
   hoy: string
+  /** Desde qué fecha se trajeron las compras: va en el mensaje si no aparece. */
+  desde?: string
 }): { chequeos: ChequeoProveedor[]; ok: boolean; proveedorNombre: string } {
   const nit = normNit(input.nit)
   const f = normDoc(input.factura)
   const valor = Math.round(input.valor)
   const delProveedor = input.compras.filter((c) => normNit(c.proveedor) === nit)
   const coinciden = delProveedor.filter((c) => normDoc(c.facturaProveedor) === f || normDoc(c.nombre) === f)
-  const compra = coinciden[0]
+  // Si escribieron el comprobante de Siigo (FC-1-73) de una compra más vieja
+  // que la ventana consultada, se reconoce por lo que sigue pendiente.
+  const pendientePorComprobante = !coinciden.length ? input.cxp.filter((c) => normNit(c.proveedor) === nit && normDoc(c.documento) === f) : []
+  const compra: Compra | undefined =
+    coinciden[0] ??
+    (pendientePorComprobante.length
+      ? { id: '', nombre: pendientePorComprobante[0]!.documento, fecha: '', proveedor: nit, facturaProveedor: '', total: 0, saldo: pendientePorComprobante.reduce((a, c) => a + c.saldo, 0) }
+      : undefined)
   const nombre = input.cxp.find((c) => normNit(c.proveedor) === nit)?.proveedorNombre || `NIT ${nit}`
+  const ventana = input.desde ? ` desde el ${input.desde}` : ''
   const out: ChequeoProveedor[] = []
 
   out.push({
@@ -323,10 +333,12 @@ export function verificarPago(input: {
     titulo: 'La factura está registrada en Siigo',
     ok: !!compra,
     detalle: compra
-      ? `${compra.nombre} del ${compra.fecha} por ${pesosTxt(compra.total)}.`
+      ? compra.fecha
+        ? `${compra.nombre} del ${compra.fecha} por ${pesosTxt(compra.total)}.`
+        : `${compra.nombre} figura en las cuentas por pagar.`
       : delProveedor.length
-        ? `No hay una compra de ${nombre} con la factura ${input.factura}. Regístrela en Siigo antes de pagar.`
-        : `No hay compras recientes de ese NIT en Siigo. Revise el NIT o registre la factura.`,
+        ? `No hay una compra de ${nombre} con la factura ${input.factura}${ventana}. Si es más vieja, búsquela por el comprobante de Siigo (FC-...); si no, regístrela antes de pagar.`
+        : `No hay compras de ese NIT en Siigo${ventana}. Revise el NIT o registre la factura.`,
   })
 
   out.push({

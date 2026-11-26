@@ -304,7 +304,7 @@ export const TALLER_2: Taller = {
       ],
       siPreguntan: [
         { p: '¿Claude puede borrar algo en Zoho?', r: 'Solo si usted le da permiso a esa herramienta. Por eso dejamos la escritura en "Always ask" o bloqueada: cada cambio le pide aprobación, y usted lee qué va a hacer antes de permitirlo.' },
-        { p: '¿Se puede conectar con Siigo?', r: 'Sí. Siigo tiene un conector oficial para Claude, en beta: en Claude, Configuración, Conectores, Agregar conector personalizado, con la dirección https://mcp.siigo.com/mcp-adapter, y se entra con el usuario de Siigo. Antes, en Siigo Nube hay que activar las credenciales de integración tipo MCP. Consulta facturas de venta y de compra, clientes y productos, y crea facturas o clientes solo si usted lo confirma; nunca borra. La contabilidad y los balances no entran: el balance de prueba sale en Excel desde Finanzas, en el panel, o se exporta de Siigo.' },
+        { p: '¿Se puede conectar con Siigo?', r: 'Sí. Siigo tiene un conector oficial para Claude, en beta: en Claude, Configuración, Conectores, Agregar conector personalizado, con la dirección https://mcp.siigo.com/mcp-adapter, y se entra con el usuario de Siigo. Antes, en Siigo Nube hay que activar las credenciales de integración tipo MCP. Consulta facturas de venta y de compra, clientes y productos, y crea facturas o clientes solo si usted lo confirma; nunca borra. Una factura creada así es real: en la capacitación solo se consulta. En un plan de equipo de Claude, el conector lo agrega el administrador de la cuenta. La contabilidad y los balances no entran: el balance de prueba sale en Excel desde Finanzas, en el panel, o se exporta de Siigo.' },
       ],
       datos: {
         sistemas: [

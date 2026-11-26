@@ -88,6 +88,7 @@ Todas están documentadas con su procedimiento de obtención en
 | `RESEND_API_KEY`, `NOTIFY_FROM`, `NOTIFY_EMAIL` | Avisos internos por email | No-op: el dato se guarda igual |
 | `ZOHO_CLIENT_ID`, `ZOHO_CLIENT_SECRET`, `ZOHO_REFRESH_TOKEN`, `ZOHO_DC` | CRM | No-op: los leads se acumulan en `zoho_outbox` |
 | `ZOHO_BOOKS_ORG_ID` | Zoho Books | Books queda deshabilitado |
+| `SIIGO_USERNAME`, `SIIGO_ACCESS_KEY`, `SIIGO_PARTNER_ID` | Siigo Nube en Finanzas (pestaña Proveedores, resúmenes) y en el asistente | La pestaña dice que Siigo no está conectado y los resúmenes salen sin esas cifras |
 | `ZOHO_CAMPAIGNS_LISTKEY` | Lista de Campaigns para quien acepta comunicaciones | Las filas esperan en la bandeja sin gastar reintentos |
 | `ANTHROPIC_API_KEY` | Asesor público, agente de cumplimiento y asistente del panel | El asesor no se ofrece, los actos quedan "esperando clave" y el asistente no responde |
 | `AGENTE_MODELO` | Modelo del agente de cumplimiento | `claude-sonnet-5-5` |

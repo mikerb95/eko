@@ -208,10 +208,10 @@ async function conSiigo<T>(fn: () => Promise<T>): Promise<T> {
   try {
     return await fn()
   } catch (e: any) {
-    if (e?.name === 'SiigoError' || e?.name === 'TimeoutError') {
-      console.error('[finanzas/siigo]', e?.message || e)
-      throw new UserError(e?.name === 'TimeoutError' ? 'Siigo tardó demasiado en responder. Intente de nuevo en un momento.' : String(e.message))
-    }
+    console.error('[finanzas/siigo]', e?.message || e)
+    if (e?.name === 'SiigoError') throw new UserError(String(e.message))
+    if (e?.name === 'TimeoutError') throw new UserError('Siigo tardó demasiado en responder. Intente de nuevo en un momento.')
+    if (e instanceof TypeError) throw new UserError('No se pudo conectar con Siigo. Intente de nuevo en un momento.')
     throw e
   }
 }
@@ -450,11 +450,7 @@ export const ACCIONES: Record<string, Accion> = {
     exigir(s, CONSULTAN_SIIGO, 'consultar Siigo')
     const hoy = hoyEnBogota()
     const mes = /^\d{4}-\d{2}$/.test(String(b.mes || '')) ? String(b.mes) : hoy.slice(0, 7)
-    return conSiigo(async () => {
-      const revision = await Siigo.revisionProveedores(hoy)
-      const cifras = await Siigo.cifrasDelMes(mes, hoy)
-      return { revision, cifras }
-    })
+    return conSiigo(() => Siigo.revisionYCifras(hoy, mes))
   },
 
   async siigo_verificar_pago(s, b) {
@@ -534,9 +530,9 @@ async function enviarResumen(tipo: 'semanal' | 'mensual', hoy: string): Promise<
       const c = await Siigo.cifrasDelMes(r.mesAnterior, hoy)
       if (c) {
         extra.push(
-          ['Ventas facturadas (Siigo)', `${pesos(c.ventas)} en ${c.facturasVenta} facturas`],
-          ['Compras registradas', `${pesos(c.compras)} en ${c.facturasCompra} facturas`],
-          ['Pagado a proveedores', `${pesos(c.pagadoProveedores)} en ${c.egresos} egresos`],
+          ['Ventas facturadas (Siigo, antes de notas crédito)', `${pesos(c.ventas)} en ${c.facturasVenta} facturas`],
+          ['Facturas de compra registradas', `${pesos(c.compras)} en ${c.facturasCompra} facturas`],
+          ['Pagos registrados (egresos)', `${pesos(c.pagos)} en ${c.egresos} recibos`],
           ['Por pagar a proveedores a hoy', pesos(c.porPagar)],
           ['De eso, vencido', pesos(c.porPagarVencido)],
         )

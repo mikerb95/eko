@@ -23,7 +23,10 @@
  */
 
 const TOKEN_MARGEN_MS = 5 * 60 * 1000
+/** Lecturas. */
 const TIMEOUT_MS = 60_000
+/** Siigo recomienda 120 s o más para lo que genera algo (el balance en Excel). */
+const TIMEOUT_POST_MS = 120_000
 const REINTENTOS_429 = 3
 export const TAMANO_PAGINA = 100
 export const MAX_PAGINAS = 20
@@ -119,7 +122,7 @@ export async function siigoFetch(ruta: string, opts: { metodo?: 'GET' | 'POST'; 
         'content-type': 'application/json',
       },
       body: opts.cuerpo === undefined ? undefined : JSON.stringify(opts.cuerpo),
-      signal: AbortSignal.timeout(TIMEOUT_MS),
+      signal: AbortSignal.timeout(opts.metodo === 'POST' ? TIMEOUT_POST_MS : TIMEOUT_MS),
     })
     if (r.status === 401 && !renovado) {
       renovado = true
