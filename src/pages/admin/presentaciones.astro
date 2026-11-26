@@ -35,7 +35,7 @@ const decks: Deck[] = Object.values(TALLERES)
     nombre: nombreTaller(t),
     titulo: t.titulo,
     base: `/academia/taller/${t.n}`,
-    vista: '?vista=1',
+    vista: '?vista=1&quieta=1',
     minutos: t.minutosTotales,
     bloques: t.bloques.map((b) => ({ titulo: b.titulo, color: COLOR_BLOQUE[b.id] ?? '#179C91' })),
     escenas: t.escenas.map((e) => ({ titulo: e.titulo, bloque: t.bloques.find((b) => b.id === e.bloque)?.titulo ?? '', color: COLOR_BLOQUE[e.bloque] ?? '#179C91' })),

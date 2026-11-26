@@ -44,6 +44,7 @@ function montar() {
 
   // Seguimiento por el servidor (presentador en otro equipo). Se crea al final.
   let red: ReturnType<typeof seguirRed> | null = null
+  const QUIETA = datos.vista && new URLSearchParams(location.search).has('quieta')
 
   const avisar = canal(datos.n, (m: Mensaje) => {
     if (!activo || datos.vista) return
@@ -192,6 +193,9 @@ function montar() {
     },
     sondear(fn, ms) {
       fn()
+      // Miniatura de la mesa de luz (/admin/presentaciones): consulta una vez y
+      // no vuelve a preguntar, porque puede haber muchas abiertas a la vez.
+      if (QUIETA) return
       limpiezas.get(k)?.push(sondear(fn, ms))
     },
     limpiar(fn) {
