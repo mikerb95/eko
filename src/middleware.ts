@@ -7,7 +7,9 @@ const PUBLIC_ADMIN_PATHS = new Set(['/admin/login'])
 // La salida es pública: sin regla en reglasEscritura.ts, su POST caía en
 // "solo admin" y a los demás roles les respondía 403 sin borrar la cookie.
 // Cerrar una sesión que no existe no hace daño.
-const PUBLIC_API_PATHS = new Set(['/api/admin/login', '/api/admin/logout'])
+// Las dos de GitHub son el acceso de desarrollo (src/lib/github.ts): solo deja
+// entrar a la cuenta autorizada por id.
+const PUBLIC_API_PATHS = new Set(['/api/admin/login', '/api/admin/logout', '/api/admin/github', '/api/admin/github/callback'])
 // La sala de la capacitación (QR del proyector): se entra con nombre, correo y
 // área, sin cuenta (el enlace de entrada llega al correo). Su API valida un pase firmado propio (src/lib/talleres/sala.ts)
 // que solo sirve para votar en la capacitación en curso.
