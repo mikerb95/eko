@@ -50,7 +50,7 @@ export const CELULAR_TALLER2: Record<string, GuiaCelular> = {
       ventas: { titulo: 'El Brief desde Zoho', texto: 'Claude trae el Brief del prospecto directo de Zoho y arma la propuesta. Usted no copia nada.' },
       mercadeo: { titulo: 'Canva conectado', texto: 'Con el conector de Canva, Claude crea o ajusta la pieza a partir del texto que acaban de escribir juntos.' },
       gerencia: { titulo: 'El embudo en vivo', texto: 'Claude consulta las Quotes y los tratos de Zoho y le arma el tablero de la semana con datos actualizados.' },
-      finanzas: { titulo: 'Siigo no tiene enchufe', texto: 'Siigo no tiene conector: se exporta el reporte a Excel y se adjunta. Zoho Books sí puede conectarse con el MCP de Zoho (por verificar el plan).' },
+      finanzas: { titulo: 'Siigo ya tiene enchufe', texto: 'Con el conector oficial de Siigo (beta), Claude consulta las facturas de compra de un proveedor sin exportar nada. Los balances todavía se exportan a Excel. Zoho Books puede conectarse con el MCP de Zoho (por verificar el plan).' },
     },
   },
   plugin: {

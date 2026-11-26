@@ -154,3 +154,22 @@
   .fin-dl { grid-template-columns: 1fr; gap: 2px; }
   .fin-dl dd { margin-bottom: 8px; }
 }
+
+/* Proveedores (Siigo): barra de consulta, alertas y veredicto del pago.
+   Las alertas graves llevan tinte de fondo, nunca franja a la izquierda. */
+.fin-sg-barra {
+  display: flex; align-items: center; justify-content: space-between; gap: 12px; flex-wrap: wrap;
+  padding: 10px 14px; margin: 0 0 12px; border-radius: 10px; background: var(--paper-2);
+  font-size: 13px; color: var(--ink-2);
+}
+.fin-sg-alertas { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 6px; }
+.fin-sg-alertas li { padding: 10px 12px; border-radius: 10px; background: var(--paper-2); font-size: 13px; }
+.fin-sg-alertas li.mal { background: color-mix(in oklab, var(--danger) 8%, var(--paper)); }
+.fin-sg-alertas small { display: block; margin-top: 4px; color: var(--ink-2); line-height: 1.45; }
+.fin-sg-alerta-head { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+.fin-sg-alerta-head b { font-weight: 600; }
+.fin-sg-valor { margin-left: auto; font-family: var(--mono); font-size: 12.5px; color: var(--ink-2); white-space: nowrap; }
+.fin-sg-veredicto { font-weight: 600; margin: 12px 0 8px; }
+.fin-mes { font: inherit; font-size: 13px; padding: 6px 8px; border-radius: 8px; border: 1px solid var(--line, #d9dfdb); background: var(--paper); color: var(--ink); }
+.tabla th.num { text-align: right; }
+.tabla td.num { text-align: right; }

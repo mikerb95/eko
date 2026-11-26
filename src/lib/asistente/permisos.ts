@@ -25,6 +25,7 @@ export const AREAS = [
   'zoho_books',
   'zoho_workdrive',
   'zoho_campaigns',
+  'siigo',
 ] as const
 export type Area = (typeof AREAS)[number]
 
@@ -53,6 +54,8 @@ export const MATRIZ: Record<Area, { consultan: readonly Role[]; proponen: readon
   zoho_campaigns: { consultan: TODOS, proponen: ZOHO_PROPONEN },
   // Books es dinero: solo admin y finanzas lo ven y proponen en él.
   zoho_books: { consultan: ['admin', 'finanzas'], proponen: ['admin', 'finanzas'] },
+  // Siigo es la contabilidad: la ven quienes entran a Finanzas, y solo lectura.
+  siigo: { consultan: ['admin', 'finanzas', 'gerencia'], proponen: [] },
 }
 
 export const puedeConsultar = (rol: string, area: Area) => (MATRIZ[area].consultan as readonly string[]).includes(rol)

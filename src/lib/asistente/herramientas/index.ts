@@ -11,12 +11,13 @@ import { CONTENIDO } from './contenido.ts'
 import { CUMPLIMIENTO } from './cumplimiento.ts'
 import { BUSCAR_EN_PANEL } from './panel.ts'
 import { RECOLECCIONES } from './recolecciones.ts'
+import { SIIGO } from './siigo.ts'
 import { TALENTO } from './talento.ts'
 import { fallo, type Contexto, type Herramienta, type Resultado } from './tipos.ts'
 
 export type { Contexto, Herramienta, Resultado }
 
-export const HERRAMIENTAS: readonly Herramienta[] = [RECOLECCIONES, CONTACTOS, CUMPLIMIENTO, CONTENIDO, TALENTO, BUSCAR_EN_PANEL]
+export const HERRAMIENTAS: readonly Herramienta[] = [RECOLECCIONES, CONTACTOS, CUMPLIMIENTO, CONTENIDO, TALENTO, SIIGO, BUSCAR_EN_PANEL]
 
 export const herramienta = (nombre: string) => HERRAMIENTAS.find((h) => h.nombre === nombre)
 

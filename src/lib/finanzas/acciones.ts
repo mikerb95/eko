@@ -24,6 +24,8 @@ import * as D from './datos.ts'
 import { asociarDocumento, crearAlertaRequerimiento, gastoDelMes, leerDocumento, listarDocumentos, procesarDocumento } from './documentos.ts'
 import { anterior, ESTADO_TEXTO, ESTADOS, puedeAvanzar, puedeDevolver, siguiente, soporteExigido, TIPOS_SOPORTE, type Estado, type TipoSoporte } from './estados.ts'
 import { nombreMes, resumenMensual, resumenSemanal } from './resumen.ts'
+import * as Siigo from './siigo.ts'
+import { pesosTxt } from './proveedores.ts'
 import { cifrasDelMes } from './zohoBooks.ts'
 
 function env(key: string): string {
@@ -124,7 +126,7 @@ export async function cargarEstado(s: Sesion, hoy = hoyEnBogota()) {
     avisos,
     ia: { gastoMes: gasto, tope: config.topeIaUsd, activa: !!env('ANTHROPIC_API_KEY') },
     faltantes: [...faltantesDelAnio(config, anio), ...faltantesDelAnio(config, anio + 1)],
-    entorno: { correo: correo.correoConfigurado(), books: booksConfigured(), cron: !!env('CRON_SECRET') },
+    entorno: { correo: correo.correoConfigurado(), books: booksConfigured(), siigo: Siigo.siigoConfigurado(), cron: !!env('CRON_SECRET') },
     catalogos: { estados: ESTADOS, estadoTexto: ESTADO_TEXTO, soportes: TIPOS_SOPORTE, tipos: TIPO_TEXTO },
     puede: {
       preparar: PREPARAN.includes(s.rol),
@@ -196,6 +198,23 @@ async function contexto() {
 const obCorreo = (o: D.Obligacion, responsable = '') => ({ id: o.id, concepto: o.concepto, entidad: o.entidad, periodo: o.periodo, vence: o.vence, estado: o.estado, responsable })
 
 type Accion = (s: Sesion, b: any) => Promise<unknown>
+
+/** Quién consulta Siigo desde el panel: Finanzas, Gerencia y el admin. */
+const CONSULTAN_SIIGO = [...PREPARAN, 'gerencia']
+
+/** Un error de Siigo llega al panel como mensaje legible, no como error 500. */
+async function conSiigo<T>(fn: () => Promise<T>): Promise<T> {
+  if (!Siigo.siigoConfigurado()) throw new UserError('Siigo no está conectado todavía (faltan las credenciales de la API en Vercel).')
+  try {
+    return await fn()
+  } catch (e: any) {
+    if (e?.name === 'SiigoError' || e?.name === 'TimeoutError') {
+      console.error('[finanzas/siigo]', e?.message || e)
+      throw new UserError(e?.name === 'TimeoutError' ? 'Siigo tardó demasiado en responder. Intente de nuevo en un momento.' : String(e.message))
+    }
+    throw e
+  }
+}
 
 export const ACCIONES: Record<string, Accion> = {
   async guardar_config(s, b) {
@@ -427,6 +446,43 @@ export const ACCIONES: Record<string, Accion> = {
     return null
   },
 
+  async siigo_revisar(s, b) {
+    exigir(s, CONSULTAN_SIIGO, 'consultar Siigo')
+    const hoy = hoyEnBogota()
+    const mes = /^\d{4}-\d{2}$/.test(String(b.mes || '')) ? String(b.mes) : hoy.slice(0, 7)
+    return conSiigo(async () => {
+      const revision = await Siigo.revisionProveedores(hoy)
+      const cifras = await Siigo.cifrasDelMes(mes, hoy)
+      return { revision, cifras }
+    })
+  },
+
+  async siigo_verificar_pago(s, b) {
+    exigir(s, CONSULTAN_SIIGO, 'consultar Siigo')
+    const nit = String(b.nit || '').replace(/\D/g, '')
+    const factura = String(b.factura || '').trim()
+    const valor = Math.round(Number(String(b.valor ?? '').replace(/\D/g, '')))
+    if (nit.length < 5) throw new UserError('Escriba el NIT o la cédula del proveedor, sin dígito de verificación.')
+    if (!factura) throw new UserError('Escriba el número de la factura.')
+    if (!Number.isFinite(valor) || valor <= 0) throw new UserError('Escriba el valor a pagar.')
+    const r = await conSiigo(() => Siigo.verificarPagoProveedor(hoyEnBogota(), { nit, factura, valor }))
+    await D.anotarEvento({ accion: 'siigo_verificacion', detalle: `${r.proveedorNombre}, factura ${factura}, ${pesos(valor)}: ${r.ok ? 'todo en verde' : 'con alertas'}`, usuario: s.usuario, rol: s.rol })
+    return r
+  },
+
+  async siigo_balance(s, b) {
+    exigir(s, CONSULTAN_SIIGO, 'pedir el balance de prueba')
+    const anio = entero(b.anio, 'El año')
+    const mesInicio = entero(b.mes_inicio, 'El mes inicial')
+    const mesFin = entero(b.mes_fin, 'El mes final')
+    if (anio < 2015 || anio > 2100) throw new UserError('Año fuera de rango.')
+    if (mesInicio > 13 || mesFin > 13 || mesInicio > mesFin) throw new UserError('Los meses van de 1 a 13 (13 es el cierre) y el inicial no puede ser mayor que el final.')
+    const nit = String(b.nit || '').replace(/\D/g, '')
+    const r = await conSiigo(() => Siigo.balancePrueba({ anio, mesInicio, mesFin, nit: nit || undefined }))
+    await D.anotarEvento({ accion: 'siigo_balance', detalle: `Balance de prueba ${anio}, meses ${mesInicio} a ${mesFin}${nit ? `, tercero ${nit}` : ''}`, usuario: s.usuario, rol: s.rol })
+    return r
+  },
+
   async enviar_resumen(s, b) {
     exigir(s, [...PREPARAN, 'gerencia'], 'enviar resúmenes')
     const tipo = b.tipo === 'mensual' ? 'mensual' : 'semanal'
@@ -451,21 +507,58 @@ async function enviarResumen(tipo: 'semanal' | 'mensual', hoy: string): Promise<
   const to = [...D.correosDe(ds, 'finanzas'), ...D.correosDe(ds, 'gerencia')]
   if (tipo === 'semanal') {
     const r = resumenSemanal(obs, hoy)
-    return correo.resumen({ to, tipo, titulo: `Calendario tributario: semana del ${hoy.slice(8)} de ${nombreMes(hoy.slice(0, 7))}`, atrasadas: r.atrasadas, proximas: r.proximas, extra: [] })
+    const extra: [string, string][] = []
+    let nota = ''
+    if (Siigo.siigoConfigurado()) {
+      try {
+        const rv = await Siigo.revisionProveedores(hoy)
+        const t = rv.totales
+        extra.push(
+          ['Proveedores: vencido (Siigo)', pesosTxt(t.vencido)],
+          ['Proveedores: vence en 7 días', pesosTxt(t.porVencer)],
+          ['Proveedores: total por pagar', `${pesosTxt(t.porPagar)} en ${t.facturas} facturas`],
+        )
+        if (t.graves) extra.push(['Posibles pagos o registros dobles', `${t.graves}: revíselos en Finanzas, pestaña Proveedores`])
+      } catch (e: any) {
+        console.error('[finanzas/resumen] Siigo', e?.message || e)
+        nota = 'No se pudieron leer las cuentas por pagar de Siigo esta semana.'
+      }
+    }
+    return correo.resumen({ to, tipo, titulo: `Calendario tributario: semana del ${hoy.slice(8)} de ${nombreMes(hoy.slice(0, 7))}`, atrasadas: r.atrasadas, proximas: r.proximas, extra, nota })
   }
   const r = resumenMensual(obs, hoy)
   const extra: [string, string][] = [[`Obligaciones de ${nombreMes(r.mesAnterior)}`, `${r.cerradasDelMes} de ${r.delMes} presentadas`]]
+  const notas: string[] = []
+  if (Siigo.siigoConfigurado()) {
+    try {
+      const c = await Siigo.cifrasDelMes(r.mesAnterior, hoy)
+      if (c) {
+        extra.push(
+          ['Ventas facturadas (Siigo)', `${pesos(c.ventas)} en ${c.facturasVenta} facturas`],
+          ['Compras registradas', `${pesos(c.compras)} en ${c.facturasCompra} facturas`],
+          ['Pagado a proveedores', `${pesos(c.pagadoProveedores)} en ${c.egresos} egresos`],
+          ['Por pagar a proveedores a hoy', pesos(c.porPagar)],
+          ['De eso, vencido', pesos(c.porPagarVencido)],
+        )
+        if (c.truncado) notas.push('Siigo devolvió más documentos de los que se leen en un resumen: las cifras pueden estar incompletas.')
+      }
+    } catch (e: any) {
+      console.error('[finanzas/resumen] Siigo', e?.message || e)
+      notas.push('No se pudieron leer las cifras de Siigo este mes.')
+    }
+  }
   let nota = ''
   try {
     const c = await cifrasDelMes(r.mesAnterior)
     if (c) {
       extra.push(['Facturado (Zoho Books)', `${pesos(c.facturado)} en ${c.facturas} facturas`], ['Recaudado', pesos(c.recaudado)], ['Cartera por cobrar a hoy', pesos(c.cartera)], ['Cartera vencida', pesos(c.carteraVencida)])
-    } else nota = 'Las cifras de Zoho Books aparecerán cuando se conecte la cuenta.'
+    } else if (!Siigo.siigoConfigurado()) nota = 'Las cifras de Siigo y de Zoho Books aparecerán cuando se conecten las cuentas.'
   } catch (e: any) {
     console.error('[finanzas/resumen] Zoho Books', e?.message || e)
     nota = 'No se pudieron leer las cifras de Zoho Books este mes.'
   }
-  return correo.resumen({ to, tipo, titulo: `Resumen tributario de ${nombreMes(r.mesAnterior)}`, atrasadas: r.atrasadas, proximas: r.proximas, extra, nota })
+  if (nota) notas.push(nota)
+  return correo.resumen({ to, tipo, titulo: `Resumen tributario de ${nombreMes(r.mesAnterior)}`, atrasadas: r.atrasadas, proximas: r.proximas, extra, nota: notas.join(' ') })
 }
 
 /** Tarea programada (una vez al día): avisos de vencimiento y, si toca, resúmenes. */

@@ -15,6 +15,7 @@ const AREAS: Record<string, string> = {
   cumplimiento: 'alertas, expedientes y actos del agente de cumplimiento ambiental',
   contenido: 'artículos del blog y normativas publicadas',
   talento_humano: 'fichas, vencimientos, vacaciones, ausencias, formación y evaluaciones del equipo',
+  siigo: 'contabilidad en Siigo: cuentas por pagar a proveedores, alertas de pagos dobles, ventas y compras del mes',
   buscar_en_panel: 'dónde está cada cosa en el panel',
 }
 
@@ -33,6 +34,7 @@ Cómo trabajar:
 - Si le preguntan dónde está algo, use buscar_en_panel y dé el enlace.
 - Los plazos y días hábiles salen de la herramienta cumplimiento; no los calcule usted.
 - Los saldos de vacaciones y los vencimientos del equipo salen de talento_humano; no los calcule usted.
+- Los saldos, vencimientos y alertas de proveedores salen de siigo; no los calcule usted. Siigo solo se lee: si piden registrar o pagar algo, explique que eso se hace en Siigo Nube o en el banco.
 
 ${
   escrituras.length

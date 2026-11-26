@@ -442,6 +442,94 @@ $('#doc-list').addEventListener('submit', (e) => {
 })
 $('#doc-list').addEventListener('click', (e) => { const b = e.target.closest('[data-reintentar]'); if (b) conBoton(b, null, () => enviar('reintentar_documento', { id: Number(b.dataset.reintentar) })) })
 
+/* ---------- Proveedores (Siigo) ---------- */
+// La revisión no viene en el estado del panel: se pide a Siigo con el botón
+// (cada consulta gasta peticiones del tope de Siigo, 100 por minuto).
+let SG = null // { revision, cifras }
+let sgCargando = false
+const ALERTA_PUNTO = { factura_repetida: 'cancelada', egreso_repetido: 'cancelada', pagada_de_mas: 'cancelada', posible_duplicado: 'solicitada', vencida: 'borrador', por_vencer: 'activa' }
+const ALERTA_CORTO = { factura_repetida: 'Factura doble', egreso_repetido: 'Pago doble', pagada_de_mas: 'Pagada de más', posible_duplicado: 'Revisar', vencida: 'Vencida', por_vencer: 'Por vencer' }
+const puedeSiigo = () => P().preparar || P().aprobar
+
+async function consultarSiigo() {
+  if (sgCargando) return
+  sgCargando = true
+  renderSiigo()
+  try {
+    const r = await enviar('siigo_revisar', { mes: $('#sg-mes').value || E.hoy.slice(0, 7) })
+    SG = r.resultado
+  } catch (e) { avisoError(e) } finally { sgCargando = false; renderSiigo() }
+}
+
+function sinDatos(txt) {
+  $('#sg-kpis').innerHTML = ''
+  for (const id of ['#sg-alertas', '#sg-proveedores', '#sg-cifras']) $(id).innerHTML = `<p class="muted">${esc(txt)}</p>`
+}
+
+function renderSiigo() {
+  const conectado = E.entorno.siigo
+  const est = $('#sg-estado')
+  const fb = $('#sg-balance')
+  if (!$('#sg-mes').value) $('#sg-mes').value = E.hoy.slice(0, 7)
+  if (!fb.anio.value) { fb.anio.value = E.hoy.slice(0, 4); fb.mes_fin.value = Number(E.hoy.slice(5, 7)) }
+  $$('#sg-verificar, #sg-balance').forEach((f) => { f.hidden = !conectado || !puedeSiigo() })
+  if (!conectado) {
+    est.innerHTML = `<div class="fin-aviso info"><span>${E.sesion.rol === 'admin'
+      ? 'Siigo no está conectado en este entorno. Faltan SIIGO_USERNAME y SIIGO_ACCESS_KEY en Vercel (se sacan en Siigo Nube, Alianzas, Mi credencial API).'
+      : 'Siigo todavía no está conectado. Cuando el administrador agregue las credenciales, aquí aparecerán las cuentas por pagar.'}</span></div>`
+    sinDatos('Sin conexión con Siigo.')
+    return
+  }
+  const rv = SG?.revision
+  const cuando = rv ? new Date(rv.consultado).toLocaleString('es-CO', { dateStyle: 'medium', timeStyle: 'short', timeZone: 'America/Bogota' }) : ''
+  const txt = sgCargando ? 'Consultando Siigo…' : rv ? `Consultado el ${cuando}. Compras y pagos desde el ${fmtCorto(rv.desde)}.` : 'Siigo conectado. Consulte para ver las cuentas por pagar y las alertas.'
+  est.innerHTML = `<div class="fin-sg-barra"><span>${esc(txt)}</span>${puedeSiigo() ? `<button type="button" class="btn-primary btn-sm" id="sg-consultar" ${sgCargando ? 'disabled' : ''}>${rv ? 'Consultar de nuevo' : 'Consultar Siigo'}</button>` : ''}</div>${rv?.truncado ? '<div class="fin-aviso warn"><span>Siigo devolvió más documentos de los que se leen en una consulta: los totales pueden estar incompletos.</span></div>' : ''}`
+  const cuenta = $('[data-cuenta="proveedores"]')
+  if (cuenta) { cuenta.hidden = !rv?.totales.graves; cuenta.textContent = rv?.totales.graves || '' }
+  if (!rv) { sinDatos('Todavía no se ha consultado.'); return }
+  const t = rv.totales
+  const k = [
+    ['Por pagar a proveedores', pesos(t.porPagar), '#2f80c9', `${t.facturas} factura${t.facturas === 1 ? '' : 's'} con saldo`, false],
+    ['Vencido', pesos(t.vencido), '#d8453a', 'Saldo con fecha pasada', t.vencido > 0],
+    ['Vence en 7 días', pesos(t.porVencer), '#e8920c', 'Para programar el pago', false],
+    ['Posibles dobles', t.graves, '#8b5cf6', 'Facturas o pagos repetidos', t.graves > 0],
+  ]
+  $('#sg-kpis').innerHTML = k.map(([l, n, c, sub, alerta]) => `<div class="kpi${alerta ? ' is-alerta' : ''}" style="--c:${c}"><span class="kpi-lbl">${esc(l)}</span><span class="kpi-num">${esc(n)}</span><span class="kpi-sub">${esc(sub)}</span></div>`).join('')
+  $('#sg-alertas').innerHTML = rv.alertas.length
+    ? `<ul class="fin-sg-alertas">${rv.alertas.slice(0, 60).map((a) => `<li class="${a.grave ? 'mal' : ''}"><div class="fin-sg-alerta-head">${pastilla(ALERTA_PUNTO[a.tipo], ALERTA_CORTO[a.tipo])}<b>${esc(a.proveedorNombre)}</b><span class="fin-sg-valor">${esc(pesos(a.valor))}</span></div><small>${esc(a.detalle)}</small></li>`).join('')}</ul>${rv.alertas.length > 60 ? `<p class="muted fin-nota">Y ${rv.alertas.length - 60} más.</p>` : ''}`
+    : '<p class="fin-bien">Sin alertas: no hay facturas ni pagos repetidos, ni nada vencido.</p>'
+  $('#sg-proveedores').innerHTML = rv.proveedores.length
+    ? `<div class="tabla-wrap"><table class="tabla"><thead><tr><th>Proveedor</th><th class="num">Por pagar</th><th class="num">Vencido</th><th class="num">Facturas</th><th>Próximo vencimiento</th></tr></thead><tbody>${rv.proveedores.map((p) => `<tr><td><div class="t1">${esc(p.nombre)}</div><div class="t2">NIT ${esc(p.proveedor)}</div></td><td class="num">${esc(pesos(p.porPagar))}</td><td class="num${p.vencido ? ' fin-mal' : ''}">${p.vencido ? esc(pesos(p.vencido)) : '-'}</td><td class="num">${p.facturas}</td><td class="nw">${p.proximoVence ? esc(fmtCorto(p.proximoVence)) : '-'}</td></tr>`).join('')}</tbody></table></div>`
+    : '<p class="muted">No hay cuentas por pagar con saldo en Siigo.</p>'
+  const c = SG.cifras
+  $('#sg-cifras').innerHTML = c
+    ? `<dl class="fin-dl"><dt>Ventas facturadas</dt><dd>${esc(pesos(c.ventas))} <span class="muted">en ${c.facturasVenta} facturas</span></dd><dt>Compras registradas</dt><dd>${esc(pesos(c.compras))} <span class="muted">en ${c.facturasCompra} facturas</span></dd><dt>Pagado a proveedores</dt><dd>${esc(pesos(c.pagadoProveedores))} <span class="muted">en ${c.egresos} egresos</span></dd></dl>${c.truncado ? '<p class="muted fin-nota">Hay más documentos de los que se leen: las cifras pueden estar incompletas.</p>' : ''}`
+    : '<p class="muted">Sin cifras.</p>'
+}
+document.addEventListener('click', (e) => { if (e.target.closest('#sg-consultar')) consultarSiigo() })
+$('#sg-mes').addEventListener('change', () => { if (SG) consultarSiigo() })
+$('#sg-verificar').addEventListener('submit', (e) => {
+  e.preventDefault()
+  const f = e.currentTarget
+  const out = $('#sg-verificacion')
+  conBoton(f.querySelector('[type=submit]'), $('#sg-verificar-err'), async () => {
+    out.innerHTML = '<p class="muted">Revisando en Siigo…</p>'
+    try {
+      const r = await enviar('siigo_verificar_pago', { nit: soloDigitos(f.nit.value), factura: f.factura.value, valor: soloDigitos(f.valor.value) })
+      const v = r.resultado
+      out.innerHTML = `<p class="${v.ok ? 'fin-bien' : 'fin-mal'} fin-sg-veredicto">${v.ok ? `Todo en verde para pagarle a ${esc(v.proveedorNombre)}. Igual compare el valor y la cuenta del proveedor en la pantalla del banco.` : 'No pague todavía: revise lo marcado.'}</p>${chequeosHtml(v.chequeos)}`
+    } catch (err) { out.innerHTML = ''; throw err }
+  })
+})
+$('#sg-balance').addEventListener('submit', (e) => {
+  e.preventDefault()
+  const f = e.currentTarget
+  conBoton(f.querySelector('[type=submit]'), $('#sg-balance-err'), async () => {
+    const r = await enviar('siigo_balance', { anio: Number(f.anio.value), mes_inicio: Number(f.mes_inicio.value), mes_fin: Number(f.mes_fin.value), nit: soloDigitos(f.nit.value) })
+    $('#sg-balance-out').innerHTML = `<p class="fin-bien">Listo. <a href="${esc(r.resultado.url)}" target="_blank" rel="noopener">Descargar el balance en Excel</a></p><p class="muted fin-nota">El enlace lo genera Siigo y puede vencer: descárguelo ahora.</p>`
+  })
+})
+
 /* ---------- Resúmenes ---------- */
 const masDias = (iso, n) => { const d = new Date(iso + 'T12:00:00Z'); d.setUTCDate(d.getUTCDate() + n); return d.toISOString().slice(0, 10) }
 const filasResumen = (obs) => obs.length ? `<ul class="fin-lista">${obs.map((o) => `<li><button type="button" class="link-btn" data-ver-ob="${o.id}">${esc(o.concepto)}</button> <span class="muted">${esc(o.periodo)}</span> · ${esc(fmtCorto(o.vence))} · ${plazoHtml(o)}</li>`).join('')}</ul>` : '<p class="muted">Nada.</p>'
@@ -449,7 +537,8 @@ function renderResumenes() {
   const abiertas = E.obligaciones.filter((o) => o.nivel !== 'cerrada' && o.vence)
   const hasta = masDias(E.hoy, 14)
   $('#res-semanal').innerHTML = `<h4 class="fin-h4 mal">Atrasadas</h4>${filasResumen(abiertas.filter((o) => o.vence < E.hoy))}<h4 class="fin-h4">Próximas dos semanas</h4>${filasResumen(abiertas.filter((o) => o.vence >= E.hoy && o.vence <= hasta))}`
-  $('#res-mensual').innerHTML = `<p>${E.entorno.books ? 'Zoho Books conectado: el resumen trae facturación, recaudo y cartera.' : 'Zoho Books todavía no está conectado: el resumen sale con el estado de las obligaciones y sin cifras.'}</p>`
+  const fuentes = [E.entorno.siigo && 'Siigo (ventas, compras y pagos a proveedores)', E.entorno.books && 'Zoho Books (facturación, recaudo y cartera)'].filter(Boolean)
+  $('#res-mensual').innerHTML = `<p>${fuentes.length ? `El resumen trae las cifras de ${fuentes.join(' y de ')}.` : 'Siigo y Zoho Books todavía no están conectados: el resumen sale con el estado de las obligaciones y sin cifras.'}</p>`
   const av = E.avisos
   $('#res-avisos').innerHTML = av.length ? `<div class="tabla-wrap"><table class="tabla"><thead><tr><th>Aviso</th><th>Para</th><th>Cuándo</th><th>Envío</th></tr></thead><tbody>${av.map((a) => {
     const o = a.obligacion_id ? ob(a.obligacion_id) : null
@@ -632,6 +721,7 @@ function renderTodo() {
   renderKpis()
   listaOb.pintar()
   listaPagos.pintar()
+  renderSiigo()
   renderDocumentos()
   renderResumenes()
   renderAjustes()

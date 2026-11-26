@@ -49,6 +49,7 @@ const porAprobar = estado ? estado.pagos.filter((p) => p.estado === 'por_aprobar
   <nav class="subtabs" aria-label="Secciones de Finanzas">
     <button class="subtab is-active" data-tab="calendario">Calendario <span class="count" data-cuenta="calendario">{abiertas.length}</span></button>
     <button class="subtab" data-tab="pagos">Pagos <span class="count" data-cuenta="pagos">{porAprobar}</span></button>
+    <button class="subtab" data-tab="proveedores">Proveedores <span class="count" data-cuenta="proveedores" hidden></span></button>
     <button class="subtab" data-tab="documentos">Documentos</button>
     <button class="subtab" data-tab="resumenes">Resúmenes</button>
     <button class="subtab" data-tab="ajustes">Ajustes</button>
@@ -69,6 +70,50 @@ const porAprobar = estado ? estado.pagos.filter((p) => p.estado === 'por_aprobar
     <p class="fin-intro">Cada pago pasa por el control antes de pagar: que no esté pagado ya, que el valor sea el del borrador, que la entidad, la referencia y la cuenta estén autorizadas, y que Gerencia dé el visto bueno. Quien prepara no aprueba.</p>
     <div class="chips" id="pago-chips"></div>
     <div id="pago-list"></div>
+  </section>
+
+  <!-- PROVEEDORES (SIIGO) -->
+  <section id="panel-proveedores" class="panel">
+    <p class="fin-intro">Cuentas por pagar y pagos a proveedores leídos de Siigo. El panel busca facturas registradas dos veces, pagos repetidos, facturas con más pagado que su valor y lo que está vencido. Solo lee: no registra ni paga nada en Siigo.</p>
+    <div id="sg-estado"></div>
+    <div class="kpi-grid" id="sg-kpis"></div>
+    <div class="dash-grid">
+      <article class="dash-card">
+        <header class="dash-head"><div><h3>Alertas</h3><p>Primero lo que puede ser un pago o un registro doble.</p></div></header>
+        <div id="sg-alertas"></div>
+      </article>
+      <article class="dash-card">
+        <header class="dash-head"><div><h3>Verificar un pago antes de hacerlo</h3><p>Escriba el proveedor, la factura y el valor. El panel revisa en Siigo que la factura esté registrada una vez, que tenga saldo, que el valor no lo supere y que no haya un pago igual reciente.</p></div></header>
+        <form id="sg-verificar" class="fin-form">
+          <div class="grid2"><label>NIT o cédula del proveedor (sin dígito)<input name="nit" inputmode="numeric" required /></label><label>Factura del proveedor o comprobante de Siigo<input name="factura" placeholder="FE-1234 o FC-1-73" required /></label></div>
+          <label>Valor a pagar<input name="valor" inputmode="numeric" required /></label>
+          <button type="submit" class="btn-primary">Verificar en Siigo</button>
+          <p class="form-error" id="sg-verificar-err"></p>
+        </form>
+        <div id="sg-verificacion"></div>
+      </article>
+    </div>
+    <article class="dash-card">
+      <header class="dash-head"><div><h3>Cuentas por pagar por proveedor</h3><p>Saldo pendiente en Siigo a hoy, con lo vencido primero.</p></div></header>
+      <div id="sg-proveedores"></div>
+    </article>
+    <div class="dash-grid">
+      <article class="dash-card">
+        <header class="dash-head"><div><h3>Cifras del mes</h3><p>Ventas, compras y pagos a proveedores registrados en Siigo.</p></div>
+          <input type="month" id="sg-mes" class="fin-mes" aria-label="Mes de las cifras" /></header>
+        <div id="sg-cifras"></div>
+      </article>
+      <article class="dash-card">
+        <header class="dash-head"><div><h3>Balance de prueba en Excel</h3><p>Siigo lo genera y el panel le da el enlace para descargarlo. Sirve para el comparativo de balances con Claude. Con NIT sale el balance de ese tercero.</p></div></header>
+        <form id="sg-balance" class="fin-form">
+          <div class="grid3"><label>Año<input name="anio" type="number" min="2015" max="2100" required /></label><label>Desde el mes<input name="mes_inicio" type="number" min="1" max="13" value="1" required /></label><label>Hasta el mes<input name="mes_fin" type="number" min="1" max="13" required /></label></div>
+          <label>NIT del tercero (opcional)<input name="nit" inputmode="numeric" /></label>
+          <button type="submit" class="btn-ghost">Generar balance</button>
+          <p class="form-error" id="sg-balance-err"></p>
+        </form>
+        <div id="sg-balance-out"></div>
+      </article>
+    </div>
   </section>
 
   <!-- DOCUMENTOS -->
@@ -93,14 +138,14 @@ const porAprobar = estado ? estado.pagos.filter((p) => p.estado === 'por_aprobar
     <div class="dash-grid">
       <article class="dash-card">
         <header class="dash-head">
-          <div><h3>Resumen del lunes</h3><p>Cada lunes a las 7:00 a. m.: lo que vence en las dos semanas siguientes y lo atrasado. Llega a Finanzas y a Gerencia.</p></div>
+          <div><h3>Resumen del lunes</h3><p>Cada lunes a las 7:00 a. m.: lo que vence en las dos semanas siguientes, lo atrasado y, con Siigo conectado, las cuentas por pagar a proveedores. Llega a Finanzas y a Gerencia.</p></div>
           <button type="button" class="btn-ghost btn-sm" data-resumen="semanal">Enviar ahora</button>
         </header>
         <div id="res-semanal"></div>
       </article>
       <article class="dash-card">
         <header class="dash-head">
-          <div><h3>Resumen del mes</h3><p>El día 1: cómo cerraron las obligaciones del mes anterior y las cifras de Zoho Books (facturación, recaudo y cartera).</p></div>
+          <div><h3>Resumen del mes</h3><p>El día 1: cómo cerraron las obligaciones del mes anterior y las cifras de Siigo y de Zoho Books.</p></div>
           <button type="button" class="btn-ghost btn-sm" data-resumen="mensual">Enviar ahora</button>
         </header>
         <div id="res-mensual"></div>

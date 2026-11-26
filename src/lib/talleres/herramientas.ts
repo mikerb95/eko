@@ -76,7 +76,7 @@ const POR_AREA: Record<string, Herramienta[]> = {
     { nombre: 'Skills de Excel y PDF', tipo: 'incluida', estado: 'lista', para: 'Comparar balances de dos periodos y leer extractos y requerimientos en PDF.' },
     { nombre: 'Proyecto de Finanzas', tipo: 'proyecto', estado: 'lista', para: 'Plantillas de respuesta, calendario tributario y procedimientos del área, siempre a la mano.' },
     { nombre: 'Claude in Chrome', tipo: 'extension', estado: 'lista', para: 'Consultar los portales de la DIAN y Hacienda, que no tienen conexión directa. Usted inicia la sesión: las claves nunca van en el chat.' },
-    { nombre: 'Siigo Nube con exportaciones', tipo: 'forma', estado: 'lista', para: 'Siigo no tiene conector: exporte a Excel y trabaje con el archivo. La nómina no se conecta.' },
+    { nombre: 'Conector oficial de Siigo', tipo: 'mcp', estado: 'lista', para: 'Facturas de venta y de compra, clientes y productos de Siigo Nube desde el chat (beta). Se agrega como conector personalizado con https://mcp.siigo.com/mcp-adapter. Balances y nómina no entran: esos se exportan a Excel.' },
     { nombre: 'Zoho MCP (Books)', tipo: 'mcp', estado: 'verificar', para: 'Cartera, recaudos y facturas de Zoho Books desde el chat. Depende del plan de Zoho One.' },
     { nombre: 'Skill de comparativo de balances', tipo: 'skill', estado: 'crear', para: 'Compara dos periodos con el formato de Ekosolv y explica las variaciones que pasan del umbral que usted fije.' },
     { nombre: 'Skill de requerimientos DIAN y Hacienda', tipo: 'skill', estado: 'crear', para: 'Estructura la respuesta, lista los soportes que hay que pedir y marca el plazo.' },
