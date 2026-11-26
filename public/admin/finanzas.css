@@ -170,6 +170,7 @@
 .fin-sg-alerta-head b { font-weight: 600; }
 .fin-sg-valor { margin-left: auto; font-family: var(--mono); font-size: 12.5px; color: var(--ink-2); white-space: nowrap; }
 .fin-sg-veredicto { font-weight: 600; margin: 12px 0 8px; }
-.fin-mes { font: inherit; font-size: 13px; padding: 6px 8px; border-radius: 8px; border: 1px solid var(--line, #d9dfdb); background: var(--paper); color: var(--ink); }
+.fin-mes { flex: none; width: auto; font: inherit; font-size: 13px; padding: 6px 8px; border-radius: 8px; border: 1px solid var(--line, #d9dfdb); background: var(--paper); color: var(--ink); }
 .tabla th.num { text-align: right; }
 .tabla td.num { text-align: right; }
+.fin-form[hidden] { display: none; }

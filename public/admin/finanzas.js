@@ -482,7 +482,7 @@ function renderSiigo() {
   }
   const rv = SG?.revision
   const cuando = rv ? new Date(rv.consultado).toLocaleString('es-CO', { dateStyle: 'medium', timeStyle: 'short', timeZone: 'America/Bogota' }) : ''
-  const txt = sgCargando ? 'Consultando Siigo…' : rv ? `Consultado el ${cuando}. Compras y pagos desde el ${fmtCorto(rv.desde)}.` : 'Siigo conectado. Consulte para ver las cuentas por pagar y las alertas.'
+  const txt = sgCargando ? 'Consultando Siigo…' : rv ? `Consultado el ${cuando} · compras y pagos desde el ${fmtCorto(rv.desde)}` : 'Siigo conectado. Consulte para ver las cuentas por pagar y las alertas.'
   est.innerHTML = `<div class="fin-sg-barra"><span>${esc(txt)}</span>${puedeSiigo() ? `<button type="button" class="btn-primary btn-sm" id="sg-consultar" ${sgCargando ? 'disabled' : ''}>${rv ? 'Consultar de nuevo' : 'Consultar Siigo'}</button>` : ''}</div>${rv?.truncado ? '<div class="fin-aviso warn"><span>Siigo devolvió más documentos de los que se leen en una consulta: los totales pueden estar incompletos.</span></div>' : ''}`
   const cuenta = $('[data-cuenta="proveedores"]')
   if (cuenta) { cuenta.hidden = !rv?.totales.graves; cuenta.textContent = rv?.totales.graves || '' }
