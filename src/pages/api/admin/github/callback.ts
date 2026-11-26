@@ -1,6 +1,6 @@
 import type { APIRoute } from 'astro'
 import { createSession, SESSION_COOKIE, SESSION_TTL_SECONDS } from '../../../../lib/auth'
-import { cuentaDesdeCodigo, esDesarrollador, GITHUB_STATE_COOKIE, githubConfigurado } from '../../../../lib/github'
+import { type CuentaGithub, cuentaDesdeCodigo, esDesarrollador, GITHUB_STATE_COOKIE, githubConfigurado } from '../../../../lib/github'
 import { clientIp } from '../../../../lib/rateLimit'
 import { anotar } from '../../../../lib/bitacora'
 
@@ -27,7 +27,7 @@ export const GET: APIRoute = async (context) => {
   // Sin state que coincida, la vuelta no la pidió este navegador (CSRF de login).
   if (!code || !esperado.state || state !== esperado.state) return redirect('/admin/login?error=github')
 
-  let cuenta
+  let cuenta: CuentaGithub | null = null
   try {
     cuenta = await cuentaDesdeCodigo(code, url.origin)
   } catch (e: any) {
