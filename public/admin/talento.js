@@ -342,10 +342,8 @@ function llenarFicha(p) {
   const f = p.ficha || {}
   const el = fichaForm.elements
   el.usuario_id.value = p.usuario_id
-  // El nombre solo se edita aquí en empleados sin cuenta; el de las cuentas sale de Usuarios.
-  $('#ficha-nombre').hidden = !p.sinCuenta
-  el.nombre.required = !!p.sinCuenta
-  el.nombre.value = p.sinCuenta ? p.nombre : ''
+  el.nombre.value = p.nombre || ''
+  pintarAcceso(p)
   $('#empleado-borrar').hidden = !p.sinCuenta || !p.usuario_id
   // Sin guardar todavía no hay a quién colgarle documentos ni novedades.
   $$('#persona-tabs .subtab').forEach((b) => { b.disabled = !p.usuario_id && b.dataset.ptab !== 'ficha' })
@@ -376,6 +374,64 @@ fichaForm.addEventListener('submit', (ev) => {
     t.textContent = 'Guardada'
     setTimeout(() => { t.textContent = 'Guardar ficha' }, 1500)
   })
+})
+
+/* ---------- Acceso al panel (desde la ficha) ---------- */
+// Es la misma persona antes y después: darle acceso crea su usuario y le pasa
+// todo el historial; con cuenta, aquí mismo se le cambia el rol o se desactiva.
+function pintarAcceso(p) {
+  const el = $('#ficha-acceso')
+  if (!p.usuario_id) { el.hidden = true; el.innerHTML = ''; return }
+  el.hidden = false
+  if (p.sinCuenta) {
+    el.innerHTML = `
+      <legend>Acceso al panel</legend>
+      <p class="muted th-acceso-txt">No entra al panel. Si asciende o lo necesita, dele acceso aquí: sigue siendo la misma persona, con su ficha y todo su historial.</p>
+      <button type="button" class="btn-ghost" data-acceso="abrir">Darle acceso al panel</button>
+      <div class="th-acceso-form" hidden>
+        <div class="grid3">
+          <label>Usuario<input data-campo="username" autocomplete="off" placeholder="nombre.apellido" /></label>
+          <label>Contraseña<input data-campo="password" type="password" autocomplete="new-password" placeholder="Mínimo 8 caracteres" /></label>
+          <label>Rol<select data-campo="role">${opciones(C.roles, 'lectura')}</select></label>
+        </div>
+        <div class="th-acciones-form"><p class="form-error" data-acceso-err></p><button type="button" class="btn-primary" data-acceso="crear">Crear acceso</button></div>
+      </div>`
+    return
+  }
+  el.innerHTML = `
+    <legend>Acceso al panel</legend>
+    <div class="grid3">
+      <label>Usuario<input value="${esc(p.username)}" disabled /></label>
+      <label>Rol<select data-campo="role">${opciones(C.roles, p.rol)}</select></label>
+      <label class="th-check th-acceso-activo"><input type="checkbox" data-campo="active"${p.cuentaActiva ? ' checked' : ''} /><span>Puede entrar al panel</span></label>
+    </div>
+    <div class="th-acciones-form"><p class="form-error" data-acceso-err></p><button type="button" class="btn-ghost" data-acceso="guardar"><span class="t">Guardar acceso</span></button></div>
+    <p class="muted th-nota">La contraseña se cambia en <a href="/admin?tab=usuarios">Usuarios</a>.</p>`
+}
+$('#ficha-acceso').addEventListener('click', (e) => {
+  const b = e.target.closest('[data-acceso]')
+  if (!b) return
+  const el = $('#ficha-acceso')
+  const campo = (k) => el.querySelector(`[data-campo="${k}"]`)
+  const err = el.querySelector('[data-acceso-err]')
+  if (b.dataset.acceso === 'abrir') { b.hidden = true; el.querySelector('.th-acceso-form').hidden = false; campo('username').focus(); return }
+  if (b.dataset.acceso === 'crear') {
+    conBoton(b, err, async () => {
+      const r = await enviar('dar_acceso', { usuario_id: personaAbierta, nombre: fichaForm.elements.nombre.value, username: campo('username').value, password: campo('password').value, role: campo('role').value })
+      const p = persona(r.resultado)
+      // Al refrescar, el id viejo ya no existe y la ficha se cerró: se reabre con el nuevo.
+      if (p) { personaAbierta = p.usuario_id; llenarFicha(p); verPestana(pestanaPersona); abrir(perDrawer) }
+    })
+    return
+  }
+  if (b.dataset.acceso === 'guardar') {
+    conBoton(b, err, async () => {
+      await enviar('cambiar_acceso', { usuario_id: personaAbierta, role: campo('role').value, active: campo('active').checked })
+      const p = persona(personaAbierta)
+      if (p) pintarAcceso(p)
+      const t = $('#ficha-acceso [data-acceso="guardar"] .t'); if (t) { t.textContent = 'Guardado'; setTimeout(() => { t.textContent = 'Guardar acceso' }, 1500) }
+    })
+  }
 })
 
 $('#empleado-borrar').addEventListener('click', (e) => confirmarClic(e.currentTarget, () => conBoton(e.currentTarget, $('#ficha-err'), async () => {

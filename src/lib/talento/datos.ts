@@ -11,6 +11,7 @@ import type { Client } from '@libsql/client'
 import { asegurarEsquema, cliente } from '../db.ts'
 import { UserError } from '../apiError.ts'
 import { GENERAL, MODULOS } from '../capacitacion.ts'
+import { ROLES, listUsers, upsertUser, type Role } from '../users.ts'
 import {
   AJUSTES_BASE,
   AREAS_EMPRESA,
@@ -461,8 +462,13 @@ export async function guardarFicha(b: any): Promise<number> {
   const nuevo = b.usuario_id === '' || b.usuario_id == null
   const usuario_id = nuevo ? 0 : idPersona(b.usuario_id)
   if (usuario_id) await personaExiste(db, usuario_id)
-  const nombre = usuario_id > 0 ? '' : texto(b.nombre, 120)
-  if (usuario_id <= 0 && !nombre) throw new UserError('Escriba el nombre completo del empleado')
+  const nombreEscrito = texto(b.nombre, 120)
+  if (usuario_id <= 0 && !nombreEscrito) throw new UserError('Escriba el nombre completo del empleado')
+  // Con cuenta, el nombre vive en users (es el mismo que ve en Usuarios).
+  const nombre = usuario_id > 0 ? '' : nombreEscrito
+  if (usuario_id > 0 && nombreEscrito) {
+    await db.execute({ sql: 'UPDATE users SET name = ?, updated_at = ? WHERE id = ?', args: [nombreEscrito, ahora(), usuario_id] })
+  }
   const tipo_contrato = catalogo(b.tipo_contrato, TIPOS_CONTRATO, 'El tipo de contrato', true)
   const fecha_ingreso = fechaOpcional(b.fecha_ingreso, 'ingreso')
   const fecha_fin_contrato = fechaOpcional(b.fecha_fin_contrato, 'fin del contrato')
@@ -527,6 +533,75 @@ export async function guardarFicha(b: any): Promise<number> {
     args: [usuario_id, ...Object.values(campos), ts, ts] as any[],
   })
   return usuario_id
+}
+
+/** Tablas que cuelgan de la persona y se mueven con ella al darle acceso. */
+const TABLAS_PERSONA = ['th_documentos', 'th_novedades', 'th_formaciones', 'th_evaluaciones'] as const
+
+function rolValido(v: unknown): Role {
+  const r = texto(v, 40)
+  if (!(ROLES as readonly string[]).includes(r)) throw new UserError('Elija un rol válido')
+  return r as Role
+}
+
+/**
+ * Le da acceso al panel a un empleado sin cuenta. Es la misma persona: se crea
+ * su usuario y la ficha, los documentos, las novedades, la formación y las
+ * evaluaciones pasan a ese usuario. No queda nadie duplicado.
+ */
+export async function darAcceso(b: any): Promise<number> {
+  const db = cliente()
+  const viejo = idPersona(b.usuario_id)
+  if (viejo > 0) throw new UserError('Esta persona ya tiene acceso al panel')
+  const r = await db.execute({ sql: 'SELECT nombre FROM th_empleados WHERE usuario_id = ?', args: [viejo] })
+  if (!r.rows.length) throw new UserError('Esa persona ya no está en el panel')
+  const nombre = texto(b.nombre, 120) || str((r.rows[0] as any).nombre)
+  const username = texto(b.username, 60).toLowerCase()
+  if (!/^[a-z0-9@._-]{3,60}$/.test(username)) throw new UserError('Usuario inválido (mínimo 3 caracteres: letras, números, @ . _ -)')
+  const password = str(b.password)
+  if (password.length < 8) throw new UserError('La contraseña debe tener al menos 8 caracteres')
+  const role = rolValido(b.role)
+
+  let nuevo: number
+  try {
+    nuevo = await upsertUser({ username, name: nombre, role, active: true, password })
+  } catch (e: any) {
+    if (String(e?.message || e).includes('UNIQUE')) throw new UserError('Ese usuario ya existe. Elija otro.')
+    throw e
+  }
+  try {
+    // Todo o nada: si algo falla, no queda la ficha partida entre los dos ids.
+    await db.batch(
+      [
+        { sql: `UPDATE th_empleados SET usuario_id = ?, nombre = '', updated_at = ? WHERE usuario_id = ?`, args: [nuevo, ahora(), viejo] },
+        ...TABLAS_PERSONA.map((t) => ({ sql: `UPDATE ${t} SET usuario_id = ? WHERE usuario_id = ?`, args: [nuevo, viejo] })),
+      ],
+      'write',
+    )
+  } catch (e) {
+    // Sin la mudanza, el usuario recién creado sobra: se quita para poder reintentar.
+    await db.execute({ sql: 'DELETE FROM users WHERE id = ?', args: [nuevo] }).catch(() => {})
+    throw e
+  }
+  return nuevo
+}
+
+/**
+ * Cambia el rol o activa y desactiva el acceso de una persona con cuenta,
+ * desde su ficha. Mismas protecciones que en Usuarios: nadie se quita a sí
+ * mismo el rol de administrador ni se desactiva, y no se puede quedar el
+ * panel sin ningún administrador activo.
+ */
+export async function cambiarAcceso(b: any, yo: string): Promise<number> {
+  const id = idPersona(b.usuario_id)
+  if (id < 0) throw new UserError('Esta persona no tiene acceso al panel todavía')
+  const u = (await listUsers()).find((x) => x.id === id)
+  if (!u) throw new UserError('Esa cuenta ya no existe')
+  const role = rolValido(b.role)
+  const active = b.active !== false
+  if (yo && u.username === yo && (role !== 'admin' || !active)) throw new UserError('No puede quitarse a sí mismo el rol de administrador ni desactivar su propia cuenta')
+  await upsertUser({ id, username: u.username, name: u.name, role, active })
+  return id
 }
 
 /**

@@ -4,7 +4,9 @@ import { hoyEnBogota } from '../../../lib/agente/diasHabiles'
 import { asegurarEsquema } from '../../../lib/db'
 import { notifyResumenTalento, talentoEmailConfigured } from '../../../lib/email'
 import {
+  cambiarAcceso,
   cargarEstado,
+  darAcceso,
   decidirNovedad,
   eliminarCargo,
   eliminarCurso,
@@ -42,11 +44,13 @@ export const GET: APIRoute = async ({ locals }) => {
   }
 }
 
-type Accion = (b: any, quien: string) => Promise<unknown>
+type Accion = (b: any, quien: string, yo: string) => Promise<unknown>
 
 const ACCIONES: Record<string, Accion> = {
   guardar_ficha: (b) => guardarFicha(b),
   eliminar_empleado: (b) => eliminarEmpleadoSinCuenta(b.usuario_id),
+  dar_acceso: (b) => darAcceso(b),
+  cambiar_acceso: (b, _q, yo) => cambiarAcceso(b, yo),
   guardar_cargo: (b) => guardarCargo(b),
   eliminar_cargo: (b) => eliminarCargo(b.id),
   guardar_documento: (b) => guardarDocumento(b),
@@ -91,7 +95,7 @@ export const POST: APIRoute = async ({ request, locals }) => {
     // El esquema y los cursos de IA, antes de la primera escritura.
     await asegurarEsquema()
     await sembrarCursosIA()
-    const resultado = await accion(b, quien)
+    const resultado = await accion(b, quien, String(locals.username || ''))
     return json({ ok: true, resultado: resultado ?? null, estado: await cargarEstado(hoy) })
   } catch (e) {
     return fail('talento', e)

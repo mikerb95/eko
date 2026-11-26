@@ -172,3 +172,6 @@
   .th-avisos .plazo-chip { margin-left: 40px; }
 }
 .th-pestanas .subtab:disabled { opacity: .45; cursor: not-allowed; }
+.th-acceso-txt { margin: 0 0 10px; font-size: 13px; }
+.th-acceso-form { margin-top: 12px; }
+.th-acceso-activo { align-self: end; padding-bottom: 10px; }

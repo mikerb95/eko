@@ -8,6 +8,7 @@ import AdminLayout from '../../layouts/AdminLayout.astro'
 import { ico } from '../../lib/admin/iconos'
 import { festivosColombia, hoyEnBogota } from '../../lib/agente/diasHabiles'
 import { talentoEmailConfigured } from '../../lib/email'
+import { ROLES, ROLE_LABELS } from '../../lib/users'
 import { cargarEstado, type EstadoTalento } from '../../lib/talento/datos'
 import {
   AREAS_EMPRESA,
@@ -46,6 +47,7 @@ const catalogos = {
   cursos: TIPOS_CURSO,
   niveles: NIVELES,
   criteriosBase: CRITERIOS_BASE,
+  roles: ROLES.map((id) => ({ id, etiqueta: ROLE_LABELS[id] })),
 }
 const emailListo = talentoEmailConfigured()
 
@@ -229,10 +231,11 @@ const user = Astro.locals.user || ''
         </nav>
         <form id="ficha-form" class="drawer-body" data-pvista="ficha">
           <input type="hidden" name="usuario_id" />
-          <fieldset class="grupo" id="ficha-nombre">
+          <fieldset class="grupo">
             <legend>Empleado</legend>
-            <label>Nombre completo<input name="nombre" autocomplete="off" maxlength="120" /><small>No tiene cuenta del panel: no entra con usuario ni contraseña.</small></label>
+            <label>Nombre completo<input name="nombre" required autocomplete="off" maxlength="120" /></label>
           </fieldset>
+          <fieldset class="grupo" id="ficha-acceso"></fieldset>
           <fieldset class="grupo">
             <legend>Cargo y contrato</legend>
             <div class="grid2">
