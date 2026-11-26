@@ -56,3 +56,9 @@ test('resumen por año: abiertas y por confirmar, sin contar presentadas ni requ
   const r = resumenRevision(obs, { confirmado: true }, REV)
   assert.deepEqual(r.map((x) => [x.anio, x.abiertas, x.porConfirmar, !!x.revision]), [['2026', 2, 1, true], ['2027', 1, 1, false]])
 })
+
+test('la fecha de la constancia se muestra en hora de Bogotá', () => {
+  const rev: Revisiones = { '2026': { anio: 2026, contador: 'Ana', registradoPor: 'f', fecha: '2026-11-26T02:30:00.000Z', nota: '' } }
+  const m = motivosFecha({ ...base, created_at: '2026-11-26T03:00:00.000Z' }, { confirmado: true }, rev)
+  assert.match(m[0]!.texto, /25\/11\/2026/)
+})

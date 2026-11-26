@@ -222,6 +222,6 @@ export async function resumen(p: {
   </table>
 </div>`
   const lin = (t: string, ls: LineaResumen[]) => (ls.length ? `\n${t}:\n${ls.map((l) => `- ${l.concepto} (${l.periodo}): ${fecha(l.vence)}, ${l.plazo}, ${l.estado}`).join('\n')}\n` : '')
-  const text = `${p.titulo}\n${p.extra.map(([k, v]) => `${k}: ${v}`).join('\n')}\n${lin('Atrasadas', p.atrasadas)}${lin('Próximas', p.proximas)}\nAbrir el calendario: ${href}\n`
+  const text = `${p.titulo}\n${p.extra.map(([k, v]) => `${k}: ${v}`).join('\n')}\n${lin('Atrasadas', p.atrasadas)}${lin('Próximas', p.proximas)}\nAbrir el calendario: ${href}\n${p.nota ? `\n${p.nota}\n` : ''}`
   return enviar(p.to, p.titulo, html, text)
 }

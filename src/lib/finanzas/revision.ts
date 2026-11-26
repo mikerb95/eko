@@ -41,9 +41,12 @@ const DEL_RUT = ['retefuente', 'iva', 'renta', 'activos_exterior', 'exogena', 'p
 /** Frase fija que va en avisos y correos: qué fecha vale. */
 export const FECHA_QUE_VALE = 'La fecha que vale es la del calendario oficial de la DIAN o de la Secretaría de Hacienda; el panel es una ayuda y no la reemplaza.'
 
+/** Día de la constancia en Bogotá (se guarda en UTC: de noche ya sería el día siguiente). */
 const fechaCorta = (iso: string) => {
-  const m = /^(\d{4})-(\d{2})-(\d{2})/.exec(iso)
-  return m ? `${Number(m[3])}/${Number(m[2])}/${m[1]}` : iso
+  const d = new Date(iso)
+  if (Number.isNaN(d.getTime())) return iso
+  const [a, m, dia] = new Intl.DateTimeFormat('en-CA', { timeZone: 'America/Bogota' }).format(d).split('-')
+  return `${Number(dia)}/${Number(m)}/${a}`
 }
 
 export function motivosFecha(

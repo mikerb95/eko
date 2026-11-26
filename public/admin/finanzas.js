@@ -570,7 +570,7 @@ function renderRevision() {
     const r = E.revisionCalendario.find((x) => Number(x.anio) === a)
     const rev = r?.revision
     const estado = rev
-      ? `Revisado por ${esc(rev.contador)} · constancia del ${esc(fmtCorto(rev.fecha.slice(0, 10)))}`
+      ? `Revisado por ${esc(rev.contador)} · constancia del ${esc(new Date(rev.fecha).toLocaleDateString('es-CO', { day: 'numeric', month: 'short', year: 'numeric', timeZone: 'America/Bogota' }))}`
       : r?.abiertas ? '<span class="fin-mal">Sin revisión del contador</span>' : '<span class="muted">Sin obligaciones cargadas</span>'
     const pend = r?.porConfirmar ? ` · <span class="fin-porconf">${r.porConfirmar} por confirmar</span>` : ''
     return `<li><b>${a}</b> ${estado}${pend}</li>`
