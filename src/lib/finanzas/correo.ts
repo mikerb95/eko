@@ -8,6 +8,7 @@
  */
 import { SITE_URL } from '../site.ts'
 import { pesos } from './control.ts'
+import { FECHA_QUE_VALE } from './revision.ts'
 
 const RESEND_ENDPOINT = 'https://api.resend.com/emails'
 const FROM_DEFECTO = 'Ekosolv Finanzas <finanzas@codebymike.net>'
@@ -112,8 +113,11 @@ export async function avisoVencimiento(p: {
   plazo: string
   estadoTexto: string
   escalado: boolean
+  /** Lo que falta confirmar de la fecha (revision.ts). Vacío si nada. */
+  porConfirmar?: string[]
 }): Promise<Envio> {
   const o = p.obligacion
+  const pendientes = p.porConfirmar ?? []
   const titulo = p.escalado ? `Sin cerrar a ${p.plazo.toLowerCase().replace('faltan ', '').replace('falta ', '')}: ${o.concepto}` : `${p.plazo}: ${o.concepto}`
   const intro = p.escalado
     ? 'Esta obligación sigue sin presentarse y está por vencer. El aviso también le llega a Gerencia.'
@@ -126,13 +130,15 @@ export async function avisoVencimiento(p: {
     ['Plazo', p.plazo],
     ['Estado actual', p.estadoTexto],
     ['Responsable', o.responsable || ''],
+    ['Fecha por confirmar', pendientes.join(' ')],
   ]
   const href = url(`?ob=${o.id}`)
+  const nota = `${FECHA_QUE_VALE} ${NOTA_LIMITE}`
   return enviar(
     p.to,
     `${p.escalado ? '[Gerencia] ' : ''}${p.plazo}: ${o.concepto} (${o.periodo})`,
-    plantilla(titulo, intro, filas, 'Abrir la obligación', href, NOTA_LIMITE, p.escalado ? '#b4442f' : '#2f7d4f'),
-    plano(titulo, intro, filas, href, NOTA_LIMITE),
+    plantilla(titulo, intro, filas, 'Abrir la obligación', href, nota, p.escalado ? '#b4442f' : '#2f7d4f'),
+    plano(titulo, intro, filas, href, nota),
   )
 }
 

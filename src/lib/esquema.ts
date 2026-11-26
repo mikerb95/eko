@@ -899,6 +899,9 @@ export const TABLAS: readonly string[] = [
  * siempre si no se hace el `ALTER`. Todas son `TEXT NOT NULL DEFAULT ''`.
  */
 export const COLUMNAS: readonly (readonly [tabla: string, columna: string])[] = [
+  // Finanzas: cuándo se cambió a mano la fecha de una obligación. Si es
+  // después de la revisión del contador, el panel lo marca (revision.ts).
+  ['fin_obligaciones', 'fecha_cambiada_at'],
   ['posts', 'image'],
   ['contacts', 'consent_at'],
   ['contacts', 'consent_version'],

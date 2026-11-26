@@ -8,6 +8,7 @@ import { UserError } from '../apiError.ts'
 import { obligacionesDelAnio, type Responsabilidades, type TipoObligacion } from './calendario.ts'
 import type { Cuenta, Entidad, PagoExistente } from './control.ts'
 import type { Estado, TipoSoporte } from './estados.ts'
+import type { RevisionContador, Revisiones } from './revision.ts'
 
 const ahora = () => new Date().toISOString()
 const db = () => cliente()
@@ -18,6 +19,8 @@ export interface Config extends Responsabilidades {
   topeIaUsd: number
   /** `false` mientras no se confirmen las responsabilidades del RUT. */
   confirmado: boolean
+  /** Constancia de la revisión del contador por año (`'2026'`). Solo la escribe registrarRevision. */
+  revisiones: Revisiones
 }
 
 /**
@@ -43,6 +46,7 @@ export const CONFIG_INICIAL: Config = {
   rub: true,
   topeIaUsd: 10,
   confirmado: false,
+  revisiones: {},
 }
 
 export async function leerConfig(): Promise<Config> {
@@ -96,6 +100,26 @@ export async function guardarConfig(c: Partial<Config>): Promise<Config> {
     })
   }
   return { ...actual, ...limpio }
+}
+
+/**
+ * Deja constancia de que el contador revisó las fechas de un año contra el
+ * calendario oficial. No cambia ninguna fecha: solo quita el aviso de "sin
+ * revisión" de las obligaciones de ese año cargadas antes de la constancia.
+ */
+export async function registrarRevision(r: Omit<RevisionContador, 'fecha'>): Promise<RevisionContador> {
+  await asegurarEsquema()
+  const contador = String(r.contador || '').trim().slice(0, 120)
+  if (contador.length < 3) throw new UserError('Escriba el nombre del contador que revisó.')
+  if (!Number.isInteger(r.anio) || r.anio < 2025 || r.anio > 2035) throw new UserError('Año fuera de rango.')
+  const actual = await leerConfig()
+  const nueva: RevisionContador = { anio: r.anio, contador, registradoPor: r.registradoPor, fecha: ahora(), nota: String(r.nota || '').trim().slice(0, 500) }
+  const revisiones = { ...actual.revisiones, [String(r.anio)]: nueva }
+  await db().execute({
+    sql: `INSERT INTO fin_config (clave, valor, updated_at) VALUES ('revisiones', ?, ?) ON CONFLICT(clave) DO UPDATE SET valor = excluded.valor, updated_at = excluded.updated_at`,
+    args: [JSON.stringify(revisiones), nueva.fecha],
+  })
+  return nueva
 }
 
 // ------------------------------------------------------------------ usuarios
@@ -228,6 +252,8 @@ export interface Obligacion {
   notas: string
   created_at: string
   updated_at: string
+  /** Cuándo se cambió a mano la fecha ('' si nunca). */
+  fecha_cambiada_at: string
 }
 
 const filaObligacion = (f: any): Obligacion => ({
@@ -247,6 +273,7 @@ const filaObligacion = (f: any): Obligacion => ({
   notas: String(f.notas),
   created_at: String(f.created_at),
   updated_at: String(f.updated_at),
+  fecha_cambiada_at: String(f.fecha_cambiada_at ?? ''),
 })
 
 export async function listarObligaciones(): Promise<Obligacion[]> {
@@ -321,8 +348,9 @@ export async function editarObligacion(id: number, c: { vence?: string; responsa
   const args: any[] = []
   if (c.vence !== undefined && c.vence !== o.vence) {
     if (!ISO.test(c.vence)) throw new UserError('La fecha de vencimiento no es válida.')
-    sets.push('vence = ?')
-    args.push(c.vence)
+    // La fuente deja de ser la del calendario: queda dicho que se cambió a mano.
+    sets.push('vence = ?', 'fecha_cambiada_at = ?', 'fuente = ?')
+    args.push(c.vence, ahora(), `Cambiada a mano en el panel (antes ${o.vence}); confírmela con el calendario oficial`)
   }
   if (c.valor_borrador !== undefined && c.valor_borrador !== o.valor_borrador) {
     if (!antesDeAprobar) throw new UserError('El valor no se puede cambiar después de aprobar.')

@@ -24,6 +24,7 @@ import * as D from './datos.ts'
 import { asociarDocumento, crearAlertaRequerimiento, gastoDelMes, leerDocumento, listarDocumentos, procesarDocumento } from './documentos.ts'
 import { anterior, ESTADO_TEXTO, ESTADOS, puedeAvanzar, puedeDevolver, siguiente, soporteExigido, TIPOS_SOPORTE, type Estado, type TipoSoporte } from './estados.ts'
 import { nombreMes, resumenMensual, resumenSemanal } from './resumen.ts'
+import { FECHA_QUE_VALE, motivosFecha, resumenRevision } from './revision.ts'
 import * as Siigo from './siigo.ts'
 import { pesosTxt } from './proveedores.ts'
 import { cifrasDelMes } from './zohoBooks.ts'
@@ -100,6 +101,7 @@ export async function cargarEstado(s: Sesion, hoy = hoyEnBogota()) {
       siguiente: sig,
       soporteSiguiente: sig ? soporteExigido(sig, o) : null,
       anterior: anterior(o),
+      motivos: o.estado === 'presentado' ? [] : motivosFecha(o, config, config.revisiones),
     }
   })
   const ctx = { otros, cuentas, entidades, config }
@@ -126,9 +128,12 @@ export async function cargarEstado(s: Sesion, hoy = hoyEnBogota()) {
     avisos,
     ia: { gastoMes: gasto, tope: config.topeIaUsd, activa: !!env('ANTHROPIC_API_KEY') },
     faltantes: [...faltantesDelAnio(config, anio), ...faltantesDelAnio(config, anio + 1)],
+    revisionCalendario: resumenRevision(obligaciones, config, config.revisiones),
     entorno: { correo: correo.correoConfigurado(), books: booksConfigured(), siigo: Siigo.siigoConfigurado(), cron: !!env('CRON_SECRET') },
     catalogos: { estados: ESTADOS, estadoTexto: ESTADO_TEXTO, soportes: TIPOS_SOPORTE, tipos: TIPO_TEXTO },
     puede: {
+      // La constancia del contador la deja Finanzas o Gerencia, nunca el admin técnico.
+      revision: s.rol === 'finanzas' || s.rol === 'gerencia',
       preparar: PREPARAN.includes(s.rol),
       aprobar: s.rol === 'gerencia',
       autorizar: AUTORIZAN.includes(s.rol),
@@ -227,6 +232,14 @@ export const ACCIONES: Record<string, Accion> = {
     const c = await D.guardarConfig(cfg)
     await D.anotarEvento({ accion: 'ajustes', detalle: JSON.stringify(cfg).slice(0, 500), usuario: s.usuario, rol: s.rol })
     return c
+  },
+
+  async registrar_revision(s, b) {
+    if (s.rol !== 'finanzas' && s.rol !== 'gerencia') throw new UserError('La constancia de la revisión del contador la deja Finanzas o Gerencia.')
+    if (b.confirmo !== true) throw new UserError('Marque que el contador revisó las fechas contra el calendario oficial.')
+    const r = await D.registrarRevision({ anio: entero(b.anio, 'El año'), contador: String(b.contador || ''), nota: String(b.nota || ''), registradoPor: s.usuario })
+    await D.anotarEvento({ accion: 'revision_contador', detalle: `Calendario ${r.anio} revisado por el contador ${r.contador}${r.nota ? `: ${r.nota}` : ''}`, usuario: s.usuario, rol: s.rol })
+    return r
   },
 
   async sembrar_anio(s, b) {
@@ -462,7 +475,7 @@ export const ACCIONES: Record<string, Accion> = {
     if (!factura) throw new UserError('Escriba el número de la factura.')
     if (!Number.isFinite(valor) || valor <= 0) throw new UserError('Escriba el valor a pagar.')
     const r = await conSiigo(() => Siigo.verificarPagoProveedor(hoyEnBogota(), { nit, factura, valor }))
-    await D.anotarEvento({ accion: 'siigo_verificacion', detalle: `${r.proveedorNombre}, factura ${factura}, ${pesos(valor)}: ${r.ok ? 'todo en verde' : 'con alertas'}`, usuario: s.usuario, rol: s.rol })
+    await D.anotarEvento({ accion: 'siigo_verificacion', detalle: `${r.proveedorNombre}, factura ${factura}, ${pesos(valor)}: ${r.ok ? 'sin alertas en Siigo' : 'con alertas'}`, usuario: s.usuario, rol: s.rol })
     return r
   },
 
@@ -497,13 +510,23 @@ export async function ejecutar(s: Sesion, accion: string, b: any): Promise<unkno
 
 // ------------------------------------------------------------------ tarea diaria
 
+/** Fila del resumen con cuántas de las obligaciones listadas tienen la fecha por confirmar. */
+function filaPorConfirmar(listadas: readonly { concepto: string; periodo: string; vence: string }[], obs: readonly D.Obligacion[], config: D.Config): [string, string][] {
+  const n = listadas.filter((l) => {
+    const o = obs.find((x) => x.concepto === l.concepto && x.periodo === l.periodo && x.vence === l.vence)
+    return o && motivosFecha(o, config, config.revisiones).length > 0
+  }).length
+  return n ? [['Fechas por confirmar', `${n} de las listadas: vea en el panel qué falta confirmar`]] : []
+}
+
 async function enviarResumen(tipo: 'semanal' | 'mensual', hoy: string): Promise<correo.Envio> {
   const obs = await D.listarObligaciones()
+  const config = await D.leerConfig()
   const ds = await D.destinos()
   const to = [...D.correosDe(ds, 'finanzas'), ...D.correosDe(ds, 'gerencia')]
   if (tipo === 'semanal') {
     const r = resumenSemanal(obs, hoy)
-    const extra: [string, string][] = []
+    const extra: [string, string][] = filaPorConfirmar([...r.atrasadas, ...r.proximas], obs, config)
     let nota = ''
     if (Siigo.siigoConfigurado()) {
       try {
@@ -520,10 +543,10 @@ async function enviarResumen(tipo: 'semanal' | 'mensual', hoy: string): Promise<
         nota = 'No se pudieron leer las cuentas por pagar de Siigo esta semana.'
       }
     }
-    return correo.resumen({ to, tipo, titulo: `Calendario tributario: semana del ${hoy.slice(8)} de ${nombreMes(hoy.slice(0, 7))}`, atrasadas: r.atrasadas, proximas: r.proximas, extra, nota })
+    return correo.resumen({ to, tipo, titulo: `Calendario tributario: semana del ${hoy.slice(8)} de ${nombreMes(hoy.slice(0, 7))}`, atrasadas: r.atrasadas, proximas: r.proximas, extra, nota: [nota, FECHA_QUE_VALE].filter(Boolean).join(' ') })
   }
   const r = resumenMensual(obs, hoy)
-  const extra: [string, string][] = [[`Obligaciones de ${nombreMes(r.mesAnterior)}`, `${r.cerradasDelMes} de ${r.delMes} presentadas`]]
+  const extra: [string, string][] = [[`Obligaciones de ${nombreMes(r.mesAnterior)}`, `${r.cerradasDelMes} de ${r.delMes} presentadas`], ...filaPorConfirmar([...r.atrasadas, ...r.proximas], obs, config)]
   const notas: string[] = []
   if (Siigo.siigoConfigurado()) {
     try {
@@ -554,12 +577,13 @@ async function enviarResumen(tipo: 'semanal' | 'mensual', hoy: string): Promise<
     nota = 'No se pudieron leer las cifras de Zoho Books este mes.'
   }
   if (nota) notas.push(nota)
+  notas.push(FECHA_QUE_VALE)
   return correo.resumen({ to, tipo, titulo: `Resumen tributario de ${nombreMes(r.mesAnterior)}`, atrasadas: r.atrasadas, proximas: r.proximas, extra, nota: notas.join(' ') })
 }
 
 /** Tarea programada (una vez al día): avisos de vencimiento y, si toca, resúmenes. */
 export async function correrDiario(hoy = hoyEnBogota()): Promise<{ avisos: number; enviados: number; semanal: boolean | null; mensual: boolean | null }> {
-  const [obs, enviadas, ds, personas] = await Promise.all([D.listarObligaciones(), D.clavesEnviadas(), D.destinos(), D.personas()])
+  const [obs, enviadas, ds, personas, config] = await Promise.all([D.listarObligaciones(), D.clavesEnviadas(), D.destinos(), D.personas(), D.leerConfig()])
   const fin = D.correosDe(ds, 'finanzas')
   const ger = D.correosDe(ds, 'gerencia')
   const avisos = avisosDelDia(obs, hoy, enviadas)
@@ -574,6 +598,7 @@ export async function correrDiario(hoy = hoyEnBogota()): Promise<{ avisos: numbe
       plazo: textoPlazo(a.restantes),
       estadoTexto: ESTADO_TEXTO[o.estado],
       escalado: a.escalar,
+      porConfirmar: motivosFecha(o, config, config.revisiones).map((m) => m.texto),
     })
     await D.marcarAviso(a.clave, r.enviado, to)
     if (r.enviado) enviados++
