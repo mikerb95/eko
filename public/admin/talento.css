@@ -190,3 +190,6 @@
 .th-paso.is-hecho b { font-weight: 500; color: var(--ink-2); }
 .th-aviso-empresa { display: flex; align-items: center; gap: 10px; padding: 10px 12px; }
 .th-aviso-empresa .th-aviso-txt { flex: 1; }
+.crm .th-paso { flex-direction: row; align-items: flex-start; font-weight: 400; color: var(--ink); }
+.crm .th-paso input { width: auto !important; margin: 3px 0 0; flex: none; }
+.crm .th-paso > .t2 { flex: none; }
