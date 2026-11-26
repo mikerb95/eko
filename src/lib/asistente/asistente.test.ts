@@ -255,6 +255,27 @@ test('roles de Zoho y finanzas como los decidió Mike', () => {
   assert.ok(!canWrite('/api/admin/recolecciones', 'finanzas'))
 })
 
+test('Siigo: solo admin y finanzas lo consultan, nadie propone, y sin credenciales lo dice', async () => {
+  assert.deepEqual([...MATRIZ.siigo.consultan].sort(), ['admin', 'finanzas'])
+  assert.deepEqual([...MATRIZ.siigo.proponen], [])
+  assert.ok(herramientasDe('finanzas').some((h) => h.nombre === 'siigo'))
+  assert.ok(!herramientasDe('operaciones').some((h) => h.nombre === 'siigo'))
+  assert.ok(!herramientasDe('lectura').some((h) => h.nombre === 'siigo'))
+  const antes = { u: process.env.SIIGO_USERNAME, k: process.env.SIIGO_ACCESS_KEY }
+  delete process.env.SIIGO_USERNAME
+  delete process.env.SIIGO_ACCESS_KEY
+  try {
+    const r = await ejecutar('siigo', { que: 'cuentas_por_pagar' }, { db: null as any, usuario: { usuario: 'f', nombre: 'F', rol: 'finanzas' }, hoy: '2026-11-25' })
+    assert.equal(r.ok, false)
+    assert.match(r.ok === false ? r.error : '', /no está conectado/)
+    const negado = await ejecutar('siigo', { que: 'cuentas_por_pagar' }, { db: null as any, usuario: { usuario: 'o', nombre: 'O', rol: 'operaciones' }, hoy: '2026-11-25' })
+    assert.equal(negado.ok, false)
+  } finally {
+    if (antes.u !== undefined) process.env.SIIGO_USERNAME = antes.u
+    if (antes.k !== undefined) process.env.SIIGO_ACCESS_KEY = antes.k
+  }
+})
+
 test('solo lectura y finanzas no reciben escrituras del panel; un rol raro no recibe nada', () => {
   assert.deepEqual(escriturasDe('lectura'), [])
   assert.deepEqual(escriturasDe('finanzas'), [])

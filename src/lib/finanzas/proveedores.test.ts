@@ -170,3 +170,16 @@ test('mapea las respuestas de Siigo (formato del blueprint oficial)', () => {
   // El egreso FC-1-68 se cruza con la compra FC-1-68.
   assert.equal(normDoc(e.aplicado[0]!.documento), normDoc('FC-1-68'))
 })
+
+test('verificar un pago: factura más vieja que la ventana, por el comprobante de Siigo', () => {
+  const v = verificarPago({ nit: '900111222', factura: 'FC-1-2', valor: 300_000, compras: [], cxp: [cxp({ documento: 'FC-1-2', saldo: 300_000 })], egresos: [], hoy: HOY, desde: '2025-10-21' })
+  assert.equal(v.ok, true, JSON.stringify(v.chequeos))
+  assert.ok(v.chequeos[0]!.detalle.includes('cuentas por pagar'))
+  const noEsta = verificarPago({ nit: '900111222', factura: 'FE-1', valor: 300_000, compras: [compra({ facturaProveedor: 'FE-9' })], cxp: [], egresos: [], hoy: HOY, desde: '2025-10-21' })
+  assert.ok(noEsta.chequeos[0]!.detalle.includes('desde el 2025-10-21'))
+})
+
+test('las alertas usan el nombre conocido del proveedor', () => {
+  const r = revisar({ compras: [], cxp: [], egresos: [egreso({ nombre: 'RP-1-1' }), egreso({ nombre: 'RP-1-2', fecha: '2026-11-11' })], hoy: HOY, nombres: new Map([['900111222', 'Transportes Andinos SAS']]) })
+  assert.equal(r.alertas[0]!.proveedorNombre, 'Transportes Andinos SAS')
+})

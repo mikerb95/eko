@@ -7,8 +7,9 @@
  *
  * Gasto de peticiones (tope de Siigo: 100 por minuto): una consulta completa
  * hace 5 listados (compras, cuentas por pagar, egresos, ventas y compras del
- * mes) de hasta 20 páginas de 100; en una empresa como Ekosolv son unas 5 a
- * 15 peticiones. Por eso se pide con un botón o una vez por semana, nunca al
+ * mes) de hasta 20 páginas de 100, más la búsqueda del nombre de hasta 10
+ * terceros de las alertas; en una empresa como Ekosolv son unas 5 a 20
+ * peticiones. Por eso se pide con un botón o una vez por semana, nunca al
  * abrir el panel ni con sondeo.
  *
  * Fechas: Siigo acepta en los listados `yyyy-MM-dd` o fecha y hora UTC
