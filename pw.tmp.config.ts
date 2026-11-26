@@ -9,7 +9,7 @@ const PUERTO = 4391
 const BASE = 'file:./data/e2e.db'
 
 export default defineConfig({
-  testDir: './e2e',
+  testDir: './e2e', testMatch: /(diagnostico|taller)\.spec/,
   globalSetup: './e2e/preparar.ts',
   timeout: 60_000,
   fullyParallel: false,
