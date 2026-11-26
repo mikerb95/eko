@@ -100,7 +100,7 @@ Se eligió el **Camino A** y ya está construido (§2). Lo que queda:
 2. **Confirmar el datacenter** de la cuenta (`ZOHO_DC`) y cargar las cuatro variables en Vercel (`vercel env add`).
 3. **Drenar** con `POST /api/admin/zoho {"action":"sync"}` y revisar en Zoho que los leads acumulados llegaron bien.
 4. **Ajustar el mapeo** en `src/lib/zohoMap.ts` con lo que diga comercial. Mientras no haya campos personalizados confirmados, sector, líneas de interés, tipo de residuo y consecutivo van en `Description`, que no pierde información y es reversible.
-5. **Automatizar el drenaje** una vez validado el paso 3: un cron de Vercel cada 15 minutos contra el endpoint, o llamar a `syncPending()` diferido tras cada envío. Se dejó manual a propósito para que el primer contacto con Zoho sea observado.
+5. **Automatizar el drenaje** una vez validado el paso 3: una tarea programada en la nube de Claude contra el endpoint (nunca un cron de Vercel, ver `docs/tareas-nube-claude.md`), o llamar a `syncPending()` diferido tras cada envío. Se dejó manual a propósito para que el primer contacto con Zoho sea observado.
 6. **Definir Books** con administración (facturación al cerrar la orden). Las preguntas abiertas están al final de `src/lib/zohoMap.ts`.
 
 ### Decisiones ya tomadas en la implementación

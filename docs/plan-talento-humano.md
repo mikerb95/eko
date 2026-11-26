@@ -23,7 +23,7 @@
 - API: `src/pages/api/admin/talento.ts` (GET estado, POST `{ accion, ... }` que devuelve el estado recalculado).
 - Página: `src/pages/admin/talento.astro`, `public/admin/talento.js`, `public/admin/talento.css`.
 - Correo: `src/lib/talento/resumen.ts` + `notifyResumenTalento` en `src/lib/email.ts`.
-- Cron: `src/pages/api/cron/talento-resumen.ts` y `vercel.json` (lunes 12:00 UTC = 7:00 a. m. Bogotá).
+- Tarea con horario: `src/pages/api/cron/talento-resumen.ts`, disparada por una tarea programada en la nube de Claude (lunes 12:00 UTC = 7:00 a. m. Bogotá). Nunca un cron de Vercel: ver `docs/tareas-nube-claude.md`.
 - Asistente: `src/lib/asistente/herramientas/talento.ts` (área `talento`, solo admin, sin propuestas).
 
 ## Reglas legales aplicadas
