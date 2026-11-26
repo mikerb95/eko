@@ -12,10 +12,13 @@ import { asegurarEsquema, cliente } from '../db.ts'
 import { UserError } from '../apiError.ts'
 import { GENERAL, MODULOS } from '../capacitacion.ts'
 import { ROLES, listUsers, upsertUser, type Role } from '../users.ts'
+import { hoyEnBogota } from '../agente/diasHabiles.ts'
 import {
   AJUSTES_BASE,
   AREAS_EMPRESA,
   ESTADOS_NOVEDAD,
+  PASOS_INGRESO,
+  PASOS_RETIRO,
   TIPOS_CONTRATO,
   TIPOS_CURSO,
   TIPOS_DOCUMENTO,
@@ -23,6 +26,7 @@ import {
   contarDias,
   esDe,
   esFecha,
+  etiquetaDe,
   masMeses,
   promedioNotas,
   saldoVacaciones,
@@ -56,6 +60,19 @@ export interface Ficha extends Empleado {
   caja: string
   notas: string
   updated_at: string
+  pasos_ingreso: Record<string, string>
+  pasos_retiro: Record<string, string>
+}
+
+/** Un cambio de cargo, área, contrato o salario, con la fecha desde la que rige. */
+export interface HistorialTH {
+  id: number
+  usuario_id: number
+  fecha: string
+  campo: 'cargo' | 'area' | 'contrato' | 'salario'
+  antes: string
+  despues: string
+  registrado_por: string
 }
 
 /**
@@ -162,6 +179,7 @@ export interface EstadoTalento {
   cursos: Curso[]
   formaciones: FormacionTH[]
   evaluaciones: EvaluacionTH[]
+  historial: HistorialTH[]
   saldos: Record<number, SaldoVacaciones>
   avisos: Aviso[]
 }
@@ -202,8 +220,20 @@ function aFicha(r: any): Ficha {
     vacaciones_ajuste: Number(r.vacaciones_ajuste) || 0,
     notas: str(r.notas),
     updated_at: str(r.updated_at),
+    pasos_ingreso: json<Record<string, string>>(r.pasos_ingreso, {}),
+    pasos_retiro: json<Record<string, string>>(r.pasos_retiro, {}),
   }
 }
+
+const aHistorial = (r: any): HistorialTH => ({
+  id: num(r.id),
+  usuario_id: num(r.usuario_id),
+  fecha: str(r.fecha),
+  campo: str(r.campo) as HistorialTH['campo'],
+  antes: str(r.antes),
+  despues: str(r.despues),
+  registrado_por: str(r.registrado_por),
+})
 
 const aCargo = (r: any): Cargo => ({
   id: num(r.id),
@@ -286,6 +316,9 @@ export async function leerAjustes(db: Client): Promise<AjustesTalento> {
   return {
     sabadoHabil: typeof v.sabadoHabil === 'boolean' ? v.sabadoHabil : AJUSTES_BASE.sabadoHabil,
     evaluacionMeses: Number.isInteger(v.evaluacionMeses) && v.evaluacionMeses! > 0 ? v.evaluacionMeses! : AJUSTES_BASE.evaluacionMeses,
+    firmaNombre: typeof v.firmaNombre === 'string' ? v.firmaNombre : '',
+    firmaCargo: typeof v.firmaCargo === 'string' ? v.firmaCargo : '',
+    pagosHechos: Array.isArray(v.pagosHechos) ? v.pagosHechos.filter((x) => typeof x === 'string') : [],
   }
 }
 
@@ -295,7 +328,7 @@ export async function leerAjustes(db: Client): Promise<AjustesTalento> {
  * tiene que reconciliar nada.
  */
 export async function leerEstado(db: Client, hoy: string): Promise<EstadoTalento> {
-  const [usuarios, fichas, cargos, documentos, novedades, cursos, formaciones, evaluaciones, ajustes] = await Promise.all([
+  const [usuarios, fichas, cargos, documentos, novedades, cursos, formaciones, evaluaciones, historial, ajustes] = await Promise.all([
     db.execute('SELECT id, username, name, role, active FROM users ORDER BY name COLLATE NOCASE'),
     db.execute('SELECT * FROM th_empleados'),
     db.execute('SELECT * FROM th_cargos ORDER BY nombre COLLATE NOCASE'),
@@ -304,6 +337,7 @@ export async function leerEstado(db: Client, hoy: string): Promise<EstadoTalento
     db.execute('SELECT * FROM th_cursos ORDER BY activo DESC, tipo, nombre COLLATE NOCASE'),
     db.execute('SELECT * FROM th_formaciones ORDER BY fecha DESC, id DESC'),
     db.execute('SELECT * FROM th_evaluaciones ORDER BY fecha DESC, id DESC'),
+    db.execute('SELECT * FROM th_historial ORDER BY fecha DESC, id DESC'),
     leerAjustes(db),
   ])
   const porUsuario = new Map(fichas.rows.map((r: any) => [num(r.usuario_id), aFicha(r)]))
@@ -342,6 +376,7 @@ export async function leerEstado(db: Client, hoy: string): Promise<EstadoTalento
     cursos: cursos.rows.map(aCurso),
     formaciones: deAlguien(formaciones.rows.map(aFormacion)),
     evaluaciones: deAlguien(evaluaciones.rows.map(aEvaluacion)),
+    historial: deAlguien(historial.rows.map(aHistorial)),
     saldos: {},
     avisos: [],
   }
@@ -367,7 +402,32 @@ export async function leerEstado(db: Client, hoy: string): Promise<EstadoTalento
 export async function cargarEstado(hoy: string): Promise<EstadoTalento> {
   await asegurarEsquema()
   await sembrarCursosIA()
+  await cerrarAccesosRetirados(hoy)
   return leerEstado(cliente(), hoy)
+}
+
+/**
+ * Desactiva la cuenta de quien ya llegó a su fecha de retiro, para que en
+ * Usuarios también salga inactiva. (El inicio de sesión ya lo bloquea por su
+ * cuenta en verifyLogin.) Nunca deja el panel sin un administrador activo.
+ */
+export async function cerrarAccesosRetirados(hoy: string): Promise<number> {
+  const db = cliente()
+  const r = await db.execute({
+    sql: `SELECT u.id, u.role FROM users u JOIN th_empleados e ON e.usuario_id = u.id
+          WHERE u.active = 1 AND e.fecha_retiro <> '' AND e.fecha_retiro <= ?`,
+    args: [hoy],
+  })
+  let n = 0
+  for (const f of r.rows as any[]) {
+    if (str(f.role) === 'admin') {
+      const otros = await db.execute({ sql: `SELECT COUNT(*) AS n FROM users WHERE role = 'admin' AND active = 1 AND id <> ?`, args: [num(f.id)] })
+      if (!num((otros.rows[0] as any)?.n)) continue
+    }
+    await db.execute({ sql: 'UPDATE users SET active = 0, updated_at = ? WHERE id = ?', args: [ahora(), num(f.id)] })
+    n++
+  }
+  return n
 }
 
 let sembrado = false
@@ -457,8 +517,9 @@ async function personaExiste(db: Client, id: number): Promise<void> {
  * sin cuenta del panel: lleva su propio nombre y un id negativo, que nunca
  * choca con los de users.
  */
-export async function guardarFicha(b: any): Promise<number> {
+export async function guardarFicha(b: any, quien = '', yo = ''): Promise<number> {
   const db = cliente()
+  const hoy = hoyEnBogota()
   const nuevo = b.usuario_id === '' || b.usuario_id == null
   const usuario_id = nuevo ? 0 : idPersona(b.usuario_id)
   if (usuario_id) await personaExiste(db, usuario_id)
@@ -475,6 +536,16 @@ export async function guardarFicha(b: any): Promise<number> {
   const fecha_retiro = fechaOpcional(b.fecha_retiro, 'retiro')
   if (fecha_ingreso && fecha_fin_contrato && fecha_fin_contrato < fecha_ingreso) throw new UserError('El fin del contrato no puede ser antes del ingreso')
   if (fecha_ingreso && fecha_retiro && fecha_retiro < fecha_ingreso) throw new UserError('El retiro no puede ser antes del ingreso')
+  // Con cuenta, la fecha de retiro cierra el acceso al panel ese día.
+  if (usuario_id > 0 && fecha_retiro && fecha_retiro <= hoy) {
+    const u = (await listUsers()).find((x) => x.id === usuario_id)
+    if (u && yo && u.username === yo) throw new UserError('No puede ponerse fecha de retiro a sí mismo: le cerraría el acceso al panel')
+    if (u?.role === 'admin' && u.active) {
+      const otros = await db.execute({ sql: `SELECT COUNT(*) AS n FROM users WHERE role = 'admin' AND active = 1 AND id <> ?`, args: [usuario_id] })
+      if (!num((otros.rows[0] as any)?.n)) throw new UserError('Es el último administrador activo: cree otro antes de registrar su retiro')
+    }
+  }
+  const fecha_cambio = fechaOpcional(b.fecha_cambio, 'cambio')
   let salario: number | null = null
   if (b.salario !== '' && b.salario != null) {
     salario = Math.round(Number(String(b.salario).replace(/[^\d]/g, '')))
@@ -514,7 +585,31 @@ export async function guardarFicha(b: any): Promise<number> {
     vacaciones_ajuste: Math.round(ajuste * 100) / 100,
     notas: texto(b.notas, 2000),
   }
+  // Trayectoria: lo que cambió frente a la ficha guardada (o, si es nueva, con
+  // qué entra), en texto legible, desde la fecha que diga el formulario.
+  const previa: any = usuario_id
+    ? (await db.execute({ sql: 'SELECT cargo_id, area, tipo_contrato, salario FROM th_empleados WHERE usuario_id = ?', args: [usuario_id] })).rows[0]
+    : undefined
+  const nombresCargo = new Map((await db.execute('SELECT id, nombre FROM th_cargos')).rows.map((r: any) => [num(r.id), str(r.nombre)]))
+  const legible = {
+    cargo: (v: unknown) => (v ? nombresCargo.get(num(v)) ?? '' : ''),
+    area: (v: unknown) => (v ? etiquetaDe(AREAS_EMPRESA, str(v)) : ''),
+    contrato: (v: unknown) => (v ? etiquetaDe(TIPOS_CONTRATO, str(v)) : ''),
+    salario: (v: unknown) => (v ? `$${num(v).toLocaleString('es-CO')}` : ''),
+  }
+  const pares: [HistorialTH['campo'], unknown, unknown][] = [
+    ['cargo', previa?.cargo_id, campos.cargo_id],
+    ['area', previa?.area, campos.area],
+    ['contrato', previa?.tipo_contrato, campos.tipo_contrato],
+    ['salario', previa?.salario, campos.salario],
+  ]
+  const cambios = pares
+    .map(([campo, a, d]) => ({ campo, antes: legible[campo](a), despues: legible[campo](d) }))
+    .filter((c) => c.antes !== c.despues)
+  const fechaHistorial = fecha_cambio || (previa ? hoy : fecha_ingreso || hoy)
+
   const cols = Object.keys(campos)
+  let id = usuario_id
   if (nuevo) {
     // El id sale en la misma sentencia (el menor que haya, menos uno), y sin
     // ON CONFLICT: si dos altas chocaran, la segunda falla en vez de pisar.
@@ -524,19 +619,53 @@ export async function guardarFicha(b: any): Promise<number> {
             RETURNING usuario_id`,
       args: [...Object.values(campos), ts, ts] as any[],
     })
-    return num((r.rows[0] as any)?.usuario_id)
+    id = num((r.rows[0] as any)?.usuario_id)
+  } else {
+    await db.execute({
+      sql: `INSERT INTO th_empleados (usuario_id, ${cols.join(', ')}, created_at, updated_at)
+            VALUES (?, ${cols.map(() => '?').join(', ')}, ?, ?)
+            ON CONFLICT(usuario_id) DO UPDATE SET ${cols.map((c) => `${c} = excluded.${c}`).join(', ')}, updated_at = excluded.updated_at`,
+      args: [usuario_id, ...Object.values(campos), ts, ts] as any[],
+    })
   }
-  await db.execute({
-    sql: `INSERT INTO th_empleados (usuario_id, ${cols.join(', ')}, created_at, updated_at)
-          VALUES (?, ${cols.map(() => '?').join(', ')}, ?, ?)
-          ON CONFLICT(usuario_id) DO UPDATE SET ${cols.map((c) => `${c} = excluded.${c}`).join(', ')}, updated_at = excluded.updated_at`,
-    args: [usuario_id, ...Object.values(campos), ts, ts] as any[],
-  })
-  return usuario_id
+  if (cambios.length) {
+    await db.batch(
+      cambios.map((c) => ({
+        sql: 'INSERT INTO th_historial (usuario_id, fecha, campo, antes, despues, registrado_por, created_at) VALUES (?, ?, ?, ?, ?, ?, ?)',
+        args: [id, fechaHistorial, c.campo, c.antes, c.despues, quien, ts],
+      })),
+      'write',
+    )
+  }
+  if (id > 0 && fecha_retiro && fecha_retiro <= hoy) await cerrarAccesosRetirados(hoy)
+  return id
+}
+
+/** Borra una línea de la trayectoria (para corregir un cambio mal registrado). */
+export async function eliminarHistorial(id: unknown): Promise<void> {
+  await cliente().execute({ sql: 'DELETE FROM th_historial WHERE id = ?', args: [idValido(id)] })
+}
+
+/** Marca o desmarca un paso de ingreso o de retiro (guarda la fecha de hoy). */
+export async function marcarPaso(b: any): Promise<void> {
+  const db = cliente()
+  const usuario_id = idPersona(b.usuario_id)
+  const momento = b.momento === 'retiro' ? 'retiro' : b.momento === 'ingreso' ? 'ingreso' : ''
+  if (!momento) throw new UserError('Paso inválido')
+  const lista = momento === 'retiro' ? PASOS_RETIRO : PASOS_INGRESO
+  const paso = texto(b.paso, 40)
+  if (!lista.some((p) => p.id === paso)) throw new UserError('Paso inválido')
+  const col = momento === 'retiro' ? 'pasos_retiro' : 'pasos_ingreso'
+  const r = await db.execute({ sql: `SELECT ${col} AS v FROM th_empleados WHERE usuario_id = ?`, args: [usuario_id] })
+  if (!r.rows.length) throw new UserError('Guarde primero la ficha de la persona')
+  const hechos = json<Record<string, string>>((r.rows[0] as any).v, {})
+  if (b.hecho === false) delete hechos[paso]
+  else hechos[paso] = hoyEnBogota()
+  await db.execute({ sql: `UPDATE th_empleados SET ${col} = ?, updated_at = ? WHERE usuario_id = ?`, args: [JSON.stringify(hechos), ahora(), usuario_id] })
 }
 
 /** Tablas que cuelgan de la persona y se mueven con ella al darle acceso. */
-const TABLAS_PERSONA = ['th_documentos', 'th_novedades', 'th_formaciones', 'th_evaluaciones'] as const
+const TABLAS_PERSONA = ['th_documentos', 'th_novedades', 'th_formaciones', 'th_evaluaciones', 'th_historial'] as const
 
 function rolValido(v: unknown): Role {
   const r = texto(v, 40)
@@ -600,6 +729,11 @@ export async function cambiarAcceso(b: any, yo: string): Promise<number> {
   const role = rolValido(b.role)
   const active = b.active !== false
   if (yo && u.username === yo && (role !== 'admin' || !active)) throw new UserError('No puede quitarse a sí mismo el rol de administrador ni desactivar su propia cuenta')
+  if (active) {
+    const f = await cliente().execute({ sql: 'SELECT fecha_retiro FROM th_empleados WHERE usuario_id = ?', args: [id] })
+    const retiro = str((f.rows[0] as any)?.fecha_retiro)
+    if (retiro && retiro <= hoyEnBogota()) throw new UserError(`Tiene fecha de retiro (${retiro}). Si vuelve a la empresa, quite esa fecha en la ficha y después active el acceso.`)
+  }
   await upsertUser({ id, username: u.username, name: u.name, role, active })
   return id
 }
@@ -621,7 +755,13 @@ export async function eliminarEmpleadoSinCuenta(idRaw: unknown): Promise<void> {
     args: [id, id, id, id],
   })
   if (num((r.rows[0] as any)?.n) > 0) throw new UserError('Esta persona ya tiene historial. En vez de borrarla, póngale fecha de retiro en la ficha.')
-  await db.execute({ sql: 'DELETE FROM th_empleados WHERE usuario_id = ?', args: [id] })
+  await db.batch(
+    [
+      { sql: 'DELETE FROM th_historial WHERE usuario_id = ?', args: [id] },
+      { sql: 'DELETE FROM th_empleados WHERE usuario_id = ?', args: [id] },
+    ],
+    'write',
+  )
 }
 
 function criteriosValidos(v: unknown): Criterio[] {
@@ -913,14 +1053,37 @@ export async function eliminarEvaluacion(id: unknown): Promise<void> {
   await cliente().execute({ sql: 'DELETE FROM th_evaluaciones WHERE id = ?', args: [idValido(id)] })
 }
 
-export async function guardarAjustes(b: any): Promise<void> {
-  const meses = Math.trunc(Number(b.evaluacionMeses))
-  if (!Number.isInteger(meses) || meses < 1 || meses > 36) throw new UserError('La periodicidad de la evaluación debe estar entre 1 y 36 meses')
-  const valor: AjustesTalento = { sabadoHabil: b.sabadoHabil === true, evaluacionMeses: meses }
+async function escribirAjustes(valor: AjustesTalento): Promise<void> {
   await cliente().execute({
     sql: `INSERT INTO ajustes (clave, valor, actualizado) VALUES (?, ?, ?)
           ON CONFLICT(clave) DO UPDATE SET valor = excluded.valor, actualizado = excluded.actualizado`,
     args: [CLAVE_AJUSTES, JSON.stringify(valor), ahora()],
+  })
+}
+
+/** Marca un pago legal (prima, cesantías, dotación) como hecho, o lo desmarca. */
+export async function marcarPago(b: any): Promise<void> {
+  const clave = texto(b.clave, 40)
+  if (!/^[a-z0-9]+-\d{4}$/.test(clave)) throw new UserError('Pago inválido')
+  const actual = await leerAjustes(cliente())
+  const hechos = new Set(actual.pagosHechos)
+  if (b.hecho === false) hechos.delete(clave)
+  else hechos.add(clave)
+  // Solo se guardan los de los últimos años, para que la lista no crezca sin fin.
+  const desde = Number(hoyEnBogota().slice(0, 4)) - 2
+  await escribirAjustes({ ...actual, pagosHechos: [...hechos].filter((k) => Number(k.slice(-4)) >= desde) })
+}
+
+export async function guardarAjustes(b: any): Promise<void> {
+  const meses = Math.trunc(Number(b.evaluacionMeses))
+  if (!Number.isInteger(meses) || meses < 1 || meses > 36) throw new UserError('La periodicidad de la evaluación debe estar entre 1 y 36 meses')
+  const actual = await leerAjustes(cliente())
+  await escribirAjustes({
+    ...actual,
+    sabadoHabil: b.sabadoHabil === true,
+    evaluacionMeses: meses,
+    firmaNombre: texto(b.firmaNombre, 120),
+    firmaCargo: texto(b.firmaCargo, 120),
   })
 }
 
