@@ -1,0 +1,67 @@
+/* Automatizaciones del portal (/admin/automatizaciones). Usa los tokens de
+   admin.css y crm.css. Las tarjetas se distinguen con sombra y un punto de
+   color junto al título, nunca con una franja en el borde. */
+
+.au-kpis { margin-bottom: 26px; }
+.kpi-num small { font-size: 17px; font-weight: 500; color: var(--mute); margin-left: 2px; }
+
+.au-grupo { margin-bottom: 30px; }
+.au-grupo-head { margin: 0 2px 12px; max-width: 760px; }
+.au-grupo-head h3 { margin: 0; font-size: 15px; font-weight: 600; letter-spacing: -0.01em; }
+.au-grupo-head p { margin: 3px 0 0; font-size: 12.5px; color: var(--mute); }
+
+.au-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 14px; }
+
+.au-card {
+  --c: var(--forest);
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  min-width: 0;
+  background: var(--paper);
+  border: 1px solid var(--line);
+  border-radius: 14px;
+  padding: 18px 20px;
+  box-shadow: var(--shadow-1);
+}
+.au-card.is-tope, .au-card.is-error { --c: var(--danger); }
+.au-card.is-sin_clave, .au-card.is-sin_dato, .au-card.is-pendiente { --c: var(--clay); }
+
+.au-card-head { display: flex; align-items: flex-start; justify-content: space-between; gap: 12px; }
+.au-card-head h4 { display: flex; align-items: center; gap: 9px; margin: 0; font-size: 14.5px; font-weight: 600; line-height: 1.3; }
+.au-punto { flex: none; width: 8px; height: 8px; border-radius: 50%; background: var(--c); box-shadow: 0 0 0 3px color-mix(in oklab, var(--c) 18%, transparent); }
+.au-estado {
+  flex: none;
+  font-size: 11.5px;
+  font-weight: 500;
+  padding: 3px 9px;
+  border-radius: 999px;
+  color: color-mix(in oklab, var(--c) 75%, var(--ink));
+  background: color-mix(in oklab, var(--c) 11%, transparent);
+  white-space: nowrap;
+}
+
+.au-desc { margin: 0; font-size: 13px; color: var(--ink-2); line-height: 1.5; }
+
+.au-datos { display: grid; grid-template-columns: 92px minmax(0, 1fr); gap: 5px 12px; margin: 0; font-size: 12.5px; }
+.au-datos dt { color: var(--mute); }
+.au-datos dd { margin: 0; color: var(--ink); overflow-wrap: anywhere; }
+.au-datos code { font: 500 12px/1.4 var(--mono); background: var(--paper-2); padding: 1px 6px; border-radius: 6px; }
+.au-detalle { display: block; color: var(--mute); margin-top: 2px; }
+
+.au-gasto { display: flex; flex-direction: column; gap: 6px; padding-top: 12px; border-top: 1px solid color-mix(in oklab, var(--line) 70%, transparent); }
+.au-gasto-txt { display: flex; justify-content: space-between; align-items: baseline; gap: 8px; font-size: 12.5px; color: var(--mute); }
+.au-gasto-txt b { font: 600 13.5px/1 var(--font); color: var(--ink); font-variant-numeric: tabular-nums; }
+.au-gasto-txt small { font-weight: 400; color: var(--mute); font-size: 12px; }
+.au-barra { display: block; height: 6px; border-radius: 99px; background: color-mix(in oklab, var(--ink) 6%, transparent); overflow: hidden; }
+.au-barra i { display: block; height: 100%; border-radius: 99px; background: var(--c); min-width: 2px; }
+
+.au-nota { margin: 0; font-size: 12px; color: var(--mute); }
+.au-ir { margin-top: auto; align-self: flex-start; font-size: 12.5px; font-weight: 500; color: var(--deep-2); text-decoration: none; }
+.au-ir:hover { text-decoration: underline; }
+
+@media (max-width: 900px) {
+  .au-grid { grid-template-columns: minmax(0, 1fr); }
+}
+.au-kpis { margin-top: 0; }
+.banner-error + .au-kpis { margin-top: 14px; }

@@ -1,0 +1,144 @@
+---
+// Automatizaciones del portal que corren con Claude, en la infraestructura de
+// Anthropic: las que responden a una persona y las que tienen horario (tareas
+// en la nube de Claude que llaman a /api/cron/*). No incluye lo que cada
+// persona programa en su Claude Desktop. Solo admin, porque muestra gastos.
+// Todo se pinta en el servidor; los datos salen de src/lib/automatizaciones.ts.
+export const prerender = false
+import AdminLayout from '../../layouts/AdminLayout.astro'
+import { cargarAutomatizaciones, type AutomatizacionIA, type Estado, type TareaProgramada } from '../../lib/automatizaciones'
+
+const role = Astro.locals.role || ''
+if (role !== 'admin') return Astro.redirect('/admin')
+
+let errorCarga = ''
+let ia: AutomatizacionIA[] = []
+let tareas: TareaProgramada[] = []
+let hayClave = false
+try {
+  ;({ ia, tareas, hayClave } = await cargarAutomatizaciones())
+} catch (e: any) {
+  console.error('[admin/automatizaciones] carga', e?.stack || e)
+  errorCarga = 'No se pudo cargar el estado de las automatizaciones.'
+}
+
+const usd = (n: number) => 'US$' + n.toLocaleString('es-CO', { minimumFractionDigits: 2, maximumFractionDigits: 2 })
+const ESTADOS: Record<Estado, string> = {
+  activa: 'Activa',
+  tope: 'Llegó al tope',
+  sin_clave: 'Sin clave de API',
+  sin_dato: 'Sin datos de gasto',
+}
+const activas = ia.filter((a) => a.estado === 'activa').length
+const gastoHoy = ia.filter((a) => a.periodo === 'dia').reduce((s, a) => s + (a.gastoUsd ?? 0), 0)
+const gastoMes = ia.filter((a) => a.periodo === 'mes').reduce((s, a) => s + (a.gastoUsd ?? 0), 0)
+const tareasOk = tareas.filter((t) => t.ultima?.ok && !t.atrasada).length
+const fecha = (iso: string) =>
+  new Date(iso).toLocaleString('es-CO', { weekday: 'long', day: 'numeric', month: 'short', hour: 'numeric', minute: '2-digit', timeZone: 'America/Bogota' })
+const pct = (a: AutomatizacionIA) => (a.topeUsd && a.gastoUsd !== null ? Math.min(100, (a.gastoUsd / a.topeUsd) * 100) : 0)
+const estadoTarea = (t: TareaProgramada) =>
+  !t.ultima ? { cls: 'is-pendiente', txt: 'Sin crear' } : !t.ultima.ok ? { cls: 'is-error', txt: 'Falló' } : t.atrasada ? { cls: 'is-error', txt: 'Atrasada' } : { cls: 'is-ok', txt: 'Al día' }
+---
+
+<AdminLayout titulo="Automatizaciones · EKOSOLV" activo="automatizaciones" css={['/admin/automatizaciones.css']}>
+  <Fragment slot="avisos">
+    {errorCarga && <div class="banner-error">{errorCarga}</div>}
+  </Fragment>
+
+  <div class="panel-head">
+    <div>
+      <h2>Automatizaciones</h2>
+      <p class="panel-sub">Lo que el portal hace solo con Claude, en la infraestructura de Anthropic. No incluye las tareas que cada persona programa en su Claude Desktop.</p>
+    </div>
+  </div>
+
+  {!hayClave && !errorCarga && (
+    <div class="banner-error">Falta ANTHROPIC_API_KEY en este ambiente: ninguna automatización con IA puede responder.</div>
+  )}
+
+  <div class="kpi-grid au-kpis">
+    <div class="kpi" style="--c:#46a85b">
+      <span class="kpi-lbl">Con IA activas</span>
+      <span class="kpi-num">{activas}<small>/{ia.length}</small></span>
+      <span class="kpi-sub">{activas === ia.length ? 'Todas pueden responder' : `${ia.length - activas} no responden ahora`}</span>
+    </div>
+    <div class="kpi" style="--c:#1f8a8a">
+      <span class="kpi-lbl">Gasto de hoy</span>
+      <span class="kpi-num">{usd(gastoHoy)}</span>
+      <span class="kpi-sub">Las que tienen tope diario. Estimado, la cifra oficial es la de la consola de Claude.</span>
+    </div>
+    <div class="kpi" style="--c:#8b5cf6">
+      <span class="kpi-lbl">Gasto del mes</span>
+      <span class="kpi-num">{usd(gastoMes)}</span>
+      <span class="kpi-sub">Cumplimiento y Finanzas, que se miden por mes</span>
+    </div>
+    <div class={`kpi${tareasOk < tareas.length ? ' is-alerta' : ''}`} style="--c:#e8920c">
+      <span class="kpi-lbl">Tareas con horario</span>
+      <span class="kpi-num">{tareasOk}<small>/{tareas.length}</small></span>
+      <span class="kpi-sub">{tareasOk === tareas.length ? 'Todas corrieron a tiempo' : 'Revise las que no están al día'}</span>
+    </div>
+  </div>
+
+  <section class="au-grupo" aria-labelledby="au-ia">
+    <header class="au-grupo-head">
+      <h3 id="au-ia">Responden a una persona</h3>
+      <p>Llaman a Claude con la clave del portal cuando alguien pregunta, sube un documento o lanza una demo. Cada una tiene su propio tope de gasto.</p>
+    </header>
+    <div class="au-grid">
+      {ia.map((a) => (
+        <article class={`au-card is-${a.estado}`}>
+          <header class="au-card-head">
+            <h4><span class="au-punto" aria-hidden="true"></span>{a.nombre}</h4>
+            <span class="au-estado">{ESTADOS[a.estado]}</span>
+          </header>
+          <p class="au-desc">{a.descripcion}</p>
+          <dl class="au-datos">
+            <dt>Se dispara</dt><dd>{a.disparador}</dd>
+            <dt>Modelo</dt><dd>{a.modelo}</dd>
+            <dt>Tope</dt><dd>{a.topeUsd === null ? 'Sin tope' : `${usd(a.topeUsd)} por ${a.periodo === 'dia' ? 'día' : 'mes'}`}</dd>
+          </dl>
+          <div class="au-gasto">
+            <div class="au-gasto-txt">
+              <span>{a.periodo === 'dia' ? 'Hoy' : 'Este mes'}</span>
+              <b>{a.gastoUsd === null ? 'Sin dato' : `${a.gastoAprox ? '≈ ' : ''}${usd(a.gastoUsd)}`}{a.topeUsd !== null && a.gastoUsd !== null && <small> de {usd(a.topeUsd)}</small>}</b>
+            </div>
+            {a.topeUsd !== null && <span class="au-barra" role="presentation"><i style={`width:${pct(a)}%`}></i></span>}
+          </div>
+          {a.nota && <p class="au-nota">{a.nota}</p>}
+          <a class="au-ir" href={a.donde.href}>Abrir {a.donde.etiqueta}<span aria-hidden="true"> →</span></a>
+        </article>
+      ))}
+    </div>
+  </section>
+
+  <section class="au-grupo" aria-labelledby="au-tareas">
+    <header class="au-grupo-head">
+      <h3 id="au-tareas">Con horario</h3>
+      <p>Las dispara una tarea programada en la nube de Claude, que llama al portal a la hora indicada. La lógica vive en el portal; la tarea solo es el despertador. Ninguna corre como cron de Vercel.</p>
+    </header>
+    <div class="au-grid">
+      {tareas.map((t) => {
+        const e = estadoTarea(t)
+        return (
+          <article class={`au-card au-tarea ${e.cls}`}>
+            <header class="au-card-head">
+              <h4><span class="au-punto" aria-hidden="true"></span>{t.nombre}</h4>
+              <span class="au-estado">{e.txt}</span>
+            </header>
+            <p class="au-desc">{t.descripcion}</p>
+            <dl class="au-datos">
+              <dt>Horario</dt><dd>{t.horario} (Bogotá)</dd>
+              <dt>Llama a</dt><dd><code>{t.ruta}</code></dd>
+              <dt>Última vez</dt>
+              <dd>
+                {t.ultima
+                  ? <>{fecha(t.ultima.fecha)}<span class="au-detalle">{t.ultima.detalle}</span></>
+                  : 'Todavía no ha corrido. Falta crear la tarea en la nube de Claude.'}
+              </dd>
+            </dl>
+          </article>
+        )
+      })}
+    </div>
+  </section>
+</AdminLayout>
