@@ -82,6 +82,11 @@ function renderAvisosConfig() {
   const av = []
   if (!E.config.confirmado) av.push(['warn', 'Las responsabilidades del RUT están por confirmar. El calendario se armó con valores de arranque: revise los Ajustes.', 'ajustes'])
   if (!E.obligaciones.length) av.push(['warn', 'Todavía no hay obligaciones. Cargue el calendario del año en Ajustes.', 'ajustes'])
+  for (const r of E.revisionCalendario.filter((x) => x.porConfirmar > 0 && Number(x.anio) <= Number(E.hoy.slice(0, 4)) + 1)) {
+    av.push(['warn', r.revision
+      ? `${r.porConfirmar} fecha${r.porConfirmar === 1 ? '' : 's'} de ${r.anio} sigue${r.porConfirmar === 1 ? '' : 'n'} por confirmar (estimadas, cambiadas después de la revisión del contador o con el RUT sin confirmar). Están marcadas en el calendario.`
+      : `El contador no ha revisado el calendario de ${r.anio}: las ${r.abiertas} fechas abiertas son de apoyo hasta que las compare con el calendario oficial.`, 'ajustes'])
+  }
   if (!E.cuentas.some((c) => c.activa)) av.push(['warn', 'No hay cuentas de origen autorizadas: sin ellas el control antes de pagar no deja preparar pagos.', 'ajustes'])
   if (E.sesion.rol === 'admin' && !E.entorno.cron) av.push(['info', 'Para que los avisos salgan solos cada día falta la variable CRON_SECRET en Vercel.', null])
   if (E.sesion.rol === 'admin' && !E.entorno.correo) av.push(['info', 'El correo no está configurado en este entorno (RESEND_API_KEY): los avisos no se enviarán.', null])
@@ -114,12 +119,13 @@ const listaOb = crearLista({
     { id: 'vencidas', lbl: 'Vencidas', f: (o) => o.nivel === 'vencida', siHay: true },
     { id: 'pronto', lbl: 'Próximas', f: (o) => o.nivel === 'pronto' },
     { id: 'mes', lbl: 'Este mes', f: (o) => o.vence.startsWith(mesActual()) },
+    { id: 'porconfirmar', lbl: 'Fecha por confirmar', f: (o) => o.motivos.length > 0, siHay: true },
     { id: 'cerradas', lbl: 'Presentadas', f: (o) => o.nivel === 'cerrada' },
     { id: 'todas', lbl: 'Todas', f: () => true },
   ],
   columnas: [
     { k: 'ob', lbl: 'Obligación', html: (o) => `<div class="t1">${esc(o.concepto)}</div><div class="t2">${esc(o.periodo)} · ${esc(o.entidad)}${o.formulario ? ` · ${esc(o.formulario)}` : ''}</div>`, orden: (o) => o.concepto },
-    { k: 'vence', lbl: 'Vence', cls: 'nw', html: (o) => `<div class="t1">${esc(o.vence ? fmtDate(o.vence) : 'Sin fecha')}</div><div class="t2">${plazoHtml(o)}</div>`, orden: (o) => o.vence || '9999' },
+    { k: 'vence', lbl: 'Vence', cls: 'nw', html: (o) => `<div class="t1">${esc(o.vence ? fmtDate(o.vence) : 'Sin fecha')}</div><div class="t2">${plazoHtml(o)}</div>${o.motivos.length ? '<div class="fin-porconf">Fecha por confirmar</div>' : ''}`, orden: (o) => o.vence || '9999' },
     { k: 'estado', lbl: 'Estado', html: (o) => pastilla(ESTADO_PUNTO[o.estado], o.estadoTexto), orden: (o) => E.catalogos.estados.indexOf(o.estado) },
     { k: 'resp', lbl: 'Responsable', html: (o) => esc(o.responsable || 'Sin asignar'), orden: (o) => o.responsable },
     { k: 'sop', lbl: 'Soportes', cls: 'num der', html: (o) => String(o.soportes.length), orden: (o) => o.soportes.length },
@@ -175,7 +181,11 @@ function renderOb() {
   }
   const devolver = o.anterior && antesDeAprobar && o.estado !== 'pendiente' && (prep || P().aprobar) ? `<button type="button" class="btn-ghost" id="ob-devolver">Devolver un paso</button>` : ''
 
+  const porConfirmar = o.motivos.length
+    ? `<div class="fin-porconf-caja"><b>Fecha por confirmar.</b> Antes de contar con esta fecha:<ul>${o.motivos.map((m) => `<li>${esc(m.texto)}</li>`).join('')}</ul><small>La fecha que vale es la del calendario oficial de la DIAN o de Hacienda.</small></div>`
+    : ''
   $('#ob-cuerpo').innerHTML = `
+    ${porConfirmar}
     ${pasosHtml(o)}
     <div class="fin-accion">${accion}${devolver}<p class="form-error" id="ob-err"></p></div>
     <div id="ob-extra"></div>
@@ -415,7 +425,7 @@ function renderDocumentos() {
     return `<article class="dash-card fin-doc">
       <header class="dash-head"><div><h3><a href="${API_ARCHIVO}?documento=${d.id}" target="_blank" rel="noopener">${esc(d.nombre)}</a></h3><p>${esc(x?.resumen || d.error || '')}</p></div>${pastilla(punto, estadoTxt)}</header>
       ${filas.length ? `<dl class="fin-dl">${filas.map(([k, v]) => `<dt>${esc(k)}</dt><dd>${esc(v)}</dd>`).join('')}</dl>` : ''}
-      ${d.diferencias.length ? `<ul class="fin-difs">${d.diferencias.map((z) => `<li class="${z.grave ? 'mal' : ''}"><b>${esc(z.campo)}</b>: se esperaba ${esc(z.esperado)} y el documento dice ${esc(z.encontrado)}</li>`).join('')}</ul>` : d.estado === 'leido' ? '<p class="fin-bien">Sin diferencias con lo esperado.</p>' : ''}
+      ${d.diferencias.length ? `<ul class="fin-difs">${d.diferencias.map((z) => `<li class="${z.grave ? 'mal' : ''}"><b>${esc(z.campo)}</b>: se esperaba ${esc(z.esperado)} y el documento dice ${esc(z.encontrado)}</li>`).join('')}</ul>` : d.estado === 'leido' ? '<p class="fin-bien">No encontré diferencias con lo esperado.</p><p class="muted fin-nota">La lectura la hace la IA: compare igual con el documento original.</p>' : ''}
       <div class="fin-doc-pie">
         ${obRel ? `<span>Obligación: <button type="button" class="link-btn" data-ver-ob="${obRel.id}">${esc(obRel.concepto)} · ${esc(obRel.periodo)}</button></span>` : ''}
         ${d.creada_obligacion_id ? `<span class="fin-bien">Alerta creada: <button type="button" class="link-btn" data-ver-ob="${d.creada_obligacion_id}">ver la obligación</button></span>` : ''}
@@ -497,7 +507,7 @@ function renderSiigo() {
   $('#sg-kpis').innerHTML = k.map(([l, n, c, sub, alerta]) => `<div class="kpi${alerta ? ' is-alerta' : ''}" style="--c:${c}"><span class="kpi-lbl">${esc(l)}</span><span class="kpi-num">${esc(n)}</span><span class="kpi-sub">${esc(sub)}</span></div>`).join('')
   $('#sg-alertas').innerHTML = rv.alertas.length
     ? `<ul class="fin-sg-alertas">${rv.alertas.slice(0, 60).map((a) => `<li class="${a.grave ? 'mal' : ''}"><div class="fin-sg-alerta-head">${pastilla(ALERTA_PUNTO[a.tipo], ALERTA_CORTO[a.tipo])}<b>${esc(a.proveedorNombre)}</b><span class="fin-sg-valor">${esc(pesos(a.valor))}</span></div><small>${esc(a.detalle)}</small></li>`).join('')}</ul>${rv.alertas.length > 60 ? `<p class="muted fin-nota">Y ${rv.alertas.length - 60} más.</p>` : ''}`
-    : '<p class="fin-bien">Sin alertas: no hay facturas ni pagos repetidos, ni nada vencido.</p>'
+    : `<p class="fin-bien">Siigo no muestra alertas con lo consultado (compras y pagos desde el ${esc(fmtCorto(rv.desde))}).</p><p class="muted fin-nota">Solo se revisa lo registrado en Siigo: no reemplaza la revisión de Finanzas.</p>`
   $('#sg-proveedores').innerHTML = rv.proveedores.length
     ? `<div class="tabla-wrap"><table class="tabla"><thead><tr><th>Proveedor</th><th class="num">Por pagar</th><th class="num">Vencido</th><th class="num">Facturas</th><th>Próximo vencimiento</th></tr></thead><tbody>${rv.proveedores.map((p) => `<tr><td><div class="t1">${esc(p.nombre)}</div><div class="t2">NIT ${esc(p.proveedor)}</div></td><td class="num">${esc(pesos(p.porPagar))}</td><td class="num${p.vencido ? ' fin-mal' : ''}">${p.vencido ? esc(pesos(p.vencido)) : '-'}</td><td class="num">${p.facturas}</td><td class="nw">${p.proximoVence ? esc(fmtCorto(p.proximoVence)) : '-'}</td></tr>`).join('')}</tbody></table></div>`
     : '<p class="muted">No hay cuentas por pagar con saldo en Siigo.</p>'
@@ -517,7 +527,7 @@ $('#sg-verificar').addEventListener('submit', (e) => {
     try {
       const r = await enviar('siigo_verificar_pago', { nit: soloDigitos(f.nit.value), factura: f.factura.value, valor: soloDigitos(f.valor.value) })
       const v = r.resultado
-      out.innerHTML = `${v.incompleto ? '<p class="muted fin-nota">Siigo devolvió más documentos de los que se leen: la revisión puede estar incompleta.</p>' : ''}<p class="${v.ok ? 'fin-bien' : 'fin-mal'} fin-sg-veredicto">${v.ok ? `Todo en verde para pagarle a ${esc(v.proveedorNombre)}. Igual compare el valor y la cuenta del proveedor en la pantalla del banco.` : 'No pague todavía: revise lo marcado.'}</p>${chequeosHtml(v.chequeos)}`
+      out.innerHTML = `${v.incompleto ? '<p class="muted fin-nota">Siigo devolvió más documentos de los que se leen: la revisión puede estar incompleta.</p>' : ''}<p class="${v.ok ? 'fin-bien' : 'fin-mal'} fin-sg-veredicto">${v.ok ? `No encontré problemas en Siigo con estos datos para ${esc(v.proveedorNombre)}. Esto no reemplaza su revisión: compare la factura, el valor y la cuenta del proveedor antes de pagar.` : 'No pague todavía: revise lo marcado.'}</p>${chequeosHtml(v.chequeos)}`
     } catch (err) { out.innerHTML = ''; throw err }
   })
 })
@@ -549,6 +559,39 @@ function renderResumenes() {
   $$('[data-resumen]').forEach((b) => { b.hidden = !(P().preparar || P().aprobar) })
 }
 $$('[data-resumen]').forEach((b) => b.addEventListener('click', () => conBoton(b, null, async () => { await enviar('enviar_resumen', { tipo: b.dataset.resumen }); avisoOk('Resumen enviado') })))
+
+/* ---------- Revisión del contador ---------- */
+function renderRevision() {
+  const cont = $('#revision')
+  if (!cont) return
+  const anioHoy = Number(E.hoy.slice(0, 4))
+  const anios = [...new Set([...E.revisionCalendario.map((r) => Number(r.anio)), anioHoy, anioHoy + 1])].filter((a) => a >= anioHoy - 1).sort()
+  const filas = anios.map((a) => {
+    const r = E.revisionCalendario.find((x) => Number(x.anio) === a)
+    const rev = r?.revision
+    const estado = rev
+      ? `Revisado por ${esc(rev.contador)} · constancia del ${esc(fmtCorto(rev.fecha.slice(0, 10)))}`
+      : r?.abiertas ? '<span class="fin-mal">Sin revisión del contador</span>' : '<span class="muted">Sin obligaciones cargadas</span>'
+    const pend = r?.porConfirmar ? ` · <span class="fin-porconf">${r.porConfirmar} por confirmar</span>` : ''
+    return `<li><b>${a}</b> ${estado}${pend}</li>`
+  }).join('')
+  cont.innerHTML = `<ul class="fin-lista fin-rev-lista">${filas}</ul>
+    ${P().revision ? `<form id="revision-form" class="fin-form">
+      <div class="grid2"><label>Año<select name="anio">${opciones(anios.map((a) => [a, String(a)]), anioHoy)}</select></label><label>Contador que revisó<input name="contador" required minlength="3" maxlength="120" /></label></div>
+      <label>Nota (opcional)<input name="nota" maxlength="500" placeholder="Por ejemplo: revisó IVA, retención e ICA" /></label>
+      <label class="fin-check"><input type="checkbox" name="confirmo" required /><span>El contador comparó las fechas de ese año con el calendario oficial de la DIAN y de la Secretaría de Hacienda.</span></label>
+      <button type="submit" class="btn-primary">Dejar constancia</button>
+      <p class="form-error" id="revision-err"></p>
+    </form>` : '<p class="muted">La constancia la deja Finanzas o Gerencia.</p>'}`
+  $('#revision-form')?.addEventListener('submit', (e) => {
+    e.preventDefault()
+    const f = e.currentTarget
+    conBoton(f.querySelector('[type=submit]'), $('#revision-err'), async () => {
+      await enviar('registrar_revision', { anio: Number(f.anio.value), contador: f.contador.value, nota: f.nota.value, confirmo: f.confirmo.checked })
+      avisoOk('Constancia guardada')
+    })
+  })
+}
 
 /* ---------- Ajustes ---------- */
 function renderAjustes() {
@@ -725,6 +768,7 @@ function renderTodo() {
   renderDocumentos()
   renderResumenes()
   renderAjustes()
+  renderRevision()
   if (abierto.ob) renderOb()
   if (abierto.pago) renderPago()
 }

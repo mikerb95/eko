@@ -39,7 +39,7 @@ const porAprobar = estado ? estado.pagos.filter((p) => p.estado === 'por_aprobar
   <div class="panel-head">
     <div>
       <h2>Finanzas</h2>
-      <p class="panel-sub">Calendario tributario, expedientes y control antes de pagar. El panel prepara, verifica y avisa; la persona paga en el portal y Gerencia aprueba.</p>
+      <p class="panel-sub">Calendario tributario, expedientes y control antes de pagar. El panel prepara, verifica y avisa; la persona paga en el portal y Gerencia aprueba. Es una ayuda: las fechas y cifras que valen son las oficiales de la DIAN, Hacienda y Siigo.</p>
     </div>
     <button class="btn-primary" type="button" id="nueva-obligacion" hidden>+ Nueva obligación</button>
   </div>
@@ -74,7 +74,7 @@ const porAprobar = estado ? estado.pagos.filter((p) => p.estado === 'por_aprobar
 
   <!-- PROVEEDORES (SIIGO) -->
   <section id="panel-proveedores" class="panel">
-    <p class="fin-intro">Cuentas por pagar y pagos a proveedores leídos de Siigo. El panel busca facturas registradas dos veces, pagos repetidos, facturas con más pagado que su valor y lo que está vencido. Solo lee: no registra ni paga nada en Siigo.</p>
+    <p class="fin-intro">Cuentas por pagar y pagos a proveedores leídos de Siigo. El panel busca facturas registradas dos veces, pagos repetidos, facturas con más pagado que su valor y lo que está vencido. Solo lee: no registra ni paga nada en Siigo. Es una ayuda: lo que no esté registrado en Siigo no se puede revisar.</p>
     <div id="sg-estado"></div>
     <div class="kpi-grid" id="sg-kpis"></div>
     <div class="dash-grid">
@@ -173,6 +173,10 @@ const porAprobar = estado ? estado.pagos.filter((p) => p.estado === 'por_aprobar
           <header class="dash-head"><div><h3>Cargar el calendario</h3><p>Agrega las obligaciones de un año según los ajustes. Las fechas que ya pasaron no se cargan y las que ya existen no se tocan.</p></div></header>
           <form id="sembrar-form" class="fin-form fin-sembrar"></form>
           <div id="faltantes"></div>
+        </article>
+        <article class="dash-card">
+          <header class="dash-head"><div><h3>Revisión del contador</h3><p>Mientras el contador no compare las fechas de un año con el calendario oficial, el panel las marca "por confirmar" y lo dice en cada aviso. Los avisos salen igual.</p></div></header>
+          <div id="revision"></div>
         </article>
         <article class="dash-card">
           <header class="dash-head"><div><h3>Quién recibe los avisos</h3><p>Ya llegan al correo de cada usuario de Finanzas y de Gerencia. Aquí puede cambiar un correo, quitar a alguien de los avisos o agregar otros.</p></div></header>

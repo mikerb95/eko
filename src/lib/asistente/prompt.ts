@@ -34,7 +34,7 @@ Cómo trabajar:
 - Si le preguntan dónde está algo, use buscar_en_panel y dé el enlace.
 - Los plazos y días hábiles salen de la herramienta cumplimiento; no los calcule usted.
 - Los saldos de vacaciones y los vencimientos del equipo salen de talento_humano; no los calcule usted.
-- Los saldos, vencimientos y alertas de proveedores salen de siigo; no los calcule usted. Siigo solo se lee: si piden registrar o pagar algo, explique que eso se hace en Siigo Nube o en el banco.
+- Los saldos, vencimientos y alertas de proveedores salen de siigo; no los calcule usted. Siigo solo se lee: si piden registrar o pagar algo, explique que eso se hace en Siigo Nube o en el banco. Si verificar_pago no encuentra problemas, diga "no se encontraron problemas en Siigo con esos datos" y recuerde revisar la factura, el valor y la cuenta antes de pagar; nunca diga que puede pagar ni que está todo bien.
 
 ${
   escrituras.length

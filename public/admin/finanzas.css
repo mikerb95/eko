@@ -174,3 +174,13 @@
 .tabla th.num { text-align: right; }
 .tabla td.num { text-align: right; }
 .fin-form[hidden] { display: none; }
+
+/* Fechas por confirmar: tinte ámbar, nunca franja a la izquierda. */
+.fin-porconf { display: inline-block; margin-top: 2px; font-size: 11.5px; font-weight: 600; color: #a5660a; }
+.fin-porconf-caja {
+  margin: 0 0 14px; padding: 12px 14px; border-radius: 10px; font-size: 13px; line-height: 1.5;
+  background: color-mix(in oklab, #e8920c 10%, var(--paper)); color: color-mix(in oklab, #a5660a 80%, var(--ink));
+}
+.fin-porconf-caja ul { margin: 6px 0; padding-left: 18px; }
+.fin-porconf-caja small { display: block; color: var(--ink-2); }
+.fin-rev-lista { margin-bottom: 12px; }
