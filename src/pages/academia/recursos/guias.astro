@@ -1,0 +1,357 @@
+---
+// Guías animadas de Claude: conectar Siigo, Zoho y Office, crear skills, usar
+// plugins, rutinas automatizadas, instalar en Windows y Mac y el crédito de
+// platform.claude.com. Textos en src/lib/talleres/guiasClaude.ts y escenas en
+// src/components/guias/Escena.astro.
+//
+// Cada guía es un reproductor: la escena animada a la izquierda y los pasos a
+// la derecha. Arranca solo cuando la guía entra en pantalla, avanza paso a
+// paso y se puede pausar o saltar a cualquier paso. Con movimiento reducido no
+// arranca solo y las escenas quedan quietas.
+//
+// Pública por estar bajo /academia/recursos (esRecursos en src/middleware.ts).
+export const prerender = false
+import '../../../styles/guias.css'
+import AcademiaLayout from '../../../layouts/AcademiaLayout.astro'
+import Escena from '../../../components/guias/Escena.astro'
+import { chispa } from '../../../lib/talleres/chispa'
+import { GRUPOS, GUIAS, SEG_PASO } from '../../../lib/talleres/guiasClaude'
+
+const nav = [
+  { href: '/academia/recursos', texto: 'Inicio' },
+  { href: '/academia/recursos/guias', texto: 'Guías de Claude', activo: true },
+]
+const dos = (n: number) => String(n).padStart(2, '0')
+const totalPasos = GUIAS.reduce((s, g) => s + g.pasos.length, 0)
+const ORBITA = [
+  { t: 'Siigo', c: '#0F7DC2' }, { t: 'Zoho', c: '#D33A2C' }, { t: 'Office', c: '#2B6CB0' },
+  { t: 'Skills', c: '#179C91' }, { t: 'Plugins', c: '#7A5AF8' }, { t: 'Rutinas', c: '#C96442' },
+]
+---
+
+<AcademiaLayout titulo="Guías de Claude · Academia de IA · Ekosolv" inicio="/academia/recursos" etiqueta="Academia de IA" nav={nav}>
+  <section class="ac-hero gc-hero">
+    <div class="ac-hero-txt">
+      <p class="ac-kicker">Guías de Claude</p>
+      <h1>Conecte, enseñe y automatice Claude, <span>paso a paso</span></h1>
+      <p class="ac-lede">{GUIAS.length} guías animadas con {totalPasos} pasos: mire la animación, siga el paso y repita cuando lo necesite. Todo en la cuenta de Ekosolv.</p>
+      <div class="gc-acciones">
+        <a class="ac-btn" href="#indice">Ver las guías</a>
+      </div>
+    </div>
+    <div class="gc-orbita" aria-hidden="true">
+      <span class="gc-anillo gc-anillo-1" />
+      <span class="gc-anillo gc-anillo-2" />
+      <span class="gc-centro" set:html={chispa(true, 'gc-chispa')} />
+      <div class="gc-giro">
+        {ORBITA.map((o, i) => (
+          <span class="gc-satelite" style={`--i:${i};--n:${ORBITA.length};--c:${o.c}`}><span class="gc-sat-txt"><i />{o.t}</span></span>
+        ))}
+      </div>
+    </div>
+  </section>
+
+  <section class="gc-indice" id="indice" aria-label="Índice de guías">
+    {GRUPOS.map((gr) => (
+      <div class="gc-grupo">
+        <h2>{gr.titulo}</h2>
+        <p>{gr.texto}</p>
+        <ul>
+          {GUIAS.filter((g) => g.grupo === gr.id).map((g) => (
+            <li>
+              <a href={`#${g.id}`} style={`--c:${g.color}`}>
+                <span class="ac-punto" aria-hidden="true" />
+                <span><b>{g.titulo}</b><small>{g.pasos.length} pasos · {g.minutos} min</small></span>
+              </a>
+            </li>
+          ))}
+        </ul>
+      </div>
+    ))}
+  </section>
+
+  {GUIAS.map((g, gi) => (
+    <section class="gc-guia" id={g.id} style={`--c:${g.color}`} aria-labelledby={`t-${g.id}`}>
+      <header class="gc-cab">
+        <span class="gc-num">{dos(gi + 1)}</span>
+        <div>
+          <h2 id={`t-${g.id}`}>{g.titulo}</h2>
+          <p>{g.paraQue}</p>
+          <span class="gc-meta"><span>{g.quien}</span><span>{g.minutos} min</span></span>
+        </div>
+      </header>
+
+      <div class="gp" data-reproductor>
+        <div class="gp-escenario">
+          {g.pasos.map((p, k) => (
+            <div class="gp-escena" data-k={k} data-seg={p.seg ?? SEG_PASO} hidden={k !== 0}>
+              <Escena id={p.escena} />
+            </div>
+          ))}
+          <div class="gp-controles">
+            <button type="button" class="gp-btn" data-ant aria-label="Paso anterior"><span class="gp-ico gp-ico-ant" /></button>
+            <button type="button" class="gp-btn gp-btn-play" data-play aria-label="Reproducir"><span class="gp-ico gp-ico-play" /></button>
+            <button type="button" class="gp-btn" data-sig aria-label="Paso siguiente"><span class="gp-ico gp-ico-sig" /></button>
+            <span class="gp-barras">
+              {g.pasos.map((_, k) => <span class="gp-barra" data-k={k}><i /></span>)}
+            </span>
+            <span class="gp-cuenta" data-cuenta>1/{g.pasos.length}</span>
+          </div>
+        </div>
+
+        <ol class="gp-pasos">
+          {g.pasos.map((p, k) => (
+            <li class:list={['gp-paso', { 'gp-activo': k === 0 }]} data-k={k}>
+              <button type="button" class="gp-paso-btn" aria-current={k === 0 ? 'step' : undefined}>
+                <span class="gp-paso-n">{k + 1}</span>
+                <span class="gp-paso-t">{p.titulo}</span>
+              </button>
+              <p class="gp-paso-txt">{p.hacer}</p>
+            </li>
+          ))}
+        </ol>
+      </div>
+
+      <footer class="gc-pie">
+        {g.ojo && <p class="gc-ojo"><b>Tenga en cuenta.</b> {g.ojo}</p>}
+        <a class="gc-fuente" href={g.fuente.url} target="_blank" rel="noopener">{g.fuente.texto} ↗</a>
+      </footer>
+    </section>
+  ))}
+</AcademiaLayout>
+
+<script>
+  // Reproductor de cada guía. La escena activa se muestra quitando `hidden`:
+  // al pasar de display:none a visible, sus animaciones CSS arrancan de cero.
+  const reducido = matchMedia('(prefers-reduced-motion: reduce)').matches
+
+  for (const raiz of document.querySelectorAll<HTMLElement>('[data-reproductor]')) {
+    const escenas = [...raiz.querySelectorAll<HTMLElement>('.gp-escena')]
+    const pasos = [...raiz.querySelectorAll<HTMLElement>('.gp-paso')]
+    const barras = [...raiz.querySelectorAll<HTMLElement>('.gp-barra')]
+    const play = raiz.querySelector<HTMLButtonElement>('[data-play]')!
+    const cuenta = raiz.querySelector<HTMLElement>('[data-cuenta]')!
+    const total = escenas.length
+    let k = 0
+    let corriendo = false
+    let pausadoPorUsuario = false
+    let terminado = false
+    let restante = 0
+    let inicio = 0
+    let reloj = 0
+
+    const seg = (i: number) => Number(escenas[i]!.dataset.seg) * 1000
+
+    function pintar() {
+      escenas.forEach((e, i) => { e.hidden = i !== k })
+      pasos.forEach((p, i) => {
+        p.classList.toggle('gp-activo', i === k)
+        p.classList.toggle('gp-visto', i < k)
+        const b = p.querySelector('button')!
+        if (i === k) b.setAttribute('aria-current', 'step'); else b.removeAttribute('aria-current')
+      })
+      barras.forEach((b, i) => {
+        b.classList.toggle('gp-llena', i < k)
+        b.classList.remove('gp-corre')
+        b.style.removeProperty('--dur')
+      })
+      cuenta.textContent = `${k + 1}/${total}`
+    }
+
+    function reiniciarEscena() {
+      // Forzar que las animaciones vuelvan a empezar aunque el paso no cambie.
+      const e = escenas[k]!
+      e.hidden = true
+      void e.offsetWidth
+      e.hidden = false
+    }
+
+    function estadoBoton() {
+      raiz.classList.toggle('gp-pausa', !corriendo)
+      play.setAttribute('aria-label', corriendo ? 'Pausar' : terminado ? 'Ver de nuevo' : 'Reproducir')
+      play.dataset.estado = corriendo ? 'pausa' : terminado ? 'otra' : 'play'
+    }
+
+    function programar(ms: number) {
+      clearTimeout(reloj)
+      restante = ms
+      inicio = performance.now()
+      reloj = window.setTimeout(siguienteAuto, ms)
+    }
+
+    function arrancarPaso() {
+      const b = barras[k]!
+      b.classList.remove('gp-corre')
+      void b.offsetWidth
+      b.style.setProperty('--dur', `${seg(k)}ms`)
+      b.classList.add('gp-corre')
+      programar(seg(k))
+    }
+
+    function siguienteAuto() {
+      if (k < total - 1) {
+        k++
+        pintar()
+        arrancarPaso()
+      } else {
+        barras[k]!.classList.add('gp-llena')
+        corriendo = false
+        terminado = true
+        estadoBoton()
+      }
+    }
+
+    function reproducir() {
+      if (reducido) return
+      if (terminado) { terminado = false; k = 0; pintar(); reiniciarEscena(); arrancarPaso() }
+      else if (barras[k]!.classList.contains('gp-corre')) programar(restante)
+      else arrancarPaso()
+      corriendo = true
+      estadoBoton()
+    }
+
+    function pausar() {
+      if (!corriendo) return
+      clearTimeout(reloj)
+      restante = Math.max(0, restante - (performance.now() - inicio))
+      corriendo = false
+      estadoBoton()
+    }
+
+    function ir(i: number) {
+      const seguir = corriendo
+      clearTimeout(reloj)
+      k = Math.max(0, Math.min(total - 1, i))
+      terminado = false
+      pintar()
+      reiniciarEscena()
+      if (seguir) arrancarPaso()
+      estadoBoton()
+    }
+
+    play.addEventListener('click', () => {
+      if (corriendo) { pausadoPorUsuario = true; pausar() } else { pausadoPorUsuario = false; reproducir() }
+    })
+    raiz.querySelector('[data-ant]')!.addEventListener('click', () => ir(k - 1))
+    raiz.querySelector('[data-sig]')!.addEventListener('click', () => ir(k + 1))
+    pasos.forEach((p, i) => p.querySelector('button')!.addEventListener('click', () => ir(i)))
+    barras.forEach((b, i) => b.addEventListener('click', () => ir(i)))
+
+    // Arranca solo al entrar en pantalla y se detiene al salir.
+    if (!reducido) {
+      new IntersectionObserver(([en]) => {
+        if (en!.isIntersecting) {
+          if (!corriendo && !pausadoPorUsuario && !terminado) { reiniciarEscena(); reproducir() }
+        } else pausar()
+      }, { threshold: 0.45 }).observe(raiz)
+    }
+    estadoBoton()
+  }
+</script>
+
+<style>
+  /* ---------- Hero ---------- */
+  .gc-hero { align-items: center; }
+  .gc-acciones { margin-top: 24px; }
+  .gc-acciones .ac-btn { margin-top: 0; }
+
+  .gc-orbita { position: relative; width: 340px; height: 340px; flex: none; }
+  .gc-anillo { position: absolute; inset: 0; border-radius: 50%; border: 1.5px dashed color-mix(in oklab, var(--ink) 16%, transparent); }
+  .gc-anillo-2 { inset: 70px; border-style: solid; border-color: color-mix(in oklab, #D97757 20%, transparent); animation: gc-late 3.2s ease-in-out infinite; }
+  @keyframes gc-late { 50% { transform: scale(1.06); opacity: .6; } }
+  .gc-centro { position: absolute; left: 50%; top: 50%; translate: -50% -50%; display: grid; place-items: center; width: 116px; height: 116px; border-radius: 50%; background: #fff; box-shadow: 0 0 0 10px color-mix(in oklab, #D97757 10%, transparent), 0 18px 40px rgba(14, 28, 38, .12); }
+  .gc-centro :global(.gc-chispa) { width: 64px; height: 64px; }
+  .gc-giro { position: absolute; inset: 0; animation: gc-gira 36s linear infinite; }
+  @keyframes gc-gira { to { transform: rotate(1turn); } }
+  .gc-satelite { position: absolute; left: 50%; top: 50%; width: 0; height: 0; transform: rotate(calc(var(--i) / var(--n) * 1turn)) translateY(-170px); }
+  .gc-sat-txt { position: absolute; translate: -50% -50%; display: inline-flex; align-items: center; gap: 7px; padding: 8px 13px; border-radius: 999px; background: #fff; font: 600 13.5px/1 var(--font-sans); color: var(--ink); white-space: nowrap; box-shadow: 0 6px 18px rgba(14, 28, 38, .1); transform: rotate(calc(var(--i) / var(--n) * -1turn)); animation: gc-contra 36s linear infinite; }
+  .gc-sat-txt i { width: 9px; height: 9px; border-radius: 50%; background: var(--c); }
+  @keyframes gc-contra { from { rotate: 0deg; } to { rotate: -360deg; } }
+
+  /* ---------- Índice ---------- */
+  .gc-indice { display: grid; grid-template-columns: repeat(3, 1fr); gap: 18px; margin: 8px 0 56px; }
+  .gc-grupo { background: #fff; border-radius: 20px; padding: 22px; box-shadow: 0 1px 2px rgba(14, 28, 38, .05), 0 10px 30px rgba(14, 28, 38, .06); }
+  .gc-grupo h2 { margin: 0; font: 600 20px/1.15 var(--font-display); letter-spacing: -.01em; }
+  .gc-grupo > p { margin: 6px 0 14px; font-size: 14px; color: var(--mute); line-height: 1.45; }
+  .gc-grupo ul { list-style: none; margin: 0; padding: 0; display: grid; gap: 2px; }
+  .gc-grupo a { display: flex; gap: 12px; align-items: flex-start; padding: 10px; margin: 0 -10px; border-radius: 12px; text-decoration: none; color: var(--ink); transition: background .15s; }
+  .gc-grupo a:hover { background: color-mix(in oklab, var(--c) 9%, #fff); }
+  .gc-grupo .ac-punto { margin-top: 6px; background: var(--c); }
+  .gc-grupo b { display: block; font-weight: 600; font-size: 15px; line-height: 1.3; }
+  .gc-grupo small { display: block; font-size: 12.5px; color: var(--mute); margin-top: 2px; }
+
+  /* ---------- Guía ---------- */
+  .gc-guia { margin: 0 0 72px; scroll-margin-top: 90px; }
+  .gc-cab { display: flex; gap: 18px; align-items: flex-start; margin-bottom: 20px; }
+  .gc-num { display: grid; place-items: center; flex: none; width: 48px; height: 48px; border-radius: 14px; background: color-mix(in oklab, var(--c) 12%, #fff); color: var(--c); font: 600 18px/1 var(--font-display); }
+  .gc-cab h2 { margin: 0; font: 600 clamp(24px, 3vw, 32px)/1.1 var(--font-display); letter-spacing: -.02em; }
+  .gc-cab p { margin: 6px 0 10px; font-size: 16px; color: var(--ink-2); line-height: 1.45; max-width: 62ch; }
+  .gc-meta { display: flex; flex-wrap: wrap; gap: 6px; }
+  .gc-meta span { padding: 5px 10px; border-radius: 999px; background: color-mix(in oklab, var(--ink) 5%, transparent); font-size: 12.5px; color: var(--ink-2); }
+
+  .gp { display: grid; grid-template-columns: minmax(0, 1.35fr) minmax(0, 1fr); gap: 22px; align-items: start; }
+  .gp-escenario { position: sticky; top: 84px; background: color-mix(in oklab, var(--c) 6%, #F6F4F0); border-radius: 24px; padding: 26px 26px 14px; font-size: clamp(11px, 1.05vw, 14.5px); }
+  .gp-escena { min-height: 21em; display: flex; flex-direction: column; justify-content: center; }
+  .gp-escena[hidden] { display: none; }
+  /* Pausar también congela la animación de la escena. */
+  .gp.gp-pausa .gp-escena :global(*) { animation-play-state: paused !important; }
+
+  .gp-controles { display: flex; align-items: center; gap: 6px; margin-top: 18px; font-size: 14px; }
+  .gp-btn { display: grid; place-items: center; width: 36px; height: 36px; border-radius: 50%; border: 0; background: #fff; color: var(--ink); cursor: pointer; box-shadow: 0 1px 3px rgba(14, 28, 38, .1); transition: transform .15s; }
+  .gp-btn:hover { transform: scale(1.06); }
+  .gp-btn:focus-visible { outline: 2px solid var(--c); outline-offset: 2px; }
+  .gp-btn-play { width: 42px; height: 42px; background: var(--ink); color: #fff; }
+  .gp-ico { display: block; width: 12px; height: 12px; background: currentColor; }
+  .gp-ico-play { clip-path: polygon(15% 0, 100% 50%, 15% 100%); }
+  [data-estado='pausa'] .gp-ico-play { clip-path: polygon(10% 0, 40% 0, 40% 100%, 10% 100%, 10% 0, 60% 0, 90% 0, 90% 100%, 60% 100%, 60% 0); }
+  [data-estado='otra'] .gp-ico-play { clip-path: none; background: none; width: 14px; height: 14px; border: 2.5px solid currentColor; border-top-color: transparent; border-radius: 50%; }
+  .gp-ico-ant { clip-path: polygon(0 0, 18% 0, 18% 45%, 100% 0, 100% 100%, 18% 55%, 18% 100%, 0 100%); }
+  .gp-ico-sig { clip-path: polygon(0 0, 82% 45%, 82% 0, 100% 0, 100% 100%, 82% 100%, 82% 55%, 0 100%); }
+  .gp-barras { flex: 1; display: flex; gap: 4px; margin-left: 8px; }
+  .gp-barra { flex: 1; height: 6px; border-radius: 99px; background: color-mix(in oklab, var(--ink) 10%, transparent); overflow: hidden; cursor: pointer; }
+  .gp-barra i { display: block; height: 100%; width: 100%; background: var(--c); transform: scaleX(0); transform-origin: left; }
+  .gp-barra.gp-llena i { transform: scaleX(1); }
+  .gp-barra.gp-corre i { animation: gp-llena var(--dur) linear both; }
+  .gp.gp-pausa .gp-barra.gp-corre i { animation-play-state: paused; }
+  @keyframes gp-llena { to { transform: scaleX(1); } }
+  .gp-cuenta { min-width: 34px; text-align: right; font: 500 12.5px/1 var(--font-mono); color: var(--mute); }
+
+  .gp-pasos { list-style: none; margin: 0; padding: 0; display: grid; gap: 8px; }
+  .gp-paso { border-radius: 16px; transition: background .2s, box-shadow .2s; }
+  .gp-paso-btn { display: flex; align-items: center; gap: 12px; width: 100%; padding: 14px 16px; border: 0; background: none; text-align: left; font: inherit; color: var(--ink-2); cursor: pointer; border-radius: 16px; }
+  .gp-paso-btn:focus-visible { outline: 2px solid var(--c); outline-offset: -2px; }
+  .gp-paso-n { display: grid; place-items: center; flex: none; width: 28px; height: 28px; border-radius: 50%; background: color-mix(in oklab, var(--ink) 7%, transparent); font: 600 13px/1 var(--font-sans); color: var(--ink-2); transition: background .2s, color .2s; }
+  .gp-paso-t { font-weight: 600; font-size: 15.5px; line-height: 1.3; }
+  .gp-paso-txt { display: none; margin: 0; padding: 0 18px 16px 56px; font-size: 15px; line-height: 1.55; color: var(--ink-2); }
+  .gp-paso:hover:not(.gp-activo) { background: color-mix(in oklab, var(--ink) 3%, transparent); }
+  .gp-activo { background: #fff; box-shadow: 0 1px 2px rgba(14, 28, 38, .05), 0 10px 26px rgba(14, 28, 38, .08); }
+  .gp-activo .gp-paso-btn { color: var(--ink); }
+  .gp-activo .gp-paso-n { background: var(--c); color: #fff; }
+  .gp-activo .gp-paso-txt { display: block; animation: gp-abre .35s ease both; }
+  @keyframes gp-abre { from { opacity: 0; transform: translateY(-4px); } }
+  .gp-visto .gp-paso-n { background: color-mix(in oklab, var(--c) 18%, #fff); color: var(--c); }
+
+  .gc-pie { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 12px 24px; margin-top: 18px; }
+  .gc-ojo { margin: 0; flex: 1 1 420px; padding: 14px 16px; border-radius: 14px; background: color-mix(in oklab, #C96442 8%, #fff); font-size: 14.5px; line-height: 1.5; color: var(--ink-2); }
+  .gc-ojo b { color: #8a3d22; font-weight: 600; }
+  .gc-fuente { font-size: 14px; font-weight: 600; color: var(--c); text-decoration: none; }
+  .gc-fuente:hover { text-decoration: underline; }
+
+  @media (max-width: 960px) {
+    .gp { grid-template-columns: 1fr; }
+    .gp-escenario { position: static; font-size: clamp(10px, 2.3vw, 14px); }
+    .gc-indice { grid-template-columns: 1fr; }
+    .gc-orbita { display: none; }
+  }
+  @media (max-width: 560px) {
+    .gp-escenario { padding: 16px 12px 10px; border-radius: 18px; }
+    .gp-escena { min-height: 24em; }
+    .gc-cab { gap: 12px; }
+    .gc-num { width: 40px; height: 40px; font-size: 16px; }
+    .gp-paso-txt { padding-left: 18px; }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .gc-giro, .gc-sat-txt, .gc-anillo-2 { animation: none; }
+    .gp-controles .gp-btn-play { display: none; }
+  }
+</style>
