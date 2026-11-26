@@ -72,7 +72,7 @@ export const SIIGO: Herramienta = {
       const r = await comprasEntre(desde, hasta, 5)
       // Nombres de proveedor desde lo por pagar (las compras traen solo el NIT).
       const nombres = new Map<string, string>()
-      if (porNombre || r.filas.length) {
+      if (r.filas.length) {
         for (const c of (await siigoTodas('/v1/accounts-payable', {}, 5)).filas.map(cxpDeSiigo)) if (c.proveedorNombre) nombres.set(c.proveedor, c.proveedorNombre)
       }
       const filas = r.filas

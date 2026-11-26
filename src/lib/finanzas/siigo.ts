@@ -68,12 +68,38 @@ export async function traerProveedores(hoy: string, diasAtras = DIAS_ATRAS): Pro
   }
 }
 
-const revisionDe = (d: DatosProveedores, hoy: string) => ({
-  ...revisar({ compras: d.compras, cxp: d.cxp, egresos: d.egresos, hoy }),
-  truncado: d.truncado,
-  desde: d.desde,
-  consultado: new Date().toISOString(),
-})
+/** Máximo de terceros que se buscan por NIT para ponerle nombre a una alerta. */
+const MAX_NOMBRES = 10
+
+/** Nombre del tercero en Siigo (`name` es una lista: razón social o nombres y apellidos). */
+async function nombreTercero(nit: string): Promise<string> {
+  const r = await siigoFetch('/v1/customers', { query: { identification: nit } })
+  const t = Array.isArray(r?.results) ? r.results[0] : null
+  const nombre = Array.isArray(t?.name) ? t.name.filter(Boolean).join(' ') : String(t?.name || '')
+  return (nombre || String(t?.commercial_name || '')).trim()
+}
+
+async function revisionDe(d: DatosProveedores, hoy: string) {
+  const entrada = { compras: d.compras, cxp: d.cxp, egresos: d.egresos, hoy }
+  let r = revisar(entrada)
+  // Las alertas de proveedores sin saldo pendiente no traen nombre (sale de lo
+  // por pagar): se buscan por NIT, pocos y sin tumbar la revisión si fallan.
+  const sinNombre = [...new Set(r.alertas.filter((a) => a.proveedorNombre === `NIT ${a.proveedor}`).map((a) => a.proveedor))].slice(0, MAX_NOMBRES)
+  if (sinNombre.length) {
+    const nombres = new Map<string, string>()
+    for (const nit of sinNombre) {
+      try {
+        const n = await nombreTercero(nit)
+        if (n) nombres.set(nit, n)
+      } catch (e: any) {
+        console.error('[finanzas/siigo] nombre del tercero', e?.message || e)
+        break
+      }
+    }
+    if (nombres.size) r = revisar({ ...entrada, nombres })
+  }
+  return { ...r, truncado: d.truncado, desde: d.desde, consultado: new Date().toISOString() }
+}
 
 export async function revisionProveedores(hoy: string) {
   return revisionDe(await traerProveedores(hoy), hoy)
@@ -82,7 +108,7 @@ export async function revisionProveedores(hoy: string) {
 /** Lo que muestra la pestaña Proveedores: revisión y cifras del mes, sin pedir dos veces lo por pagar. */
 export async function revisionYCifras(hoy: string, mes: string) {
   const d = await traerProveedores(hoy)
-  return { revision: revisionDe(d, hoy), cifras: await cifrasDelMes(mes, hoy, d.cxp) }
+  return { revision: await revisionDe(d, hoy), cifras: await cifrasDelMes(mes, hoy, d.cxp) }
 }
 
 export async function verificarPagoProveedor(hoy: string, p: { nit: string; factura: string; valor: number }) {
