@@ -28,7 +28,7 @@ export const fechaCorta = (iso: string) => {
 
 export function armarResumen(e: EstadoTalento): Resumen {
   const nombre = new Map(e.personas.map((p) => [p.usuario_id, p.nombre]))
-  const quien = (id: number) => nombre.get(id) ?? 'Persona sin cuenta'
+  const quien = (id: number) => (id === 0 ? 'Toda la empresa' : nombre.get(id) ?? 'Persona')
   const secciones: SeccionResumen[] = []
 
   const urgentes = e.avisos.filter((a) => a.nivel !== 'proximo')

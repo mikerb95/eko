@@ -173,6 +173,28 @@ export async function verifyLogin(username: string, password: string): Promise<U
   return rowToUser(r)
 }
 
+/**
+ * ¿La cuenta todavía puede estar adentro? Se consulta solo al renovar la
+ * sesión (cada pocas horas), no en cada petición: así quien fue desactivado
+ * o llegó a su fecha de retiro sale cuando vence su sesión actual, en vez de
+ * seguir renovándola sin fin. Las cuentas fijas del código siempre pueden.
+ */
+export async function cuentaPuedeEntrar(username: string): Promise<boolean> {
+  const u = String(username || '').trim().toLowerCase()
+  if (u === HARDCODED_USER || u === TEMP_ACCESS.username) return true
+  try {
+    const r = await client().execute({
+      sql: `SELECT 1 FROM users WHERE username = ? AND active = 1
+            AND NOT EXISTS (SELECT 1 FROM th_empleados e WHERE e.usuario_id = users.id AND e.fecha_retiro <> '' AND e.fecha_retiro <= ?)`,
+      args: [u, new Date(Date.now() - 5 * 3600e3).toISOString().slice(0, 10)],
+    })
+    return r.rows.length > 0
+  } catch {
+    // Si la base falla, no se saca a nadie por eso: la sesión sigue hasta vencer.
+    return true
+  }
+}
+
 // ---------- CRUD ----------
 function rowToUser(r: any): User {
   return {

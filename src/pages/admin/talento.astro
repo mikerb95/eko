@@ -15,6 +15,8 @@ import {
   CRITERIOS_BASE,
   ESTADOS_NOVEDAD,
   NIVELES,
+  PASOS_INGRESO,
+  PASOS_RETIRO,
   TIPOS_CONTRATO,
   TIPOS_CURSO,
   TIPOS_DOCUMENTO,
@@ -48,6 +50,8 @@ const catalogos = {
   niveles: NIVELES,
   criteriosBase: CRITERIOS_BASE,
   roles: ROLES.map((id) => ({ id, etiqueta: ROLE_LABELS[id] })),
+  pasosIngreso: PASOS_INGRESO,
+  pasosRetiro: PASOS_RETIRO,
 }
 const emailListo = talentoEmailConfigured()
 
@@ -192,6 +196,10 @@ const user = Astro.locals.user || ''
         <label>Evaluar a cada persona cada
           <span class="th-sufijo"><input type="number" name="evaluacionMeses" min="1" max="36" required /><span>meses</span></span>
         </label>
+        <div class="grid2">
+          <label>Quién firma los certificados laborales<input name="firmaNombre" maxlength="120" placeholder="Nombre completo" autocomplete="off" /></label>
+          <label>Cargo de quien firma<input name="firmaCargo" maxlength="120" placeholder="Por ejemplo, Representante legal" autocomplete="off" /></label>
+        </div>
         <div class="drawer-actions">
           <p class="form-error" id="ajustes-err"></p>
           <button type="submit" class="btn-primary"><span class="t">Guardar</span></button>
@@ -228,6 +236,7 @@ const user = Astro.locals.user || ''
           <button class="subtab" data-ptab="novedades">Vacaciones y novedades</button>
           <button class="subtab" data-ptab="formacion">Formación</button>
           <button class="subtab" data-ptab="desempeno">Desempeño</button>
+          <button class="subtab" data-ptab="trayectoria">Trayectoria</button>
         </nav>
         <form id="ficha-form" class="drawer-body" data-pvista="ficha">
           <input type="hidden" name="usuario_id" />
@@ -249,9 +258,10 @@ const user = Astro.locals.user || ''
             <div class="grid3">
               <label>Fecha de ingreso<input type="date" name="fecha_ingreso" /></label>
               <label>Fin del contrato<input type="date" name="fecha_fin_contrato" /><small>Solo término fijo, obra o aprendizaje.</small></label>
-              <label>Fecha de retiro<input type="date" name="fecha_retiro" /><small>Al llegar, deja de contar como activa.</small></label>
+              <label>Fecha de retiro<input type="date" name="fecha_retiro" /><small>Ese día deja de contar como activa y, si entra al panel, se le cierra el acceso.</small></label>
             </div>
             <label>Salario mensual (opcional)<input name="salario" inputmode="numeric" placeholder="Déjelo vacío si no lo lleva aquí" autocomplete="off" /><small>Solo lo ven los administradores. No sale en el correo ni en el asistente.</small></label>
+            <label>Desde cuándo rige el cambio<input type="date" name="fecha_cambio" /><small>Si cambia el cargo, el área, el contrato o el salario (por ejemplo, un ascenso), queda en la Trayectoria con esta fecha. Vacío = hoy.</small></label>
           </fieldset>
           <fieldset class="grupo">
             <legend>Datos personales y contacto</legend>

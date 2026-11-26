@@ -11,6 +11,8 @@ import {
   saldoVacaciones,
   vencimientos,
   AJUSTES_BASE,
+  PASOS_RETIRO,
+  pagosLegales,
   type DatosVencimientos,
   type Empleado,
   type Novedad,
@@ -118,15 +120,41 @@ test('vencimientos: documentos, solo el más reciente de cada tipo', () => {
       { id: 4, usuario_id: 1, tipo: 'alturas', nombre: '', fecha_vencimiento: '2025-12-01' },
     ],
   }), '2026-01-05')
-  assert.deepEqual(avisos.map((a) => [a.clave, a.nivel]), [['doc-4', 'vencido'], ['doc-3', 'urgente']])
+  assert.deepEqual(avisos.filter((a) => a.tipo === 'documento').map((a) => [a.clave, a.nivel]), [['doc-4', 'vencido'], ['doc-3', 'urgente']])
 })
 
-test('vencimientos: las personas retiradas no generan avisos', () => {
+test('vencimientos: las personas retiradas solo generan los pasos de su retiro', () => {
   const avisos = vencimientos(datos({
     empleados: [emp({ fecha_retiro: '2025-12-31' })],
     documentos: [{ id: 1, usuario_id: 1, tipo: 'licencia', nombre: '', fecha_vencimiento: '2026-01-20' }],
   }), '2026-01-05')
-  assert.deepEqual(avisos, [])
+  assert.deepEqual(avisos.map((a) => a.clave), ['retiro-1'])
+  const todoHecho = Object.fromEntries(PASOS_RETIRO.map((p) => [p.id, '2026-01-02']))
+  assert.deepEqual(vencimientos(datos({ empleados: [emp({ fecha_retiro: '2025-12-31', pasos_retiro: todoHecho })] }), '2026-01-05'), [])
+})
+
+test('vencimientos: ingreso reciente sin ARL avisa el día antes de empezar', () => {
+  const avisos = vencimientos(datos({ empleados: [emp({ fecha_ingreso: '2026-03-10' })] }), '2026-03-01')
+  const a = avisos.find((x) => x.tipo === 'ingreso')!
+  assert.equal(a.fecha, '2026-03-09')
+  assert.match(a.titulo, /ARL/)
+  // Quien entró hace más de 60 días ya no pide los pasos de ingreso.
+  assert.equal(vencimientos(datos({ empleados: [emp({ fecha_ingreso: '2025-01-01' })] }), '2026-03-01').some((x) => x.tipo === 'ingreso'), false)
+  // Ni a un contratista.
+  assert.equal(vencimientos(datos({ empleados: [emp({ tipo_contrato: 'prestacion', fecha_ingreso: '2026-03-10' })] }), '2026-03-01').some((x) => x.tipo === 'ingreso'), false)
+})
+
+test('vencimientos: pagos legales de la empresa, y desaparecen al marcarlos', () => {
+  const avisos = vencimientos(datos({}), '2026-06-15').filter((a) => a.tipo === 'pago_legal')
+  assert.deepEqual(avisos.map((a) => [a.clave, a.usuario_id]).slice(0, 1), [['pago-prima1-2026', 0]])
+  const marcados = vencimientos(datos({ ajustes: { ...AJUSTES_BASE, pagosHechos: ['prima1-2026'] } }), '2026-06-15')
+  assert.equal(marcados.some((a) => a.clave === 'pago-prima1-2026'), false)
+  // Un vencido sin marcar se muestra 30 días y luego sale.
+  assert.equal(vencimientos(datos({}), '2026-07-20').some((a) => a.clave === 'pago-prima1-2026'), true)
+  assert.equal(vencimientos(datos({}), '2026-08-05').some((a) => a.clave === 'pago-prima1-2026'), false)
+  // Sin nadie con contrato laboral, no hay pagos legales.
+  assert.equal(vencimientos(datos({ empleados: [emp({ tipo_contrato: 'prestacion' })] }), '2026-06-15').some((a) => a.tipo === 'pago_legal'), false)
+  assert.deepEqual(pagosLegales(2026).map((p) => p.fecha), ['2026-01-31', '2026-02-14', '2026-04-30', '2026-06-30', '2026-08-31', '2026-12-20', '2026-12-20'])
 })
 
 test('vencimientos: preaviso del término fijo 30 días antes', () => {

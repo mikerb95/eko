@@ -8,7 +8,7 @@ const T = window.__TALENTO__ || {}
 const C = T.catalogos
 const FESTIVOS = new Set(T.festivos || [])
 const API = '/api/admin/talento'
-let E = T.estado || { hoy: new Date().toISOString().slice(0, 10), ajustes: { sabadoHabil: false, evaluacionMeses: 12 }, personas: [], cargos: [], documentos: [], novedades: [], cursos: [], formaciones: [], evaluaciones: [], saldos: {}, avisos: [] }
+let E = T.estado || { hoy: new Date().toISOString().slice(0, 10), ajustes: { sabadoHabil: false, evaluacionMeses: 12, firmaNombre: '', firmaCargo: '', pagosHechos: [] }, personas: [], cargos: [], documentos: [], novedades: [], cursos: [], formaciones: [], evaluaciones: [], historial: [], saldos: {}, avisos: [] }
 
 /* ---------- Utilidades ---------- */
 const et = (lista, id) => (Array.isArray(lista) ? lista.find((o) => o.id === id)?.etiqueta : lista[id]) || id || ''
@@ -16,7 +16,8 @@ const opciones = (lista, actual, vacio) =>
   (vacio !== undefined ? `<option value="">${esc(vacio)}</option>` : '') +
   lista.map((o) => `<option value="${esc(o.id)}"${String(o.id) === String(actual ?? '') ? ' selected' : ''}>${esc(o.etiqueta ?? o.nombre)}</option>`).join('')
 const persona = (id) => E.personas.find((p) => p.usuario_id === Number(id))
-const nombreDe = (id) => persona(id)?.nombre || 'Persona'
+// usuario_id 0 = aviso de toda la empresa (prima, cesantías, dotación).
+const nombreDe = (id) => (Number(id) === 0 ? 'Toda la empresa' : persona(id)?.nombre || 'Persona')
 const cargoDe = (id) => E.cargos.find((c) => c.id === Number(id))
 const num = (n) => (Number(n) || 0).toLocaleString('es-CO', { maximumFractionDigits: 2 })
 const dia = 864e5
@@ -120,7 +121,7 @@ document.addEventListener('keydown', (e) => {
 
 /* ---------- Tablero ---------- */
 let filtroAviso = 'todos'
-const PARA_PESTANA = { documento: 'documentos', formacion: 'formacion', contrato: 'ficha', prueba: 'ficha', vacaciones: 'novedades', evaluacion: 'desempeno' }
+const PARA_PESTANA = { documento: 'documentos', formacion: 'formacion', contrato: 'ficha', prueba: 'ficha', vacaciones: 'novedades', evaluacion: 'desempeno', ingreso: 'trayectoria', retiro: 'trayectoria' }
 
 function renderTablero() {
   const activos = E.personas.filter(activo)
@@ -138,7 +139,13 @@ function renderTablero() {
   $('#aviso-chips').innerHTML = chips.map(([id, lbl, f]) => `<button type="button" class="chip${filtroAviso === id ? ' is-on' : ''}" data-chip="${id}">${lbl} <b>${E.avisos.filter(f).length}</b></button>`).join('')
   const lista = E.avisos.filter(chips.find((c) => c[0] === filtroAviso)[2])
   $('#th-avisos').innerHTML = lista.length
-    ? `<ul class="th-avisos">${lista.map((a) => `
+    ? `<ul class="th-avisos">${lista.map((a) => a.tipo === 'pago_legal' ? `
+        <li><div class="th-aviso-empresa">
+          ${avatar('Ekosolv', 'sm')}
+          <span class="th-aviso-txt"><b>${esc(a.titulo)}</b><small>Toda la empresa · ${esc(a.detalle)}</small></span>
+          ${chipFecha(a.dias)}
+          <button type="button" class="btn-mini is-main" data-pagado="${esc(a.clave.replace(/^pago-/, ''))}">Ya se pagó</button>
+        </div></li>` : `
         <li><button type="button" data-aviso="${esc(a.clave)}">
           ${avatar(nombreDe(a.usuario_id), 'sm')}
           <span class="th-aviso-txt"><b>${esc(a.titulo)}</b><small>${esc(nombreDe(a.usuario_id))} · ${esc(a.detalle)}</small></span>
@@ -184,6 +191,8 @@ $('#th-kpis').addEventListener('click', (e) => {
   else { filtroAviso = k; renderTablero(); $('#th-avisos').scrollIntoView({ block: 'nearest', behavior: 'smooth' }) }
 })
 $('#panel-tablero').addEventListener('click', async (e) => {
+  const pag = e.target.closest('[data-pagado]')
+  if (pag) return conBoton(pag, null, () => enviar('marcar_pago', { clave: pag.dataset.pagado, hecho: true }))
   const av = e.target.closest('[data-aviso]')
   if (av) {
     const a = E.avisos.find((x) => x.clave === av.dataset.aviso)
@@ -352,6 +361,7 @@ function llenarFicha(p) {
   el.tipo_contrato.innerHTML = opciones(C.contratos, f.tipo_contrato, 'Sin definir')
   for (const k of ['documento', 'jefe', 'fecha_ingreso', 'fecha_fin_contrato', 'fecha_retiro', 'fecha_nacimiento', 'telefono', 'correo_personal', 'emergencia_nombre', 'emergencia_telefono', 'eps', 'pension', 'cesantias', 'arl', 'caja', 'notas']) el[k].value = f[k] ?? ''
   el.salario.value = f.salario ? Number(f.salario).toLocaleString('es-CO') : ''
+  el.fecha_cambio.value = ''
   el.vacaciones_ajuste.value = f.vacaciones_ajuste ? String(f.vacaciones_ajuste).replace('.', ',') : ''
 }
 fichaForm.elements.salario.addEventListener('blur', (e) => {
@@ -514,6 +524,8 @@ function pintarVistaPersona() {
           <td class="nw">${f.vence_el ? `${esc(fmtDate(f.vence_el))} ${chipVence(f.vence_el)}` : '<span class="muted">No vence</span>'}</td>
           <td class="der"><span class="acciones">${f.enlace ? `<a class="btn-mini" href="${esc(f.enlace)}" target="_blank" rel="noopener noreferrer">Certificado</a>` : ''}<button type="button" class="btn-ico danger" data-p="form-borrar" data-id="${f.id}" title="Quitar" aria-label="Quitar">${svg('borrar')}</button></span></td></tr>` }).join('')}
       </tbody></table></div>` : '<div class="vacio"><b>Sin formación registrada</b>Registre los cursos y talleres a los que asistió.</div>'}`
+  } else if (pestanaPersona === 'trayectoria') {
+    v.innerHTML = vistaTrayectoria(p)
   } else if (pestanaPersona === 'desempeno') {
     const evs = E.evaluaciones.filter((x) => x.usuario_id === id)
     v.innerHTML = `
@@ -534,7 +546,54 @@ $('#persona-vista').addEventListener('click', (e) => {
   else if (acc === 'eval-nueva') abrirEval(null, personaAbierta)
   else if (acc === 'eval-abrir') abrirEval(E.evaluaciones.find((x) => x.id === id))
   else if (acc === 'form-borrar') confirmarClic(b, () => conBoton(b, null, () => enviar('eliminar_formacion', { id })))
+  else if (acc === 'hist-borrar') confirmarClic(b, () => conBoton(b, null, () => enviar('eliminar_historial', { id })))
 })
+$('#persona-vista').addEventListener('change', (e) => {
+  const c = e.target.closest('input[data-paso]')
+  if (!c) return
+  c.disabled = true
+  enviar('marcar_paso', { usuario_id: personaAbierta, momento: c.dataset.momento, paso: c.dataset.paso, hecho: c.checked })
+    .catch((err) => { c.checked = !c.checked; avisoError(err) })
+    .finally(() => { c.disabled = false })
+})
+
+/* ---------- Trayectoria: certificado, cambios de cargo y salario, ingreso y retiro ---------- */
+const CAMPO_HIST = { cargo: 'Cargo', area: 'Área', contrato: 'Contrato', salario: 'Salario' }
+function listaPasos(lista, hechos, momento) {
+  return `<ul class="th-pasos">${lista.map((paso) => {
+    const fecha = hechos?.[paso.id]
+    return `<li><label class="th-paso${fecha ? ' is-hecho' : ''}"><input type="checkbox" data-paso="${esc(paso.id)}" data-momento="${momento}"${fecha ? ' checked' : ''} />
+      <span><b>${esc(paso.etiqueta)}</b>${paso.ayuda ? `<small>${esc(paso.ayuda)}</small>` : ''}</span>
+      ${fecha ? `<span class="t2 nw">${esc(fmtCorto(fecha))}</span>` : ''}</label></li>`
+  }).join('')}</ul>`
+}
+function vistaTrayectoria(p) {
+  const id = p.usuario_id
+  const hist = E.historial.filter((h) => h.usuario_id === id)
+  const f = p.ficha
+  const cert = `/admin/talento/certificado?persona=${id}`
+  const pendientes = (lista, hechos) => lista.filter((x) => !hechos?.[x.id]).length
+  return `
+    <section class="th-tray-bloque">
+      <div class="th-vista-head"><div><h4>Certificado laboral</h4><p class="muted">Sale con los datos de la ficha, listo para imprimir o guardar en PDF.</p></div>
+        <span class="acciones"><a class="btn-ghost" href="${cert}" target="_blank" rel="noopener">Sin salario</a><a class="btn-primary" href="${cert}&salario=1" target="_blank" rel="noopener">Con salario</a></span></div>
+    </section>
+    <section class="th-tray-bloque">
+      <h4>Cambios de cargo, área, contrato y salario</h4>
+      ${hist.length ? `<div class="tabla-wrap"><table class="tabla"><thead><tr><th>Desde</th><th>Qué cambió</th><th>Antes</th><th>Después</th><th></th></tr></thead><tbody>
+        ${hist.map((h) => `<tr><td class="nw">${esc(fmtDate(h.fecha))}</td><td>${esc(CAMPO_HIST[h.campo] || h.campo)}</td><td>${h.antes ? esc(h.antes) : '<span class="muted">Sin dato</span>'}</td><td><b>${h.despues ? esc(h.despues) : '<span class="muted">Sin dato</span>'}</b>${h.registrado_por ? `<div class="t2">Registró ${esc(h.registrado_por)}</div>` : ''}</td>
+          <td class="der"><button type="button" class="btn-ico danger" data-p="hist-borrar" data-id="${h.id}" title="Quitar" aria-label="Quitar">${svg('borrar')}</button></td></tr>`).join('')}
+      </tbody></table></div>` : '<p class="muted">Todavía no hay cambios. Cuando le cambie el cargo, el área, el contrato o el salario en la ficha, queda aquí con su fecha.</p>'}
+    </section>
+    <section class="th-tray-bloque">
+      <h4>Ingreso ${f ? `<span class="muted">${pendientes(C.pasosIngreso, f.pasos_ingreso) ? `faltan ${pendientes(C.pasosIngreso, f.pasos_ingreso)}` : 'completo'}</span>` : ''}</h4>
+      ${f ? listaPasos(C.pasosIngreso, f.pasos_ingreso, 'ingreso') : '<p class="muted">Guarde primero la ficha.</p>'}
+    </section>
+    <section class="th-tray-bloque">
+      <h4>Retiro ${f?.fecha_retiro ? `<span class="muted">${esc(fmtDate(f.fecha_retiro))} · ${pendientes(C.pasosRetiro, f.pasos_retiro) ? `faltan ${pendientes(C.pasosRetiro, f.pasos_retiro)}` : 'completo'}</span>` : ''}</h4>
+      ${f?.fecha_retiro ? listaPasos(C.pasosRetiro, f.pasos_retiro, 'retiro') : '<p class="muted">Cuando registre la fecha de retiro en la ficha, aquí aparece la lista de salida (liquidación, examen de egreso, paz y salvo...).</p>'}
+    </section>`
+}
 $('#persona-vista').addEventListener('submit', (e) => {
   const f = e.target.closest('form[data-p="form-registrar"]')
   if (!f) return
@@ -852,12 +911,14 @@ const ajustesForm = $('#ajustes-form')
 function llenarAjustes() {
   ajustesForm.elements.sabadoHabil.checked = !!E.ajustes.sabadoHabil
   ajustesForm.elements.evaluacionMeses.value = E.ajustes.evaluacionMeses
+  ajustesForm.elements.firmaNombre.value = E.ajustes.firmaNombre || ''
+  ajustesForm.elements.firmaCargo.value = E.ajustes.firmaCargo || ''
 }
 ajustesForm.addEventListener('submit', (ev) => {
   ev.preventDefault()
   const btn = ajustesForm.querySelector('[type=submit]')
   conBoton(btn, $('#ajustes-err'), async () => {
-    await enviar('guardar_ajustes', { sabadoHabil: ajustesForm.elements.sabadoHabil.checked, evaluacionMeses: Number(ajustesForm.elements.evaluacionMeses.value) })
+    await enviar('guardar_ajustes', { sabadoHabil: ajustesForm.elements.sabadoHabil.checked, evaluacionMeses: Number(ajustesForm.elements.evaluacionMeses.value), firmaNombre: ajustesForm.elements.firmaNombre.value, firmaCargo: ajustesForm.elements.firmaCargo.value })
     const t = btn.querySelector('.t'); t.textContent = 'Guardado'; setTimeout(() => { t.textContent = 'Guardar' }, 1500)
   })
 })

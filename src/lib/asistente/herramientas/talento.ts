@@ -33,7 +33,7 @@ export const TALENTO: Herramienta = {
   nombre: 'talento_humano',
   area: 'talento',
   descripcion:
-    'Talento humano del equipo de Ekosolv: vencimientos (documentos, cursos, contratos, períodos de prueba, evaluaciones), personas con cargo y contrato, saldo de vacaciones, ausencias, solicitudes por aprobar, formación y evaluaciones de desempeño. Úsela para "¿quién tiene el examen vencido?", "¿cuántos días de vacaciones le quedan a X?" o "¿quién está de vacaciones la otra semana?". No trae salarios ni datos de contacto.',
+    'Talento humano del equipo de Ekosolv: vencimientos (documentos, cursos, contratos, períodos de prueba, evaluaciones, pasos de ingreso y retiro, y pagos legales de la empresa como prima, cesantías y dotación), personas con cargo y contrato, saldo de vacaciones, ausencias, solicitudes por aprobar, formación y evaluaciones de desempeño. Úsela para "¿quién tiene el examen vencido?", "¿cuántos días de vacaciones le quedan a X?" o "¿quién está de vacaciones la otra semana?". No trae salarios ni datos de contacto.',
   esquema,
   async ejecutar(args: z.infer<typeof esquema>, { db, hoy }) {
     const e = await leerEstado(db, hoy)
@@ -41,12 +41,13 @@ export const TALENTO: Herramienta = {
     const ids = new Set(personas.map((p) => p.usuario_id))
     const nombre = new Map(e.personas.map((p) => [p.usuario_id, p.nombre]))
     const cargo = new Map(e.cargos.map((c) => [c.id, c.nombre]))
-    const de = (id: number) => nombre.get(id) ?? 'Persona sin cuenta'
+    const de = (id: number) => (id === 0 ? 'Toda la empresa' : nombre.get(id) ?? 'Persona')
 
     if (args.que === 'vencimientos') {
       return ok({
         hoy,
-        vencimientos: e.avisos.filter((a) => ids.has(a.usuario_id)).map((a) => ({
+        // Los pagos legales (usuario_id 0) son de toda la empresa: salen cuando no se pregunta por alguien.
+        vencimientos: e.avisos.filter((a) => ids.has(a.usuario_id) || (a.usuario_id === 0 && !args.persona)).map((a) => ({
           persona: de(a.usuario_id),
           que: a.titulo,
           tipo: a.tipo,
@@ -54,7 +55,7 @@ export const TALENTO: Herramienta = {
           fecha: a.fecha,
           diasQueFaltan: a.dias,
           nivel: a.nivel,
-          enlace: enlace(a.usuario_id),
+          enlace: a.usuario_id === 0 ? null : enlace(a.usuario_id),
         })),
       })
     }

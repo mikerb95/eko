@@ -1,5 +1,6 @@
 import { defineMiddleware } from 'astro:middleware'
 import { PC_COOKIE, SESSION_COOKIE, SESSION_TTL_SECONDS, renovarSession, verifySession } from './lib/auth'
+import { cuentaPuedeEntrar } from './lib/users'
 import { pasePC } from './lib/talleres/pc'
 import { canWrite } from './lib/reglasEscritura'
 
@@ -169,7 +170,8 @@ export const onRequest = defineMiddleware(async (context, next) => {
   // medio de una capacitación de 4 horas (ver SESSION_RENEW_BELOW_SECONDS).
   if (pathname !== '/api/admin/logout') {
     const nuevo = await renovarSession(session)
-    if (nuevo) {
+    // Solo se renueva si la cuenta sigue activa y sin fecha de retiro cumplida.
+    if (nuevo && (await cuentaPuedeEntrar(session.u))) {
       context.cookies.set(SESSION_COOKIE, nuevo, { path: '/', httpOnly: true, sameSite: 'lax', secure: import.meta.env.PROD, maxAge: SESSION_TTL_SECONDS })
     }
   }

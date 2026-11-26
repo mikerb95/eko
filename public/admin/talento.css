@@ -175,3 +175,18 @@
 .th-acceso-txt { margin: 0 0 10px; font-size: 13px; }
 .th-acceso-form { margin-top: 12px; }
 .th-acceso-activo { align-self: end; padding-bottom: 10px; }
+
+/* Trayectoria */
+.th-tray-bloque { margin-bottom: 26px; }
+.th-tray-bloque h4 { margin: 0 0 10px; font-size: 14px; display: flex; gap: 10px; align-items: baseline; }
+.th-tray-bloque h4 .muted { font-weight: 400; font-size: 12.5px; }
+.th-tray-bloque .th-vista-head h4 { margin-bottom: 2px; }
+.th-pasos { list-style: none; margin: 0; padding: 0; display: grid; gap: 6px; }
+.th-paso { display: flex; gap: 10px; align-items: flex-start; padding: 9px 12px; border: 1px solid var(--line); border-radius: 10px; cursor: pointer; }
+.th-paso input { margin-top: 3px; accent-color: var(--deep); }
+.th-paso > span:first-of-type { flex: 1; display: flex; flex-direction: column; }
+.th-paso small { color: var(--ink-3, #6b746f); font-size: 12px; }
+.th-paso.is-hecho { background: color-mix(in oklab, var(--deep) 6%, var(--paper)); }
+.th-paso.is-hecho b { font-weight: 500; color: var(--ink-2); }
+.th-aviso-empresa { display: flex; align-items: center; gap: 10px; padding: 10px 12px; }
+.th-aviso-empresa .th-aviso-txt { flex: 1; }
