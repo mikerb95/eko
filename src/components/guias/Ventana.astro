@@ -1,0 +1,14 @@
+---
+// Ventana de las escenas de /academia/recursos/guias: navegador (url) o
+// aplicación. Ilustración, no captura: reutiliza la base de src/styles/maquetas.css.
+interface Props {
+  url: string
+  clase?: string
+}
+const { url, clase = '' } = Astro.props
+---
+
+<div class:list={['mq-ventana gm-ventana', clase]}>
+  <div class="mq-barra"><i /><i /><i /><span class="mq-url">{url}</span></div>
+  <div class="gm-cuerpo"><slot /></div>
+</div>

@@ -1,0 +1,18 @@
+---
+// Ruta de menú que se va encendiendo paso a paso (Customize › Connectors › +).
+// El último tramo queda resaltado: es donde hay que tocar.
+interface Props {
+  tramos: string[]
+  d?: number
+}
+const { tramos, d = 0.2 } = Astro.props
+---
+
+<span class="gm-ruta">
+  {tramos.map((t, i) => (
+    <>
+      {i > 0 && <span class="gm-ruta-sep mq-ap" style={`--d:${(d + i * 0.45 - 0.2).toFixed(2)}s`}>›</span>}
+      <span class:list={['gm-tramo mq-ap', { 'gm-tramo-fin': i === tramos.length - 1 }]} style={`--d:${(d + i * 0.45).toFixed(2)}s`}>{t}</span>
+    </>
+  ))}
+</span>
