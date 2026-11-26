@@ -34,13 +34,23 @@ const masDias = (iso: string, d: number) => {
   return x.toISOString().slice(0, 10)
 }
 
+/**
+ * Si Siigo ya rechazó la fecha y hora en compras, se recuerda mientras viva el
+ * proceso: así no se gasta una petición fallida en cada consulta (Siigo
+ * bloquea al usuario si más del 80 % de sus peticiones fallan en 7 días).
+ */
+let comprasSoloFecha = false
+
 /** Compras por fecha del documento, con el respaldo de formato descrito arriba. */
 export async function comprasEntre(desde: string, hasta: string, maxPaginas?: number) {
+  const soloFecha = () => siigoTodas('/v1/purchases', { date_start: desde, date_end: hasta }, maxPaginas)
+  if (comprasSoloFecha) return soloFecha()
   try {
     return await siigoTodas('/v1/purchases', { date_start: `${desde}T00:00:00Z`, date_end: `${hasta}T23:59:59Z` }, maxPaginas)
   } catch (e) {
     if (!(e instanceof SiigoError) || e.status !== 400) throw e
-    return siigoTodas('/v1/purchases', { date_start: desde, date_end: hasta }, maxPaginas)
+    comprasSoloFecha = true
+    return soloFecha()
   }
 }
 
