@@ -1,0 +1,215 @@
+---
+// Mesa de luz de las presentaciones (solo admin): todas las presentaciones del
+// sitio en una página, cada una con las miniaturas de sus escenas en orden.
+// Cada miniatura es la escena real (un iframe de la presentación en su último
+// paso, reducido) y se carga cuando entra en pantalla. Al hacer clic se abre
+// la presentación en esa escena, en otra pestaña. Las capacitaciones salen
+// solas del registro (src/lib/talleres); la de Finanzas es una página propia,
+// así que sus escenas se listan aquí (si se agrega una, sumarla abajo).
+export const prerender = false
+import AdminLayout from '../../layouts/AdminLayout.astro'
+import { ico } from '../../lib/admin/iconos'
+import { TALLERES, nombreTaller } from '../../lib/talleres'
+import { COLOR_BLOQUE } from '../../components/taller/tipos'
+
+if (String(Astro.locals.role || '') !== 'admin') return Astro.redirect('/admin')
+
+interface Mini { titulo: string; bloque: string; color: string }
+interface Deck {
+  id: string
+  nombre: string
+  titulo: string
+  base: string
+  /** Lo que se agrega a la URL de la miniatura (la vista previa no guarda ni oye teclas). */
+  vista: string
+  minutos: number
+  bloques: { titulo: string; color: string }[]
+  escenas: Mini[]
+  accesos: { lbl: string; href: string }[]
+}
+
+const decks: Deck[] = Object.values(TALLERES)
+  .sort((a, b) => a.n - b.n)
+  .map((t) => ({
+    id: `taller-${t.n}`,
+    nombre: nombreTaller(t),
+    titulo: t.titulo,
+    base: `/academia/taller/${t.n}`,
+    vista: '?vista=1',
+    minutos: t.minutosTotales,
+    bloques: t.bloques.map((b) => ({ titulo: b.titulo, color: COLOR_BLOQUE[b.id] ?? '#179C91' })),
+    escenas: t.escenas.map((e) => ({ titulo: e.titulo, bloque: t.bloques.find((b) => b.id === e.bloque)?.titulo ?? '', color: COLOR_BLOQUE[e.bloque] ?? '#179C91' })),
+    accesos: [
+      { lbl: 'Proyector', href: `/academia/taller/${t.n}` },
+      { lbl: 'Presentador', href: `/academia/taller/${t.n}/presentador` },
+      { lbl: 'Control', href: `/academia/taller/${t.n}/control` },
+      { lbl: 'Tarjeta resumen', href: `/academia/taller/${t.n}/resumen` },
+      ...(t.n === 1 ? [{ lbl: 'Entregables', href: '/academia/taller/1/entregables' }] : []),
+    ],
+  }))
+
+// Presentación de la oferta de Finanzas (src/pages/admin/presentacion/finanzas.astro).
+const BF = {
+  inicio: { titulo: 'Inicio', color: '#179C91' },
+  problema: { titulo: 'Lo que está en juego', color: '#B4442F' },
+  solucion: { titulo: 'Cómo funciona', color: '#124E7D' },
+  personas: { titulo: 'Las personas', color: '#00AA9F' },
+  resultado: { titulo: 'Resultado e inversión', color: '#B8926F' },
+}
+const ESCENAS_FINANZAS: [keyof typeof BF, string][] = [
+  ['inicio', 'Calendario tributario bajo control'],
+  ['problema', 'Más de 20 fechas al año, en la memoria de una persona'],
+  ['problema', 'Lo que cuesta una fecha que se pasa'],
+  ['problema', 'Y al pagar, nadie revisa dos veces'],
+  ['solucion', 'Tres piezas que trabajan juntas'],
+  ['solucion', 'Un calendario que no se olvida'],
+  ['solucion', 'Nada se cierra sin su soporte'],
+  ['solucion', 'Un segundo par de ojos antes de cada clic'],
+  ['solucion', 'La lista de cada pantalla del portal'],
+  ['solucion', 'La IA lee el documento y lo compara'],
+  ['solucion', 'El panorama sin tener que pedirlo'],
+  ['solucion', 'Prepara, verifica y avisa. Las personas deciden.'],
+  ['personas', 'Dónde se nota'],
+  ['personas', 'Excel sin la curva de siempre'],
+  ['personas', 'Claude como tutor de fórmulas'],
+  ['personas', 'Cinco sesiones, solo lo de su cargo'],
+  ['resultado', 'Cómo se asegura que funcione'],
+  ['resultado', 'Seis semanas, algo útil desde la tercera'],
+  ['resultado', 'Valores de la propuesta'],
+  ['resultado', 'Empezamos con una reunión de dos horas'],
+]
+decks.push({
+  id: 'finanzas',
+  nombre: 'Oferta de Finanzas',
+  titulo: 'Calendario tributario bajo control',
+  base: '/admin/presentacion/finanzas',
+  vista: '',
+  minutos: 0,
+  bloques: Object.values(BF),
+  escenas: ESCENAS_FINANZAS.map(([b, titulo]) => ({ titulo, bloque: BF[b].titulo, color: BF[b].color })),
+  accesos: [{ lbl: 'Abrir presentación', href: '/admin/presentacion/finanzas' }],
+})
+
+const totalEscenas = decks.reduce((s, d) => s + d.escenas.length, 0)
+const horas = (m: number) => (m >= 60 ? `${Math.floor(m / 60)} h${m % 60 ? ` ${m % 60} min` : ''}` : `${m} min`)
+---
+
+<AdminLayout titulo="Presentaciones · EKOSOLV" activo="presentaciones">
+  <div class="mesa">
+    <header class="mesa-cab">
+      <div>
+        <h1>Presentaciones</h1>
+        <p>{decks.length} presentaciones · {totalEscenas} escenas. Haga clic en una escena para abrir la presentación ahí, en otra pestaña.</p>
+      </div>
+      <nav class="mesa-ir" aria-label="Ir a una presentación">
+        {decks.map((d) => <a href={`#${d.id}`}>{d.nombre}</a>)}
+      </nav>
+    </header>
+
+    {decks.map((d) => (
+      <section class="deck" id={d.id}>
+        <div class="deck-cab">
+          <div class="deck-tit">
+            <p class="deck-kicker">{d.nombre}{d.minutos > 0 && ` · ${horas(d.minutos)}`} · {d.escenas.length} escenas</p>
+            <h2>{d.titulo}</h2>
+            <ul class="deck-bloques">
+              {d.bloques.map((b) => <li style={`--c:${b.color}`}>{b.titulo}</li>)}
+            </ul>
+          </div>
+          <div class="deck-accesos">
+            {d.accesos.map((a) => (
+              <a href={a.href} target="_blank" rel="noopener">{a.lbl}<Fragment set:html={ico('externo')} /></a>
+            ))}
+          </div>
+        </div>
+        <ol class="rejilla">
+          {d.escenas.map((e, k) => (
+            <li class="mini" style={`--c:${e.color}`}>
+              <a href={`${d.base}#${k + 1}.0`} target="_blank" rel="noopener" title={`Abrir en la escena ${k + 1}`}>
+                <span class="marco" data-marco>
+                  <iframe data-src={`${d.base}${d.vista}#${k + 1}.9`} title={`Escena ${k + 1}: ${e.titulo}`} tabindex="-1" aria-hidden="true" />
+                  <span class="cargando">{k + 1}</span>
+                </span>
+                <span class="pie">
+                  <b>{k + 1}</b>
+                  <span class="txt"><span class="t">{e.titulo}</span><small>{e.bloque}</small></span>
+                </span>
+              </a>
+            </li>
+          ))}
+        </ol>
+      </section>
+    ))}
+  </div>
+</AdminLayout>
+
+<style>
+  .mesa { display: flex; flex-direction: column; gap: 40px; padding-bottom: 48px; }
+  .mesa-cab { display: flex; flex-wrap: wrap; align-items: flex-end; justify-content: space-between; gap: 16px; }
+  .mesa-cab h1 { margin: 0 0 4px; font-size: 1.6rem; }
+  .mesa-cab p { margin: 0; color: #5b6670; font-size: .92rem; }
+  .mesa-ir { display: flex; flex-wrap: wrap; gap: 8px; }
+  .mesa-ir a, .deck-accesos a {
+    display: inline-flex; align-items: center; gap: 6px; padding: 7px 12px; border-radius: 999px;
+    background: #fff; border: 1px solid #dfe3e6; color: #0E1C26; font-size: .84rem; text-decoration: none;
+  }
+  .mesa-ir a:hover, .deck-accesos a:hover { background: #eaf6f5; border-color: #179C91; }
+  .deck-accesos :global(svg) { width: 14px; height: 14px; }
+  .deck { scroll-margin-top: 80px; display: flex; flex-direction: column; gap: 18px; }
+  .deck-cab { display: flex; flex-wrap: wrap; justify-content: space-between; align-items: flex-start; gap: 16px; }
+  .deck-kicker { margin: 0 0 4px; font-size: .78rem; letter-spacing: .06em; text-transform: uppercase; color: #179C91; font-weight: 600; }
+  .deck-tit h2 { margin: 0 0 10px; font-size: 1.3rem; }
+  .deck-bloques { list-style: none; margin: 0; padding: 0; display: flex; flex-wrap: wrap; gap: 6px 14px; }
+  .deck-bloques li { display: inline-flex; align-items: center; gap: 6px; font-size: .8rem; color: #5b6670; }
+  .deck-bloques li::before { content: ''; width: 8px; height: 8px; border-radius: 50%; background: var(--c); }
+  .deck-accesos { display: flex; flex-wrap: wrap; gap: 8px; }
+  .rejilla { list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); gap: 18px; }
+  .mini a { display: flex; flex-direction: column; gap: 8px; text-decoration: none; color: inherit; }
+  .marco {
+    position: relative; display: block; aspect-ratio: 16 / 9; overflow: hidden; border-radius: 10px;
+    background: #f1ede6; box-shadow: 0 1px 2px rgba(14, 28, 38, .08), 0 0 0 1px rgba(14, 28, 38, .08);
+    transition: box-shadow .18s, transform .18s;
+  }
+  .mini a:hover .marco, .mini a:focus-visible .marco { box-shadow: 0 8px 22px rgba(14, 28, 38, .16), 0 0 0 2px var(--c); transform: translateY(-2px); }
+  .marco iframe {
+    position: absolute; top: 0; left: 0; width: 1600px; height: 900px; border: 0;
+    transform-origin: 0 0; transform: scale(var(--s, .15)); pointer-events: none; opacity: 0; transition: opacity .3s;
+  }
+  .marco.listo iframe { opacity: 1; }
+  .cargando { position: absolute; inset: 0; display: grid; place-items: center; font-size: 2rem; font-weight: 700; color: rgba(14, 28, 38, .15); }
+  .marco.listo .cargando { display: none; }
+  .pie { display: flex; gap: 10px; align-items: flex-start; }
+  .pie b {
+    flex: none; min-width: 26px; height: 26px; padding: 0 6px; border-radius: 999px; display: grid; place-items: center;
+    background: var(--c); color: #fff; font-size: .78rem;
+  }
+  .txt { display: flex; flex-direction: column; min-width: 0; }
+  .txt .t { font-size: .86rem; line-height: 1.3; font-weight: 600; }
+  .txt small { font-size: .74rem; color: #6b7580; }
+</style>
+
+<script>
+  // Escala cada iframe (1600x900) al ancho de su marco y lo carga cuando se
+  // acerca a la pantalla. Una vez cargado no se descarga.
+  const marcos = [...document.querySelectorAll<HTMLElement>('[data-marco]')]
+  const ajustar = (m: HTMLElement) => m.style.setProperty('--s', String(m.clientWidth / 1600))
+  const ro = new ResizeObserver((es) => es.forEach((e) => ajustar(e.target as HTMLElement)))
+  const io = new IntersectionObserver(
+    (es) => {
+      for (const e of es) {
+        if (!e.isIntersecting) continue
+        const m = e.target as HTMLElement
+        io.unobserve(m)
+        const f = m.querySelector('iframe')!
+        f.addEventListener('load', () => setTimeout(() => m.classList.add('listo'), 600), { once: true })
+        f.src = f.dataset.src!
+      }
+    },
+    { rootMargin: '300px 0px' },
+  )
+  for (const m of marcos) {
+    ajustar(m)
+    ro.observe(m)
+    io.observe(m)
+  }
+</script>
