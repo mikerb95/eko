@@ -1,0 +1,587 @@
+---
+// Escenas animadas de las guías de Claude (/academia/recursos/guias, textos en
+// src/lib/talleres/guiasClaude.ts). Son motion graphics hechos con CSS
+// (src/styles/guias.css sobre la base de src/styles/maquetas.css): arrancan
+// cuando la escena aparece (el reproductor la pasa de hidden a visible) y con
+// movimiento reducido quedan quietas en su estado final.
+//
+// Ilustraciones, no capturas: los menús y botones copian los nombres reales de
+// Claude (en inglés, como salen hoy) y los datos son de ejemplo. Las escenas
+// de Zoho reutilizan las maquetas de la capacitación 1, que salen de la
+// conexión real del 2026-11-19.
+interface Props {
+  id: string
+}
+import Maqueta from '../taller/Maqueta.astro'
+import Ventana from './Ventana.astro'
+import Ruta from './Ruta.astro'
+import { chispa } from '../../lib/talleres/chispa'
+const { id } = Astro.props
+
+const pensar = (d: number, fin: number) => `--d:${d}s;--fin:${fin}s`
+const PENSANDO = `${chispa()}<span>Pensando</span>`
+const LOGO = chispa(false, 'gm-logo-claude')
+const ZOHO_MAQUETA: Record<string, string> = { 'zh-region': 'conector', 'zh-oauth': 'oauth', 'zh-permisos': 'permisos', 'zh-probar': 'prueba' }
+---
+
+<div class:list={['mq gm', `gm-${id}`]} data-escena={id} aria-hidden="true">
+  {ZOHO_MAQUETA[id] && <Maqueta id={ZOHO_MAQUETA[id]!} />}
+
+  {/* ───────────── Siigo ───────────── */}
+  {id === 'sg-activar' && (
+    <Ventana url="siigonube.siigo.com · Configuración">
+      <div class="gm-dos-col">
+        <ul class="gm-menu">
+          <li>Inicio</li><li>Ventas</li><li>Compras</li>
+          <li class="gm-sel" style="--d:.5s">Configuración</li>
+          <li class="gm-sub gm-sel" style="--d:1.1s">Alianzas e integraciones</li>
+        </ul>
+        <div class="gm-col">
+          <b class="gm-titulo mq-ap" style="--d:1.4s">Credenciales de integración (Siigo API)</b>
+          <span class="gm-fila mq-ap" style="--d:1.7s"><span>Tipo API</span><span class="gm-switch" /></span>
+          <span class="gm-fila gm-fila-clave mq-ap" style="--d:1.9s"><span>Tipo MCP <small>para Claude</small></span><span class="gm-switch gm-prende" style="--d:2.6s" /></span>
+          <span class="mq-sello mq-ap" style="--d:3.2s">Credencial MCP activa</span>
+        </div>
+      </div>
+    </Ventana>
+  )}
+
+  {id === 'sg-agregar' && (
+    <Ventana url="Claude · Customize · Connectors">
+      <Ruta tramos={['Customize', 'Connectors', '+', 'Add custom connector']} />
+      <div class="mq-modal gm-modal mq-ap" style="--d:2s">
+        <b>Add custom connector</b>
+        <span class="gm-et-claro">Name</span>
+        <span class="gm-campo-osc"><span class="mq-tipeo" style="--n:5;--t:.6s;animation-delay:2.4s,0s">Siigo</span></span>
+        <span class="gm-et-claro">Remote MCP server URL</span>
+        <span class="gm-campo-osc"><span class="mq-tipeo" style="--n:33;--t:1.8s;animation-delay:3.1s,0s">https://mcp.siigo.com/mcp-adapter</span></span>
+        <span class="mq-boton mq-pulso" style="--d:5.1s">Add</span>
+      </div>
+    </Ventana>
+  )}
+
+  {id === 'sg-login' && (
+    <Ventana url="siigonube.siigo.com · Autorizar">
+      <div class="gm-centro">
+        <b class="gm-marca-siigo">siigo</b>
+        <span class="mq-campo"><span class="mq-tipeo" style="--n:22;--t:1.2s">contabilidad@ekosolv.co</span></span>
+        <span class="mq-campo mq-clave mq-ap" style="--d:1.6s">••••••••••</span>
+        <span class="mq-boton mq-pulso" style="--d:2s">Ingresar</span>
+        <div class="gm-permiso mq-ap" style="--d:3s">
+          <span class="gm-pareja"><span class="gm-chip-siigo">S</span><span class="gm-enlace" /><Fragment set:html={LOGO} /></span>
+          <b>Claude quiere acceder a su empresa en Siigo</b>
+          <span class="mq-boton mq-pulso" style="--d:3.6s">Autorizar</span>
+        </div>
+      </div>
+    </Ventana>
+  )}
+
+  {id === 'sg-probar' && (
+    <Ventana url="Claude">
+      <div class="mq-chat gm-chat">
+        <span class="mq-burbuja mq-yo"><span class="mq-tipeo" style="--n:44;--t:1.6s">¿Qué facturas de venta se emitieron esta semana?</span></span>
+        <span class="mq-pensar chispa-fila" style={pensar(2, 2.9)} set:html={PENSANDO} />
+        <span class="mq-aprobar mq-ap" style="--d:3s"><span>Claude wants to use a tool from <b>Siigo</b></span><span class="mq-botones"><span class="mq-boton mq-sec">Decline</span><span class="mq-boton mq-pulso" style="--d:3.3s">Allow once</span></span></span>
+        <span class="mq-herramienta mq-ap" style="--d:4.3s"><span class="mq-giro" style="animation-delay:0s,4.9s" />Used Siigo</span>
+        <span class="mq-burbuja mq-ia mq-tabla gm-tabla3 mq-ap" style="--d:5.2s">
+          <span><b>Factura</b><b>Cliente</b><b>Fecha</b></span>
+          <span><i>FV-1042</i><i>Cliente de ejemplo A</i><i>24 nov</i></span>
+          <span><i>FV-1043</i><i>Cliente de ejemplo B</i><i>25 nov</i></span>
+          <span><i>FV-1044</i><i>Cliente de ejemplo C</i><i>26 nov</i></span>
+        </span>
+      </div>
+    </Ventana>
+  )}
+
+  {/* ───────────── Zoho ───────────── */}
+  {id === 'zh-buscar' && (
+    <Ventana url="Claude · Customize · Connectors">
+      <Ruta tramos={['Customize', 'Connectors', 'Browse']} />
+      <span class="mq-campo gm-buscar mq-ap" style="--d:1.2s"><span class="gm-lupa" /><span class="mq-tipeo" style="--n:8;--t:.8s;animation-delay:1.5s,0s">Zoho CRM</span></span>
+      <div class="mq-conector mq-ap" style="--d:2.6s">
+        <span class="mq-logo mq-zoho">Z</span>
+        <div><b>Zoho CRM</b><span class="mq-sub">By Zoho <span class="mq-verif">Verified</span></span></div>
+        <span class="mq-boton mq-pulso" style="--d:3.4s">Connect</span>
+      </div>
+      <div class="gm-gris mq-ap" style="--d:2.9s"><span class="gm-cuadro" /><span class="gm-renglon" /></div>
+    </Ventana>
+  )}
+
+  {/* ───────────── Microsoft 365 ───────────── */}
+  {id === 'of-admin' && (
+    <Ventana url="Claude · Organization settings · Connectors">
+      <Ruta tramos={['Organization settings', 'Connectors']} />
+      <div class="mq-conector mq-ap" style="--d:1s">
+        <span class="gm-logo-ms"><i /><i /><i /><i /></span>
+        <div><b>Microsoft 365</b><span class="mq-sub">SharePoint · OneDrive · Outlook · Teams</span></div>
+        <span class="mq-boton mq-pulso" style="--d:1.6s">Add to your team</span>
+      </div>
+      <div class="gm-ms-consent mq-ap" style="--d:3s">
+        <span class="mq-et">Microsoft Entra · Administrador global</span>
+        <b>Permisos solicitados para toda la organización</b>
+        <span class="mq-sub">Una sola vez. Después cada persona conecta su cuenta.</span>
+        <span class="mq-botones"><span class="mq-boton mq-sec">Cancel</span><span class="mq-boton gm-ms-btn mq-pulso" style="--d:3.6s">Accept</span></span>
+      </div>
+    </Ventana>
+  )}
+
+  {id === 'of-conectar' && (
+    <Ventana url="Claude · Customize · Connectors">
+      <Ruta tramos={['Customize', 'Connectors', 'Microsoft 365']} />
+      <div class="gm-dos-pantallas">
+        <div class="mq-pantalla mq-ap" style="--d:1.3s">
+          <b>¿Qué cuenta va a conectar?</b>
+          <span class="mq-opcion gm-op-claro gm-op-sel" style="--d:2s"><i />Work or school account</span>
+          <span class="mq-opcion gm-op-claro"><i />Personal account</span>
+          <span class="mq-boton mq-pulso" style="--d:2.3s">Continue</span>
+        </div>
+        <div class="mq-pantalla gm-ms-login mq-ap" style="--d:3.1s">
+          <span class="gm-logo-ms gm-ms-chico"><i /><i /><i /><i /></span>
+          <b>Iniciar sesión</b>
+          <span class="mq-campo"><span class="mq-tipeo" style="--n:21;--t:1.2s;animation-delay:3.5s,0s">su.nombre@ekosolv.co</span></span>
+          <span class="mq-boton gm-ms-btn mq-pulso" style="--d:4.9s">Siguiente</span>
+        </div>
+      </div>
+    </Ventana>
+  )}
+
+  {id === 'of-apps' && (
+    <div class="gm-radial">
+      <svg class="gm-lineas" viewBox="0 0 400 240" preserveAspectRatio="none">
+        <path d="M200 120 L70 50" style="--d:.6s" /><path d="M200 120 L330 50" style="--d:.8s" />
+        <path d="M200 120 L70 190" style="--d:1s" /><path d="M200 120 L330 190" style="--d:1.2s" />
+      </svg>
+      <span class="gm-nucleo mq-ap" style="--d:.1s"><Fragment set:html={chispa(true, 'gm-chispa-xl')} /></span>
+      {[
+        ['Outlook', 'Correo y calendario', '#0A64C9', 'gm-a1', '.9s'],
+        ['SharePoint', 'Sitios y documentos', '#038387', 'gm-a2', '1.1s'],
+        ['OneDrive', 'Sus archivos', '#0F78D4', 'gm-a3', '1.3s'],
+        ['Teams', 'Chats y canales', '#5B5FC7', 'gm-a4', '1.5s'],
+      ].map(([n, t, c, cls, d]) => (
+        <span class:list={['gm-app mq-ap', cls]} style={`--d:${d};--c:${c}`}><span class="gm-app-ico">{n![0]}</span><b>{n}</b><small>{t}</small></span>
+      ))}
+      <span class="gm-pie-chips mq-ap" style="--d:2.3s"><span class="gm-chip-ok">Lee con sus permisos</span><span class="gm-chip-ojo">Escribe solo si el admin lo activa</span></span>
+    </div>
+  )}
+
+  {id === 'of-probar' && (
+    <Ventana url="Claude">
+      <div class="mq-chat gm-chat">
+        <span class="mq-burbuja mq-yo mq-ap" style="--d:.1s">Busca en mi Outlook los correos de esta semana sobre el informe de cumplimiento y resume qué falta.</span>
+        <span class="mq-herramienta mq-ap" style="--d:.9s"><span class="mq-giro" style="animation-delay:0s,1.9s" />Buscando en Outlook</span>
+        <span class="mq-herramienta mq-ap" style="--d:2s"><span class="mq-giro" style="animation-delay:0s,3s" />Buscando en SharePoint</span>
+        <span class="mq-pensar chispa-fila" style={pensar(3.1, 4)} set:html={PENSANDO} />
+        <span class="mq-burbuja mq-ia gm-lista mq-ap" style="--d:4.1s">
+          <b>Falta por cerrar</b>
+          <span class="mq-ap" style="--d:4.4s">· Anexo de residuos (lo pidió el cliente el martes)</span>
+          <span class="mq-ap" style="--d:4.7s">· Firma del representante legal</span>
+          <span class="gm-archivo mq-ap" style="--d:5s"><span class="gm-doc" />Informe_cumplimiento.docx · SharePoint</span>
+        </span>
+      </div>
+    </Ventana>
+  )}
+
+  {id === 'of-excel' && (
+    <div class="gm-excel-escena">
+      <span class="gm-toast mq-ap" style="--d:.2s"><span class="gm-logo-ms gm-ms-chico"><i /><i /><i /><i /></span>Claude for Microsoft 365 · Get it now</span>
+      <div class="mq-ventana gm-excel mq-ap" style="--d:.9s">
+        <div class="gm-excel-cinta"><span>Inicio</span><span>Insertar</span><span>Datos</span><span class="gm-cinta-claude gm-sel" style="--d:1.6s"><Fragment set:html={chispa(false)} />Claude</span></div>
+        <div class="gm-excel-cuerpo">
+          <div class="gm-hoja">
+            {Array.from({ length: 6 }, (_, f) => (
+              <span class:list={['gm-hoja-fila', { 'gm-hoja-alerta': f === 2 || f === 4 }]} style={`--d:${4 + f * 0.15}s`}>
+                <i>{f === 0 ? 'Cliente' : `Cliente ${f}`}</i><i>{f === 0 ? 'Fecha' : f === 2 || f === 4 ? '' : `${10 + f} nov`}</i><i>{f === 0 ? 'Estado' : 'Abierto'}</i>
+              </span>
+            ))}
+          </div>
+          <div class="gm-panel mq-ap" style="--d:2s">
+            <b class="gm-panel-t"><Fragment set:html={chispa(false)} />Claude</b>
+            <span class="mq-burbuja mq-yo mq-ap" style="--d:2.4s">Marca las filas sin fecha</span>
+            <span class="mq-pensar chispa-fila" style={pensar(2.9, 3.8)} set:html={PENSANDO} />
+            <span class="mq-burbuja mq-ia mq-ap" style="--d:3.9s">Listo: marqué 2 filas en amarillo.</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  )}
+
+  {/* ───────────── Skills ───────────── */}
+  {id === 'sk-activar' && (
+    <Ventana url="Claude · Settings · Capabilities">
+      <Ruta tramos={['Settings', 'Capabilities']} />
+      <div class="gm-lista-ajustes">
+        <span class="gm-fila mq-ap" style="--d:1s"><span>Memory</span><span class="gm-switch gm-on" /></span>
+        <span class="gm-fila gm-fila-clave mq-ap" style="--d:1.2s"><span>Code execution and file creation<small>Las skills lo necesitan</small></span><span class="gm-switch gm-prende" style="--d:2.2s" /></span>
+        <span class="gm-fila mq-ap" style="--d:1.4s"><span>Web search</span><span class="gm-switch gm-on" /></span>
+      </div>
+      <span class="mq-sello mq-ap" style="--d:2.8s">Listo para usar skills</span>
+    </Ventana>
+  )}
+
+  {id === 'sk-pedir' && (
+    <Ventana url="Claude · Customize · Skills">
+      <div class="gm-dos-col">
+        <div class="gm-col">
+          <Ruta tramos={['Customize', 'Skills']} />
+          <span class="gm-fila gm-fila-clave mq-ap" style="--d:1s"><span>skill-creator<small>Anthropic</small></span><span class="gm-switch gm-prende" style="--d:1.6s" /></span>
+          <span class="gm-fila mq-ap" style="--d:1.2s"><span>docx<small>Anthropic</small></span><span class="gm-switch gm-on" /></span>
+        </div>
+        <div class="mq-chat gm-chat gm-chat-mini">
+          <span class="mq-burbuja mq-yo mq-ap" style="--d:2.3s">Ayúdame a crear una skill para las propuestas comerciales. Pregúntame una cosa a la vez.</span>
+          <span class="mq-pensar chispa-fila" style={pensar(3.2, 4.1)} set:html={PENSANDO} />
+          <span class="mq-burbuja mq-ia mq-ap" style="--d:4.2s"><b>Pregunta 1 de 5.</b> ¿Qué secciones lleva siempre una propuesta de Ekosolv?</span>
+        </div>
+      </div>
+    </Ventana>
+  )}
+
+  {id === 'sk-archivo' && (
+    <div class="mq-ventana gm-editor">
+      <div class="mq-barra"><i /><i /><i /><span class="mq-url">propuesta-ekosolv / SKILL.md</span></div>
+      <div class="gm-editor-cuerpo">
+        <ul class="gm-arbol">
+          <li class="gm-carpeta">propuesta-ekosolv</li>
+          <li class="gm-activo">SKILL.md</li>
+          <li class="mq-ap" style="--d:4.6s">plantilla.docx</li>
+        </ul>
+        <pre class="gm-codigo"><span class="mq-ap" style="--d:.2s">---</span><span class="mq-ap" style="--d:.5s"><b>name:</b> propuesta-ekosolv</span><span class="gm-brilla mq-ap" style="--d:.9s"><b>description:</b> Arma propuestas comerciales de Ekosolv. Úsala cuando pidan una propuesta, cotización u oferta.</span><span class="mq-ap" style="--d:1.4s">---</span><span class="mq-ap" style="--d:2s"># Pasos</span><span class="mq-ap" style="--d:2.4s">1. Pide el cliente, el servicio y el alcance.</span><span class="mq-ap" style="--d:2.8s">2. Usa la plantilla y el trato de usted.</span><span class="mq-ap" style="--d:3.2s"># Nunca</span><span class="mq-ap" style="--d:3.6s">- Inventar precios: déjalos entre corchetes.</span></pre>
+        <span class="gm-nota-flecha mq-ap" style="--d:1.6s">Claude lee esto para decidir cuándo abrirla</span>
+      </div>
+    </div>
+  )}
+
+  {id === 'sk-subir' && (
+    <Ventana url="Claude · Customize · Skills">
+      <Ruta tramos={['Customize', 'Skills', '+', 'Upload a skill']} />
+      <div class="gm-drop mq-ap" style="--d:1.9s">
+        <span class="gm-zip" style="--d:2.4s"><span class="gm-zip-ico">ZIP</span>propuesta-ekosolv.zip</span>
+        <span class="gm-barra-prog" style="--d:3.3s"><i /></span>
+      </div>
+      <span class="gm-fila gm-fila-clave mq-ap" style="--d:4.6s"><span>propuesta-ekosolv<small>Arma propuestas comerciales de Ekosolv…</small></span><span class="gm-switch gm-prende" style="--d:5s" /></span>
+    </Ventana>
+  )}
+
+  {id === 'sk-usar' && (
+    <Ventana url="Claude">
+      <div class="mq-chat gm-chat">
+        <span class="mq-burbuja mq-yo"><span class="mq-tipeo" style="--n:47;--t:1.6s">Arma la propuesta para el cliente de la planta.</span></span>
+        <span class="gm-skill-usada mq-ap" style="--d:2.1s"><span class="gm-skill-ico" />Using skill: propuesta-ekosolv</span>
+        <span class="mq-pensar chispa-fila" style={pensar(2.6, 3.6)} set:html={PENSANDO} />
+        <span class="mq-burbuja mq-ia gm-lista mq-ap" style="--d:3.7s">
+          <b>Propuesta comercial · [Cliente]</b>
+          <span class="mq-ap" style="--d:4s">1. Contexto y necesidad</span>
+          <span class="mq-ap" style="--d:4.3s">2. Alcance del servicio</span>
+          <span class="mq-ap" style="--d:4.6s">3. Inversión: [por definir]</span>
+        </span>
+      </div>
+    </Ventana>
+  )}
+
+  {/* ───────────── Plugins ───────────── */}
+  {id === 'pl-catalogo' && (
+    <Ventana url="Claude · Customize · Plugins">
+      <Ruta tramos={['Customize', 'Plugins', 'Discover']} />
+      <div class="gm-catalogo">
+        {[
+          ['Finanzas', '#2E8B57'], ['Ventas', '#C96442'], ['Mercadeo', '#7A5AF8'],
+          ['Operaciones', '#124E7D'], ['Legal', '#6B7580'], ['Productividad', '#179C91'],
+        ].map(([n, c], i) => (
+          <span class:list={['gm-plugin mq-ap', { 'gm-plugin-sel': i === 0 }]} style={`--d:${1.3 + i * 0.15}s;--c:${c}`}>
+            <span class="gm-plugin-ico" /><b>{n}</b><small>Anthropic</small>
+          </span>
+        ))}
+      </div>
+    </Ventana>
+  )}
+
+  {id === 'pl-instalar' && (
+    <Ventana url="Claude · Plugins · Finanzas">
+      <div class="gm-plugin-det">
+        <span class="gm-plugin-ico gm-ico-xl mq-ap" style="--d:.1s;--c:#2E8B57" />
+        <div><b class="gm-titulo">Finanzas</b><span class="mq-sub">Anthropic · Plugin</span></div>
+        <span class="mq-boton mq-pulso" style="--d:3s">Install</span>
+      </div>
+      <div class="gm-trae">
+        <span class="mq-ap" style="--d:.7s"><em>Skills</em><b>Conciliación · Cierre de mes · Reportes</b></span>
+        <span class="mq-ap" style="--d:1.2s"><em>Comandos</em><b><code>/conciliar</code> <code>/cierre</code></b></span>
+        <span class="mq-ap" style="--d:1.7s"><em>Conectores</em><b>Hoja de cálculo · Correo</b></span>
+      </div>
+      <span class="mq-aviso mq-ap" style="--d:4s">Plugin instalado</span>
+    </Ventana>
+  )}
+
+  {id === 'pl-conectores' && (
+    <Ventana url="Claude · Plugins · Finanzas · Connectors">
+      <span class="gm-pestanas"><i>Overview</i><i class="gm-sel" style="--d:.4s">Connectors</i><i>Skills</i></span>
+      {['Correo', 'Hoja de cálculo'].map((c, k) => (
+        <span class="gm-fila mq-ap" style={`--d:${0.8 + k * 0.3}s`}>
+          <span>{c}</span>
+          <span class="gm-estado-cambia" style={`--d:${2 + k * 1.3}s`}><i class="antes">Not connected</i><i class="despues">Connected</i></span>
+          <span class="mq-boton mq-sec mq-pulso" style={`--d:${1.4 + k * 1.3}s`}>Connect</span>
+        </span>
+      ))}
+      <span class="gm-nota-flecha mq-ap" style="--d:4.4s">Instalar no conecta: cada uno se conecta con su usuario</span>
+    </Ventana>
+  )}
+
+  {id === 'pl-usar' && (
+    <Ventana url="Claude">
+      <div class="mq-chat gm-chat">
+        <div class="gm-comandos mq-ap" style="--d:.9s">
+          <span class="gm-cmd gm-sel" style="--d:1.8s"><code>/conciliar</code><small>Cruza el extracto con los registros</small></span>
+          <span class="gm-cmd"><code>/cierre</code><small>Lista de cierre de mes</small></span>
+          <span class="gm-cmd"><code>/reporte</code><small>Resumen para gerencia</small></span>
+        </div>
+        <span class="mq-entrada gm-entrada"><span class="mq-tipeo" style="--n:10;--t:.5s;animation-delay:.4s,0s">/conciliar</span></span>
+        <span class="mq-burbuja mq-ia mq-ap" style="--d:2.8s">Adjunte el extracto del banco y el mes que quiere conciliar.</span>
+      </div>
+    </Ventana>
+  )}
+
+  {id === 'pl-ajustar' && (
+    <Ventana url="Claude · Plugins · Finanzas">
+      <div class="gm-plugin-det">
+        <span class="gm-plugin-ico" style="--c:#2E8B57" />
+        <div><b class="gm-titulo">Finanzas</b><span class="mq-sub">Instalado</span></div>
+        <span class="gm-menu-pop mq-ap" style="--d:.4s"><i>Disable</i><i class="gm-sel" style="--d:.9s">Customize</i><i>Uninstall</i></span>
+      </div>
+      <div class="mq-chat gm-chat gm-chat-mini">
+        <span class="mq-burbuja mq-yo mq-ap" style="--d:1.5s">Ajústalo a Ekosolv: trato de usted, mi skill de propuestas y sin el conector de correo.</span>
+        <span class="mq-pensar chispa-fila" style={pensar(2.4, 3.3)} set:html={PENSANDO} />
+        <span class="gm-cambios">
+          <span class="gm-mas mq-ap" style="--d:3.4s">+ skill propuesta-ekosolv</span>
+          <span class="gm-mas mq-ap" style="--d:3.7s">+ tono: trato de usted</span>
+          <span class="gm-menos mq-ap" style="--d:4s">− conector Correo</span>
+        </span>
+      </div>
+    </Ventana>
+  )}
+
+  {/* ───────────── Rutinas ───────────── */}
+  {id === 'ru-abrir' && (
+    <div class="mq-ventana mq-app gm-app-ventana">
+      <div class="mq-barra"><i /><i /><i /><span class="mq-url">Claude · Cowork</span></div>
+      <div class="mq-cuerpo mq-app-cuerpo">
+        <ul class="gm-menu gm-menu-app">
+          <li>New task</li><li>Projects</li>
+          <li class="gm-sel" style="--d:.8s"><span class="gm-reloj" />Scheduled</li>
+          <li>Customize</li>
+        </ul>
+        <div class="mq-chat">
+          <span class="gm-o mq-ap" style="--d:1.6s">o, dentro de una tarea:</span>
+          <span class="mq-entrada gm-entrada"><span class="mq-tipeo" style="--n:9;--t:.6s;animation-delay:2s,0s">/schedule</span></span>
+          <span class="mq-burbuja mq-ia mq-ap" style="--d:3s">¿Qué quiere que haga y cada cuánto?</span>
+        </div>
+      </div>
+    </div>
+  )}
+
+  {id === 'ru-nueva' && (
+    <Ventana url="Claude · Cowork · Scheduled">
+      <div class="gm-cabeza"><b class="gm-titulo">Scheduled</b><span class="mq-boton mq-pulso" style="--d:.6s">New task</span></div>
+      <div class="gm-opciones2">
+        <span class="gm-opcion-card gm-opcion-sel mq-ap" style="--d:1.5s"><Fragment set:html={chispa(true)} /><b>Create with Claude</b><small>La arma conversando con usted</small></span>
+        <span class="gm-opcion-card mq-ap" style="--d:1.8s"><span class="gm-lapiz" /><b>Set up manually</b><small>Usted llena los campos</small></span>
+      </div>
+    </Ventana>
+  )}
+
+  {id === 'ru-instruccion' && (
+    <Ventana url="Claude · Scheduled · New task">
+      <span class="gm-et-form">Name</span>
+      <span class="mq-campo gm-campo-ancho"><span class="mq-tipeo" style="--n:25;--t:1s">Seguimiento de propuestas</span></span>
+      <span class="gm-et-form mq-ap" style="--d:1.4s">Prompt</span>
+      <span class="gm-area mq-ap" style="--d:1.5s">
+        <span class="gm-linea" style="--d:1.8s"><b class="gm-parte" style="--c:#124E7D">Qué</b>Revisa las propuestas sin respuesta hace más de 7 días</span>
+        <span class="gm-linea" style="--d:2.8s"><b class="gm-parte" style="--c:#179C91">Dónde</b>en Zoho CRM, etapa "Propuesta enviada".</span>
+        <span class="gm-linea" style="--d:3.8s"><b class="gm-parte" style="--c:#B8926F">Entrega</b>Un borrador de correo de seguimiento por cada una.</span>
+        <span class="gm-linea" style="--d:4.8s"><b class="gm-parte" style="--c:#C96442">Límite</b>No envíes nada. Si no hay, dímelo en una línea.</span>
+      </span>
+    </Ventana>
+  )}
+
+  {id === 'ru-horario' && (
+    <Ventana url="Claude · Scheduled · New task">
+      <span class="gm-et-form">Frequency</span>
+      <span class="gm-segmentos mq-ap" style="--d:.2s"><i>Hourly</i><i>Daily</i><i class="gm-seg-sel" style="--d:.9s">Weekdays</i><i>Manual</i></span>
+      <div class="gm-semana">
+        {['L', 'M', 'M', 'J', 'V', 'S', 'D'].map((d, i) => (
+          <span class:list={['gm-dia', { 'gm-dia-on': i < 5 }]} style={`--d:${1.3 + i * 0.12}s`}>{d}</span>
+        ))}
+      </div>
+      <div class="gm-dos-campos">
+        <span class="mq-ap" style="--d:2.2s"><span class="gm-et-form">Time</span><span class="mq-campo">7:00 a. m.</span></span>
+        <span class="mq-ap" style="--d:2.5s"><span class="gm-et-form">Model</span><span class="mq-campo gm-modelo"><span class="gm-cambia-texto" style="--d:3.1s"><i class="antes">Sonnet</i><i class="despues">Haiku</i></span></span></span>
+      </div>
+      <span class="mq-boton mq-pulso gm-der" style="--d:3.8s">Save</span>
+    </Ventana>
+  )}
+
+  {id === 'ru-corre' && (
+    <div class="gm-corre">
+      <div class="gm-nube mq-ap" style="--d:.1s">
+        <span class="gm-nube-forma"><Fragment set:html={chispa(true, 'gm-chispa-md')} /></span>
+        <b>Corre en la nube</b>
+        <span class="gm-pc-off mq-ap" style="--d:.6s"><span class="gm-pc" />PC apagado: igual corre</span>
+      </div>
+      <ol class="gm-corridas">
+        <li class="mq-ap" style="--d:1s"><b>Lun 7:00</b><span class="gm-ok">✓</span>4 borradores listos</li>
+        <li class="mq-ap" style="--d:1.6s"><b>Mar 7:00</b><span class="gm-ok">✓</span>2 borradores listos</li>
+        <li class="mq-ap" style="--d:2.2s"><b>Mié 7:00</b><span class="gm-ok">✓</span>Nada pendiente hoy</li>
+        <li class="gm-corriendo mq-ap" style="--d:2.8s"><b>Jue 7:00</b><span class="mq-giro" style="animation-delay:0s,99s" />Corriendo…</li>
+      </ol>
+      <span class="mq-boton mq-sec mq-pulso gm-der" style="--d:3.6s">Run now</span>
+    </div>
+  )}
+
+  {/* ───────────── Instalar ───────────── */}
+  {(id === 'win-descargar' || id === 'mac-descargar') && (
+    <Ventana url="claude.com/download">
+      <b class="gm-titulo gm-centro-t mq-ap" style="--d:.1s">Download Claude</b>
+      <div class="gm-opciones2">
+        <span class:list={['gm-opcion-card mq-ap', { 'gm-opcion-sel': id === 'mac-descargar' }]} style="--d:.4s"><span class="gm-os gm-os-mac" /><b>macOS</b><small>macOS 13 o superior</small>{id === 'mac-descargar' && <span class="mq-boton mq-pulso" style="--d:1.2s">Download for macOS</span>}</span>
+        <span class:list={['gm-opcion-card mq-ap', { 'gm-opcion-sel': id === 'win-descargar' }]} style="--d:.6s"><span class="gm-os gm-os-win"><i /><i /><i /><i /></span><b>Windows</b><small>Windows 10 o superior</small>{id === 'win-descargar' && <span class="mq-boton mq-pulso" style="--d:1.2s">Download for Windows</span>}</span>
+      </div>
+      <span class="gm-descarga mq-ap" style="--d:2.4s"><span class="gm-doc" />{id === 'mac-descargar' ? 'Claude.dmg' : 'Claude Setup.exe'}<span class="gm-barra-prog" style="--d:2.6s"><i /></span></span>
+    </Ventana>
+  )}
+
+  {id === 'win-instalar' && (
+    <div class="gm-win-escena">
+      <div class="gm-uac mq-ap" style="--d:.2s">
+        <span class="gm-uac-cab">Control de cuentas de usuario</span>
+        <div class="gm-uac-cuerpo">
+          <b>¿Quiere permitir que esta aplicación haga cambios en el dispositivo?</b>
+          <span class="gm-uac-app"><Fragment set:html={LOGO} />Claude · Anthropic, PBC</span>
+          <span class="mq-botones"><span class="mq-boton gm-win-btn mq-pulso" style="--d:1.2s">Sí</span><span class="mq-boton mq-sec">No</span></span>
+        </div>
+      </div>
+      <div class="gm-instalando mq-ap" style="--d:2.4s">
+        <span>Instalando Claude con Cowork</span>
+        <span class="gm-barra-prog gm-prog-lenta" style="--d:2.6s"><i /></span>
+        <span class="mq-sello mq-ap" style="--d:5s">Instalado</span>
+      </div>
+    </div>
+  )}
+
+  {id === 'win-entrar' && (
+    <div class="gm-win-escena">
+      <div class="gm-inicio mq-ap" style="--d:.1s">
+        <span class="mq-campo gm-buscar"><span class="gm-lupa" /><span class="mq-tipeo" style="--n:6;--t:.5s;animation-delay:.4s,0s">Claude</span></span>
+        <span class="gm-resultado mq-ap" style="--d:1.1s"><Fragment set:html={LOGO} /><b>Claude</b><small>Aplicación</small></span>
+      </div>
+      <div class="mq-ventana gm-login mq-ap" style="--d:2.2s">
+        <div class="mq-cuerpo mq-centro">
+          <Fragment set:html={chispa(false, 'gm-chispa-md')} />
+          <span class="mq-campo"><span class="mq-tipeo" style="--n:20;--t:1.1s;animation-delay:2.6s,0s">su.nombre@ekosolv.co</span></span>
+          <span class="mq-boton mq-pulso" style="--d:3.9s">Continue</span>
+          <span class="mq-sello mq-ap" style="--d:4.6s">Espacio: Ekosolv · Team</span>
+        </div>
+      </div>
+    </div>
+  )}
+
+  {id === 'mac-arrastrar' && (
+    <div class="mq-ventana gm-dmg">
+      <div class="mq-barra"><i /><i /><i /><span class="mq-url">Claude</span></div>
+      <div class="gm-dmg-cuerpo">
+        <span class="gm-dmg-app"><span class="gm-icono-app"><Fragment set:html={chispa(false)} /></span>Claude</span>
+        <span class="gm-dmg-flecha" />
+        <span class="gm-dmg-carpeta"><span class="gm-icono-carpeta" />Aplicaciones</span>
+        <span class="gm-icono-app gm-arrastre"><Fragment set:html={chispa(false)} /></span>
+      </div>
+      <span class="gm-nota-centro mq-ap" style="--d:3.4s">Copiando a Aplicaciones…</span>
+    </div>
+  )}
+
+  {id === 'mac-entrar' && (
+    <div class="gm-mac-escena">
+      <span class="gm-spotlight mq-ap" style="--d:.1s"><span class="gm-lupa" /><span class="mq-tipeo" style="--n:6;--t:.5s;animation-delay:.4s,0s">Claude</span></span>
+      <div class="gm-mac-alerta mq-ap" style="--d:1.4s">
+        <span class="gm-icono-app"><Fragment set:html={chispa(false)} /></span>
+        <b>"Claude" se descargó de internet. ¿Seguro que quiere abrirla?</b>
+        <span class="mq-botones"><span class="mq-boton mq-sec">Cancelar</span><span class="mq-boton gm-mac-btn mq-pulso" style="--d:2s">Abrir</span></span>
+      </div>
+      <span class="mq-sello mq-ap" style="--d:3.4s">Sesión iniciada · Ekosolv · Team</span>
+    </div>
+  )}
+
+  {/* ───────────── Créditos ───────────── */}
+  {id === 'cr-dos' && (
+    <div class="gm-cr-dos">
+      <div class="gm-cuenta-card mq-ap" style="--d:.2s;--c:#C96442">
+        <span class="mq-et">claude.ai y Claude Desktop</span>
+        <b>Suscripción del equipo</b>
+        <span class="gm-personas"><i /><i /><i /><i /></span>
+        <small>Se paga por persona, cada mes</small>
+        <span class="gm-quien">La usan: las personas</span>
+      </div>
+      <span class="gm-muro mq-ap" style="--d:1.2s"><span>No se mezclan</span></span>
+      <div class="gm-cuenta-card mq-ap" style="--d:.6s;--c:#2E8B57">
+        <span class="mq-et">platform.claude.com</span>
+        <b>Créditos de la API</b>
+        <span class="gm-llave"><span class="gm-llave-ico" /><code>sk-ant-•••</code></span>
+        <small>Saldo prepago, se gasta por uso</small>
+        <span class="gm-quien">La usan: los programas (el asistente del panel)</span>
+      </div>
+    </div>
+  )}
+
+  {id === 'cr-comprar' && (
+    <Ventana url="platform.claude.com · Billing">
+      <Ruta tramos={['Settings', 'Billing']} />
+      <div class="gm-saldo mq-ap" style="--d:.9s">
+        <span class="mq-et">Credit balance</span>
+        <b class="gm-cifra"><span class="gm-cifra-cambia" style="--d:2.8s"><i class="antes">US$ 0.00</i><i class="despues">US$ 50.00</i></span></b>
+        <span class="mq-boton mq-pulso" style="--d:1.5s">Buy credits</span>
+      </div>
+      <span class="mq-aviso mq-ap" style="--d:3.2s">Créditos disponibles de inmediato</span>
+      <span class="gm-nota-chica-d mq-ap" style="--d:3.5s">Valores de ejemplo</span>
+    </Ventana>
+  )}
+
+  {id === 'cr-gasto' && (
+    <div class="gm-gasto">
+      <div class="gm-flujo">
+        <span class="gm-origen mq-ap" style="--d:.1s"><span class="gm-doc" />Asistente del panel</span>
+        <span class="gm-tubo"><i style="--k:0" /><i style="--k:1" /><i style="--k:2" /></span>
+        <span class="gm-nucleo gm-nucleo-chico mq-ap" style="--d:.3s"><Fragment set:html={chispa(true, 'gm-chispa-md')} /></span>
+        <span class="gm-tubo gm-tubo-vuelta"><i style="--k:0" /><i style="--k:1" /><i style="--k:2" /></span>
+        <span class="gm-medidor mq-ap" style="--d:.5s"><span class="mq-et">Saldo</span><span class="gm-medidor-barra"><i /></span></span>
+      </div>
+      <div class="gm-modelos">
+        <span class="mq-et mq-ap" style="--d:1.6s">Cuánto gasta cada modelo por la misma pregunta</span>
+        {[['Opus', 100, '#7A3E2B'], ['Sonnet', 60, '#C96442'], ['Haiku', 20, '#E8A88C']].map(([n, w, c], i) => (
+          <span class="gm-modelo-fila mq-ap" style={`--d:${1.9 + i * 0.3}s`}><b>{n}</b><span class="gm-barra-modelo" style={`--w:${w}%;--c:${c};--d:${2.1 + i * 0.3}s`} /></span>
+        ))}
+      </div>
+    </div>
+  )}
+
+  {id === 'cr-recarga' && (
+    <div class="gm-grafica">
+      <svg viewBox="0 0 400 200" class="gm-svg-recarga">
+        <line x1="20" y1="150" x2="390" y2="150" class="gm-umbral" />
+        <line x1="20" y1="40" x2="390" y2="40" class="gm-objetivo" />
+        <path class="gm-trazo" d="M20 50 L110 110 L150 150 L152 40 L250 100 L290 150 L292 40 L380 90" />
+        <circle cx="152" cy="40" r="6" class="gm-punto" style="--d:2.2s" />
+        <circle cx="292" cy="40" r="6" class="gm-punto" style="--d:3.6s" />
+      </svg>
+      <span class="gm-et-graf gm-et-umbral mq-ap" style="--d:.4s">Mínimo: cuando baja de aquí, recarga</span>
+      <span class="gm-et-graf gm-et-objetivo mq-ap" style="--d:.6s">Vuelve a este saldo</span>
+      <span class="mq-aviso gm-aviso-graf mq-ap" style="--d:2.4s">Recarga automática</span>
+    </div>
+  )}
+
+  {id === 'cr-cero' && (
+    <div class="gm-cero">
+      <span class="gm-medidor gm-medidor-grande mq-ap" style="--d:.1s"><span class="mq-et">Saldo</span><span class="gm-medidor-barra gm-vacia"><i /></span><b class="gm-cifra-cambia" style="--d:1.6s"><i class="antes">Bajo</i><i class="despues">US$ 0.00</i></b></span>
+      <div class="gm-servicio mq-ap" style="--d:.3s">
+        <b>Asistente del panel</b>
+        <span class="gm-estado-cambia gm-estado-mal" style="--d:1.9s"><i class="antes">Funcionando</i><i class="despues">Sin servicio</i></span>
+      </div>
+      <span class="mq-boton mq-pulso" style="--d:2.8s">Buy credits</span>
+      <span class="gm-vence mq-ap" style="--d:3.4s"><span class="gm-cal"><b>12</b>meses</span>Los créditos vencen un año después de comprados</span>
+    </div>
+  )}
+</div>
