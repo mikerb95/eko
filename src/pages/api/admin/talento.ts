@@ -12,6 +12,9 @@ import {
   eliminarCurso,
   eliminarDocumento,
   eliminarEmpleadoSinCuenta,
+  eliminarHistorial,
+  marcarPago,
+  marcarPaso,
   eliminarEvaluacion,
   eliminarFormacion,
   eliminarNovedad,
@@ -47,7 +50,10 @@ export const GET: APIRoute = async ({ locals }) => {
 type Accion = (b: any, quien: string, yo: string) => Promise<unknown>
 
 const ACCIONES: Record<string, Accion> = {
-  guardar_ficha: (b) => guardarFicha(b),
+  guardar_ficha: (b, quien, yo) => guardarFicha(b, quien, yo),
+  eliminar_historial: (b) => eliminarHistorial(b.id),
+  marcar_paso: (b) => marcarPaso(b),
+  marcar_pago: (b) => marcarPago(b),
   eliminar_empleado: (b) => eliminarEmpleadoSinCuenta(b.usuario_id),
   dar_acceso: (b) => darAcceso(b),
   cambiar_acceso: (b, _q, yo) => cambiarAcceso(b, yo),

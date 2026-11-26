@@ -160,8 +160,12 @@ export async function verifyLogin(username: string, password: string): Promise<U
 
   await seedAdminIfEmpty()
   const res = await client().execute({
-    sql: 'SELECT * FROM users WHERE username = ? AND active = 1 LIMIT 1',
-    args: [String(username || '').trim().toLowerCase()],
+    // Quien ya llegó a su fecha de retiro (Talento humano) no entra, aunque la
+    // cuenta siga activa porque nadie ha abierto el panel desde ese día.
+    sql: `SELECT * FROM users WHERE username = ? AND active = 1
+          AND NOT EXISTS (SELECT 1 FROM th_empleados e WHERE e.usuario_id = users.id AND e.fecha_retiro <> '' AND e.fecha_retiro <= ?)
+          LIMIT 1`,
+    args: [String(username || '').trim().toLowerCase(), new Date(Date.now() - 5 * 3600e3).toISOString().slice(0, 10)],
   })
   if (!res.rows.length) return null
   const r: any = res.rows[0]
