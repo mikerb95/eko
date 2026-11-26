@@ -9,7 +9,7 @@ body.crm {
   --bg: #f4f6f5;
   --side: #fbfcfb;
   --hover: color-mix(in oklab, var(--deep) 6%, transparent);
-  --shadow-1: 0 1px 2px rgba(16, 40, 36, 0.05);
+  --shadow-1: 0 1px 2px rgba(16, 40, 36, 0.07);
   --shadow-2: 0 1px 2px rgba(16, 40, 36, 0.04), 0 8px 24px rgba(16, 40, 36, 0.06);
   --side-w: 248px;
   background: var(--bg);
@@ -52,7 +52,7 @@ body.crm {
 .side .tab.is-active .ico { color: var(--deep); }
 .side .tab .count {
   font: 500 11px/1 var(--mono); padding: 4px 7px; border-radius: 999px;
-  background: transparent; color: var(--mute);
+  background: color-mix(in oklab, var(--ink) 6%, transparent); color: var(--ink-2);
 }
 .side .tab .count.is-alert { background: var(--clay); color: #fff; font-weight: 600; }
 .side .tab.is-active .count:not(.is-alert) { color: var(--deep-2); }
@@ -100,7 +100,10 @@ body.crm {
 }
 .side-velo { display: none; }
 
-.crm-main { max-width: 1240px; padding: 28px 28px 64px; margin: 0; }
+/* Contenido centrado; la barra de arriba usa el mismo ancho para que la miga
+   de pan y la fecha queden alineadas con los bordes de las tarjetas. */
+.crm-main { width: 100%; max-width: 1320px; padding: 28px 28px 64px; margin: 0 auto; }
+.crm-top { padding-inline: max(28px, calc((100% - 1320px) / 2 + 28px)); }
 
 /* ---------- Encabezado de cada sección ---------- */
 .crm .panel-head { align-items: flex-end; gap: 16px; margin-bottom: 18px; }
@@ -252,7 +255,21 @@ body.crm {
 .kpi.is-alerta { background: color-mix(in oklab, var(--clay) 6%, var(--paper)); border-color: color-mix(in oklab, var(--clay) 30%, var(--line)); }
 
 .dash-grid { display: grid; grid-template-columns: minmax(0, 1.1fr) minmax(0, 1fr); gap: 14px; margin-bottom: 14px; }
-.dash-card { background: var(--paper); border: 1px solid var(--line); border-radius: 14px; padding: 18px 20px; box-shadow: var(--shadow-1); min-width: 0; }
+.dash-card { background: var(--paper); border: 1px solid var(--line); border-radius: 14px; padding: 18px 20px; box-shadow: var(--shadow-1); min-width: 0; display: flex; flex-direction: column; }
+.dash-card > div:last-child { flex: 1; display: flex; flex-direction: column; }
+/* Vacío dentro de una tarjeta: sin caja punteada flotando; llena el espacio
+   que deja la tarjeta vecina, centrado y con un ícono que lo ancla. */
+.dash-card .vacio {
+  flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center;
+  border: 0; background: color-mix(in oklab, var(--deep) 4%, var(--paper)); border-radius: 12px;
+  padding: 28px 20px; font-size: 13px; color: var(--mute);
+}
+.dash-card .vacio::before {
+  content: ""; width: 34px; height: 34px; margin-bottom: 10px; border-radius: 50%;
+  background: color-mix(in oklab, var(--forest) 16%, transparent) center / 18px no-repeat
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%232f7a42' stroke-width='2.4' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M5 12.5l4.5 4.5L19 7.5'/%3E%3C/svg%3E");
+}
+.dash-card .vacio b { color: var(--ink); }
 .dash-head { display: flex; align-items: flex-start; justify-content: space-between; gap: 12px; margin-bottom: 14px; }
 .dash-head h3 { margin: 0; font-size: 15px; font-weight: 600; }
 .dash-head p { margin: 3px 0 0; font-size: 12.5px; color: var(--mute); }
@@ -265,9 +282,9 @@ body.crm {
 }
 .embudo-fila:hover { background: var(--hover); }
 .embudo-fila span { font-size: 13px; color: var(--ink-2); }
-.embudo-barra { height: 8px; border-radius: 99px; background: color-mix(in oklab, var(--ink) 5%, transparent); overflow: hidden; }
+.embudo-barra { height: 8px; border-radius: 99px; background: color-mix(in oklab, var(--ink) 9%, transparent); overflow: hidden; }
 .embudo-barra i { display: block; height: 100%; border-radius: 99px; background: var(--c); min-width: 0; transition: width 0.5s cubic-bezier(.2,.7,.2,1); }
-.embudo-fila b { font: 500 12.5px/1 var(--mono); text-align: right; }
+.embudo-fila b { font: 600 12.5px/1 var(--mono); text-align: right; color: var(--ink); }
 
 .feed { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; }
 .feed li + li { border-top: 1px solid color-mix(in oklab, var(--line) 70%, transparent); }
