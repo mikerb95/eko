@@ -70,6 +70,8 @@ body {
   font: 500 12px var(--font); color: var(--deep-2); background: none; border: 0; cursor: pointer; padding: 6px 8px; border-radius: 6px;
 }
 .login-clave button:hover { background: color-mix(in oklab, var(--deep) 8%, transparent); }
+.login-github { margin-top: 22px; padding-top: 18px; border-top: 1px solid var(--line); display: inline-flex; align-items: center; gap: 8px; font-size: 12.5px; color: var(--mute); text-decoration: none; }
+.login-github:hover { color: var(--ink-2); }
 @media (max-width: 760px) {
   .login-card { grid-template-columns: 1fr; max-width: 420px; }
   .login-lado { padding: 24px 26px; gap: 8px; }
