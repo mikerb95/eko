@@ -486,6 +486,22 @@ export const TABLAS: readonly string[] = [
 
   `CREATE INDEX IF NOT EXISTS th_evaluaciones_usuario ON th_evaluaciones (usuario_id, fecha)`,
 
+  // Trayectoria: cada cambio de cargo, área, contrato o salario, con la fecha
+  // desde la que rige. antes/despues son el texto ya legible (nombre del
+  // cargo, etiqueta del contrato, salario en pesos). Solo admin lo ve.
+  `CREATE TABLE IF NOT EXISTS th_historial (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    usuario_id INTEGER NOT NULL,
+    fecha TEXT NOT NULL,
+    campo TEXT NOT NULL,
+    antes TEXT NOT NULL DEFAULT '',
+    despues TEXT NOT NULL DEFAULT '',
+    registrado_por TEXT NOT NULL DEFAULT '',
+    created_at TEXT NOT NULL
+  )`,
+
+  `CREATE INDEX IF NOT EXISTS th_historial_usuario ON th_historial (usuario_id, fecha)`,
+
   // ── Academia de IA (/academia, /admin/academia; docs/plan-academia.md) ──
   // Quién estudia y en qué área. La ruta de cada persona es la capacitación
   // general más el taller de su área (src/lib/capacitacion.ts).
@@ -944,6 +960,9 @@ export const COLUMNAS: readonly (readonly [tabla: string, columna: string])[] = 
   // Nombre del empleado sin cuenta del panel (usuario_id negativo). Con cuenta
   // queda vacío: el nombre sale de users.
   ['th_empleados', 'nombre'],
+  // Pasos de ingreso y de retiro ya hechos: JSON { idDelPaso: 'AAAA-MM-DD' }.
+  ['th_empleados', 'pasos_ingreso'],
+  ['th_empleados', 'pasos_retiro'],
 ]
 
 /** Tablas que deben existir al terminar. Sirve para verificar tras migrar. */
@@ -1000,6 +1019,7 @@ export const TABLAS_ESPERADAS: readonly string[] = [
   'th_empleados',
   'th_evaluaciones',
   'th_formaciones',
+  'th_historial',
   'th_novedades',
   'users',
   'zoho_outbox',
