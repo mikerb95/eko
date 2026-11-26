@@ -130,6 +130,9 @@ export interface Empleado {
   fecha_nacimiento: string
   vacaciones_ajuste: number
   cargo_id: number | null
+  /** Pasos de ingreso y de retiro ya hechos: { idDelPaso: 'AAAA-MM-DD' }. */
+  pasos_ingreso?: Record<string, string>
+  pasos_retiro?: Record<string, string>
 }
 
 export interface Novedad {
@@ -171,9 +174,79 @@ export interface AjustesTalento {
   sabadoHabil: boolean
   /** Cada cuántos meses se evalúa a cada persona. */
   evaluacionMeses: number
+  /** Quién firma los certificados laborales. */
+  firmaNombre: string
+  firmaCargo: string
+  /** Claves de los pagos legales ya marcados como hechos (ver pagosLegales). */
+  pagosHechos: string[]
 }
 
-export const AJUSTES_BASE: AjustesTalento = { sabadoHabil: false, evaluacionMeses: 12 }
+export const AJUSTES_BASE: AjustesTalento = { sabadoHabil: false, evaluacionMeses: 12, firmaNombre: '', firmaCargo: '', pagosHechos: [] }
+
+// ---------- Ingreso y retiro ----------
+
+export interface Paso extends Opcion {
+  ayuda: string
+}
+
+/** Lo que hay que tener listo cuando entra alguien. */
+export const PASOS_INGRESO: readonly Paso[] = [
+  { id: 'contrato', etiqueta: 'Contrato firmado', ayuda: 'Guarde el enlace en Documentos.' },
+  { id: 'arl', etiqueta: 'Afiliación a la ARL', ayuda: 'A más tardar el día antes de empezar a trabajar.' },
+  { id: 'eps', etiqueta: 'Afiliación a la EPS', ayuda: '' },
+  { id: 'pension', etiqueta: 'Afiliación a pensión', ayuda: '' },
+  { id: 'caja', etiqueta: 'Afiliación a la caja de compensación', ayuda: '' },
+  { id: 'cesantias', etiqueta: 'Fondo de cesantías elegido', ayuda: '' },
+  { id: 'examen', etiqueta: 'Examen médico de ingreso', ayuda: 'Solo el certificado de aptitud, nunca la historia clínica.' },
+  { id: 'induccion', etiqueta: 'Inducción y SST', ayuda: '' },
+]
+
+/** Lo que hay que cerrar cuando alguien se va. */
+export const PASOS_RETIRO: readonly Paso[] = [
+  { id: 'carta', etiqueta: 'Carta de renuncia o de terminación', ayuda: '' },
+  { id: 'examen', etiqueta: 'Orden del examen médico de egreso', ayuda: 'La persona tiene 5 días hábiles para presentarse.' },
+  { id: 'liquidacion', etiqueta: 'Liquidación pagada', ayuda: 'Salario, prestaciones y vacaciones pendientes, el día del retiro.' },
+  { id: 'afiliaciones', etiqueta: 'Retiro de afiliaciones en la PILA', ayuda: '' },
+  { id: 'paz_salvo', etiqueta: 'Paz y salvo y devolución de equipos', ayuda: '' },
+  { id: 'certificado', etiqueta: 'Certificado laboral entregado', ayuda: 'Se genera en la pestaña Trayectoria.' },
+]
+
+/** Días hacia atrás en que un ingreso o un retiro todavía pide cerrar sus pasos. */
+export const DIAS_PASOS = 60
+
+export const pasosPendientes = (lista: readonly Paso[], hechos: Record<string, string> | undefined) =>
+  lista.filter((p) => !hechos?.[p.id])
+
+// ---------- Pagos que pone la ley ----------
+
+export interface PagoLegal {
+  clave: string
+  titulo: string
+  detalle: string
+  fecha: string
+}
+
+/**
+ * Fechas límite de los pagos a los trabajadores en Colombia, de un año:
+ * prima (CST art. 306), intereses y consignación de cesantías (Ley 52 de
+ * 1975 y Ley 50 de 1990, art. 99) y dotación (CST arts. 230 a 232).
+ */
+export function pagosLegales(anio: number): PagoLegal[] {
+  const f = (m: number, d: number) => `${anio}-${String(m).padStart(2, '0')}-${String(d).padStart(2, '0')}`
+  const dotacion = 'A quienes ganan hasta dos salarios mínimos y llevan más de tres meses.'
+  return [
+    { clave: `intereses-${anio}`, titulo: 'Intereses de cesantías', detalle: 'Se pagan directamente a cada trabajador: 12 % anual sobre las cesantías del año anterior.', fecha: f(1, 31) },
+    { clave: `cesantias-${anio}`, titulo: 'Consignación de cesantías', detalle: 'Las cesantías del año anterior se consignan en el fondo de cada trabajador.', fecha: f(2, 14) },
+    { clave: `dotacion1-${anio}`, titulo: 'Primera entrega de dotación', detalle: dotacion, fecha: f(4, 30) },
+    { clave: `prima1-${anio}`, titulo: 'Prima de servicios (primer semestre)', detalle: 'Medio salario por el semestre trabajado (proporcional si entró después).', fecha: f(6, 30) },
+    { clave: `dotacion2-${anio}`, titulo: 'Segunda entrega de dotación', detalle: dotacion, fecha: f(8, 31) },
+    { clave: `prima2-${anio}`, titulo: 'Prima de servicios (segundo semestre)', detalle: 'Medio salario por el semestre trabajado (proporcional si entró después).', fecha: f(12, 20) },
+    { clave: `dotacion3-${anio}`, titulo: 'Tercera entrega de dotación', detalle: dotacion, fecha: f(12, 20) },
+  ]
+}
+
+/** Un pago vencido sin marcar como hecho se sigue mostrando este número de días. */
+export const DIAS_PAGO_VENCIDO = 30
 
 // ---------- Fechas ----------
 
@@ -346,7 +419,8 @@ export interface Aviso {
   /** Clave estable, para la lista del tablero. */
   clave: string
   usuario_id: number
-  tipo: 'documento' | 'formacion' | 'contrato' | 'prueba' | 'vacaciones' | 'evaluacion'
+  /** 0 = toda la empresa (los pagos legales). */
+  tipo: 'documento' | 'formacion' | 'contrato' | 'prueba' | 'vacaciones' | 'evaluacion' | 'ingreso' | 'retiro' | 'pago_legal'
   titulo: string
   detalle: string
   /** Fecha que vence (o null si el aviso no tiene una, como las vacaciones). */
@@ -506,6 +580,49 @@ export function vencimientos(d: DatosVencimientos, hoy: string): Aviso[] {
         detalle: cerradas.length ? `La última fue el ${desde}.` : 'Todavía no tiene ninguna evaluación cerrada.',
         fecha: toca,
       })
+    }
+  }
+
+  // Ingreso y retiro: solo los recientes o futuros, y no a quien es contratista.
+  for (const e of d.empleados) {
+    if (e.tipo_contrato === 'prestacion') continue
+    const desde = masDias(hoy, -DIAS_PASOS)
+    if (estaActivo(e, hoy) && esFecha(e.fecha_ingreso) && e.fecha_ingreso >= desde) {
+      const faltan = pasosPendientes(PASOS_INGRESO, e.pasos_ingreso)
+      if (faltan.length) {
+        const sinArl = faltan.some((p) => p.id === 'arl')
+        agregar({
+          clave: `ingreso-${e.usuario_id}`,
+          usuario_id: e.usuario_id,
+          tipo: 'ingreso',
+          titulo: sinArl ? 'Ingreso: falta afiliar a la ARL' : `Ingreso: faltan ${faltan.length} ${faltan.length === 1 ? 'paso' : 'pasos'}`,
+          detalle: sinArl ? `La ARL se afilia a más tardar el día antes de empezar (${e.fecha_ingreso}).` : faltan.map((p) => p.etiqueta).join(', '),
+          fecha: sinArl ? masDias(e.fecha_ingreso, -1) : e.fecha_ingreso,
+        })
+      }
+    }
+    if (esFecha(e.fecha_retiro) && e.fecha_retiro >= desde) {
+      const faltan = pasosPendientes(PASOS_RETIRO, e.pasos_retiro)
+      if (faltan.length) {
+        agregar({
+          clave: `retiro-${e.usuario_id}`,
+          usuario_id: e.usuario_id,
+          tipo: 'retiro',
+          titulo: `Retiro: faltan ${faltan.length} ${faltan.length === 1 ? 'paso' : 'pasos'}`,
+          detalle: faltan.map((p) => p.etiqueta).join(', '),
+          fecha: e.fecha_retiro,
+        })
+      }
+    }
+  }
+
+  // Pagos legales: solo si hay alguien con contrato laboral activo.
+  if ([...activos.values()].some((e) => CONTRATOS_LABORALES.includes(e.tipo_contrato))) {
+    const anio = Number(hoy.slice(0, 4))
+    const hechos = new Set(d.ajustes.pagosHechos ?? [])
+    for (const p of [...pagosLegales(anio - 1), ...pagosLegales(anio), ...pagosLegales(anio + 1)]) {
+      if (hechos.has(p.clave) || diasEntre(hoy, p.fecha) < -DIAS_PAGO_VENCIDO) continue
+      agregar({ clave: `pago-${p.clave}`, usuario_id: 0, tipo: 'pago_legal', titulo: p.titulo, detalle: p.detalle, fecha: p.fecha })
     }
   }
 
