@@ -39,6 +39,7 @@
 - Middleware bloquea `/api/admin/talento` a no admin también en GET, y el endpoint lo vuelve a revisar.
 - Enlaces solo `http(s)` (se pintan como `<a href>`).
 - Una cuenta con ficha no se puede borrar: se desactiva.
+- Acceso al panel desde la ficha: a un empleado sin cuenta se le da acceso (usuario, contraseña y rol) y sigue siendo la misma persona: la ficha, documentos, novedades, formación y evaluaciones pasan a su `users.id` en una sola transacción (`darAcceso`). A quien ya tiene cuenta se le cambia el rol o se desactiva ahí mismo (`cambiarAcceso`), con las protecciones de Usuarios (no auto-degradarse, no quedarse sin admin). El nombre se edita en la ficha para todos (con cuenta actualiza `users.name`).
 - Un empleado sin cuenta solo se borra si no tiene historial (documentos, novedades, formación ni evaluaciones); si tiene, se le pone fecha de retiro.
 - Ni el correo ni el asistente reciben salario, documento, contactos, seguridad social ni motivos de incapacidades.
 
@@ -47,5 +48,4 @@
 - Activar correo: `RESEND_API_KEY`, `NOTIFY_FROM` (dominio verificado), `TALENTO_EMAIL` y `CRON_SECRET` en Vercel.
 - Validar con Ekosolv si trabajan sábados y cada cuánto evalúan, y cargar sus cargos reales con criterios.
 - Cargar el ajuste de vacaciones ya disfrutadas de cada persona antigua para que el saldo arranque bien.
-- Si un empleado sin cuenta llega a necesitar entrar al panel, hoy no se puede convertir: habría que agregar "vincular a una cuenta" (mover sus registros del id negativo al de `users`).
 - Posibles fases siguientes: que el asistente proponga novedades con aprobación, exportar a Excel, registro de quién consulta salarios.
